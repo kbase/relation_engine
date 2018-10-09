@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  # For running the Flask server
+  web:
+    build: .
+    env_file: .env
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
