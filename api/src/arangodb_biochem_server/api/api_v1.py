@@ -12,18 +12,10 @@ def create_view():
     return flask.jsonify({'test': True})
 
 
+@swag_from('query_view.yaml')
 @api_v1.route('/views', methods=['GET'])
 def query_view():
-    """
-    Run a saved query (a "view") using custom arguments.
-    ---
-    tags: ["views"]
-    parameters: []
-    responses:
-        200:
-            description: TODO
-            schema: {type: object}
-    """
+    """See ./query_view.yaml for documentation."""
     return flask.jsonify([])
 
 
@@ -43,29 +35,12 @@ def fetch_schemas():
 
 @api_v1.route('/documents', methods=['PUT'])
 def save_documents():
-    """
-    Create, update, or replace one or more documents in the database.
-    ---
-    tags: ["documents"]
-    parameters: []
-    responses:
-        200:
-            description: TODO
-            schema: {type: object}
-    """
+    """See ./save_documents.yaml for documentation."""
     return flask.jsonify({})
 
 
+@swag_from('delete_documents.yaml')
 @api_v1.route('/documents', methods=['DELETE'])
 def delete_documents():
-    """
-    Remove one or more documents from the database.
-    ---
-    tags: ["documents"]
-    parameters: []
-    responses:
-        200:
-            description: TODO
-            schema: {type: object}
-    """
+    """See ./delete_documents.yaml for documentation."""
     return flask.jsonify({})

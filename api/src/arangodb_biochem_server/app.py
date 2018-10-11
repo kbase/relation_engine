@@ -16,7 +16,7 @@ app.url_map.strict_slashes = False  # allow both `get /v1/` and `get /v1`
 app.register_blueprint(api_v1, url_prefix='/v1')
 
 swagger_template = {
-    'swagger': '2.0',
+    'swagger': '3.0',
     'info': {
         'title': 'Relation Engine API',
         'description': 'API for working with the KBase Relation Engine graph database.',
@@ -42,15 +42,14 @@ def root():
     tags: ["root"]
     parameters: []
     responses:
-        200:
-            description: "An object of API version links in the form {version_name: version_path}"
-            schema: {type: object}
-        schema:
-            type: object
-            properties:
-                versions: {type: array, items: {type: string}}
-                server_time: {type: integer}
-                current_commit_hash: {type: string}
+      200:
+        description: "An object of API version links in the form {version_name: version_path}"
+      schema:
+        type: object
+        properties:
+          versions: {type: array, items: {type: string}}
+          server_time: {type: integer}
+          current_commit_hash: {type: string}
     """
     return flask.jsonify({
         'versions': ['/v1'],

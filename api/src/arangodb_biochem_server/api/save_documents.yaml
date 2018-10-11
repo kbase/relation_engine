@@ -1,0 +1,8 @@
+Create, update, or replace one or more documents in the database.
+---
+tags: ["documents"]
+parameters: []
+responses:
+  200:
+    description: TODO
+    schema: {type: object}
