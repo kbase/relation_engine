@@ -1,0 +1,8 @@
+Create a new saved query (a "view"), which can be used by other API users.
+---
+tags: ["views"]
+parameters: []
+responses:
+  200:
+    description: TODO
+    schema: {type: object}

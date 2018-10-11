@@ -1,0 +1,15 @@
+Fetch a list of saved schemas with optional filters.
+---
+tags: [schemas]
+parameters:
+- name: "collection_names"
+  in: query
+  required: false
+  description: "A comma-separated string listing collection names to filter for accessible schemas"
+  schema:
+    type: string
+    example: "genomes,genes,reactions"
+responses:
+  200:
+    description: "An object of endpoints in the form {endpoint_name: endpoint_path}"
+    schema: {type: object}

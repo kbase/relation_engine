@@ -1,0 +1,28 @@
+Create/update/replace one or more schemas, which define document validation rules for a collection.
+---
+tags: ["schemas"]
+parameters:
+  - name: action
+    in: body
+    required: true
+    description: 'One of "create", "update", "replace", "create_or_update", or "create_or_replace"'
+    schema:
+      type: string
+      example: create_or_update
+  - name: schemas
+    in: body
+    required: true
+    description: "The JSON schemas to create -- an array of objects with properties for
+      'collection' (collection name) and 'schema' (JSON schema data)."
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          collection: {type: string, example: genomes}
+          schema:
+            type: object
+            example: {name: string, accession_id: string, feature_count: integer}
+responses:
+  200:
+    description: Save operation was successful
