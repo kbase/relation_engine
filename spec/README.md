@@ -1,6 +1,6 @@
 # Relation Engine Spec
 
-This repo holds the views and schemas for the relation engine graph database service.
+This repo holds the [views](src/views), [schemas](src/schemas), and [migrations](src/migrations) for the relation engine graph database service.
 
 The views are stored ([AQL queries](https://docs.arangodb.com/3.3/AQL/index.html)) that can be used
 by KBase SDK apps to fetch data from the database.
@@ -18,7 +18,10 @@ Versioning on collections:
   schema is saved, and the version in the database is incremented.
 - If there are multiple schemas/migrations that are newer for a collection, then each migration
   will get run in order until they have all been applied.
+- Migrations can get rolled back (each migration has an `up` and `down` function).
 
 Questions:
 - How do developers write and test new views and migrations and run them against test data?
   - Provide a small docker image with a subset of data from prod
+- Python test modules for views and migrations?
+
