@@ -2,8 +2,8 @@
 
 This repo holds the [views](src/views), [schemas](src/schemas), and [migrations](src/migrations) for the relation engine graph database service.
 
-The views are stored ([AQL queries](https://docs.arangodb.com/3.3/AQL/index.html)) that can be used
-by KBase SDK apps to fetch data from the database.
+The views are stored [AQL queries](https://docs.arangodb.com/3.3/AQL/index.html) that can be used
+by KBase apps to fetch data from the database.
 
 Schemas are [JSON schemas](https://json-schema.org/) that define what form of data can be stored in
 the database's collections.
@@ -20,8 +20,10 @@ Versioning on collections:
   will get run in order until they have all been applied.
 - Migrations can get rolled back (each migration has an `up` and `down` function).
 
-Questions:
+Views and migrations both have python tests located in [`./src/test`](src/test)
+
+
+_Questions_
+
 - How do developers write and test new views and migrations and run them against test data?
   - Provide a small docker image with a subset of data from prod
-- Python test modules for views and migrations?
-
