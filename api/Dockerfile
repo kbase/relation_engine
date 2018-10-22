@@ -15,4 +15,4 @@ RUN apk --update add --virtual build-dependencies python-dev build-base && \
 # Run the app
 COPY . /app
 
-CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "1800", "--workers", "17", "-b", ":5000", "--reload", "src.arangodb_biochem_server.app:app"]
+CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "1800", "--workers", "17", "-b", ":5000", "--reload", "src.relation_engine_api.app:app"]
