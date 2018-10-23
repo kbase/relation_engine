@@ -1,0 +1,14 @@
+Execute a saved query (a "view") using custom arguments and return the results as JSON.
+---
+tags: ["views"]
+parameters:
+- name: name
+  in: query
+  required: true
+  description: Name of the view to run.
+  schema:
+    type: string
+    example: "view_name"
+responses:
+  200:
+    description: Result data.

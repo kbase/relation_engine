@@ -1,8 +1,38 @@
-Create, update, or replace one or more documents in the database.
+Create, update, or replace documents in the database.
+
+Pass in an array of objects that describe documents to be created, updated, and/or replaced in the
+database. View the "Model" below for further details on the structure of the parameters.
+
+"onDuplicate" controls what happens when we encounter documents with the same "_key" attributes.
+Valid options are "error", "update", "replace", or "ignore". The default is "error". 
+
+If any update fails, then no changes are made to the database.
 ---
 tags: ["documents"]
-parameters: []
+parameters:
+- name: body
+  in: body
+  required: true
+  schema:
+    type: array
+    items:
+      type: object
+      required: [collection, doc]
+      properties:
+        collection: {type: string, example: "genes"}
+        onDuplicate:
+          type: string
+          default: "error"
+          enum: ["error", "update", "replace", "ignore"]
+        doc:
+          type: object
+          required: ["_key"]
+          example: {
+            "_key": "DAES_RS11325",
+            "location_start": 1111,
+            "location_end": 9999
+          }
+          properties:
+            _key: {type: string}
 responses:
-  200:
-    description: TODO
-    schema: {type: object}
+  200: {description: "Success status."}

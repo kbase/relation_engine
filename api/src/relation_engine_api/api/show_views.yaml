@@ -1,0 +1,14 @@
+List out all the available views, optionally showing the parameters and AQL source query.
+---
+tags: ["views"]
+parameters:
+- name: names
+  in: query
+  required: true
+  description: Array of view names to fetch (if blank, then all views are fetched)
+  schema:
+    type: array
+    items: {type: string}
+responses:
+  200:
+    description: "Array of views."

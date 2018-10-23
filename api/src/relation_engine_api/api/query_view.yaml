@@ -1,8 +1,0 @@
-Run a saved query (a "view") using custom arguments.
----
-tags: ["views"]
-parameters: []
-responses:
-  200:
-    description: TODO
-    schema: {type: object}
