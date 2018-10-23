@@ -1,1 +1,7 @@
-// TODO
+// Return count of documents in a collection
+// Args:
+//   collection - name of collection to count docs
+
+for v in @collection:
+  collect with count into length
+  return length
