@@ -1,0 +1,3 @@
+include README.md
+include relation_engine_spec/views/*.aql
+include relation_engine_spec/schemas/*.json

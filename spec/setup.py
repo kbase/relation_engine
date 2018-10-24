@@ -7,7 +7,6 @@ setup(
     author_email='jrbolton@lbl.gov',
     packages=find_packages(),
     include_package_data=True,
-    package_data={'': ['*.aql', '*.json']},
     license='MIT',
     description='Specifications for the KBase Relation Engine API.',
     url='https://kbase.us',
