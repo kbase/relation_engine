@@ -27,3 +27,14 @@ _Questions_
 
 - How do developers write and test new views and migrations and run them against test data?
   - Provide a small docker image with a subset of data from prod
+
+
+# Publish the package
+
+The package can be published to anaconda, where it can then be installed via pip or conda.
+
+```sh
+$ python setup.py sdist
+$ anaconda upload -i -u kbase dist/*.tar.gz
+```
+

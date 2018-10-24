@@ -12,5 +12,8 @@ setup(
     license='MIT',
     description='Specifications for the KBase Relation Engine API.',
     url='https://kbase.us',
-    python_requires='>=3'
+    python_requires='>=3',
+    install_requires=[
+        'jsonschema'
+    ]
 )
