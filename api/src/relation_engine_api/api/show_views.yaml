@@ -2,13 +2,10 @@ List out all the available views, optionally showing the parameters and AQL sour
 ---
 tags: ["views"]
 parameters:
-- name: names
+- name: show_source
   in: query
-  required: true
-  description: Array of view names to fetch (if blank, then all views are fetched)
-  schema:
-    type: array
-    items: {type: string}
+  description: Whether to show the AQL source code for each view.
+  schema: {type: boolean}
 responses:
   200:
     description: "Array of views."

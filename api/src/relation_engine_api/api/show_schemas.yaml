@@ -2,14 +2,11 @@ Fetch a list of saved schemas with optional filters.
 ---
 tags: ["schemas"]
 parameters:
-- name: collection_names
+- name: show_source
   in: query
   required: false
-  description: An array listing collection names to filter for accessible schemas
-  schema:
-    type: array
-    items: {type: string}
-    example: [genomes, genes, reactions]
+  description: Whether to show the JSON of each schema.
+  schema: {type: boolean}
 responses:
   200:
     description: "View data."

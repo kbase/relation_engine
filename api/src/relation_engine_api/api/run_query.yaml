@@ -1,14 +1,20 @@
-Execute a saved query (a "view") using custom arguments and return the results as JSON.
+Execute a view as a query against the database.
 ---
 tags: ["views"]
 parameters:
-- name: name
-  in: query
+- name: view_name
+  in: path
   required: true
-  description: Name of the view to run.
-  schema:
-    type: string
-    example: "view_name"
+  description: Name of the view for running the query.
+  schema: {type: string}
+requestBody:
+  description: Arguments for the query.
+  content:
+    application/json:
+      required: true
+      schema: 
+        type: object
+        required: true
 responses:
   200:
     description: Result data.
