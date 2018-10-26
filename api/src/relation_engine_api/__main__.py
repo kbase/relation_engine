@@ -13,8 +13,7 @@ swagger_template = {
         'description': 'API for working with the KBase Relation Engine graph database.',
         'contact': {
             'responsibleOrganization': 'DOE KBase',
-            'responsibleDeveloper': 'Jay R Bolton <jrbolton@lbl.gov>',
-            'email': 'scanon@lbl.gov',
+            'email': 'info@kbase.us',
             'url': 'https://kbase.us'
         },
         'version': '1'

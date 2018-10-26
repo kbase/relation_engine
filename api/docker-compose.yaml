@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/app
     environment:
+      - PYTHONUNBUFFERED=true
       - DB_URL=http://arangodb:8529
 
   # For running (and testing against) ArangoDB
