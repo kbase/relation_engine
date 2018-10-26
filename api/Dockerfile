@@ -1,9 +1,6 @@
 FROM python:3.7-alpine
 
-# Are we in development or testing mode?
 ARG DEVELOPMENT
-# How many workers to use in running the server
-ARG WORKERS=17
 
 COPY requirements.txt /app/requirements.txt
 COPY dev-requirements.txt /app/dev-requirements.txt
@@ -22,4 +19,4 @@ RUN apk --update add --virtual build-dependencies python-dev build-base && \
 # Run the app
 COPY . /app
 
-CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "1800", "--workers", $WORKERS, "-b", ":5000", "--reload", "src.relation_engine_api.__main__:app"]
+CMD ["sh", "start_server.sh"]

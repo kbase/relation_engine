@@ -1,11 +1,7 @@
 .PHONY: dev-server dev-build test test-local
 
 dev-server:
-	DEVELOPMENT=1 docker-compose up
-
-dev-build:
-	docker-compose down
-	docker-compose build --build-arg DEVELOPMENT=1 --no-cache web
+	docker-compose up
 
 test:
 	docker-compose run web make test-local

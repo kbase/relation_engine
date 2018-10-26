@@ -1,10 +1,15 @@
 version: '3'
 
+# This docker-compose is for developer convenience, not for running in production.
+
 services:
 
   # For running the Flask server
   web:
-    build: .
+    build:
+      context: .
+      args:
+        DEVELOPMENT: 1
     env_file: .env
     ports:
       - "5000:5000"
@@ -13,6 +18,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=true
       - DB_URL=http://arangodb:8529
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
 
   # For running (and testing against) ArangoDB
   arangodb:
