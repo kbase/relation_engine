@@ -5,4 +5,4 @@
 calc_workers="$(($(nproc) * 2 + 1))"
 workers=${WORKERS:-$calc_workers}
 
-gunicorn --worker-class gevent --timeout 1800 --workers $workers -b :5000 --reload src.relation_engine_api.__main__:app
+gunicorn --worker-class gevent --timeout 1800 --workers $workers -b :5000 --reload src.relation_engine_server.__main__:app

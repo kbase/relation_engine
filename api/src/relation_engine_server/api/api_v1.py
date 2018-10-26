@@ -5,7 +5,7 @@ from flasgger import swag_from
 import relation_engine_spec.views
 import relation_engine_spec.schemas
 
-from src.relation_engine_api.arango_utils.arango_requests import (
+from src.relation_engine_server.arango_utils.arango_requests import (
     arango_post_request,
     arango_server_status,
     ArangoServerError
