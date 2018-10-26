@@ -15,4 +15,6 @@ class TestApiV1(unittest.TestCase):
         """Test root path for api."""
         resp = requests.get(url)
         json = resp.json()
-        self.assertTrue(json['test'])
+        self.assertEqual(json['arangodb_status'], 'Connected and authorized.')
+        self.assertTrue(json['server_time'])
+        self.assertTrue(json['current_commit_hash'])
