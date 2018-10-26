@@ -1,4 +1,4 @@
-# Biochem Server with ArangoDB
+# Relation Engine API
 
 A simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
 
