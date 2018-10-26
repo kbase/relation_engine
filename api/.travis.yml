@@ -1,0 +1,10 @@
+sudo: required
+services:
+- docker
+language: python
+python:
+- '3.7'
+script:
+- cp .env.development.example .env
+- docker-compose up -d
+- make test
