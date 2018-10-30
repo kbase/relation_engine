@@ -14,24 +14,24 @@ def arango_server_status():
     try:
         resp = requests.get(db_url + '/_api/endpoint', auth=(db_user, db_pass))
     except requests.exceptions.ConnectionError:
-        return 'Failed to establish a connection to %s.' % db_url
-    if resp.status_code == 200:
-        return 'Connected and authorized.'
+        return 'no_connection'
+    if resp.ok:
+        return 'connected_authorized'
     elif resp.status_code == 401:
-        return 'Unauthorized; username or password is invalid.'
+        return 'unauthorized'
     else:
-        return 'Failed to connect: %s' % resp.text
+        return 'unknown_failure'
 
 
-def arango_post_request(path, data, query={}, method='post'):
+def bulk_import(data, query):
     """Make a generic arango post request."""
     resp = requests.post(
-        db_url + path,
+        db_url + '/_api/import',
         data=data,
         auth=(db_user, db_pass),
         params=query
     )
-    if resp.status_code != 200:
+    if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
 
