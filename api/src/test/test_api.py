@@ -86,28 +86,66 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['source_json'], '\n')
 
     def test_save_documents(self):
+        """Test all valid cases for saving documents."""
+        example_data = '\n'.join([
+            '{"name": "x", "_key": "1"}',
+            '{"name": "y", "_key": "2"}',
+            '{"name": "z", "_key": "3"}'
+        ])
+        headers = {'Authorization': 'Bearer ' + auth_token}
         # Create
         resp = requests.put(
             url + '/api/documents',
-            params={
-                'overwrite': True,
-                'collection': 'taxon'
-            },
-            data='\n'.join([
-                '{"name": "x", "_key": "1"}',
-                '{"name": "y", "_key": "2"}',
-                '{"name": "z", "_key": "3"}'
-            ]),
-            headers={'Authorization': 'Bearer ' + auth_token}
+            params={'overwrite': True, 'collection': 'taxon'},
+            data=example_data,
+            headers=headers
         ).json()
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
-        # TODO Update
-        # TODO Replace
-        # TODO error on duplicate
-        # TODO ignore duplicates
+        # update on duplicate
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'update', 'collection': 'taxon'},
+            data=example_data,
+            headers=headers
+        ).json()
+        expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
+        self.assertEqual(resp, expected)
+        # replace on duplicate
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'replace', 'collection': 'taxon'},
+            data=example_data,
+            headers=headers
+        ).json()
+        expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
+        self.assertEqual(resp, expected)
+        # error on duplicate
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'error', 'collection': 'taxon'},
+            data=example_data,
+            headers=headers
+        ).json()
+        expected = {'created': 0, 'errors': 3, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
+        self.assertEqual(resp, expected)
+        # ignore duplicates
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'ignore', 'collection': 'taxon'},
+            data=example_data,
+            headers=headers
+        ).json()
+        expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
+        self.assertEqual(resp, expected)
 
     def test_query(self):
+        resp = requests.post(
+            url + '/api/query',
+            params={'view': 'example'},
+            headers={'Authorization': 'Bearer ' + auth_token}
+        ).json()
+        print('!', resp)
         pass
         # TODO valid query
         # TODO missing query name

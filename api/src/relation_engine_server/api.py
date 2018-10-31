@@ -37,7 +37,9 @@ def show_views():
 def run_query_cursor():
     """
     Continue fetching query results from a cursor id
+    Auth: only kbase users (any role)
     """
+    require_auth_token(roles=[])
     cursor_id = flask.request.args['id']
     resp = run_query(cursor_id=cursor_id)
     return flask.jsonify(resp)
@@ -49,7 +51,7 @@ def run_query():
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
     """
-    require_auth_token([])
+    require_auth_token(roles=[])
     view_name = flask.request.args['view']
     view_source = relation_engine_spec.views.get_view_content(view_name)
     bind_vars = flask.request.json
