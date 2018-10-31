@@ -24,16 +24,22 @@ def arango_server_status():
         return 'unknown_failure'
 
 
-def run_query(query_text, bind_vars):
+def run_query(query_text=None, cursor_id=None, bind_vars={}):
+    """Run a query using the arango HTTP api. Can return a cursor to get more results."""
+    url = db_url + '/_api/cursor'
     req_json = {
-        'query': query_text,
         'batchSize': 100,
         'memoryLimit': 16000000000,  # 16gb
         'count': True,
-        'bindVars': bind_vars
     }
+    if cursor_id:
+        url += '/' + cursor_id
+    else:
+        req_json['bindVars'] = bind_vars
+        req_json['query'] = query_text
+
     resp = requests.post(
-        db_url + '/_api/cursor',
+        url,
         data=json.dumps(req_json),
         auth=(db_user, db_pass)
     )

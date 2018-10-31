@@ -22,7 +22,6 @@ api = flask.Blueprint('api', __name__)
 def show_views():
     """
     Fetch view names and content.
-    See ./show_views.yaml for documentation.
     Auth: public
     """
     view_names = relation_engine_spec.views.get_view_names()
@@ -34,18 +33,28 @@ def show_views():
     return flask.jsonify(resp)
 
 
-@api.route('/views/<view_name>/query', methods=['POST'])
-def run_query(view_name):
+@api.route('/query_cursor', methods=['GET'])
+def run_query_cursor():
+    """
+    Continue fetching query results from a cursor id
+    """
+    cursor_id = flask.request.args['id']
+    resp = run_query(cursor_id=cursor_id)
+    return flask.jsonify(resp)
+
+
+@api.route('query', methods=['POST'])
+def run_query():
     """
     Run a stored view as a query against the database.
-    See ./run_query.yaml for documentation.
     Auth: only kbase users (any role)
     """
     require_auth_token([])
+    view_name = flask.request.args['view']
     view_source = relation_engine_spec.views.get_view_content(view_name)
     bind_vars = flask.request.json
     # Make a request to the Arango server to run the query
-    resp = run_query(view_source, bind_vars)
+    resp = run_query(query=view_source, bind_vars=bind_vars)
     return flask.jsonify(resp)
 
 
