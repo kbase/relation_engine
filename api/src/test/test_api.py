@@ -74,6 +74,17 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertTrue('Schema does not exist' in resp['error'])
 
+    def test_save_documents_invalid_json(self):
+        resp = requests.put(
+            url + '/api/documents',
+            params={'collection': 'taxon'},
+            data='\n',
+            headers={'Authorization': 'Bearer ' + auth_token}
+        ).json()
+        self.assertTrue('Unable to parse' in resp['error'])
+        self.assertEqual(resp['pos'], 1)
+        self.assertEqual(resp['source_json'], '\n')
+
     def test_save_documents(self):
         # Create
         resp = requests.put(
@@ -95,8 +106,6 @@ class TestApi(unittest.TestCase):
         # TODO Replace
         # TODO error on duplicate
         # TODO ignore duplicates
-        # TODO empty lines
-        # TODO invalid collection
 
     def test_query(self):
         pass

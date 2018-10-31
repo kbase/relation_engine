@@ -82,13 +82,28 @@ def save_documents():
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
         query['overwrite'] = 'true'
-    with tempfile.TemporaryFile(mode='w', encoding='utf-8') as temp_fd:
+    temp_fd = tempfile.NamedTemporaryFile()
+    with open(temp_fd.name, 'a') as fd:
         for line in flask.request.stream:
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
-            json.dump(json_line, temp_fd)
-        resp_text = bulk_import(temp_fd, query)
+            fd.write(json.dumps(json_line) + '\n')
+    resp_text = bulk_import(temp_fd.name, query)
+    temp_fd.close()  # Also deletes the file
     return resp_text
+
+
+@api.errorhandler(json.decoder.JSONDecodeError)
+def json_decode_error(err):
+    """A problem parsing json."""
+    resp = {
+        'error': 'Unable to parse JSON',
+        'source_json': err.doc,
+        'pos': err.pos,
+        'lineno': err.lineno,
+        'colno': err.colno
+    }
+    return (flask.jsonify(resp), 400)
 
 
 @api.errorhandler(ArangoServerError)

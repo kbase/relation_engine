@@ -42,14 +42,15 @@ def run_query(query_text, bind_vars):
     return resp.text
 
 
-def bulk_import(file_desc, query):
+def bulk_import(file_path, query):
     """Make a generic arango post request."""
-    resp = requests.post(
-        db_url + '/_api/import',
-        data=file_desc,
-        auth=(db_user, db_pass),
-        params=query
-    )
+    with open(file_path, 'rb') as file_desc:
+        resp = requests.post(
+            db_url + '/_api/import',
+            data=file_desc,
+            auth=(db_user, db_pass),
+            params=query
+        )
     if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
