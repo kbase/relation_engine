@@ -2,6 +2,6 @@
 // Args:
 //   collection - name of collection to count docs
 
-for v in @collection
+for v in @@collection
   collect with count into length
   return length
