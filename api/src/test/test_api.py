@@ -51,6 +51,7 @@ class TestApi(unittest.TestCase):
         self.assertTrue('Unauthorized' in resp['error'])
 
     def test_save_documents_no_keys(self):
+        """Test the case where some documents fail against their schema."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'ignore', 'collection': 'taxon'},
@@ -62,6 +63,16 @@ class TestApi(unittest.TestCase):
         self.assertTrue(resp['schema'])
         self.assertEqual(resp['validator'], 'required')
         self.assertEqual(resp['validator_value'], ['_key', 'name'])
+
+    def test_save_documents_missing_schema(self):
+        """Test the case where the collection/schema does not exist."""
+        resp = requests.put(
+            url + '/api/documents',
+            params={'collection': 'xyzabc'},
+            data='',
+            headers={'Authorization': 'Bearer ' + auth_token}
+        ).json()
+        self.assertTrue('Schema does not exist' in resp['error'])
 
     def test_save_documents(self):
         # Create
@@ -86,7 +97,6 @@ class TestApi(unittest.TestCase):
         # TODO ignore duplicates
         # TODO empty lines
         # TODO invalid collection
-        # TODO invalid schema
 
     def test_query(self):
         pass

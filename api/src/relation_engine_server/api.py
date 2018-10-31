@@ -109,3 +109,14 @@ def validation_error(err):
         'schema': err.schema
     }
     return (flask.jsonify(resp), 400)
+
+
+@api.errorhandler(relation_engine_spec.schemas.SchemaNonexistent)
+def schema_nonexistent(err):
+    """A schema/collection was requested but does not exist."""
+    resp = {
+        'error': str(err)
+        # 'available_schemas': err.available_schemas
+        # 'nonexistent_schema': err.schema_name
+    }
+    return (flask.jsonify(resp), 400)
