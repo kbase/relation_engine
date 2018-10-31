@@ -2,6 +2,7 @@
 Make ajax requests to the ArangoDB server.
 """
 import requests
+import json
 import os
 
 db_url = os.environ.get('DB_URL', 'http://localhost:8529')
@@ -23,11 +24,29 @@ def arango_server_status():
         return 'unknown_failure'
 
 
-def bulk_import(data, query):
+def run_query(query_text, bind_vars):
+    req_json = {
+        'query': query_text,
+        'batchSize': 100,
+        'memoryLimit': 16000000000,  # 16gb
+        'count': True,
+        'bindVars': bind_vars
+    }
+    resp = requests.post(
+        db_url + '/_api/cursor',
+        data=json.dumps(req_json),
+        auth=(db_user, db_pass)
+    )
+    if not resp.ok:
+        raise ArangoServerError(resp.text)
+    return resp.text
+
+
+def bulk_import(file_desc, query):
     """Make a generic arango post request."""
     resp = requests.post(
         db_url + '/_api/import',
-        data=data,
+        data=file_desc,
         auth=(db_user, db_pass),
         params=query
     )

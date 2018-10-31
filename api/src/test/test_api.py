@@ -16,7 +16,7 @@ class TestApi(unittest.TestCase):
     def test_root(self):
         """Test root path for api."""
         resp = requests.get(url).json()
-        self.assertEqual(resp['arangodb_status'], 'Connected and authorized.')
+        self.assertEqual(resp['arangodb_status'], 'connected_authorized')
         self.assertEqual(resp['docs'], '/docs')
         self.assertTrue(resp['commit_hash'])
         self.assertTrue(resp['repo_url'])
@@ -40,20 +40,32 @@ class TestApi(unittest.TestCase):
         self.assertFalse(resp.get('content'))
 
     def test_save_documents_no_auth(self):
+        # Missing bearer
         resp = requests.put(url + '/api/documents?on_duplicate=error&overwrite=true&collection').json()
         self.assertTrue('Missing header' in resp['error'])
+        # Invalid bearer
         resp = requests.put(
             url + '/api/documents?on_duplicate=error&overwrite=true&collection',
             headers={'Authorization': 'Bearer xyz'}
         ).json()
         self.assertTrue('Unauthorized' in resp['error'])
 
-    def test_save_documents_with_create(self):
+    def test_save_documents_no_keys(self):
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'ignore', 'collection': 'taxon'},
+            data='{"name": "x"}\n{"name": "y"}',
+            headers={'Authorization': 'Bearer ' + auth_token}
+        )
+        print('resp!', resp.text)
+
+    def test_save_documents(self):
+        # Create
         resp = requests.put(
             url + '/api/documents',
             params={
                 'overwrite': True,
-                'collection': 'genes'
+                'collection': 'taxon'
             },
             data='\n'.join([
                 '{"name": "x", "_key": "1"}',
@@ -64,3 +76,17 @@ class TestApi(unittest.TestCase):
         ).json()
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
+        # TODO Update
+        # TODO Replace
+        # TODO error on duplicate
+        # TODO ignore duplicates
+        # TODO empty lines
+        # TODO invalid collection
+        # TODO invalid schema
+
+    def test_query(self):
+        pass
+        # TODO valid query
+        # TODO missing query name
+        # TODO missing bind variables
+        # TODO bind variable is invalid

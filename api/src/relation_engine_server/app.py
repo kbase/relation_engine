@@ -67,7 +67,7 @@ def server_error(err):
     print('-' * 80)
     traceback.print_exc()
     print('=' * 80)
-    return (flask.jsonify({'error': 'Unexpected server error'}), 500)
+    return (flask.jsonify({'error': 'Unexpected server error', 'message': str(err)}), 500)
 
 
 @app.after_request
