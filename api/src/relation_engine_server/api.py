@@ -8,8 +8,9 @@ from jsonschema.exceptions import ValidationError
 import relation_engine_spec.views
 import relation_engine_spec.schemas
 
-from src.relation_engine_server.arango_utils.arango_requests import (
+from .arango_utils.arango_requests import (
     bulk_import,
+    run_query,
     ArangoServerError
 )
 
@@ -46,7 +47,7 @@ def run_query_cursor():
 
 
 @api.route('query', methods=['POST'])
-def run_query():
+def run_query_from_view():
     """
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
@@ -56,7 +57,7 @@ def run_query():
     view_source = relation_engine_spec.views.get_view_content(view_name)
     bind_vars = flask.request.json
     # Make a request to the Arango server to run the query
-    resp = run_query(query=view_source, bind_vars=bind_vars)
+    resp = run_query(query_text=view_source, bind_vars=bind_vars)
     return flask.jsonify(resp)
 
 
