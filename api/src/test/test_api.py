@@ -56,8 +56,12 @@ class TestApi(unittest.TestCase):
             params={'on_duplicate': 'ignore', 'collection': 'taxon'},
             data='{"name": "x"}\n{"name": "y"}',
             headers={'Authorization': 'Bearer ' + auth_token}
-        )
-        print('resp!', resp.text)
+        ).json()
+        self.assertEqual(resp['error'], "'_key' is a required property")
+        self.assertEqual(resp['instance'], {'name': 'x'})
+        self.assertTrue(resp['schema'])
+        self.assertEqual(resp['validator'], 'required')
+        self.assertEqual(resp['validator_value'], ['_key', 'name'])
 
     def test_save_documents(self):
         # Create

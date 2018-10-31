@@ -3,6 +3,7 @@ import flask
 import json
 import tempfile
 import jsonschema
+from jsonschema.exceptions import ValidationError
 
 import relation_engine_spec.views
 import relation_engine_spec.schemas
@@ -95,3 +96,16 @@ def save_documents():
 def view_does_not_exist(err):
     """General error cases."""
     return (flask.jsonify({'error': str(err)}), 400)
+
+
+@api.errorhandler(ValidationError)
+def validation_error(err):
+    """Json Schema validation error."""
+    resp = {
+        'error': str(err).split('\n')[0],
+        'instance': err.instance,
+        'validator': err.validator,
+        'validator_value': err.validator_value,
+        'schema': err.schema
+    }
+    return (flask.jsonify(resp), 400)
