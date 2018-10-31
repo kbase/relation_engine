@@ -5,14 +5,9 @@ import tempfile
 import jsonschema
 from jsonschema.exceptions import ValidationError
 
-from .arango_utils.arango_requests import (
-    bulk_import,
-    run_query,
-    ArangoServerError
-)
-
 from .auth import require_auth_token
 from . import spec_loader
+from . import arango_client
 
 api = flask.Blueprint('api', __name__)
 
@@ -38,7 +33,7 @@ def run_query_cursor():
     """
     require_auth_token(roles=[])
     cursor_id = flask.request.args['id']
-    resp = run_query(cursor_id=cursor_id)
+    resp = arango_client.run_query(cursor_id=cursor_id)
     return flask.jsonify(resp)
 
 
@@ -51,9 +46,9 @@ def run_query_from_view():
     require_auth_token(roles=[])
     view_name = flask.request.args['view']
     view_source = spec_loader.get_view_content([view_name])[view_name]
-    bind_vars = flask.request.json
+    bind_vars = flask.request.json or {}
     # Make a request to the Arango server to run the query
-    resp = run_query(query_text=view_source, bind_vars=bind_vars)
+    resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
     return flask.jsonify(resp)
 
 
@@ -92,7 +87,7 @@ def save_documents():
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
             fd.write(json.dumps(json_line) + '\n')
-    resp_text = bulk_import(temp_fd.name, query)
+    resp_text = arango_client.bulk_import(temp_fd.name, query)
     temp_fd.close()  # Also deletes the file
     return resp_text
 
@@ -110,11 +105,25 @@ def json_decode_error(err):
     return (flask.jsonify(resp), 400)
 
 
-@api.errorhandler(ArangoServerError)
+@api.errorhandler(arango_client.ArangoServerError)
+def arango_server_error(err):
+    resp = {
+        'error': str(err),
+        'arango_message': err.resp_json['errorMessage']
+    }
+    return (flask.jsonify(resp), 400)
+
+
+@api.errorhandler(spec_loader.SchemaNonexistent)
 @api.errorhandler(spec_loader.ViewNonexistent)
 def view_does_not_exist(err):
     """General error cases."""
-    return (flask.jsonify({'error': str(err)}), 400)
+    resp = {
+        'error': str(err),
+        'name': err.name,
+        'available': err.available
+    }
+    return (flask.jsonify(resp), 400)
 
 
 @api.errorhandler(ValidationError)

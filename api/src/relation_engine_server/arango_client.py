@@ -10,7 +10,7 @@ db_user = os.environ.get('DB_USER', 'root')
 db_pass = os.environ.get('DB_PASS', 'password')
 
 
-def arango_server_status():
+def server_status():
     """Get the status of our connection and authorization to the ArangoDB server."""
     try:
         resp = requests.get(db_url + '/_api/endpoint', auth=(db_user, db_pass))
@@ -45,7 +45,16 @@ def run_query(query_text=None, cursor_id=None, bind_vars={}):
     )
     if not resp.ok:
         raise ArangoServerError(resp.text)
-    return resp.text
+    resp_json = resp.json()
+    if resp_json['error']:
+        raise ArangoServerError(resp.text)
+    return {
+        'results': resp_json['result'],
+        'count': resp_json['count'],
+        'has_more': resp_json['hasMore'],
+        'cursor_id': resp_json.get('id'),
+        'stats': resp_json['extra']['stats']
+    }
 
 
 def bulk_import(file_path, query):
@@ -67,11 +76,7 @@ class ArangoServerError(Exception):
 
     def __init__(self, resp_text):
         self.resp_text = resp_text
+        self.resp_json = json.loads(resp_text)
 
     def __str__(self):
-        return '\n'.join([
-            '-' * 80,
-            'ArangoDB server error',
-            self.resp_text,
-            '-' * 80
-        ])
+        return 'ArangoDB server error.'

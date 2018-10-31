@@ -25,7 +25,6 @@ def require_auth_token(roles=[]):
     # Make an authorization request to the kbase auth2 server
     headers = {'Authorization': token}
     url = kbase_auth_url + '/api/V2/me'
-    print(url)
     auth_resp = requests.get(url, headers=headers)
     if not auth_resp.ok:
         print('-' * 80)

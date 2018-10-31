@@ -4,11 +4,10 @@ import os
 from uuid import uuid4
 import traceback
 
-from .arango_utils.arango_requests import arango_server_status
-
 from .api import api
 from .docs import docs
 from .exceptions import MissingHeader, UnauthorizedAccess
+from . import arango_client
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -24,7 +23,7 @@ def root():
     """Server status and link to docs."""
     with open('.git/refs/heads/master', 'r') as fd:
         commit_hash = fd.read().strip()
-    arangodb_status = arango_server_status()
+    arangodb_status = arango_client.server_status()
     repo_url = 'https://github.com/kbase/relation_engine_api.git'
     return flask.jsonify({
         'arangodb_status': arangodb_status,

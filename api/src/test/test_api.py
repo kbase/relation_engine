@@ -5,6 +5,7 @@ We make actual ajax requests to the running docker container.
 """
 import unittest
 import requests
+import json
 import os
 
 url = 'http://web:5000'
@@ -139,16 +140,58 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('TODO')
     def test_query(self):
         resp = requests.post(
             url + '/api/query',
             params={'view': 'example'},
-            headers={'Authorization': 'Bearer ' + auth_token}
+            data=json.dumps({'@collection': 'taxon'}),
+            headers={
+                'Authorization': 'Bearer ' + auth_token,
+                'Content-Type': 'application/json'
+            }
         ).json()
-        print('!', resp)
-        pass
-        # TODO valid query
-        # TODO missing query name
-        # TODO missing bind variables
-        # TODO bind variable is invalid
+        self.assertEqual(resp['results'], [3])
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(resp['has_more'], False)
+        self.assertEqual(resp['cursor_id'], None)
+        self.assertTrue(resp['stats'])
+
+    def test_query_no_name(self):
+        resp = requests.post(
+            url + '/api/query',
+            params={'view': 'nonexistent'},
+            data=json.dumps({'@collection': 'taxon'}),
+            headers={
+                'Authorization': 'Bearer ' + auth_token,
+                'Content-Type': 'application/json'
+            }
+        ).json()
+        self.assertEqual(resp['error'], 'View does not exist.')
+        self.assertEqual(resp['name'], 'nonexistent')
+        self.assertTrue(len(resp['available']) > 0)
+
+    def test_query_missing_bind_var(self):
+        resp = requests.post(
+            url + '/api/query',
+            params={'view': 'example'},
+            data=json.dumps({'xyz': 'taxon'}),
+            headers={
+                'Authorization': 'Bearer ' + auth_token,
+                'Content-Type': 'application/json'
+            }
+        ).json()
+        self.assertEqual(resp['error'], 'ArangoDB server error.')
+        self.assertTrue(resp['arango_message'])
+
+    def test_query_incorrect_collection(self):
+        resp = requests.post(
+            url + '/api/query',
+            params={'view': 'example'},
+            data=json.dumps({'@collection': 123}),
+            headers={
+                'Authorization': 'Bearer ' + auth_token,
+                'Content-Type': 'application/json'
+            }
+        ).json()
+        self.assertEqual(resp['error'], 'ArangoDB server error.')
+        self.assertTrue(resp['arango_message'])
