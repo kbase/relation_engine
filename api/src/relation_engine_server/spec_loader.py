@@ -22,26 +22,30 @@ def get_view_names():
     return _get_file_names(view_path, '.aql')
 
 
-def get_view_content(name):
+def get_view_content(names):
     """Return the AQL source code for a view."""
+    views = {}
     view_names = get_view_names()
-    if name not in view_names:
-        raise ViewNonexistent(name, view_names)
-    view_path = os.path.join(_spec_path, 'views', name + '.aql')
-    print('name', name)
-    print('view_path', view_path)
-    with open(view_path, 'r') as fd:
-        return fd.read()
+    for name in names:
+        if name not in view_names:
+            raise ViewNonexistent(name, view_names)
+        view_path = os.path.join(_spec_path, 'views', name + '.aql')
+        with open(view_path, 'r') as fd:
+            views[name] = fd.read()
+    return views
 
 
-def get_schema_as_dict(name):
+def get_schema_dicts(names):
     """Return a particular JSON schema as a python dict."""
+    schemas = {}
     schema_names = get_schema_names()
-    if name not in schema_names:
-        raise SchemaNonexistent(name, schema_names)
-    schema_path = os.path.join(_spec_path, 'schemas', name + '.json')
-    with open(schema_path, 'r') as fd:
-        return json.loads(fd.read())
+    for name in names:
+        if name not in schema_names:
+            raise SchemaNonexistent(name, schema_names)
+        schema_path = os.path.join(_spec_path, 'schemas', name + '.json')
+        with open(schema_path, 'r') as fd:
+            schemas[name] = json.loads(fd.read())
+    return schemas
 
 
 def git_pull():

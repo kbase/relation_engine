@@ -26,9 +26,7 @@ def show_views():
     view_names = spec_loader.get_view_names()
     resp = {'names': view_names}
     if flask.request.args.get('show_source'):
-        resp['content'] = {}
-        for name in view_names:
-            resp['content'][name] = spec_loader.get_view_content(name)
+        resp['content'] = spec_loader.get_view_content(view_names)
     return flask.jsonify(resp)
 
 
@@ -52,7 +50,7 @@ def run_query_from_view():
     """
     require_auth_token(roles=[])
     view_name = flask.request.args['view']
-    view_source = spec_loader.get_view_content(view_name)
+    view_source = spec_loader.get_view_content([view_name])[view_name]
     bind_vars = flask.request.json
     # Make a request to the Arango server to run the query
     resp = run_query(query_text=view_source, bind_vars=bind_vars)
@@ -69,9 +67,7 @@ def show_schemas():
     schema_names = spec_loader.get_schema_names()
     resp = {'names': schema_names}
     if flask.request.args.get('show_source'):
-        resp['content'] = {}
-        for name in schema_names:
-            resp['content'][name] = spec_loader.get_schema_as_dict(name)
+        resp['content'] = spec_loader.get_schema_dicts(schema_names)
     return flask.jsonify(resp)
 
 
@@ -83,11 +79,9 @@ def save_documents():
     Auth: only sysadmins
     """
     require_auth_token(['RE_ADMIN'])
-    query = {
-        'collection': flask.request.args['collection'],
-        'type': 'documents'
-    }
-    schema = spec_loader.get_schema_as_dict(query['collection'])
+    coll = flask.request.args['collection']
+    query = {'collection': coll, 'type': 'documents'}
+    schema = spec_loader.get_schema_dicts([coll])[coll]
     if flask.request.args.get('on_duplicate'):
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
