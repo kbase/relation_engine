@@ -5,9 +5,6 @@ import tempfile
 import jsonschema
 from jsonschema.exceptions import ValidationError
 
-import relation_engine_spec.views
-import relation_engine_spec.schemas
-
 from .arango_utils.arango_requests import (
     bulk_import,
     run_query,
@@ -15,6 +12,7 @@ from .arango_utils.arango_requests import (
 )
 
 from .auth import require_auth_token
+from . import spec_loader
 
 api = flask.Blueprint('api', __name__)
 
@@ -25,12 +23,12 @@ def show_views():
     Fetch view names and content.
     Auth: public
     """
-    view_names = relation_engine_spec.views.get_view_names()
+    view_names = spec_loader.get_view_names()
     resp = {'names': view_names}
     if flask.request.args.get('show_source'):
         resp['content'] = {}
         for name in view_names:
-            resp['content'][name] = relation_engine_spec.views.get_view_content(name)
+            resp['content'][name] = spec_loader.get_view_content(name)
     return flask.jsonify(resp)
 
 
@@ -54,7 +52,7 @@ def run_query_from_view():
     """
     require_auth_token(roles=[])
     view_name = flask.request.args['view']
-    view_source = relation_engine_spec.views.get_view_content(view_name)
+    view_source = spec_loader.get_view_content(view_name)
     bind_vars = flask.request.json
     # Make a request to the Arango server to run the query
     resp = run_query(query_text=view_source, bind_vars=bind_vars)
@@ -68,12 +66,12 @@ def show_schemas():
     See ./show_schemas.yaml for documentation.
     Auth: public
     """
-    schema_names = relation_engine_spec.schemas.get_schema_names()
+    schema_names = spec_loader.get_schema_names()
     resp = {'names': schema_names}
     if flask.request.args.get('show_source'):
         resp['content'] = {}
         for name in schema_names:
-            resp['content'][name] = relation_engine_spec.schemas.get_schema_as_dict(name)
+            resp['content'][name] = spec_loader.get_schema_as_dict(name)
     return flask.jsonify(resp)
 
 
@@ -89,7 +87,7 @@ def save_documents():
         'collection': flask.request.args['collection'],
         'type': 'documents'
     }
-    schema = relation_engine_spec.schemas.get_schema_as_dict(query['collection'])
+    schema = spec_loader.get_schema_as_dict(query['collection'])
     if flask.request.args.get('on_duplicate'):
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
@@ -119,7 +117,7 @@ def json_decode_error(err):
 
 
 @api.errorhandler(ArangoServerError)
-@api.errorhandler(relation_engine_spec.views.ViewNonexistent)
+@api.errorhandler(spec_loader.ViewNonexistent)
 def view_does_not_exist(err):
     """General error cases."""
     return (flask.jsonify({'error': str(err)}), 400)
@@ -138,7 +136,7 @@ def validation_error(err):
     return (flask.jsonify(resp), 400)
 
 
-@api.errorhandler(relation_engine_spec.schemas.SchemaNonexistent)
+@api.errorhandler(spec_loader.SchemaNonexistent)
 def schema_nonexistent(err):
     """A schema/collection was requested but does not exist."""
     resp = {

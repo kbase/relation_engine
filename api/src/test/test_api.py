@@ -139,6 +139,7 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
         self.assertEqual(resp, expected)
 
+    @unittest.skip('TODO')
     def test_query(self):
         resp = requests.post(
             url + '/api/query',
