@@ -1,8 +1,5 @@
 .PHONY: dev-server dev-build test test-local
 
-dev-server:
-	docker-compose up
-
 test:
 	docker-compose run web make test-local
 

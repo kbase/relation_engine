@@ -25,7 +25,7 @@ def server_status():
 
 
 def run_query(query_text=None, cursor_id=None, bind_vars={}):
-    """Run a query using the arango HTTP api. Can return a cursor to get more results."""
+    """Run a query using the arangodb http api. Can return a cursor to get more results."""
     url = db_url + '/_api/cursor'
     req_json = {
         'batchSize': 100,
