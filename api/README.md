@@ -8,7 +8,7 @@ View the root path of the running server in your browser to get the Swagger API 
 
 ### GET /
 
-Returns server status
+Returns server status info
 
 ### GET /api/views
 
@@ -80,11 +80,19 @@ Run a new query using a view.
 _Example_
 
 ```sh
-$ curl -X - POST http://relation_engine/api/query?view=example
+$ curl -X -d '{"argument": "value"}' POST http://relation_engine/api/query?view=example
 ```
 
 _Query params_
 * `view` - required - string - name of the view to run as a query against the database
+
+_Request body_
+
+The request body should be a JSON object of all bind variables for the query. Anything with a `@name` in the query source should have an entry in the object here. For example, for a query with bind vars for `@@collection` and `@value`, you will need to pass:
+
+```json
+{ "@collection": "collection_name", "value": "my_value"}
+```
 
 _Response JSON schema_
 
@@ -187,7 +195,6 @@ _Response JSON schema_
     }
   }
 }
-expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
 ```
 
 ## Python client API
@@ -210,15 +217,50 @@ List out all the current relation engine views:
 
 ```py
 views = rec.get_views(show_source=True)
-# returns an array of {name, source}
 ```
 
 List out all the current schemas
 
 ```py
 schemas = rec.get_schemas(show_source=True)
-# returns an array of {name, source}
 ```
+
+Run a query:
+
+```py
+results = rec.query(view=view_name, bind_vars={'@collection': 'genes', 'value': 123})
+```
+
+Get more results from a cursor:
+
+```py
+more_results = rec.run_query(cursor_id=results['cursor_id'])
+```
+
+Save documents from python dictionaries:
+
+```py
+save_results = rec.save_documents(
+  collection='genes',
+  on_duplicate='update',
+  docs=[
+    {'_key': 'x', 'name': 'x'},
+    {'_key': 'y', 'name': 'y'}
+  ]
+)
+```
+
+Bulk-save documents from a file:
+
+```py
+save_results = rec.save_documents(
+  collection='genes',
+  on_duplicate='update',
+  from_file='my-file-path.json'
+)
+```
+
+Where the file contains multiple JSON documents separated by line-breaks.
 
 ## Development
 
