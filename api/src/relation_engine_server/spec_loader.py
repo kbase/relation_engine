@@ -50,8 +50,11 @@ def get_schema_dicts(names):
 
 def git_pull():
     """Git pull the spec repo to get any updates."""
-    output = subprocess.check_output(['git', '-C', _spec_path, 'pull'])  # nosec
-    print('git pull output', output)
+    output = subprocess.check_output(['git', '-C', _spec_path, 'rev-list', 'HEAD..origin/master', '--count'])  # nosec
+    change_count = int(output.strip())
+    if change_count > 0:
+        output = subprocess.check_output(['git', '-C', _spec_path, 'pull'])  # nosec
+        print('git pull output', output)
     return output
 
 

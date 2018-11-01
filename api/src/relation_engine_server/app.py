@@ -5,7 +5,6 @@ from uuid import uuid4
 import traceback
 
 from .api import api
-from .docs import docs
 from .exceptions import MissingHeader, UnauthorizedAccess
 from . import arango_client
 
@@ -15,12 +14,11 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', str(uuid4()))
 app.url_map.strict_slashes = False  # allow both `get /v1/` and `get /v1`
 
 app.register_blueprint(api, url_prefix='/api')
-app.register_blueprint(docs, url_prefix='/docs')
 
 
 @app.route('/', methods=['GET'])
 def root():
-    """Server status and link to docs."""
+    """Server status."""
     with open('.git/refs/heads/master', 'r') as fd:
         commit_hash = fd.read().strip()
     arangodb_status = arango_client.server_status()
@@ -28,8 +26,7 @@ def root():
     return flask.jsonify({
         'arangodb_status': arangodb_status,
         'commit_hash': commit_hash,
-        'repo_url': repo_url,
-        'docs': '/docs'
+        'repo_url': repo_url
     })
 
 
