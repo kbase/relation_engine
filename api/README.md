@@ -147,7 +147,7 @@ Bulk-update documents by either creating, replacing, or updating.
 _Example_
 
 ```sh
-$ curl -X PUT http://relation_engine/api/documents?collection=genes&
+$ curl -X PUT http://relation_engine/api/documents?collection=genes&on_duplicate=update
 ```
 
 _Query params_
