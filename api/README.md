@@ -4,9 +4,11 @@ A simple API that allows KBase community developers to interact with the Relatio
 
 View the root path of the running server in your browser to get the Swagger API interface.
 
-View `/v1` to get server status. All API endpoints are nested under `/v1` and are documented via the Swagger API.
-
 ## HTTP API
+
+### GET /
+
+Returns server status
 
 ### GET /api/views
 
