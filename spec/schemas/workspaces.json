@@ -1,0 +1,35 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "version": 1,
+  "additionalProperties": false,
+  "required": [
+    "_key",
+    "name",
+    "public"
+  ],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "The workspace ID for this workspace",
+      "examples": [
+        "35414"
+      ],
+      "pattern": "^\\d+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "The workspace name for this workspace",
+      "examples": [
+        "jjeffryes:narrative_1534187093329"
+      ]
+    },
+    "public": {
+      "type": "boolean",
+      "examples": [
+        false
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "version": 1,
+  "additionalProperties": false,
+  "required": [
+    "_key",
+    "size",
+    "epoch"
+  ],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "The UPA for this data",
+      "examples": [
+        "35414/73/1"
+      ],
+      "pattern": "^\\d+\\/\\d+\\/\\d+$"
+    },
+    "size": {
+      "type": "integer",
+      "description": "Size in bits",
+      "default": 0,
+      "examples": [
+        8870316
+      ]
+    },
+    "epoch": {
+      "type": "integer",
+      "description": "Creation time in UTC epoch",
+      "default": 0,
+      "examples": [
+        1540402856060
+      ]
+    }
+  }
+}

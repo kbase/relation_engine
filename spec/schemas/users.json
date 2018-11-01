@@ -1,0 +1,19 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "version": 1,
+  "additionalProperties": false,
+  "required": ["_key"],
+  "properties": {
+    "_key": {
+      "$id": "#/properties/_key",
+      "type": "string",
+      "description": "The username for this user",
+      "examples": [
+        "jjeffryes"
+      ],
+      "pattern": "^\\w+$"
+    }
+  }
+}
