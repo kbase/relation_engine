@@ -14,9 +14,9 @@
       "type": "string",
       "description": "The UPA for this data",
       "examples": [
-        "35414/73/1"
+        "35414:73:1"
       ],
-      "pattern": "^\\d+\\/\\d+\\/\\d+$"
+      "pattern": "^\\d+:\\d+:\\d+$"
     },
     "size": {
       "type": "integer",

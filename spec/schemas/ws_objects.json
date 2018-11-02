@@ -10,9 +10,9 @@
       "type": "string",
       "description": "The wsid/objectid for this data",
       "examples": [
-        "35414/73"
+        "35414:73"
       ],
-      "pattern": "^\\d+\\/\\d+$"
+      "pattern": "^\\d+:\\d+$"
     }
   }
 }
