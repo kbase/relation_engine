@@ -1,6 +1,7 @@
 """
 Utilities for loading views, schemas, and migrations from the spec.
 """
+import glob
 import os
 import json
 import subprocess  # nosec
@@ -42,7 +43,8 @@ def get_schema_dicts(names):
     for name in names:
         if name not in schema_names:
             raise SchemaNonexistent(name, schema_names)
-        schema_path = os.path.join(_spec_path, 'schemas', name + '.json')
+        schema_path = glob.glob(os.path.join(_spec_path, 'schemas', '**', name + '.json'),
+                                recursive=True)[0]
         with open(schema_path, 'r') as fd:
             schemas[name] = json.loads(fd.read())
     return schemas
@@ -59,13 +61,8 @@ def git_pull():
 
 
 def _get_file_names(dir_path, target_extension):
-    """Get a list of file basenames in a certain directory with a certain extension."""
-    names = []
-    for name in os.listdir(dir_path):
-        filename, extension = os.path.splitext(name)
-        if extension == target_extension:
-            names.append(filename)
-    return names
+    """Get a list of file basenames in all subdirectory of a dir_path with a certain extension."""
+    return [os.path.basename(p) for p in glob.iglob(os.path.join(dir_path, '**', '*' + target_extension), recursive=True)]
 
 
 class ViewNonexistent(Exception):
