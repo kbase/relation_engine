@@ -1,5 +1,4 @@
 {
-  "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "version": 1,
@@ -18,9 +17,16 @@
       ],
       "pattern": "^\\d+:\\d+:\\d+$"
     },
+    "name": {
+      "type": "string",
+      "description": "The workspace name for this workspace",
+      "examples": [
+        "jjeffryes:narrative_1534187093329"
+      ]
+    },
     "size": {
       "type": "integer",
-      "description": "Size in bits",
+      "description": "Size in bytes",
       "default": 0,
       "examples": [
         8870316
