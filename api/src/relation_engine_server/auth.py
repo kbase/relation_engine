@@ -30,6 +30,11 @@ def require_auth_token(roles=[]):
         print('-' * 80)
         print(auth_resp.text)
         raise UnauthorizedAccess(kbase_auth_url)
+    print('*' * 80)
+    print(headers)
+    print(url)
+    print(auth_resp.text)
+    print('*' * 80)
     auth_json = auth_resp.json()
     if len(roles):
         check_roles(required=roles, given=auth_json['customroles'], auth_url=kbase_auth_url)

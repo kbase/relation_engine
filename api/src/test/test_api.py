@@ -10,6 +10,22 @@ import os
 
 url = 'http://web:5000'
 auth_token = os.environ.get('KBASE_TEST_AUTH_TOKEN', '')
+headers = {'Authorization': 'Bearer ' + auth_token}
+example_data = '\n'.join([
+    '{"name": "x", "_key": "1"}',
+    '{"name": "y", "_key": "2"}',
+    '{"name": "z", "_key": "3"}'
+])
+
+
+def create_docs():
+    """Generic function to create a few docs -- reused in a couple places in the tests."""
+    return requests.put(
+        url + '/api/documents',
+        params={'overwrite': True, 'collection': 'taxon'},
+        data=example_data,
+        headers=headers
+    ).json()
 
 
 class TestApi(unittest.TestCase):
@@ -85,21 +101,10 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['pos'], 1)
         self.assertEqual(resp['source_json'], '\n')
 
-    def test_save_documents(self):
+    def test_save_documents_and_query(self):
         """Test all valid cases for saving documents."""
-        example_data = '\n'.join([
-            '{"name": "x", "_key": "1"}',
-            '{"name": "y", "_key": "2"}',
-            '{"name": "z", "_key": "3"}'
-        ])
-        headers = {'Authorization': 'Bearer ' + auth_token}
         # Create
-        resp = requests.put(
-            url + '/api/documents',
-            params={'overwrite': True, 'collection': 'taxon'},
-            data=example_data,
-            headers=headers
-        ).json()
+        resp = create_docs()
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
         # update on duplicate
@@ -140,6 +145,8 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp, expected)
 
     def test_query(self):
+        """Test a query that fetches some docs."""
+        create_docs()
         resp = requests.post(
             url + '/api/query',
             params={'view': 'example'},
