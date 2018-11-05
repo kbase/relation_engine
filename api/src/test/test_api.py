@@ -8,7 +8,7 @@ import requests
 import json
 import os
 
-url = 'http://web:5000'
+url = os.environ.get('TEST_URL', 'http://web:5000')
 auth_token = os.environ.get('KBASE_TEST_AUTH_TOKEN', '')
 headers = {'Authorization': 'Bearer ' + auth_token}
 example_data = '\n'.join([
