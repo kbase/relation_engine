@@ -64,9 +64,9 @@ def server_error(err):
     traceback.print_exc()
     print('=' * 80)
     resp = {'error': '500 - Unexpected server error'}
-    if os.environ.get('FLASK_DEBUG'):
-        resp['error_class'] = err.__class__.__name__
-        resp['error_details'] = str(err)
+    # if os.environ.get('FLASK_DEBUG'):  TODO
+    resp['error_class'] = err.__class__.__name__
+    resp['error_details'] = str(err)
     return (flask.jsonify(resp), 500)
 
 
