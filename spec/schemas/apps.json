@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "version": 1,
+  "additionalProperties": false,
+  "required": ["_key"],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "examples": [
+        "kb_uploadmethods.import_fasta_as_assembly_from_staging"
+      ],
+      "description": "<module_name>.<method_name>",
+      "pattern": "^\\w+\\.\\w+$"
+    }
+  }
+}
