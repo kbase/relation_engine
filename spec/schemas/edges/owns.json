@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "version": 1,
+  "additionalProperties": false,
+  "required": ["_from", "_to"],
+  "properties": {
+    "_from": {
+      "type": "string",
+      "examples": [
+        "jjeffryes"
+      ],
+      "description": "A username"
+    },
+    "_to": {
+      "type": "string",
+      "examples": [
+        "KBaseGenomes",
+        "35414"
+      ],
+      "description": "A Workspace or Type Module"
+    }
+  }
+}
