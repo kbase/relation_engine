@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "version": 1,
   "additionalProperties": false,
   "required": [
     "_key",
@@ -28,17 +27,13 @@
       "type": "integer",
       "description": "Size in bytes",
       "default": 0,
-      "examples": [
-        8870316
-      ]
+      "minimum": 0
     },
     "epoch": {
       "type": "integer",
       "description": "Creation time in UTC epoch",
       "default": 0,
-      "examples": [
-        1540402856060
-      ]
+      "minimum": 0
     }
   }
 }
