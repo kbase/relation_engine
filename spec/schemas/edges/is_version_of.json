@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_from", "_to"],
+  "properties": {
+    "_from": {
+      "type": "string",
+      "examples": [
+        "KBaseGenomes.Genome‑9.0",
+        "kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
+      ],
+      "description": "A versioned entity (eg. a workspace object, module, or workspace type)"
+    },
+    "_to": {
+      "type": "string",
+      "examples": [
+        "KBaseGenomes.Genome",
+        "kb_uploadmethods"
+      ],
+      "description": "A non-versioned grouping of versioned entities (eg. a workspace object, module, or workspace type)."
+    }
+  }
+}
