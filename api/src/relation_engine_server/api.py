@@ -19,7 +19,7 @@ def show_views():
     return flask.jsonify(spec_loader.get_view_names())
 
 
-@api.route('/query_cursor', methods=['GET'])
+@api.route('/cursor', methods=['GET'])
 def run_query_cursor():
     """
     Continue fetching query results from a cursor id
