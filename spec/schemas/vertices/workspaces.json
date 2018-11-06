@@ -6,6 +6,7 @@
   "required": [
     "_key",
     "name",
+    "moddate",
     "public"
   ],
   "properties": {
@@ -23,6 +24,14 @@
       "examples": [
         "jjeffryes:narrative_1534187093329"
       ]
+    },
+    "moddate": {
+      "type": "string",
+      "description": "Date when the Workspace was last modified",
+      "examples": [
+        "2014-04-09T19:40:25+0000"
+      ],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$"
     },
     "public": {
       "type": "boolean",
