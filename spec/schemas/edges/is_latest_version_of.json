@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "version": 1,
   "additionalProperties": false,
   "required": ["_from", "_to"],
   "properties": {
@@ -11,7 +10,7 @@
         "KBaseGenomes.Genome‑9.0",
         "kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
       ],
-      "description": "The versioned entity (Workspace Object, Module, or Type)"
+      "description": "A versioned entity, representing the most recent version of an entity in a group (most likely a workspace object, module, or workspace type)."
     },
     "_to": {
       "type": "string",
@@ -19,7 +18,7 @@
         "KBaseGenomes.Genome",
         "kb_uploadmethods"
       ],
-      "description": "A Workspace Object, Module, or Type"
+      "description": "The unversioned entity group, where all members of the group are different versions of something (eg. a workspace object, module, or workspace type)"
     }
   }
 }
