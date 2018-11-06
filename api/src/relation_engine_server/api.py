@@ -5,9 +5,7 @@ import tempfile
 import jsonschema
 from jsonschema.exceptions import ValidationError
 
-from .auth import require_auth_token
-from . import spec_loader
-from . import arango_client
+from . import spec_loader, arango_client, auth
 
 api = flask.Blueprint('api', __name__)
 
@@ -18,11 +16,7 @@ def show_views():
     Fetch view names and content.
     Auth: public
     """
-    view_names = spec_loader.get_view_names()
-    resp = {'names': view_names}
-    if flask.request.args.get('show_source'):
-        resp['content'] = spec_loader.get_view_content(view_names)
-    return flask.jsonify(resp)
+    return flask.jsonify(spec_loader.get_view_names())
 
 
 @api.route('/query_cursor', methods=['GET'])
@@ -31,7 +25,7 @@ def run_query_cursor():
     Continue fetching query results from a cursor id
     Auth: only kbase users (any role)
     """
-    require_auth_token(roles=[])
+    auth.require_auth_token(roles=[])
     cursor_id = flask.request.args['id']
     resp = arango_client.run_query(cursor_id=cursor_id)
     return flask.jsonify(resp)
@@ -43,9 +37,9 @@ def run_query_from_view():
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
     """
-    require_auth_token(roles=[])
+    auth.require_auth_token(roles=[])
     view_name = flask.request.args['view']
-    view_source = spec_loader.get_view_content([view_name])[view_name]
+    view_source = spec_loader.get_view(view_name)
     bind_vars = flask.request.json or {}
     # Make a request to the Arango server to run the query
     resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
@@ -56,27 +50,39 @@ def run_query_from_view():
 def show_schemas():
     """
     Fetch schema names and content.
-    See ./show_schemas.yaml for documentation.
     Auth: public
     """
-    schema_names = spec_loader.get_schema_names()
-    resp = {'names': schema_names}
-    if flask.request.args.get('show_source'):
-        resp['content'] = spec_loader.get_schema_dicts(schema_names)
-    return flask.jsonify(resp)
+    return flask.jsonify(spec_loader.get_schema_names())
+
+
+@api.route('/schemas/<name>', methods=['GET'])
+def show_schema(name):
+    """
+    Fetch the JSON for a single schema.
+    Auth: public
+    """
+    return flask.jsonify(spec_loader.get_schema(name))
+
+
+@api.route('/views/<name>', methods=['GET'])
+def show_view(name):
+    """
+    Fetch the AQL for a single view.
+    Auth: public
+    """
+    return flask.Response(spec_loader.get_view(name), mimetype='text/plain')
 
 
 @api.route('/documents', methods=['PUT'])
 def save_documents():
     """
     Create, update, or replace many documents in a batch.
-    See ./save_documents.yaml for documentation.
     Auth: only sysadmins
     """
-    require_auth_token(['RE_ADMIN'])
-    coll = flask.request.args['collection']
-    query = {'collection': coll, 'type': 'documents'}
-    schema = spec_loader.get_schema_dicts([coll])[coll]
+    auth.require_auth_token(['RE_ADMIN'])
+    collection_name = flask.request.args['collection']
+    query = {'collection': collection_name, 'type': 'documents'}
+    schema = spec_loader.get_schema(collection_name)
     if flask.request.args.get('on_duplicate'):
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
@@ -120,8 +126,7 @@ def view_does_not_exist(err):
     """General error cases."""
     resp = {
         'error': str(err),
-        'name': err.name,
-        'available': err.available
+        'name': err.name
     }
     return (flask.jsonify(resp), 400)
 
@@ -135,16 +140,5 @@ def validation_error(err):
         'validator': err.validator,
         'validator_value': err.validator_value,
         'schema': err.schema
-    }
-    return (flask.jsonify(resp), 400)
-
-
-@api.errorhandler(spec_loader.SchemaNonexistent)
-def schema_nonexistent(err):
-    """A schema/collection was requested but does not exist."""
-    resp = {
-        'error': str(err)
-        # 'available_schemas': err.available_schemas
-        # 'nonexistent_schema': err.schema_name
     }
     return (flask.jsonify(resp), 400)
