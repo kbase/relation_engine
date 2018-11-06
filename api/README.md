@@ -21,7 +21,7 @@ $ curl -X GET http://relation_engine/api/views
 _Example response_
 
 ```json
-['example_view1', 'example_view1']
+["example_view1", "example_view1"]
 ```
 
 ### GET /api/schemas
@@ -38,8 +38,8 @@ _Example response_
 
 ```json
 {
-  'vertices': ['vertex_examples1', 'vertex_examples2'],
-  'edges': ['edge_example1', edge_example2']
+  "vertices": ["vertex_examples1", "vertex_examples2"],
+  "edges": ["edge_example1", "edge_example2"]
 }
 ```
 
