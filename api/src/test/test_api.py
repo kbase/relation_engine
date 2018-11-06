@@ -22,7 +22,7 @@ def create_docs():
     """Generic function to create a few docs -- reused in a couple places in the tests."""
     return requests.put(
         url + '/api/documents',
-        params={'overwrite': True, 'collection': 'taxon'},
+        params={'overwrite': True, 'collection': 'example_vertices'},
         data=example_data,
         headers=headers
     ).json()
@@ -38,22 +38,25 @@ class TestApi(unittest.TestCase):
         self.assertTrue(resp['repo_url'])
 
     def test_list_views(self):
-        resp = requests.get(url + '/api/views?show_source=1').json()
-        self.assertTrue(len(resp['names']) > 0)
-        for name in resp['names']:
-            self.assertTrue(resp['content'][name])
         resp = requests.get(url + '/api/views').json()
-        self.assertTrue(len(resp['names']) > 0)
-        self.assertFalse(resp.get('content'))
+        self.assertTrue('example' in resp)
+
+    def test_show_view(self):
+        resp = requests.get(url + '/api/views/example').text
+        self.assertTrue('Return count of documents' in resp)
 
     def test_list_schemas(self):
-        resp = requests.get(url + '/api/schemas?show_source=1').json()
-        self.assertTrue(len(resp['names']) > 0)
-        for name in resp['names']:
-            self.assertTrue(resp['content'][name])
-        resp = requests.get(url + '/api/views').json()
-        self.assertTrue(len(resp['names']) > 0)
-        self.assertFalse(resp.get('content'))
+        resp = requests.get(url + '/api/schemas').json()
+        self.assertTrue('example_vertices' in resp['vertices'])
+        self.assertTrue('example_edges' in resp['edges'])
+        self.assertFalse('error' in resp)
+        self.assertTrue(len(resp))
+
+    def test_show_schema(self):
+        resp = requests.get(url + '/api/schemas/example_edges').text
+        self.assertTrue('_from' in resp)
+        resp = requests.get(url + '/api/schemas/example_vertices').text
+        self.assertTrue('_key' in resp)
 
     def test_save_documents_no_auth(self):
         # Missing bearer
@@ -66,11 +69,11 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertTrue('Unauthorized' in resp['error'])
 
-    def test_save_documents_no_keys(self):
+    def test_save_documents_invalid_schema(self):
         """Test the case where some documents fail against their schema."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'ignore', 'collection': 'taxon'},
+            params={'on_duplicate': 'ignore', 'collection': 'example_vertices'},
             data='{"name": "x"}\n{"name": "y"}',
             headers={'Authorization': 'Bearer ' + auth_token}
         ).json()
@@ -78,7 +81,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['instance'], {'name': 'x'})
         self.assertTrue(resp['schema'])
         self.assertEqual(resp['validator'], 'required')
-        self.assertEqual(resp['validator_value'], ['_key', 'name'])
+        self.assertEqual(resp['validator_value'], ['_key'])
 
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
@@ -93,7 +96,7 @@ class TestApi(unittest.TestCase):
     def test_save_documents_invalid_json(self):
         resp = requests.put(
             url + '/api/documents',
-            params={'collection': 'taxon'},
+            params={'collection': 'example_vertices'},
             data='\n',
             headers={'Authorization': 'Bearer ' + auth_token}
         ).json()
@@ -110,7 +113,7 @@ class TestApi(unittest.TestCase):
         # update on duplicate
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'update', 'collection': 'taxon'},
+            params={'on_duplicate': 'update', 'collection': 'example_vertices'},
             data=example_data,
             headers=headers
         ).json()
@@ -119,7 +122,7 @@ class TestApi(unittest.TestCase):
         # replace on duplicate
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'replace', 'collection': 'taxon'},
+            params={'on_duplicate': 'replace', 'collection': 'example_vertices'},
             data=example_data,
             headers=headers
         ).json()
@@ -128,7 +131,7 @@ class TestApi(unittest.TestCase):
         # error on duplicate
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'error', 'collection': 'taxon'},
+            params={'on_duplicate': 'error', 'collection': 'example_vertices'},
             data=example_data,
             headers=headers
         ).json()
@@ -137,7 +140,7 @@ class TestApi(unittest.TestCase):
         # ignore duplicates
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'ignore', 'collection': 'taxon'},
+            params={'on_duplicate': 'ignore', 'collection': 'example_vertices'},
             data=example_data,
             headers=headers
         ).json()
@@ -150,7 +153,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query',
             params={'view': 'example'},
-            data=json.dumps({'@collection': 'taxon'}),
+            data=json.dumps({'@collection': 'example_vertices'}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,
                 'Content-Type': 'application/json'
@@ -166,7 +169,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query',
             params={'view': 'nonexistent'},
-            data=json.dumps({'@collection': 'taxon'}),
+            data=json.dumps({'@collection': 'example_vertices'}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,
                 'Content-Type': 'application/json'
@@ -174,13 +177,12 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertEqual(resp['error'], 'View does not exist.')
         self.assertEqual(resp['name'], 'nonexistent')
-        self.assertTrue(len(resp['available']) > 0)
 
     def test_query_missing_bind_var(self):
         resp = requests.post(
             url + '/api/query',
             params={'view': 'example'},
-            data=json.dumps({'xyz': 'taxon'}),
+            data=json.dumps({'xyz': 'example_vertices'}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,
                 'Content-Type': 'application/json'
