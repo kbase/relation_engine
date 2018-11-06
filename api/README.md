@@ -2,8 +2,6 @@
 
 A simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
 
-View the root path of the running server in your browser to get the Swagger API interface.
-
 ## HTTP API
 
 ### GET /
@@ -12,64 +10,77 @@ Returns server status info
 
 ### GET /api/views
 
-Return a list of view names and optionally the AQL source code for each.
+Return a list of view names.
 
-_Example_
+_Example request_
 
 ```sh
-$ curl -X GET http://relation_engine/api/views?show_source=1
+$ curl -X GET http://relation_engine/api/views
 ```
 
-_Query params_
-* `show_source` - optional - boolean - whether to show the full AQL source for each view
-
-_Response JSON schema_
+_Example response_
 
 ```json
-{ "type": "object",
-  "properties": {
-    "names": {
-      "type": "array",
-      "item": "string",
-      "description": "Array of view names"
-    },
-    "content": {
-      "type": "object",
-      "description": "An object where keys are view names and properties are AQL source."
-    }
-  }
-}
+['example_view1', 'example_view1']
 ```
-
-The `"content"` property is returned only if the `show_source` query parameter is truthy.
 
 ### GET /api/schemas
 
-Return a list of schema names and optionall the JSON schema source for each.
+Fetch the registered schema names.
 
-_Example_
+_Example request_
 
 ```sh
-$ curl -X GET http://relation_engine/api/schemas?show_source=1
+$ curl -X GET http://relation_engine/api/schemas
 ```
 
-_Query params_
-* `show_source` - optional - boolean - whether to show the full JSON source for each schema
+_Example response_
 
-_Response JSON schema_
 ```json
-{ "type": "object",
-  "properties": {
-    "names": {
-      "type": "array",
-      "item": "string",
-      "description": "Array of schema names"
-    },
-    "content": {
-      "type": "object",
-      "description": "An object where keys are schema names and properties are JSON schemas."
-    }
-  }
+{
+  'vertices': ['vertex_examples1', 'vertex_examples2'],
+  'edges': ['edge_example1', edge_example2']
+}
+```
+
+### GET /api/views/<name>
+
+Get the AQL source code for a view
+
+_Example request_
+
+```sh
+$ curl http://relation_engine/api/views/example_view1
+```
+
+Response has mimetype of text/plain
+
+_Example response_
+
+```json
+// This is some AQL source code
+
+for x in @@collection
+  return x
+```
+
+### GET /api/schemas/<name>
+
+Get the JSON source for a registered schema by name.
+
+_Example request_
+
+```sh
+$ curl http://relation_engine/api/schemas/vertex_examples1
+```
+
+_Example response_
+
+```json
+{
+  "type": "object",
+  "required": ["_key"],
+  "properties": {"_key": {"type": "string"}}
 }
 ```
 
@@ -77,10 +88,10 @@ _Response JSON schema_
 
 Run a new query using a view.
 
-_Example_
+_Example rquest_
 
 ```sh
-$ curl -X -d '{"argument": "value"}' POST http://relation_engine/api/query?view=example
+$ curl -X POST -d '{"argument": "value"}' http://relation_engine/api/query?view=example
 ```
 
 _Query params_
@@ -92,6 +103,18 @@ The request body should be a JSON object of all bind variables for the query. An
 
 ```json
 { "@collection": "collection_name", "value": "my_value"}
+```
+
+_Example response_
+
+```json
+{
+  "results": [..],
+  "count": 100,
+  "has_more": true,
+  "cursor_id": 123,
+  "stats": {..}
+}
 ```
 
 _Response JSON schema_
@@ -125,18 +148,19 @@ _Response JSON schema_
 
 Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` below:
 
-### GET /query_cursor
+### GET /cursor
 
-Fetch more results from existing query results using a cursor ID
+Fetch more results after an initial query using a cursor ID
 
 _Example_
 
 ```sh
-$ curl -X GET http://relation_engine/api/query_cursor?id=123123123
+$ curl http://relation_engine/api/cursor?id=123123123
 ```
 
 _Query params_
-* `id` - required - string - cursor ID as found in the query results object above when `has_more` is true.
+
+* `id` - required - string - cursor ID as found in the query results object when `has_more` is true.
 
 The response JSON will match the same JSON schema as the one for the response under `POST /query`
 
@@ -152,7 +176,7 @@ $ curl -X PUT http://relation_engine/api/documents?collection=genes&on_duplicate
 
 _Query params_
 * `collection` - required - string - name of the collection that we want to bulk-import into.
-* `on_duplicate` - optional - "replace", "update", "ignore", "error" - Action to take when we are saving a duplicate document by matching `_key`. "replace" replaces the whole document. "update" merges in the new values. "ignore" takes no action. "error" cancels the entire transaction.
+* `on_duplicate` - optional - "replace", "update", "ignore", "error" - Action to take when we find a duplicate document by `_key`. "replace" replaces the whole document. "update" merges in the new values. "ignore" takes no action. "error" cancels the entire transaction.
 * `overwrite` - optional - boolean - whether to overwrite the whole collection (that is, delete all documents currently in the collection before creating the documents you provide)
 
 _Request body_
@@ -162,6 +186,12 @@ The request body should be a series of JSON documents separated by line-breaks. 
 ```
 {"_key": "1", "name": "x"}
 {"_key": "2", "name": "y"}
+```
+
+_Example response_
+
+```json
+{"created": 3, "errors": 2, "empty": 0, "updated": 0, "ignored": 0, "error": false}
 ```
 
 _Response JSON schema_
@@ -198,6 +228,8 @@ _Response JSON schema_
 ```
 
 ## Python client API
+
+> NOTE: Work in progress -- this is not yet available
 
 A python client is provided and published on anaconda, installable via pip or conda:
 
