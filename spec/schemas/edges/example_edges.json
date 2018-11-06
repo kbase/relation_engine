@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_from", "_to", "_key"],
+  "description": "Example edge schema for testing.",
+  "properties": {
+    "_from": {"type": "string"},
+    "_to": {"type": "string"},
+    "_key": {"type": "string"}
+  }
+}
+
