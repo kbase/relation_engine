@@ -15,7 +15,6 @@ _edge_dir = os.path.join(_schema_dir, 'edges')
 
 def get_schema_names():
     """Return a dict of vertex and edge base names."""
-    git_pull()
     return {
         'vertices': [
             _get_file_name(path)
@@ -30,7 +29,6 @@ def get_schema_names():
 
 def get_view_names():
     """Return an array of all view base names."""
-    git_pull()
     return [
         _get_file_name(path)
         for path in _find_paths(_view_dir, '*.aql')
@@ -39,7 +37,6 @@ def get_view_names():
 
 def get_schema(name):
     """Get JSON content for a specific schema. Throws an error if nonexistent."""
-    git_pull()
     try:
         path = _find_paths(_schema_dir, name + '.json')[0]
     except IndexError:
@@ -50,7 +47,6 @@ def get_schema(name):
 
 def get_view(name):
     """Get AQL content for a specific view. Throws an error if nonexistent."""
-    git_pull()
     try:
         path = _find_paths(_view_dir, name + '.aql')[0]
     except IndexError:
@@ -65,6 +61,7 @@ def git_pull():
     if output:
         # Pull if there were updates on fetch
         subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
+    return bool(output)
 
 
 def _find_paths(dir_path, file_pattern):

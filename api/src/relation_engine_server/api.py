@@ -73,6 +73,15 @@ def show_view(name):
     return flask.Response(spec_loader.get_view(name), mimetype='text/plain')
 
 
+@api.route('/refresh_specs', methods=['GET'])
+def refresh_specs():
+    """
+    Manually pull from the spec git repo to get updates.
+    """
+    updates = spec_loader.git_pull()
+    return flask.jsonify({"updates": updates})
+
+
 @api.route('/documents', methods=['PUT'])
 def save_documents():
     """
