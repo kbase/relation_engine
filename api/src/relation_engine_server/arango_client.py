@@ -68,26 +68,25 @@ def init_collections(schemas):
 
 
 def create_collection(name, is_edge):
+    """
+    Create a single collection by name using some basic defaults.
+    We ignore duplicates. For any other server error, an exception is thrown.
+    """
     url = db_url + '/_api/collection'
     # collection types:
     #   2 is a document collection
     #   3 is an edge collection
     collection_type = 3 if is_edge else 2
-    resp = requests.post(
-        url,
-        data=json.dumps({
-            'keyOptions': {
-                'allowUserKeys': True,
-            },
-            'name': name,
-            'type': collection_type
-        }),
-        auth=(db_user, db_pass)
-    ).json()
+    data = json.dumps({
+        'keyOptions': {'allowUserKeys': True},
+        'name': name,
+        'type': collection_type
+    })
+    resp = requests.post(url, data, auth=(db_user, db_pass))
     if resp['error']:
         if 'duplicate' not in resp['errorMessage']:
             # Unable to create a collection
-            raise Exception(resp.text)
+            raise ArangoServerError(resp.text)
 
 
 def bulk_import(file_path, query):
