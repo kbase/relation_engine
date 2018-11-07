@@ -84,9 +84,9 @@ _Example response_
 }
 ```
 
-### POST /query
+### POST /query_results
 
-Run a new query using a view.
+Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
 
 _Example rquest_
 
@@ -96,14 +96,19 @@ $ curl -X POST -d '{"argument": "value"}' http://relation_engine/api/query?view=
 
 _Query params_
 * `view` - required - string - name of the view to run as a query against the database
+* `cursor_id` - required - string - ID of a cursor that was returned from a previous query with >100 results
+
+Pass one of `view` or `cursor_id` -- not both.
 
 _Request body_
 
-The request body should be a JSON object of all bind variables for the query. Anything with a `@name` in the query source should have an entry in the object here. For example, for a query with bind vars for `@@collection` and `@value`, you will need to pass:
+When running a new query with a view, the request body should be a JSON object of all bind variables for the query. Anything with a `@name` in the query source should have an entry in the object here. For example, a query with bind vars for `@@collection` and `@value`, you will need to pass:
 
 ```json
 { "@collection": "collection_name", "value": "my_value"}
 ```
+
+If you are using a cursor, the request body should be blank.
 
 _Example response_
 
@@ -147,22 +152,6 @@ _Response JSON schema_
 ```
 
 Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` below:
-
-### GET /cursor
-
-Fetch more results after an initial query using a cursor ID
-
-_Example_
-
-```sh
-$ curl http://relation_engine/api/cursor?id=123123123
-```
-
-_Query params_
-
-* `id` - required - string - cursor ID as found in the query results object when `has_more` is true.
-
-The response JSON will match the same JSON schema as the one for the response under `POST /query`
 
 ### PUT /documents
 
