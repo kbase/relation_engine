@@ -201,6 +201,14 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['has_more'], False)
         self.assertEqual(resp['cursor_id'], None)
         self.assertTrue(len(resp['results']), 100)
+        # Try to get the same cursor again
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'cursor_id': cursor_id},
+            headers={'Authorization': 'Bearer ' + auth_token}
+        ).json()
+        self.assertTrue(resp['error'])
+        self.assertEqual(resp['arango_message'], 'cursor not found')
 
     def test_query_no_name(self):
         resp = requests.post(
