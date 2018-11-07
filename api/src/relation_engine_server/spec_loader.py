@@ -6,6 +6,8 @@ import os
 import json
 import subprocess  # nosec
 
+from . import arango_client
+
 _spec_dir = os.environ.get('SPEC_PATH', '/spec')
 _view_dir = os.path.join(_spec_dir, 'views')
 _schema_dir = os.path.join(_spec_dir, 'schemas')
@@ -61,6 +63,8 @@ def git_pull():
     if output:
         # Pull if there were updates on fetch
         subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
+        # Initialize any collections
+        arango_client.init_collections(get_schema_names())
     return bool(output)
 
 
