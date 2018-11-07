@@ -5,3 +5,4 @@
 for v in @@collection
   collect with count into length
   return length
+
