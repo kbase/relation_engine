@@ -19,30 +19,24 @@ def show_views():
     return flask.jsonify(spec_loader.get_view_names())
 
 
-@api.route('/cursor', methods=['GET'])
-def run_query_cursor():
-    """
-    Continue fetching query results from a cursor id
-    Auth: only kbase users (any role)
-    """
-    auth.require_auth_token(roles=[])
-    cursor_id = flask.request.args['id']
-    resp = arango_client.run_query(cursor_id=cursor_id)
-    return flask.jsonify(resp)
-
-
-@api.route('query', methods=['POST'])
-def run_query_from_view():
+@api.route('/query_results', methods=['POST'])
+def run_query():
     """
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
     """
     auth.require_auth_token(roles=[])
-    view_name = flask.request.args['view']
-    view_source = spec_loader.get_view(view_name)
-    bind_vars = flask.request.json or {}
-    # Make a request to the Arango server to run the query
-    resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
+    if 'view' in flask.request.args:
+        view_name = flask.request.args['view']
+        view_source = spec_loader.get_view(view_name)
+        bind_vars = flask.request.json or {}
+        resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
+    elif 'cursor_id' in flask.request.args:
+        cursor_id = flask.request.args['cursor_id']
+        resp = arango_client.run_query(cursor_id=cursor_id)
+    else:
+        resp = {'error': 'Pass in a view or a cursor_id'}
+        return (flask.jsonify(resp), 400)
     return flask.jsonify(resp)
 
 
@@ -78,8 +72,8 @@ def refresh_specs():
     """
     Manually pull from the spec git repo to get updates.
     """
-    updates = spec_loader.git_pull()
-    return flask.jsonify({"updates": updates})
+    git_output = spec_loader.git_pull()
+    return flask.jsonify({"updates": git_output})
 
 
 @api.route('/documents', methods=['PUT'])

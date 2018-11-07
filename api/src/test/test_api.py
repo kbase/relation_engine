@@ -11,19 +11,21 @@ import os
 url = os.environ.get('TEST_URL', 'http://web:5000')
 auth_token = os.environ.get('KBASE_TEST_AUTH_TOKEN', '')
 headers = {'Authorization': 'Bearer ' + auth_token}
-example_data = '\n'.join([
-    '{"name": "x", "_key": "1"}',
-    '{"name": "y", "_key": "2"}',
-    '{"name": "z", "_key": "3"}'
-])
 
 
-def create_docs():
-    """Generic function to create a few docs -- reused in a couple places in the tests."""
+def create_test_docs(count):
+    """Produce some test documents."""
+    def doc(i):
+        return '{"name": "name", "_key": "%s"}' % i
+    return '\n'.join(doc(i) for i in range(0, count))
+
+
+def save_test_docs(count):
+    docs = create_test_docs(count)
     return requests.put(
         url + '/api/documents',
         params={'overwrite': True, 'collection': 'example_vertices'},
-        data=example_data,
+        data=docs,
         headers=headers
     ).json()
 
@@ -39,10 +41,10 @@ class TestApi(unittest.TestCase):
 
     def test_list_views(self):
         resp = requests.get(url + '/api/views').json()
-        self.assertTrue('example' in resp)
+        self.assertTrue('list_all_documents_in_collection' in resp)
 
     def test_show_view(self):
-        resp = requests.get(url + '/api/views/example').text
+        resp = requests.get(url + '/api/views/count_documents_in_collection').text
         self.assertTrue('Return count of documents' in resp)
 
     def test_list_schemas(self):
@@ -104,70 +106,105 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['pos'], 1)
         self.assertEqual(resp['source_json'], '\n')
 
-    def test_save_documents_and_query(self):
+    def test_create_documents(self):
         """Test all valid cases for saving documents."""
         # Create
-        resp = create_docs()
+        resp = save_test_docs(3)
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
-        # update on duplicate
+
+    def test_update_documents(self):
+        """Test updating existing documents."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'update', 'collection': 'example_vertices'},
-            data=example_data,
+            data=create_test_docs(3),
             headers=headers
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
-        # replace on duplicate
+
+    def test_replace_documents(self):
+        """Test replacing of existing documents."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'replace', 'collection': 'example_vertices'},
-            data=example_data,
+            data=create_test_docs(3),
             headers=headers
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
-        # error on duplicate
+
+    def test_save_documents_dupe_errors(self):
+        """Test where we want to raise errors on duplicate documents."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'error', 'collection': 'example_vertices'},
-            data=example_data,
+            data=create_test_docs(3),
             headers=headers
         ).json()
         expected = {'created': 0, 'errors': 3, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
-        # ignore duplicates
+
+    def test_save_documents_ignore_dupes(self):
+        """Test ignoring duplicate, existing documents when saving."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'ignore', 'collection': 'example_vertices'},
-            data=example_data,
+            data=create_test_docs(3),
             headers=headers
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
         self.assertEqual(resp, expected)
 
     def test_query(self):
-        """Test a query that fetches some docs."""
-        create_docs()
+        """Test a basic query that fetches some docs."""
+        save_test_docs(3)
         resp = requests.post(
-            url + '/api/query',
-            params={'view': 'example'},
+            url + '/api/query_results',
+            params={'view': 'list_all_documents_in_collection'},
             data=json.dumps({'@collection': 'example_vertices'}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,
                 'Content-Type': 'application/json'
             }
         ).json()
-        self.assertEqual(resp['results'], [3])
-        self.assertEqual(resp['count'], 1)
+        self.assertEqual(len(resp['results']), 3)
+        self.assertEqual(resp['count'], 3)
         self.assertEqual(resp['has_more'], False)
         self.assertEqual(resp['cursor_id'], None)
         self.assertTrue(resp['stats'])
 
+    def test_query_with_cursor(self):
+        """Test getting more data via a query cursor."""
+        save_test_docs(count=200)
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'view': 'list_all_documents_in_collection'},
+            data=json.dumps({'@collection': 'example_vertices'}),
+            headers={
+                'Authorization': 'Bearer ' + auth_token,
+                'Content-Type': 'application/json'
+            }
+        ).json()
+        cursor_id = resp['cursor_id']
+        self.assertTrue(resp['cursor_id'])
+        self.assertEqual(resp['has_more'], True)
+        self.assertEqual(resp['count'], 200)
+        self.assertTrue(len(resp['results']), 100)
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'cursor_id': cursor_id},
+            headers={'Authorization': 'Bearer ' + auth_token}
+        ).json()
+        self.assertEqual(resp['count'], 200)
+        self.assertEqual(resp['has_more'], False)
+        self.assertEqual(resp['cursor_id'], None)
+        self.assertTrue(len(resp['results']), 100)
+
     def test_query_no_name(self):
         resp = requests.post(
-            url + '/api/query',
+            url + '/api/query_results',
             params={'view': 'nonexistent'},
             data=json.dumps({'@collection': 'example_vertices'}),
             headers={
@@ -180,8 +217,8 @@ class TestApi(unittest.TestCase):
 
     def test_query_missing_bind_var(self):
         resp = requests.post(
-            url + '/api/query',
-            params={'view': 'example'},
+            url + '/api/query_results',
+            params={'view': 'list_all_documents_in_collection'},
             data=json.dumps({'xyz': 'example_vertices'}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,
@@ -193,8 +230,8 @@ class TestApi(unittest.TestCase):
 
     def test_query_incorrect_collection(self):
         resp = requests.post(
-            url + '/api/query',
-            params={'view': 'example'},
+            url + '/api/query_results',
+            params={'view': 'list_all_documents_in_collection'},
             data=json.dumps({'@collection': 123}),
             headers={
                 'Authorization': 'Bearer ' + auth_token,

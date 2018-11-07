@@ -29,16 +29,19 @@ def run_query(query_text=None, cursor_id=None, bind_vars={}):
     url = db_url + '/_api/cursor'
     req_json = {
         'batchSize': 100,
-        'memoryLimit': 16000000000,  # 16gb
-        'count': True,
+        'memoryLimit': 16000000000  # 16gb
     }
     if cursor_id:
+        method = 'PUT'
         url += '/' + cursor_id
     else:
+        method = 'POST'
+        req_json['count'] = True
         req_json['bindVars'] = bind_vars
         req_json['query'] = query_text
 
-    resp = requests.post(
+    resp = requests.request(
+        method,
         url,
         data=json.dumps(req_json),
         auth=(db_user, db_pass)
@@ -82,7 +85,7 @@ def create_collection(name, is_edge):
         'name': name,
         'type': collection_type
     })
-    resp = requests.post(url, data, auth=(db_user, db_pass))
+    resp = requests.post(url, data, auth=(db_user, db_pass)).json()
     if resp['error']:
         if 'duplicate' not in resp['errorMessage']:
             # Unable to create a collection

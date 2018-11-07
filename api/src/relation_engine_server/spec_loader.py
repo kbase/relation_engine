@@ -59,13 +59,11 @@ def get_view(name):
 
 def git_pull():
     """Git pull the spec repo to get any updates."""
-    output = subprocess.check_output(['git', '-C', _spec_dir, 'fetch'])  # nosec
-    if output:
-        # Pull if there were updates on fetch
-        subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
-        # Initialize any collections
-        arango_client.init_collections(get_schema_names())
-    return bool(output)
+    # Pull if there were updates on fetch
+    output = subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
+    # Initialize any collections
+    arango_client.init_collections(get_schema_names())
+    return output
 
 
 def _find_paths(dir_path, file_pattern):
