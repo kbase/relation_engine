@@ -85,6 +85,9 @@ def save_documents():
     auth.require_auth_token(['RE_ADMIN'])
     collection_name = flask.request.args['collection']
     query = {'collection': collection_name, 'type': 'documents'}
+    if flask.request.args.get('display_errors'):
+        # Display an array of error messages
+        query['details'] = 'true'
     schema = spec_loader.get_schema(collection_name)
     if flask.request.args.get('on_duplicate'):
         query['onDuplicate'] = flask.request.args['on_duplicate']
