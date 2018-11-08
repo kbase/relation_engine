@@ -137,14 +137,16 @@ class TestApi(unittest.TestCase):
 
     def test_save_documents_dupe_errors(self):
         """Test where we want to raise errors on duplicate documents."""
+        save_test_docs(3)
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'error', 'collection': 'example_vertices'},
+            params={'on_duplicate': 'error', 'collection': 'example_vertices', 'display_errors': '1'},
             data=create_test_docs(3),
             headers=headers
         ).json()
-        expected = {'created': 0, 'errors': 3, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
-        self.assertEqual(resp, expected)
+        self.assertEqual(resp['created'], 0)
+        self.assertEqual(resp['errors'], 3)
+        self.assertTrue(resp['details'])
 
     def test_save_documents_ignore_dupes(self):
         """Test ignoring duplicate, existing documents when saving."""
