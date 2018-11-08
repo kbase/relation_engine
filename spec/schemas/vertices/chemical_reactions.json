@@ -9,7 +9,7 @@
       "type": "string",
       "example": "rxn02201",
       "description": "ms id",
-      "pattern": "^rxn\\d+#"
+      "pattern": "^rxn\\d+$"
     },
     "direction": {
       "type": "string",
