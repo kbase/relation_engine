@@ -19,8 +19,8 @@
         "items": {
           "type": "string",
           "description": "Gene vertex ID"
+        }
       }
     }
   }
 }
-
