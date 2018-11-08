@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "description": "An entity produced from something else.",
+  "additionalProperties": true,
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The ID of a vertex that produces something else."
+    },
+    "_to": {
+      "type": "string",
+      "description": "The ID of a vertex that is produced by something else."
+    }
+  }
+}
+
+

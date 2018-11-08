@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "description": "A taxonomic, parent-child hierarchical relationship.",
+  "additionalProperties": true,
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The ID of a child vertex that inherits from a parent."
+    },
+    "_to": {
+      "type": "string",
+      "description": "The ID of a parent vertex that is inherited by a child."
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Groups of genes that take part in producing a chemical reaction in the cell.",
+  "required": ["_key", "conjunctions"],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Hash of the conjunctions."
+    },
+    "conjunctions": {
+      "type": "array",
+      "example": [["A", "B"], ["C", "D"]],
+      "description": "Array of conjunctions of genes. Eg: (A AND B) OR (C AND D).",
+      "items": {
+        "type": "array",
+        "description": "Conjunction of genes necessary to produce a reaction (eg. gene X AND Y AND Z)",
+        "items": {
+          "type": "string",
+          "description": "Gene vertex ID"
+      }
+    }
+  }
+}
+
