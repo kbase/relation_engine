@@ -8,7 +8,7 @@
     "_key": {
       "type": "string",
       "example": "rxn02201",
-      "description": "ms id",
+      "title": "ModelSeed ID",
       "pattern": "^rxn\\d+$"
     },
     "direction": {
@@ -27,6 +27,7 @@
     "ec_number": {
       "type": "string",
       "example": "2.7.3.7",
+      "title": "Enzyme Commission Number",
       "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
     },
     "bbcwn": {
