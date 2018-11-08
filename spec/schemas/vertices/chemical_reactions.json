@@ -24,7 +24,7 @@
       "type": "string",
       "example": "PGN_RS01070"
     },
-    "enzyme": {
+    "ec_number": {
       "type": "string",
       "example": "2.7.3.7",
       "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
@@ -55,8 +55,9 @@
       "example": "Folate biosynthesis"
     },
     "metacyc_pathways": {
-      "type": "string",
-      "example": "AMINE-DEG|Creatinine-Degradation|Degradation"
+      "type": "array",
+      "items": {"type": "string"},
+      "example": ["AMINE-DEG", "Creatinine-Degradation", "Degradation"]
     }
   }
 }

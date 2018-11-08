@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": ["_from", "_to"],
-  "description": "An entity produced from something else.",
+  "description": "An entity produced from something else. Eg: reactions -> is_produced_by -> gene_reaction_complexes",
   "additionalProperties": true,
   "properties": {
     "_from": {
