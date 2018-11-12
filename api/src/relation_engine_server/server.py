@@ -6,7 +6,7 @@ import traceback
 
 from .api import api
 from .exceptions import MissingHeader, UnauthorizedAccess
-from . import arango_client, spec_loader
+from . import arango_client
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -14,9 +14,6 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', str(uuid4()))
 app.url_map.strict_slashes = False  # allow both `get /v1/` and `get /v1`
 
 app.register_blueprint(api, url_prefix='/api')
-
-# Pull any updates to the spec on startup
-spec_loader.git_pull()
 
 
 @app.route('/', methods=['GET'])
