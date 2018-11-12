@@ -1,12 +1,9 @@
 """The primary router for the Relation Engine API."""
 import flask
-import hashlib
 import json
-import tempfile
-import jsonschema
 from jsonschema.exceptions import ValidationError
 
-from . import spec_loader, arango_client, auth
+from . import spec_loader, arango_client, auth, bulk_import, pull_spec
 
 api = flask.Blueprint('api', __name__)
 
@@ -73,7 +70,7 @@ def refresh_specs():
     """
     Manually pull from the spec git repo to get updates.
     """
-    git_output = spec_loader.git_pull()
+    git_output = pull_spec.pull_spec()
     return flask.jsonify({"updates": git_output})
 
 
@@ -89,24 +86,11 @@ def save_documents():
     if flask.request.args.get('display_errors'):
         # Display an array of error messages
         query['details'] = 'true'
-    schema = spec_loader.get_schema(collection_name)
     if flask.request.args.get('on_duplicate'):
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
         query['overwrite'] = 'true'
-    temp_fd = tempfile.NamedTemporaryFile()
-    with open(temp_fd.name, 'a') as fd:
-        for line in flask.request.stream:
-            json_line = json.loads(line)
-            jsonschema.validate(json_line, schema)
-            # for edges, we want a deterministic key so that there are not duplicates
-            if "_key" not in json_line and "_from" in json_line and "_to" in json_line:
-                json_line['_key'] = hashlib.blake2b(
-                    json_line["_from"].encode() + json_line["_to"].encode(), digest_size=10
-                ).hexdigest()
-            fd.write(json.dumps(json_line) + '\n')
-    resp_text = arango_client.bulk_import(temp_fd.name, query)
-    temp_fd.close()  # Also deletes the file
+    resp_text = bulk_import.bulk_import(query)
     return resp_text
 
 
