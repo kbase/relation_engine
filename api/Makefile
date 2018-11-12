@@ -4,7 +4,7 @@ test:
 	docker-compose run web make test-local
 
 test-local:
-	flake8 --max-complexity 5 src
+	flake8 --max-complexity 6 src
 	mypy --ignore-missing-imports src
 	python -m pyflakes src
 	bandit -r src

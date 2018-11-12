@@ -20,11 +20,23 @@ def create_test_docs(count):
     return '\n'.join(doc(i) for i in range(0, count))
 
 
-def save_test_docs(count):
-    docs = create_test_docs(count)
+def create_test_edges(count):
+    """Produce some test edges."""
+    def doc(i):
+        return '{"_from": "example_vertices/%s", "_to": "example_vertices/%s"}' % (i, i)
+    return '\n'.join(doc(i) for i in range(0, count))
+
+
+def save_test_docs(count, edges=False):
+    if edges:
+        docs = create_test_edges(count)
+        collection = 'example_edges'
+    else:
+        docs = create_test_docs(count)
+        collection = 'example_vertices'
     return requests.put(
         url + '/api/documents',
-        params={'overwrite': True, 'collection': 'example_vertices'},
+        params={'overwrite': True, 'collection': collection},
         data=docs,
         headers=headers
     ).json()
@@ -113,12 +125,30 @@ class TestApi(unittest.TestCase):
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
+    def test_create_edges(self):
+        """Test all valid cases for saving edges."""
+        # Create
+        resp = save_test_docs(3, edges=True)
+        expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
+        self.assertEqual(resp, expected)
+
     def test_update_documents(self):
         """Test updating existing documents."""
         resp = requests.put(
             url + '/api/documents',
             params={'on_duplicate': 'update', 'collection': 'example_vertices'},
             data=create_test_docs(3),
+            headers=headers
+        ).json()
+        expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
+        self.assertEqual(resp, expected)
+
+    def test_update_edge(self):
+        """Test updating existing edge."""
+        resp = requests.put(
+            url + '/api/documents',
+            params={'on_duplicate': 'update', 'collection': 'example_edges'},
+            data=create_test_edges(3),
             headers=headers
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}

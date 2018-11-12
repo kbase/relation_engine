@@ -1,5 +1,6 @@
 """The primary router for the Relation Engine API."""
 import flask
+import hashlib
 import json
 import tempfile
 import jsonschema
@@ -98,6 +99,11 @@ def save_documents():
         for line in flask.request.stream:
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
+            # for edges, we want a deterministic key so that there are not duplicates
+            if "_key" not in json_line and "_from" in json_line and "_to" in json_line:
+                json_line['_key'] = hashlib.blake2b(
+                    json_line["_from"].encode() + json_line["_to"].encode(), digest_size=10
+                ).hexdigest()
             fd.write(json.dumps(json_line) + '\n')
     resp_text = arango_client.bulk_import(temp_fd.name, query)
     temp_fd.close()  # Also deletes the file
