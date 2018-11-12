@@ -3,21 +3,21 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["_from", "_to"],
+  "description": "The _from object was created as an exact copy of the _to object.",
   "properties": {
     "_from": {
       "type": "string",
       "examples": [
-        "users/jjeffryes"
+        "ws_object_versions/35414:73:1"
       ],
-      "description": "A username"
+      "description": "A versioned workspace object"
     },
     "_to": {
       "type": "string",
       "examples": [
-        "type_modules/KBaseGenomes",
-        "workspaces/35414"
+        "ws_object_versions/35414:73:1"
       ],
-      "description": "A Workspace or Type Module"
+      "description": "A versioned workspace object"
     }
   }
 }
