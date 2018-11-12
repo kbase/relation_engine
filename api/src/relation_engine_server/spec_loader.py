@@ -4,9 +4,6 @@ Utilities for loading views, schemas, and migrations from the spec.
 import glob
 import os
 import json
-import subprocess  # nosec
-
-from . import arango_client
 
 _spec_dir = os.environ.get('SPEC_PATH', '/spec')
 _view_dir = os.path.join(_spec_dir, 'views')
@@ -55,15 +52,6 @@ def get_view(name):
         raise ViewNonexistent(name)
     with open(path, 'r', encoding='utf8') as fd:
         return fd.read()
-
-
-def git_pull():
-    """Git pull the spec repo to get any updates."""
-    # This always git-pulls no matter what. We may want to throttle or change this in the future.
-    output = subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
-    # Initialize any collections
-    arango_client.init_collections(get_schema_names())
-    return output
 
 
 def _find_paths(dir_path, file_pattern):
