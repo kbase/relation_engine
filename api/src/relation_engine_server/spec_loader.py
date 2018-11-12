@@ -60,10 +60,11 @@ def get_view(name):
 def git_pull():
     """Git pull the spec repo to get any updates."""
     # This always git-pulls no matter what. We may want to throttle or change this in the future.
-    output = subprocess.check_output(['git', '-C', _spec_dir, 'pull'])  # nosec
+    subprocess.check_output(['git', '-C', _spec_dir, 'checkout', 'master'])
+    subprocess.check_output(['git', '-C', _spec_dir, 'fetch', 'origin'])
+    subprocess.check_output(['git', '-C', _spec_dir, 'merge', 'origin/master'])
     # Initialize any collections
     arango_client.init_collections(get_schema_names())
-    return output
 
 
 def _find_paths(dir_path, file_pattern):
