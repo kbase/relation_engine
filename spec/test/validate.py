@@ -12,7 +12,7 @@ from jsonschema.exceptions import ValidationError
 def validate_json_schemas():
     """Validate the syntax of all the JSON schemas."""
     print('Validating JSON schemas..')
-    names = {}
+    names = {}  # type: dict
     for path in glob.iglob('schemas/**/*.json', recursive=True):
         name = os.path.basename(path)
         # Make sure collection is lower snake case
@@ -63,7 +63,7 @@ def validate_aql_syntax():
     """Validate the syntax of all the queries."""
     # TODO check AQL syntax. Unsure how to do this without connecting to a running arango server :/
     print('Validating AQL queries..')
-    names = {}
+    names = {}  # type: dict
     for path in glob.iglob('views/**/*.aql', recursive=True):
         name = os.path.basename(path)
         if names.get(name):
