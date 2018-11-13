@@ -29,7 +29,6 @@ _Example response_
 Fetch the registered schema names.
 
 _Example request_
-
 ```sh
 $ curl -X GET http://relation_engine/api/schemas
 ```
@@ -84,7 +83,7 @@ _Example response_
 }
 ```
 
-### POST /query_results
+### POST /api/query_results
 
 Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
 
@@ -153,7 +152,7 @@ _Response JSON schema_
 
 Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` below:
 
-### PUT /documents
+### PUT /api/documents
 
 Bulk-update documents by either creating, replacing, or updating.
 
@@ -215,6 +214,20 @@ _Response JSON schema_
   }
 }
 ```
+
+### GET /api/update_specs
+
+Manually check and pull spec updates. Requires sysadmin auth.
+
+_Example_
+
+```
+$ curl http://relation_engine/api/update_specs
+```
+
+_Query params_
+* `init_collections` - optional - boolean - whether to initialize any new collections in arango
+* `reset` - optional - boolean - whether to completely reset the spec data (do a clean download and overwrite)
 
 ## Python client API
 
