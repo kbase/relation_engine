@@ -5,11 +5,12 @@ import glob
 import os
 import json
 
-_spec_dir = os.environ.get('SPEC_PATH', '/spec')
-_view_dir = os.path.join(_spec_dir, 'views')
-_schema_dir = os.path.join(_spec_dir, 'schemas')
-_vertex_dir = os.path.join(_schema_dir, 'vertices')
-_edge_dir = os.path.join(_schema_dir, 'edges')
+_spec_root_dir = os.environ.get('SPEC_PATH', '/spec')
+_spec_dir = os.path.join(_spec_root_dir, 'repo')  # /spec/repo
+_view_dir = os.path.join(_spec_dir, 'views')  # /spec/repo/views
+_schema_dir = os.path.join(_spec_dir, 'schemas')  # /spec/repo/schemas
+_vertex_dir = os.path.join(_schema_dir, 'vertices')  # /spec/repo/schemas/vertices
+_edge_dir = os.path.join(_schema_dir, 'edges')  # /spec/repo/schemas/edges
 
 
 def get_schema_names():
