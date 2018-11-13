@@ -2,9 +2,6 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.travis.yaml export-ignore
-/README.md export-ignore
-/migrations/README.md export-ignore
-/schemas/README.md export-ignore
-/views/README.md export-ignore
+README.md export-ignore
 /Makefile export-ignore
 /test export-ignore
