@@ -3,8 +3,8 @@ services:
 - docker
 language: python
 python:
-- '3.7'
+- 3.6
 script:
-- cp .env.development.example .env
+- cp .env.example .env
 - docker-compose up -d
 - make test
