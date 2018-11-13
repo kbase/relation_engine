@@ -3,7 +3,11 @@
   "type": "object",
   "additionalProperties": false,
   "description": "Whole-genome metadata (genes are separate vertices)",
-  "required": ["_key", "scientific_name", "domain"],
+  "required": [
+    "_key",
+    "scientific_name",
+    "domain"
+  ],
   "properties": {
     "_key": {
       "type": "string",

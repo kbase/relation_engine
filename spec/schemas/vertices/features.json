@@ -106,6 +106,7 @@
       "description": "Aliases for these feature, grouped by alias type",
       "items": {
         "type": "object",
+        "description": "All values are arrays of strings",
         "patternProperties": {
           ".*": {
             "type": "array",
