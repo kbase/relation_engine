@@ -11,12 +11,12 @@
     },
     "refseq_id": {
       "type": "string",
-      "example": "NC_008270.1",
+      "examples": ["NC_008270.1"],
       "description": "RefSeq database accession id"
     },
     "scientific_name": {
       "type": "string",
-      "example": "Haloferax Volcanii"
+      "examples": ["Haloferax Volcanii"]
     },
     "domain": {
       "type": "string",
@@ -42,7 +42,7 @@
     "molecule_type": {
       "type": "string",
       "title": "Molecule type",
-      "example": "DNA",
+      "examples": ["DNA"],
       "description": "Can include genomic DNA, genomic RNA, precursor RNA, mRNA (cDNA), ribosomal RNA, transfer RNA, small nuclear RNA, and small cytoplasmic RNA"
     },
     "contig_lengths": {
@@ -58,7 +58,7 @@
     "source": {
       "type": "string",
       "description": "The tool or database that produced the genome",
-      "example": ["RefSeq", "Ensembl", "Phytozome", "RAST", "Prokka", "User_upload"]
+      "examples": ["RefSeq", "Ensembl", "Phytozome", "RAST", "Prokka", "User_upload"]
     },
     "source_id": {
       "type": "string",
@@ -71,7 +71,7 @@
     "taxonomy": {
       "type": "array",
       "description": "Full taxonomy parent-to-child linkage up to the domain",
-      "example": ["Bacteria", "Actinobacteria", "Corynebacteriales", "Nocardiaceae", "Rhodococcus"],
+      "examples": [["Bacteria", "Actinobacteria", "Corynebacteriales", "Nocardiaceae", "Rhodococcus"]],
       "items": {
         "type": "string"
       }
