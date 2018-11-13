@@ -25,7 +25,7 @@
     "feature_counts": {
       "type": "object",
       "additionalProperties": true,
-      "description": "A count of the number of instaces of each feature type such as CDSs, repeats etc.",
+      "description": "A count of the number of instances of each feature type such as CDSs, repeats etc.",
       "patternProperties": {
         ".*": {"type": "integer"}
       }
@@ -52,7 +52,7 @@
     },
     "contig_ids": {
       "type": "array",
-      "description": "The ids of each condtig in the associated assembly",
+      "description": "The ids of each contig in the associated assembly",
       "items": {"type": "string"}
     },
     "source": {

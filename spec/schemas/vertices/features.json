@@ -6,7 +6,7 @@
   "required": [
     "_key",
     "type",
-    "location",
+    "location"
   ],
   "properties": {
     "_key": {
@@ -30,7 +30,7 @@
     },
     "note": {
       "type": "string",
-      "description": "Free-text discription of this feature"
+      "description": "Free-text description of this feature"
     },
     "functions": {
       "type": "array",
@@ -48,15 +48,15 @@
     },
     "location": {
       "type": "array",
-      "description": "A list of segments of sequence that comprise this feature"
-      items: {
+      "description": "A list of segments of sequence that comprise this feature",
+      "items": {
         "contig": {
           "type": "string",
-          "description": "Contig ID where this segment occurs
-        }
+          "description": "Contig ID where this segment occurs"
+        },
         "strand": {
           "type": "string",
-          "description": "Strand where this segment occurs"
+          "description": "Strand where this segment occurs",
           "enum": ["+", "-", "?"]
         },
         "start": {
@@ -68,10 +68,10 @@
           "description": "Length of this segment of the feature"
         }
       }
-    }
+    },
     "flags": {
       "type": "array",
-      "description": "Addition flags about the feature such trans_splicing",
+      "description": "Additional flags about the feature such trans_splicing",
       "items": {"type": "string"}
     },
     "warnings": {

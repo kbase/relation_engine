@@ -15,7 +15,7 @@
   ],
   "properties": {
     "_key": {
-      "type": "number"
+      "type": "string"
     },
     "pubmed_id": {
       "type": "number"
