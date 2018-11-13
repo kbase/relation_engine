@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "description": "The _from dataset was published in the _to publication",
+  "additionalProperties": true,
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The ID of the data that was published in _to"
+    },
+    "_to": {
+      "type": "string",
+      "pattern": "^publications/.+$",
+      "description": "The ID of a publication that was published in _from"
+    }
+  }
+}
+

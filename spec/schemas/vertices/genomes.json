@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Whole-genome metadata (genes are separate vertices)",
+  "required": ["_key", "scientific_name", "domain"],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Hash of the full set of data contained in this genome."
+    },
+    "refseq_id": {
+      "type": "string",
+      "example": "NC_008270.1",
+      "description": "RefSeq database accession id"
+    },
+    "scientific_name": {
+      "type": "string",
+      "example": "Haloferax Volcanii"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["Archaea", "Bacteria", "Eukarya"]
+    },
+    "feature_counts": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "TODO",
+      "patternProperties": {
+        ".*": {"type": "integer"}
+      }
+    },
+    "genetic_code": {
+      "type": "integer",
+      "description": "TODO"
+    },
+    "dna_size": {
+      "type": "integer",
+      "title": "Nucleotide count"
+    },
+    "num_contigs": {
+      "type": "integer",
+      "title": "Number of contigs",
+      "description": "Number of consensus regions of the DNA."
+    },
+    "molecule_type": {
+      "type": "string",
+      "title": "Molecule type",
+      "example": "DNA",
+      "description": "Can include genomic DNA, genomic RNA, precursor RNA, mRNA (cDNA), ribosomal RNA, transfer RNA, small nuclear RNA, and small cytoplasmic RNA"
+    },
+    "contig_lengths": {
+      "type": "array",
+      "description": "Nucleotide length of each contig",
+      "items": {"type": "integer"}
+    },
+    "contig_strings": {
+      "type": "array",
+      "description": "Nucleotide content of each contig",
+      "items": {"type": "string"}
+    },
+    "source": {
+      "type": "string",
+      "description": "TODO"
+    },
+    "source_id": {
+      "type": "string",
+      "description": "TODO"
+    },
+    "taxonomy": {
+      "type": "array",
+      "description": "Full taxonomy parent-to-child linkage up to the domain.",
+      "example": ["Bacteria", "Actinobacteria", "Corynebacteriales", "Nocardiaceae", "Rhodococcus"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "gc_content": {
+      "type": "number",
+      "description": "TODO"
+    },
+    "is_suspect": {
+      "type": "boolean",
+      "description": "TODO"
+    },
+    "notes": {
+      "type": "string",
+      "description": "TODO"
+    },
+    "original_source_file_name": {
+      "type": "string",
+      "description": "TODO"
+    },
+    "external_source_origination_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "release": {
+      "type": "string",
+      "description": "TODO"
+    }
+  }
+}
+

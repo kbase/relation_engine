@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The citation for an academic publication",
+  "required": ["_key", "scientific_name", "domain"],
+  "properties": {
+    "pubmed_id": {
+      "type": "number"
+    },
+    "source": {
+      "type": "string",
+      "example": "Pubmed"
+    },
+    "title": {
+      "type": "string"
+    },
+    "web_address": {
+      "type": "string",
+      "format": "url"
+    },
+    "publication_year": {
+      "type": "integer",
+      "min": 1800
+    },
+    "authors": {
+      "type": "string"
+    },
+    "journal": {
+      "type": "string"
+    }
+  }
+}
+
