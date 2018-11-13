@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
+  "description": "A component of a DNA sequence, such as a CDS, mRNA, etc.",
   "required": [
     "_key",
     "type",
@@ -14,6 +15,34 @@
       "type": "string",
       "title": "Content hash",
       "description": "Hash of the DNA sequence for this feature."
+    },
+    "protein_translation": {
+      "type": "string",
+      "title": "Protein translation",
+      "description": "Longest coded protein (representative protein for splice variants)"
+    },
+    "protein_translation_length": {
+      "type": "integer",
+      "description": "Length of protein_translation"
+    },
+    "protein_hash": {
+      "type": "string",
+      "title": "Protein content hash",
+      "description": "Hash of the protein sequence that this feature encodes."
+    },
+    "note": {
+      "type": "string",
+      "description": "TODO"
+    },
+    "functions": {
+      "type": "array",
+      "title": "Gene functions",
+      "items": {"type": "string"}
+    },
+    "functional_descriptions": {
+      "type": "array",
+      "title": "Gene function descriptions",
+      "items": {"type": "string"}
     },
     "type": {
       "type": "string",
