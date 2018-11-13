@@ -22,7 +22,7 @@
     },
     "source": {
       "type": "string",
-      "example": "Pubmed"
+      "examples": ["Pubmed"]
     },
     "title": {
       "type": "string"
@@ -43,4 +43,3 @@
     }
   }
 }
-

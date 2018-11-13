@@ -11,10 +11,10 @@
     },
     "conjunctions": {
       "type": "array",
-      "example": ["A", "B", "C", "D"],
+      "examples": [["SO_0001", "SO_0001"]],
       "description": "Array of conjunctions of genes. Eg: (A AND B AND C AND D).",
       "items": {
-        "type": "String",
+        "type": "string",
         "description": "Gene vertex _key"
       }
     }
