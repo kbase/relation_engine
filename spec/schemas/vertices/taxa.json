@@ -7,12 +7,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "example": "haloferax_volcanii",
+      "examples": ["haloferax_volcanii"],
       "description": "Normalized name (lower-cased and snake-cased)"
     },
     "name": {
       "type": "string",
-      "example": "Haloferax Volcanii"
+      "examples": ["Haloferax Volcanii"]
     }
   }
 }

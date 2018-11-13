@@ -7,7 +7,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "example": "rxn02201",
+      "examples": ["rxn02201"],
       "title": "ModelSeed ID",
       "pattern": "^rxn\\d+$"
     },
@@ -18,26 +18,26 @@
     "name": {
       "type": "string",
       "description": "Chemical names",
-      "example": "trans-2-Methyl-5-isopropylhexa-2,5-dienal dehydrogenase_c0"
+      "examples": ["trans-2-Methyl-5-isopropylhexa-2,5-dienal dehydrogenase_c0"]
     },
     "gpr": {
       "type": "string",
-      "example": "PGN_RS01070"
+      "examples": ["PGN_RS01070"]
     },
     "ec_number": {
       "type": "string",
-      "example": "2.7.3.7",
+      "examples": ["2.7.3.7"],
       "title": "Enzyme Commission Number",
       "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
     },
     "bbcwn": {
       "type": "number",
-      "example": -108
+      "examples": [-108]
     },
     "equation": {
       "type": "string",
       "description": "Reaction formula using compound IDs (eg. cd00443)",
-      "example": "(1) cpd00443[c0] + (1) cpd02920[c0] => (1) cpd00012[c0] + (1) cpd00067[c0] + (1) cpd00683[c0]"
+      "examples": ["(1) cpd00443[c0] + (1) cpd02920[c0] => (1) cpd00012[c0] + (1) cpd00067[c0] + (1) cpd00683[c0]"]
     },
     "definition": {
       "type": "string",
@@ -45,20 +45,20 @@
     },
     "bigg_id": {
       "type": "string",
-      "example": "DHPS2"
+      "examples": ["DHPS2"]
     },
     "kegg_id": {
       "type": "string",
-      "example": "R03067"
+      "examples": ["R03067"]
     },
     "kegg_pathways": {
       "type": "string",
-      "example": "Folate biosynthesis"
+      "examples": ["Folate biosynthesis"]
     },
     "metacyc_pathways": {
       "type": "array",
       "items": {"type": "string"},
-      "example": ["AMINE-DEG", "Creatinine-Degradation", "Degradation"]
+      "examples": [["AMINE-DEG", "Creatinine-Degradation", "Degradation"]]
     }
   }
 }
