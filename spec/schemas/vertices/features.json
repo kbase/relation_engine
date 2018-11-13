@@ -90,7 +90,6 @@
     "db_xrefs": {
       "type": "array",
       "title": "Database cross-references",
-
       "description": "IDs for these feature in other databases, grouped by database",
       "items": {
         "type": "object",
