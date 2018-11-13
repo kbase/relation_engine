@@ -25,14 +25,10 @@
     "feature_counts": {
       "type": "object",
       "additionalProperties": true,
-      "description": "TODO",
+      "description": "A count of the number of instaces of each feature type such as CDSs, repeats etc.",
       "patternProperties": {
         ".*": {"type": "integer"}
       }
-    },
-    "genetic_code": {
-      "type": "integer",
-      "description": "TODO"
     },
     "dna_size": {
       "type": "integer",
@@ -54,22 +50,27 @@
       "description": "Nucleotide length of each contig",
       "items": {"type": "integer"}
     },
-    "contig_strings": {
+    "contig_ids": {
       "type": "array",
-      "description": "Nucleotide content of each contig",
+      "description": "The ids of each condtig in the associated assembly",
       "items": {"type": "string"}
     },
     "source": {
       "type": "string",
-      "description": "TODO"
+      "description": "The tool or database that produced the genome",
+      "example": ["RefSeq", "Ensembl", "Phytozome", "RAST", "Prokka", "User_upload"]
     },
     "source_id": {
       "type": "string",
-      "description": "TODO"
+      "description": "The ID assigned the to the genome by that source"
+    },
+    "release": {
+      "type": "string",
+      "description": "The release version of the source database for this genome if applicable"
     },
     "taxonomy": {
       "type": "array",
-      "description": "Full taxonomy parent-to-child linkage up to the domain.",
+      "description": "Full taxonomy parent-to-child linkage up to the domain",
       "example": ["Bacteria", "Actinobacteria", "Corynebacteriales", "Nocardiaceae", "Rhodococcus"],
       "items": {
         "type": "string"
@@ -77,27 +78,15 @@
     },
     "gc_content": {
       "type": "number",
-      "description": "TODO"
+      "description": "Fraction of GC pairs in the genome"
     },
     "is_suspect": {
       "type": "boolean",
-      "description": "TODO"
+      "description": "Flag indicating that the genome has failed to pass one or more validation tests"
     },
     "notes": {
       "type": "string",
-      "description": "TODO"
-    },
-    "original_source_file_name": {
-      "type": "string",
-      "description": "TODO"
-    },
-    "external_source_origination_date": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "release": {
-      "type": "string",
-      "description": "TODO"
+      "description": "Free text notes from the genome upload"
     }
   }
 }

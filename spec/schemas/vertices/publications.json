@@ -3,8 +3,20 @@
   "type": "object",
   "additionalProperties": false,
   "description": "The citation for an academic publication",
-  "required": ["_key", "scientific_name", "domain"],
+  "required": [
+    "_key",
+    "pubmed_id",
+    "source",
+    "title",
+    "web_address",
+    "publication_year",
+    "authors",
+    "journal"
+  ],
   "properties": {
+    "_key": {
+      "type": "number"
+    },
     "pubmed_id": {
       "type": "number"
     },
@@ -21,7 +33,7 @@
     },
     "publication_year": {
       "type": "integer",
-      "min": 1800
+      "min": 1700
     },
     "authors": {
       "type": "string"
