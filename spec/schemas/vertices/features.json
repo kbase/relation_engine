@@ -7,7 +7,6 @@
     "_key",
     "type",
     "location",
-    "dna_sequence_hash"
   ],
   "properties": {
     "_key": {
@@ -88,10 +87,6 @@
       "type": "integer",
       "description": "Total character/nucleotide length of dna_sequence"
     },
-    "dna_sequence_hash": {
-      "type": "string",
-      "description": "The MD5 hash of the feature sequence"
-    }
     "db_xrefs": {
       "type": "array",
       "title": "Database cross-references",
