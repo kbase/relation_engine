@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_key",
+    "type",
+    "dna_sequence",
+    "location_start",
+    "location_end"
+  ],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "title": "Content hash",
+      "description": "Hash of the DNA sequence for this feature."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["feature", "non-coding-feature", "CDS", "mRNA"]
+    },
+    "location_start": {
+      "type": "integer",
+      "title": "Location start index",
+      "description": "Index in the genome sequence where this feature starts."
+    },
+    "location_end": {
+      "type": "integer",
+      "title": "location end index",
+      "description": "Location in the genome sequence where this feature ends."
+    },
+    "flags": {
+      "type": "array",
+      "description": "TODO",
+      "items": {"type": "string"}
+    },
+    "warnings": {
+      "type": "array",
+      "description": "TODO",
+      "items": {"type": "string"}
+    },
+    "inference_data": {
+      "type": "array",
+      "description": "TODO",
+      "example": "TODO",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "TODO"
+          },
+          "type": {
+            "type": "string",
+            "description": "TODO"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "TODO"
+          }
+        }
+      }
+    },
+    "dna_sequence": {
+      "type": "string",
+      "description": "Nucleotide sequence for this feature."
+    },
+    "dna_sequence_length": {
+      "type": "integer",
+      "description": "Total character/nucleotide length of dna_sequence"
+    },
+    "db_xrefs": {
+      "type": "array",
+      "title": "Database cross-references",
+      "description": "TODO",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          ".*": {"type": "string"}
+        }
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "description": "TODO",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          ".*": {"type": "string"}
+        }
+      }
+    }
+  }
+}
+
