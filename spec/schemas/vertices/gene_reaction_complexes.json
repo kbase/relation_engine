@@ -11,15 +11,11 @@
     },
     "conjunctions": {
       "type": "array",
-      "example": [["A", "B"], ["C", "D"]],
-      "description": "Array of conjunctions of genes. Eg: (A AND B) OR (C AND D).",
+      "example": ["A", "B", "C", "D"],
+      "description": "Array of conjunctions of genes. Eg: (A AND B AND C AND D).",
       "items": {
-        "type": "array",
-        "description": "Conjunction of genes necessary to produce a reaction (eg. gene X AND Y AND Z)",
-        "items": {
-          "type": "string",
-          "description": "Gene vertex ID"
-        }
+        "type": "String",
+        "description": "Gene vertex _key"
       }
     }
   }

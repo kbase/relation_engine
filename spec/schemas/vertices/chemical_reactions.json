@@ -8,7 +8,7 @@
     "_key": {
       "type": "string",
       "example": "rxn02201",
-      "description": "ms id",
+      "title": "ModelSeed ID",
       "pattern": "^rxn\\d+$"
     },
     "direction": {
@@ -24,9 +24,10 @@
       "type": "string",
       "example": "PGN_RS01070"
     },
-    "enzyme": {
+    "ec_number": {
       "type": "string",
       "example": "2.7.3.7",
+      "title": "Enzyme Commission Number",
       "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
     },
     "bbcwn": {
@@ -55,8 +56,9 @@
       "example": "Folate biosynthesis"
     },
     "metacyc_pathways": {
-      "type": "string",
-      "example": "AMINE-DEG|Creatinine-Degradation|Degradation"
+      "type": "array",
+      "items": {"type": "string"},
+      "example": ["AMINE-DEG", "Creatinine-Degradation", "Degradation"]
     }
   }
 }
