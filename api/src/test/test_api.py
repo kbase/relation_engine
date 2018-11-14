@@ -51,6 +51,16 @@ class TestApi(unittest.TestCase):
         self.assertTrue(resp['commit_hash'])
         self.assertTrue(resp['repo_url'])
 
+    def test_update_specs(self):
+        resp = requests.get(
+            url + '/api/update_specs',
+            headers={'Authorization': 'Bearer ' + auth_token},
+            params={'reset': '1', 'init_collections': '1'}
+        )
+        resp_json = resp.json()
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(len(resp_json['status']))
+
     def test_list_views(self):
         resp = requests.get(url + '/api/views').json()
         self.assertTrue('list_all_documents_in_collection' in resp)
