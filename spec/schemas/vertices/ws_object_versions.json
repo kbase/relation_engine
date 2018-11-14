@@ -4,6 +4,11 @@
   "additionalProperties": false,
   "required": [
     "_key",
+    "workspace_id",
+    "object_id",
+    "version",
+    "name",
+    "hash",
     "size",
     "epoch"
   ],
@@ -15,6 +20,21 @@
         "35414:73:1"
       ],
       "pattern": "^\\d+:\\d+:\\d+$"
+    },
+    "workspace_id": {
+      "type": "integer",
+      "description": "The workspace_id for this object",
+      "minimum": 1
+    },
+    "object_id": {
+      "type": "integer",
+      "description": "The permanent object id",
+      "minimum": 1
+    },
+    "version": {
+      "type": "integer",
+      "description": "The object's version",
+      "minimum": 1
     },
     "name": {
       "type": "string",
