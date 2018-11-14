@@ -3,7 +3,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["_from", "_to"],
-  "description": "The _from entity has an attribute which is a reference to the _to object.",
+  "description": "The _from object was created as an exact copy of the _to object.",
   "properties": {
     "_from": { "type": "string" },
     "_to": { "type": "string" }
