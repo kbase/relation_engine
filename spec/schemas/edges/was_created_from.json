@@ -3,7 +3,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["_from", "_to"],
-  "description": "The _from entity is derived from the _to data. Eg: an assembly is created *from* reads.",
+  "description": "The _from entity is derived from the _to data. Eg: an assembly is created *from* reads, a house is created *from* wood.",
   "properties": {
     "_from": {
       "type": "string",
@@ -14,7 +14,7 @@
       "examples": [
         "app_module_versions/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
       ],
-      "description": "The originating data that led to the creation of the _from data."
+      "description": "The originating data that was material in the creation of the _from data."
     }
   }
 }
