@@ -28,12 +28,12 @@ def download_latest(reset=False, init_collections=True):
     spec_repo_path = os.path.join(_spec_dir, 'repo')
     tarball_url = release_info['tarball_url']
     resp = requests.get(tarball_url, stream=True)
-    temp_file = tempfile.NamedTemporaryFile()
-    # Download from the tarball url to the temp file
-    _download_file(resp, temp_file.name)
-    # Extract the downloaded tarball into the spec path
-    _extract_tarball(temp_file.name, _spec_dir)
-    temp_file.close()  # Also deletes it
+    with tempfile.NamedTemporaryFile() as temp_file:
+        # The temp file will be closed/deleted when the context ends
+        # Download from the tarball url to the temp file
+        _download_file(resp, temp_file.name)
+        # Extract the downloaded tarball into the spec path
+        _extract_tarball(temp_file.name, _spec_dir)
     # The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
     # We want to move that to /spec/repo
     _rename_directories(_spec_dir, spec_repo_path)
