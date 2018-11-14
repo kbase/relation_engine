@@ -55,8 +55,10 @@ class TestApi(unittest.TestCase):
         resp = requests.get(
             url + '/api/update_specs',
             headers={'Authorization': 'Bearer ' + auth_token}
-        ).json()
-        self.assertTrue(len(resp['status']))
+        )
+        resp_json = resp.json()
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(len(resp_json['status']))
 
     def test_list_views(self):
         resp = requests.get(url + '/api/views').json()

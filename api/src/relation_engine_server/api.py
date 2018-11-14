@@ -68,7 +68,7 @@ def show_view(name):
 @api.route('/update_specs', methods=['GET'])
 def refresh_specs():
     """
-    Manually pull from the spec git repo to get updates.
+    Manually check for updates, download spec releases, and init new collections.
     """
     auth.require_auth_token(['RE_ADMIN'])
     status = pull_spec.download_latest(
