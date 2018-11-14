@@ -11,9 +11,6 @@
     },
     "_to": {
       "type": "string",
-      "examples": [
-        "app_module_versions/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
-      ],
       "description": "The originating data that was material in the creation of the _from data."
     }
   }
