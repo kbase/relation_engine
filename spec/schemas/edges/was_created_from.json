@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_from", "_to"],
+  "description": "The _from entity is derived from the _to data. Eg: an assembly is created *from* reads, a house is created *from* wood.",
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The entity that was created."
+    },
+    "_to": {
+      "type": "string",
+      "description": "The originating data that was material in the creation of the _from data."
+    }
+  }
+}
+
+

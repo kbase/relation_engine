@@ -20,9 +20,8 @@
     },
     "name": {
       "type": "string",
-      "examples": [
-        "kb_uploadmethods"
-      ],
+      "title": "Module name",
+      "examples": ["kb_uploadmethods"],
       "pattern": "^\\w+$"
     },
     "commit": {
