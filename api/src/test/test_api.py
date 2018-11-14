@@ -54,7 +54,8 @@ class TestApi(unittest.TestCase):
     def test_update_specs(self):
         resp = requests.get(
             url + '/api/update_specs',
-            headers={'Authorization': 'Bearer ' + auth_token}
+            headers={'Authorization': 'Bearer ' + auth_token},
+            params={'reset': '1', 'init_collections': '1'}
         )
         resp_json = resp.json()
         self.assertEqual(resp.status_code, 200)
