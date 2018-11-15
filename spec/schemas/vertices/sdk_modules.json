@@ -2,7 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
-  "required": ["_key"],
+  "required": [
+    "_key",
+    "language",
+    "dynamic_service"
+  ],
   "properties": {
     "_key": {
       "type": "string",
@@ -10,6 +14,15 @@
         "kb_uploadmethods"
       ],
       "pattern": "^\\w+$"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["python", "perl", "java"],
+      "description": "The programing language the module is written in"
+    },
+    "dynamic_service": {
+      "type": "boolean",
+      "description": "Indicates if the module can be run as a webservice"
     }
   }
 }
