@@ -10,7 +10,8 @@
     "name",
     "hash",
     "size",
-    "epoch"
+    "epoch",
+    "deleted"
   ],
   "properties": {
     "_key": {
@@ -61,6 +62,9 @@
       "description": "Creation time in UTC epoch",
       "default": 0,
       "minimum": 0
+    },
+    "deleted": {
+      "type": "boolean"
     }
   }
 }

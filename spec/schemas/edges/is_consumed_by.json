@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "description": "An entity consumed by something else. For example a type -> is_consumed_by -> sdk_method_version",
+  "additionalProperties": true,
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The ID of a vertex that consumes something else."
+    },
+    "_to": {
+      "type": "string",
+      "description": "The ID of a vertex that is consumed by something else."
+    }
+  }
+}
+
+

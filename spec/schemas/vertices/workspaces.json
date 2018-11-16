@@ -5,7 +5,7 @@
   "required": [
     "_key",
     "name",
-    "moddate",
+    "mod_epoch",
     "public"
   ],
   "properties": {
@@ -24,15 +24,15 @@
         "jjeffryes:narrative_1534187093329"
       ]
     },
-    "moddate": {
-      "type": "string",
-      "description": "Date when the Workspace was last modified",
-      "examples": [
-        "2014-04-09T19:40:25+0000"
-      ],
-      "format": "date-time"
+    "mod_epoch": {
+      "type": "integer",
+      "description": "Epoch when the Workspace was last modified",
+      "minimum": 0
     },
     "public": {
+      "type": "boolean"
+    },
+    "deleted": {
       "type": "boolean"
     }
   }

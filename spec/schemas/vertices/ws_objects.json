@@ -5,7 +5,8 @@
   "required": [
     "_key",
     "workspace_id",
-    "object_id"
+    "object_id",
+    "deleted"
   ],
   "properties": {
     "_key": {
@@ -25,6 +26,9 @@
       "type": "integer",
       "description": "The permanent object id",
       "minimum": 1
+    },
+    "deleted": {
+      "type": "boolean"
     }
   }
 }

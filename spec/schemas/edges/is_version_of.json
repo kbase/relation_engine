@@ -19,6 +19,11 @@
         "app_modules/kb_uploadmethods"
       ],
       "description": "The non-versioned entity group, where all members of the group are different versions of something (eg. a workspace object, module, or workspace type)."
+    },
+    "tag": {
+      "type": "string",
+      "description": "Tags for entities managed by catalog",
+      "enum": ["release", "beta", "dev"]
     }
   }
 }
