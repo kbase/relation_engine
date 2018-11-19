@@ -152,6 +152,18 @@ _Response JSON schema_
 
 Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` below:
 
+#### Ad-hoc sysadmin queries
+
+System admins can run ad-hoc queries by specifying a "query" property in the JSON request body.
+
+```sh
+$ curl -X POST \
+    -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
+    http://relation_engine/api/query?view=example
+```
+
+This will return the same form of results as above.
+
 ### PUT /api/documents
 
 Bulk-update documents by either creating, replacing, or updating.

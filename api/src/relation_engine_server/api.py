@@ -23,12 +23,20 @@ def run_query():
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
     """
-    auth.require_auth_token(roles=[])
+    json_body = flask.request.json or {}
+    if 'query' in json_body:
+        # Run an adhoc query for a sysadmin
+        auth.require_auth_token(roles=['RE_ADMIN'])
+        query_text = json_body['query']
+        del json_body['query']
+        resp = arango_client.run_query(query_text=query_text, bind_vars=json_body)
+        return flask.jsonify(resp)
+    else:
+        auth.require_auth_token(roles=[])
     if 'view' in flask.request.args:
         view_name = flask.request.args['view']
         view_source = spec_loader.get_view(view_name)
-        bind_vars = flask.request.json or {}
-        resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
+        resp = arango_client.run_query(query_text=view_source, bind_vars=json_body)
     elif 'cursor_id' in flask.request.args:
         cursor_id = flask.request.args['cursor_id']
         resp = arango_client.run_query(cursor_id=cursor_id)
