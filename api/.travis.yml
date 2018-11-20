@@ -8,4 +8,5 @@ script:
 - cp .env.example .env
 - docker-compose up -d
 - "curl -v -H 'Authorization: admin_token' http://127.0.0.1:5000/api/update_specs"
+- sleep 10
 - make test
