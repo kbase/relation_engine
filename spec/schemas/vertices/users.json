@@ -8,9 +8,9 @@
       "type": "string",
       "description": "The username for this user",
       "examples": [
-        "jjeffryes"
-      ],
-      "pattern": "^\\w+$"
+        "jjeffryes",
+        "sean-mccorkle3."
+      ]
     }
   }
 }
