@@ -10,7 +10,7 @@ import os
 
 url = os.environ.get('TEST_URL', 'http://web:5000')
 auth_token = os.environ.get('KBASE_TEST_AUTH_TOKEN', '')
-headers = {'Authorization': 'Bearer ' + auth_token}
+headers = {'Authorization': 'Bearer ' + auth_token, 'Content-Type': 'application/json'}
 
 
 def create_test_docs(count):
@@ -198,6 +198,33 @@ class TestApi(unittest.TestCase):
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
         self.assertEqual(resp, expected)
+
+    def test_admin_query(self):
+        """Test an ad-hoc query made by an admin."""
+        resp = requests.post(
+            url + '/api/query_results',
+            params={},
+            headers=headers,
+            data=json.dumps({
+                'query': 'for v in example_vertices sort rand() limit @count return v._id',
+                'count': 1
+            })
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(len(resp['results']), 1)
+
+    def test_admin_query_invalid_auth(self):
+        """Test the error response for an ad-hoc admin query without auth."""
+        resp = requests.post(
+            url + '/api/query_results',
+            params={},
+            headers={'Content-Type': 'application/json', 'Authorization': 'xyz'},
+            data=json.dumps({
+                'query': 'for v in example_vertices sort rand() limit @count return v._id',
+                'count': 1
+            })
+        ).json()
+        self.assertEqual(resp['error'], '403 - Unauthorized')
 
     def test_query(self):
         """Test a basic query that fetches some docs."""

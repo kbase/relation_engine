@@ -23,19 +23,30 @@ def run_query():
     Run a stored view as a query against the database.
     Auth: only kbase users (any role)
     """
+    # Note that flask.request.json only works if the request Content-Type is application/json
+    json_body = json.loads(flask.request.get_data() or '{}')
+    if 'query' in json_body:
+        # Run an adhoc query for a sysadmin
+        auth.require_auth_token(roles=['RE_ADMIN'])
+        query_text = json_body['query']
+        del json_body['query']
+        resp_body = arango_client.run_query(query_text=query_text, bind_vars=json_body)
+        return flask.jsonify(resp_body)
     auth.require_auth_token(roles=[])
     if 'view' in flask.request.args:
+        # Run a query from a view name
         view_name = flask.request.args['view']
         view_source = spec_loader.get_view(view_name)
-        bind_vars = flask.request.json or {}
-        resp = arango_client.run_query(query_text=view_source, bind_vars=bind_vars)
+        resp_body = arango_client.run_query(query_text=view_source, bind_vars=json_body)
+        return flask.jsonify(resp_body)
     elif 'cursor_id' in flask.request.args:
+        # Run a query from a cursor ID
         cursor_id = flask.request.args['cursor_id']
-        resp = arango_client.run_query(cursor_id=cursor_id)
-    else:
-        resp = {'error': 'Pass in a view or a cursor_id'}
-        return (flask.jsonify(resp), 400)
-    return flask.jsonify(resp)
+        resp_body = arango_client.run_query(cursor_id=cursor_id)
+        return flask.jsonify(resp_body)
+    # No valid options were passed
+    resp_body = {'error': 'Pass in a view or a cursor_id'}
+    return (flask.jsonify(resp_body), 500)
 
 
 @api.route('/schemas', methods=['GET'])
@@ -69,6 +80,7 @@ def show_view(name):
 def refresh_specs():
     """
     Manually check for updates, download spec releases, and init new collections.
+    Auth: admin
     """
     auth.require_auth_token(['RE_ADMIN'])
     status = pull_spec.download_latest(
@@ -82,7 +94,7 @@ def refresh_specs():
 def save_documents():
     """
     Create, update, or replace many documents in a batch.
-    Auth: only sysadmins
+    Auth: admin
     """
     auth.require_auth_token(['RE_ADMIN'])
     collection_name = flask.request.args['collection']
