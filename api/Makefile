@@ -1,4 +1,4 @@
-.PHONY: dev-server dev-build test test-local
+.PHONY: test
 
 test:
 	docker-compose run web sh scripts/run_tests.sh
