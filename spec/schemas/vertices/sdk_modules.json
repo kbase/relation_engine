@@ -17,7 +17,7 @@
     },
     "language": {
       "type": "string",
-      "enum": ["python", "perl", "java"],
+      "enum": ["python", "perl", "java", "r"],
       "description": "The programing language the module is written in"
     },
     "dynamic_service": {
