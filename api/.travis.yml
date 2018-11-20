@@ -7,4 +7,5 @@ python:
 script:
 - cp .env.example .env
 - docker-compose up -d
+- "curl -H 'Authorization: admin_token' http://localhost:5000/api/update_specs"
 - make test
