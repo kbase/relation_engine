@@ -5,16 +5,19 @@ We make actual ajax requests to the running docker container.
 """
 import unittest
 import requests
-import responses
 import json
 import os
 
-from src.test.mock_auth import tokens
+# Use the mock auth tokens
+non_admin_token = 'non_admin_token'
+admin_token = 'admin_token'
+invalid_token = 'invalid_token'
 
+# Use the docker-compose url of the running flask server
 url = os.environ.get('TEST_URL', 'http://web:5000')
 
-headers_non_admin = {'Authorization': 'Bearer ' + tokens['non_admin'], 'Content-Type': 'application/json'}
-headers_admin = {'Authorization': 'Bearer ' + tokens['admin'], 'Content-Type': 'application/json'}
+headers_non_admin = {'Authorization': 'Bearer ' + non_admin_token, 'Content-Type': 'application/json'}
+headers_admin = {'Authorization': 'Bearer ' + admin_token, 'Content-Type': 'application/json'}
 
 
 def create_test_docs(count):
@@ -57,7 +60,6 @@ class TestApi(unittest.TestCase):
 
     def test_update_specs(self):
         """Test the endpoint that triggers an update on the specs."""
-        with 
         resp = requests.get(
             url + '/api/update_specs',
             headers=headers_admin,
@@ -67,19 +69,16 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(len(resp_json['status']))
 
-    @unittest.skip('x')
     def test_list_views(self):
         """Test the listing out of saved AQL views."""
         resp = requests.get(url + '/api/views').json()
         self.assertTrue('list_all_documents_in_collection' in resp)
 
-    @unittest.skip('x')
     def test_show_view(self):
         """Test the endpoint that displays AQL source code for one view."""
         resp = requests.get(url + '/api/views/count_documents_in_collection').text
         self.assertTrue('Return count of documents' in resp)
 
-    @unittest.skip('x')
     def test_list_schemas(self):
         """Test the listing out of registered JSON schemas for vertices and edges."""
         resp = requests.get(url + '/api/schemas').json()
@@ -88,7 +87,6 @@ class TestApi(unittest.TestCase):
         self.assertFalse('error' in resp)
         self.assertTrue(len(resp))
 
-    @unittest.skip('x')
     def test_show_schema(self):
         """Test the endpoint that displays the JSON source for one schema."""
         resp = requests.get(url + '/api/schemas/example_edges').text
@@ -96,16 +94,13 @@ class TestApi(unittest.TestCase):
         resp = requests.get(url + '/api/schemas/example_vertices').text
         self.assertTrue('_key' in resp)
 
-    @unittest.skip('x')
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
         resp = requests.put(
-            url + '/api/documents?on_duplicate=error&overwrite=true&collection',
-            headers={}
+            url + '/api/documents?on_duplicate=error&overwrite=true&collection'
         ).json()
-        self.assertEqual(resp['error'], 'Missing header: authorization')
+        self.assertEqual(resp['error'], 'Missing header: Authorization')
 
-    @unittest.skip('x')
     def test_save_documents_invalid_auth(self):
         """Test an invalid attempt to save a doc with a bad auth token."""
         resp = requests.put(
@@ -114,7 +109,6 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
-    @unittest.skip('x')
     def test_save_documents_non_admin(self):
         """Test an invalid attempt to save a doc as a non-admin."""
         resp = requests.put(
@@ -123,7 +117,6 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
-    @unittest.skip('x')
     def test_save_documents_invalid_schema(self):
         """Test the case where some documents fail against their schema."""
         resp = requests.put(
@@ -138,7 +131,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['validator'], 'required')
         self.assertEqual(resp['validator_value'], ['_key'])
 
-    @unittest.skip('x')
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
         resp = requests.put(
@@ -149,7 +141,6 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertTrue('Schema does not exist' in resp['error'])
 
-    @unittest.skip('x')
     def test_save_documents_invalid_json(self):
         """Test an attempt to save documents with an invalid JSON body."""
         resp = requests.put(
@@ -162,21 +153,18 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['pos'], 1)
         self.assertEqual(resp['source_json'], '\n')
 
-    @unittest.skip('x')
     def test_create_documents(self):
         """Test all valid cases for saving documents."""
         resp = save_test_docs(3)
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_create_edges(self):
         """Test all valid cases for saving edges."""
         resp = save_test_docs(3, edges=True)
         expected = {'created': 3, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_update_documents(self):
         """Test updating existing documents."""
         resp = requests.put(
@@ -188,7 +176,6 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_update_edge(self):
         """Test updating existing edge."""
         resp = requests.put(
@@ -200,7 +187,6 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_replace_documents(self):
         """Test replacing of existing documents."""
         resp = requests.put(
@@ -212,7 +198,6 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_save_documents_dupe_errors(self):
         """Test where we want to raise errors on duplicate documents."""
         save_test_docs(3)
@@ -226,7 +211,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['errors'], 3)
         self.assertTrue(resp['details'])
 
-    @unittest.skip('x')
     def test_save_documents_ignore_dupes(self):
         """Test ignoring duplicate, existing documents when saving."""
         resp = requests.put(
@@ -238,7 +222,6 @@ class TestApi(unittest.TestCase):
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
         self.assertEqual(resp, expected)
 
-    @unittest.skip('x')
     def test_admin_query(self):
         """Test an ad-hoc query made by an admin."""
         resp = requests.post(
@@ -253,7 +236,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
-    @unittest.skip('x')
     def test_admin_query_non_admin(self):
         """Test an ad-hoc query error as a non-admin."""
         resp = requests.post(
@@ -267,7 +249,6 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
-    @unittest.skip('x')
     def test_admin_query_invalid_auth(self):
         """Test the error response for an ad-hoc admin query without auth."""
         resp = requests.post(
@@ -281,7 +262,6 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
-    @unittest.skip('x')
     def test_query(self):
         """Test a basic query that fetches some docs."""
         save_test_docs(3)
@@ -297,7 +277,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['cursor_id'], None)
         self.assertTrue(resp['stats'])
 
-    @unittest.skip('x')
     def test_query_with_cursor(self):
         """Test getting more data via a query cursor."""
         save_test_docs(count=200)
@@ -330,7 +309,6 @@ class TestApi(unittest.TestCase):
         self.assertTrue(resp['error'])
         self.assertEqual(resp['arango_message'], 'cursor not found')
 
-    @unittest.skip('x')
     def test_query_no_name(self):
         """Test a query error with a view name that does not exist."""
         resp = requests.post(
@@ -342,7 +320,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['error'], 'View does not exist.')
         self.assertEqual(resp['name'], 'nonexistent')
 
-    @unittest.skip('x')
     def test_query_missing_bind_var(self):
         """Test a query error with a missing bind variable."""
         resp = requests.post(
@@ -354,7 +331,6 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['error'], 'ArangoDB server error.')
         self.assertTrue(resp['arango_message'])
 
-    @unittest.skip('x')
     def test_query_incorrect_collection(self):
         """Test a query error with an invalid collection name."""
         resp = requests.post(

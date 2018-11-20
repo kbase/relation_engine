@@ -12,10 +12,11 @@ services:
         DEVELOPMENT: 1
     env_file: .env
     ports:
-      - "5000:5000"
+      - 5000:5000
     volumes:
-      - .:/app
+      - ${PWD}:/app
     environment:
+      - KBASE_AUTH_URL=http://auth:5000
       - PYTHONUNBUFFERED=true
       - DB_URL=http://arangodb:8529
       - FLASK_ENV=development
@@ -28,3 +29,9 @@ services:
       - 8529:8529
     environment:
       - ARANGO_ROOT_PASSWORD=password
+
+  # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
+  auth:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/src/test/mock_auth:/config

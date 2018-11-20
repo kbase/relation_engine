@@ -17,7 +17,7 @@ def require_auth_token(roles=[]):
     Raises some exception if any auth requirement is not met.
     """
     kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
-    kbase_auth_url = kbase_endpoint + '/auth'
+    kbase_auth_url = os.environ.get('KBASE_AUTH_URL', kbase_endpoint + '/auth')
     if not flask.request.headers.get('Authorization'):
         # No authorization token was provided in the headers
         raise MissingHeader('Authorization')
