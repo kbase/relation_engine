@@ -21,4 +21,4 @@ COPY . /app
 # Clone the spec files
 RUN git clone ${spec_url} ${spec_path}
 
-CMD ["sh", "start_server.sh"]
+CMD ["python", "server.py"]
