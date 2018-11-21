@@ -2,9 +2,12 @@ sudo: required
 services:
 - docker
 language: python
+env:
+  - SPEC_RELEASE_URL=https://api.github.com/repos/kbase/relation_engine_spec/tarball/v0.0.2
 python:
 - 3.6
 script:
 - cp .env.example .env
-- docker-compose up -d
+- docker-compose up --build -d
+- sleep 15
 - make test
