@@ -3,10 +3,10 @@ import flask
 import json
 import jsonschema
 import hashlib
-import requests
+import os
 
 from . import spec_loader
-from .arango_client import ArangoServerError, db_url, db_user, db_pass
+from .arango_client import import_from_file
 
 
 def bulk_import(query_params):
@@ -16,15 +16,16 @@ def bulk_import(query_params):
     arango client.
     """
     schema = spec_loader.get_schema(query_params['collection'])
-    temp_fd = tempfile.NamedTemporaryFile()
-    with open(temp_fd.name, 'a') as fd:
+    with tempfile.NamedTemporaryFile(mode='a', delete=False) as temp_fd:
+        # temp_fd is closed and deleted when the context ends
         for line in flask.request.stream:
+            print('line', line)
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
             json_line = _write_edge_key(json_line)
-            fd.write(json.dumps(json_line) + '\n')
-    resp_text = _import_from_file(temp_fd.name, query_params)
-    temp_fd.close()  # Also deletes the file
+            print(temp_fd.write(json.dumps(json_line) + '\n'))
+    resp_text = import_from_file(temp_fd.name, query_params)
+    os.remove(temp_fd.name)
     return resp_text
 
 
@@ -35,17 +36,3 @@ def _write_edge_key(json_line):
             json_line["_from"].encode() + json_line["_to"].encode(), digest_size=8
         ).hexdigest()
     return json_line
-
-
-def _import_from_file(file_path, query):
-    """Open a file of line-separated JSON and bulk-import it."""
-    with open(file_path, 'rb') as file_desc:
-        resp = requests.post(
-            db_url + '/_api/import',
-            data=file_desc,
-            auth=(db_user, db_pass),
-            params=query
-        )
-    if not resp.ok:
-        raise ArangoServerError(resp.text)
-    return resp.text
