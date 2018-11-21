@@ -54,11 +54,12 @@ class TestApi(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Initialize collections before running any tests
-        requests.get(
+        resp = requests.get(
             url + '/api/update_specs',
             headers=headers_admin,
             params={'reset': '1', 'init_collections': '1'}
         )
+        print('update_specs response', resp.text)
 
     def test_root(self):
         """Test root path for api."""
