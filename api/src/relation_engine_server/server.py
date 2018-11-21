@@ -22,6 +22,8 @@ def root():
     if os.path.exists('.git/refs/heads/master'):
         with open('.git/refs/heads/master', 'r') as fd:
             commit_hash = fd.read().strip()
+    else:
+        commit_hash = 'unknown'
     arangodb_status = arango_client.server_status()
     repo_url = 'https://github.com/kbase/relation_engine_api.git'
     return flask.jsonify({
