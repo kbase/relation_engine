@@ -6,6 +6,6 @@ python:
 - 3.6
 script:
 - cp .env.example .env
-- docker-compose up -d
+- docker-compose up --build -d
 - sleep 15
 - make test
