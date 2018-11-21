@@ -51,6 +51,15 @@ def save_test_docs(count, edges=False):
 
 class TestApi(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        # Initialize collections before running any tests
+        requests.get(
+            url + '/api/update_specs',
+            headers=headers_admin,
+            params={'reset': '1', 'init_collections': '1'}
+        )
+
     def test_root(self):
         """Test root path for api."""
         resp = requests.get(url).json()
@@ -233,7 +242,6 @@ class TestApi(unittest.TestCase):
                 'count': 1
             })
         ).json()
-        print('RESP', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 

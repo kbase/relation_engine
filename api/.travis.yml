@@ -7,7 +7,5 @@ python:
 script:
 - cp .env.example .env
 - docker-compose up -d
-- sleep 10
-- "curl -v -H 'Authorization: admin_token' http://127.0.0.1:5000/api/update_specs"
-- sleep 60
+- sleep 15
 - make test
