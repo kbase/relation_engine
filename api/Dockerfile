@@ -9,7 +9,6 @@ COPY dev-requirements.txt /app/dev-requirements.txt
 WORKDIR /app
 
 # Install dependencies
-RUN apk --update add make git
 RUN apk --update add --virtual build-dependencies python-dev build-base && \
     pip install --upgrade pip && \
     pip install --upgrade --no-cache-dir -r requirements.txt && \
@@ -18,7 +17,5 @@ RUN apk --update add --virtual build-dependencies python-dev build-base && \
 
 # Run the app
 COPY . /app
-# Clone the spec files
-RUN git clone ${spec_url} ${spec_path}
 
-CMD ["sh", "start_server.sh"]
+CMD ["sh", "scripts/start_server.sh"]

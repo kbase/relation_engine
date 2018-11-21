@@ -16,17 +16,12 @@ def download_latest(reset=False, init_collections=True):
     if reset and os.path.exists(_spec_dir):
         shutil.rmtree(_spec_dir)
     os.makedirs(_spec_dir, exist_ok=True)
-    # Download information about the latest release
-    release_resp = requests.get(_api_url + '/releases/latest')
-    release_info = release_resp.json()
-    if release_resp.status_code != 200:
-        # This may be a github API rate usage limit, or some other error
-        return release_info['message']
-    if _has_latest_spec(release_info):
-        return 'already up to date: ' + release_info['tag_name']
     # Download and extract a new release to /spec/repo
     spec_repo_path = os.path.join(_spec_dir, 'repo')
-    tarball_url = release_info['tarball_url']
+    if 'SPEC_RELEASE_URL' in os.environ:
+        tarball_url = os.environ['SPEC_RELEASE_URL']
+    else:
+        tarball_url = _fetch_github_release_url()
     resp = requests.get(tarball_url, stream=True)
     with tempfile.NamedTemporaryFile() as temp_file:
         # The temp file will be closed/deleted when the context ends
@@ -37,13 +32,21 @@ def download_latest(reset=False, init_collections=True):
     # The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
     # We want to move that to /spec/repo
     _rename_directories(_spec_dir, spec_repo_path)
-    # Save the release ID to /spec/.release_id
-    _save_release_id(release_info)
     # Initialize all the collections
     if init_collections:
         schemas = spec_loader.get_schema_names()
         arango_client.init_collections(schemas)
-    return 'updated to ' + release_info['tag_name']
+    return 'updated from ' + tarball_url
+
+
+def _fetch_github_release_url():
+    # Download information about the latest release
+    release_resp = requests.get(_api_url + '/releases/latest')
+    release_info = release_resp.json()
+    if release_resp.status_code != 200:
+        # This may be a github API rate usage limit, or some other error
+        raise Exception(release_info['message'])
+    return release_info['tarball_url']
 
 
 def _download_file(resp, path):

@@ -92,7 +92,7 @@ def create_collection(name, is_edge):
             raise ArangoServerError(resp.text)
 
 
-def bulk_import(file_path, query):
+def import_from_file(file_path, query):
     """Make a generic arango post request."""
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
