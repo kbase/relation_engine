@@ -244,6 +244,7 @@ class TestApi(unittest.TestCase):
                 'count': 1
             })
         ).json()
+        print('RESP', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
