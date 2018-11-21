@@ -62,7 +62,7 @@ class TestApi(unittest.TestCase):
 
     def test_root(self):
         """Test root path for api."""
-        resp = requests.get(url).json()
+        resp = requests.get(url + '/').json()
         self.assertEqual(resp['arangodb_status'], 'connected_authorized')
         self.assertTrue(resp['commit_hash'])
         self.assertTrue(resp['repo_url'])
@@ -242,6 +242,7 @@ class TestApi(unittest.TestCase):
                 'count': 1
             })
         ).json()
+        print('RESP', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
