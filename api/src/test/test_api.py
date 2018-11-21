@@ -63,6 +63,7 @@ class TestApi(unittest.TestCase):
     def test_root(self):
         """Test root path for api."""
         resp = requests.get(url + '/').json()
+        print('RESP', resp)
         self.assertEqual(resp['arangodb_status'], 'connected_authorized')
         self.assertTrue(resp['commit_hash'])
         self.assertTrue(resp['repo_url'])
@@ -233,6 +234,7 @@ class TestApi(unittest.TestCase):
 
     def test_admin_query(self):
         """Test an ad-hoc query made by an admin."""
+        save_test_docs(1, edges=True)
         resp = requests.post(
             url + '/api/query_results',
             params={},
@@ -242,7 +244,6 @@ class TestApi(unittest.TestCase):
                 'count': 1
             })
         ).json()
-        print('RESP', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
