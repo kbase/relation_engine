@@ -114,7 +114,7 @@ class TestApi(unittest.TestCase):
         """Test an invalid attempt to save a doc with a bad auth token."""
         resp = requests.put(
             url + '/api/documents?on_duplicate=error&overwrite=true&collection',
-            headers={'Authorization': 'Bearer xyz'}
+            headers={'Authorization': 'Bearer ' + invalid_token}
         ).json()
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
@@ -264,7 +264,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={},
-            headers={'Authorization': 'xyz'},
+            headers={'Authorization': invalid_token},
             data=json.dumps({
                 'query': 'for v in example_vertices sort rand() limit @count return v._id',
                 'count': 1
