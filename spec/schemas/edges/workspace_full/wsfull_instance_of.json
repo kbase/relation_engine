@@ -3,7 +3,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["_from", "_to"],
-  "description": "The _from entity is an instance of the _to entity.",
+  "description": "The _from WS versioned object is an instance of the _to versioned type.",
   "properties": {
     "_from": { "type": "string" },
     "_to": { "type": "string" }

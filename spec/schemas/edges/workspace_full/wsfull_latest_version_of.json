@@ -7,16 +7,16 @@
     "_from": {
       "type": "string",
       "examples": [
-        "type_versions/KBaseGenomes.Genome‑9.0",
-        "app_module_versions/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
+        "wsfull_type_version/KBaseGenomes.Genome‑9.0",
+        "wsfull_module_version/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
       ],
       "description": "A versioned entity, representing the most recent version of an entity in a group (most likely a workspace object, module, or workspace type)."
     },
     "_to": {
       "type": "string",
       "examples": [
-        "types/KBaseGenomes.Genome",
-        "app_modules/kb_uploadmethods"
+        "wsfull_type/KBaseGenomes.Genome",
+        "wsfull_module/kb_uploadmethods"
       ],
       "description": "The non-versioned entity group, where all members of the group are different versions of something (eg. a workspace object, module, or workspace type)"
     }

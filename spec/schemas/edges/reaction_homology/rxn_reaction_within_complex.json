@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The rxn_reaction contained within a rxn_gene_complex."
+    },
+    "_to": {
+      "type": "string",
+      "description": "The rxn_gene_complex that produces a reaction."
+    }
+  }
+}

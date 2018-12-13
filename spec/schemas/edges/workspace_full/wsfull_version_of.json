@@ -2,21 +2,22 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
+  "description": "The _from entity is a version of a the _to entity (eg. type, method, module).",
   "required": ["_from", "_to"],
   "properties": {
     "_from": {
       "type": "string",
       "examples": [
-        "type_versions/KBaseGenomes.Genome‑9.0",
-        "app_module_versions/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
+        "wsfull_type_version/KBaseGenomes.Genome‑9.0",
+        "wsfull_method_version/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433"
       ],
       "description": "A versioned entity (eg. a workspace object, module, or workspace type)"
     },
     "_to": {
       "type": "string",
       "examples": [
-        "types/KBaseGenomes.Genome",
-        "app_modules/kb_uploadmethods"
+        "wsfull_type/KBaseGenomes.Genome",
+        "wsfull_method/kb_uploadmethods"
       ],
       "description": "The non-versioned entity group, where all members of the group are different versions of something (eg. a workspace object, module, or workspace type)."
     },
