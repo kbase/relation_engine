@@ -17,7 +17,7 @@
       "examples": [
         "module_name:version_hash.method_name",
         "module_name:UNKNOWN.method_name",
-        "sdk_module_method_versions/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433.import_genbank_from_staging"
+        "wsfull_method_version/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433.import_genbank_from_staging"
       ],
       "description": "<module_name>:<module_commit>.<method_name>",
       "pattern": "^\\w+:\\w+\\.\\w+$"
