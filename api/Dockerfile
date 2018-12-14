@@ -1,8 +1,6 @@
 FROM python:3.7-alpine
 
 ARG DEVELOPMENT
-ARG spec_url=https://github.com/kbase/relation_engine_spec
-ARG spec_path=/spec
 
 COPY requirements.txt /app/requirements.txt
 COPY dev-requirements.txt /app/dev-requirements.txt

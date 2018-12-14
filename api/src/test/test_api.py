@@ -30,17 +30,17 @@ def create_test_docs(count):
 def create_test_edges(count):
     """Produce some test edges."""
     def doc(i):
-        return '{"_from": "example_vertices/%s", "_to": "example_vertices/%s"}' % (i, i)
+        return '{"_from": "test_vertex/%s", "_to": "test_vertex/%s"}' % (i, i)
     return '\n'.join(doc(i) for i in range(0, count))
 
 
 def save_test_docs(count, edges=False):
     if edges:
         docs = create_test_edges(count)
-        collection = 'example_edges'
+        collection = 'test_edge'
     else:
         docs = create_test_docs(count)
-        collection = 'example_vertices'
+        collection = 'test_vertex'
     return requests.put(
         url + '/api/documents',
         params={'overwrite': True, 'collection': collection},
@@ -92,16 +92,16 @@ class TestApi(unittest.TestCase):
     def test_list_schemas(self):
         """Test the listing out of registered JSON schemas for vertices and edges."""
         resp = requests.get(url + '/api/schemas').json()
-        self.assertTrue('example_vertices' in resp['vertices'])
-        self.assertTrue('example_edges' in resp['edges'])
+        self.assertTrue('test_vertex' in resp['vertices'])
+        self.assertTrue('test_edge' in resp['edges'])
         self.assertFalse('error' in resp)
         self.assertTrue(len(resp))
 
     def test_show_schema(self):
         """Test the endpoint that displays the JSON source for one schema."""
-        resp = requests.get(url + '/api/schemas/example_edges').text
+        resp = requests.get(url + '/api/schemas/test_edge').text
         self.assertTrue('_from' in resp)
-        resp = requests.get(url + '/api/schemas/example_vertices').text
+        resp = requests.get(url + '/api/schemas/test_vertex').text
         self.assertTrue('_key' in resp)
 
     def test_save_documents_missing_auth(self):
@@ -131,7 +131,7 @@ class TestApi(unittest.TestCase):
         """Test the case where some documents fail against their schema."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'ignore', 'collection': 'example_vertices'},
+            params={'on_duplicate': 'ignore', 'collection': 'test_vertex'},
             data='{"name": "x"}\n{"name": "y"}',
             headers=headers_admin
         ).json()
@@ -155,7 +155,7 @@ class TestApi(unittest.TestCase):
         """Test an attempt to save documents with an invalid JSON body."""
         resp = requests.put(
             url + '/api/documents',
-            params={'collection': 'example_vertices'},
+            params={'collection': 'test_vertex'},
             data='\n',
             headers=headers_admin
         ).json()
@@ -179,7 +179,7 @@ class TestApi(unittest.TestCase):
         """Test updating existing documents."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'update', 'collection': 'example_vertices'},
+            params={'on_duplicate': 'update', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=headers_admin
         ).json()
@@ -190,7 +190,7 @@ class TestApi(unittest.TestCase):
         """Test updating existing edge."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'update', 'collection': 'example_edges'},
+            params={'on_duplicate': 'update', 'collection': 'test_edge'},
             data=create_test_edges(3),
             headers=headers_admin
         ).json()
@@ -201,7 +201,7 @@ class TestApi(unittest.TestCase):
         """Test replacing of existing documents."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'replace', 'collection': 'example_vertices'},
+            params={'on_duplicate': 'replace', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=headers_admin
         ).json()
@@ -213,7 +213,7 @@ class TestApi(unittest.TestCase):
         save_test_docs(3)
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'error', 'collection': 'example_vertices', 'display_errors': '1'},
+            params={'on_duplicate': 'error', 'collection': 'test_vertex', 'display_errors': '1'},
             data=create_test_docs(3),
             headers=headers_admin
         ).json()
@@ -225,7 +225,7 @@ class TestApi(unittest.TestCase):
         """Test ignoring duplicate, existing documents when saving."""
         resp = requests.put(
             url + '/api/documents',
-            params={'on_duplicate': 'ignore', 'collection': 'example_vertices'},
+            params={'on_duplicate': 'ignore', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=headers_admin
         ).json()
@@ -240,7 +240,7 @@ class TestApi(unittest.TestCase):
             params={},
             headers=headers_admin,
             data=json.dumps({
-                'query': 'for v in example_vertices sort rand() limit @count return v._id',
+                'query': 'for v in test_vertex sort rand() limit @count return v._id',
                 'count': 1
             })
         ).json()
@@ -254,7 +254,7 @@ class TestApi(unittest.TestCase):
             params={},
             headers=headers_non_admin,
             data=json.dumps({
-                'query': 'for v in example_vertices sort rand() limit @count return v._id',
+                'query': 'for v in test_vertex sort rand() limit @count return v._id',
                 'count': 1
             })
         ).json()
@@ -267,7 +267,7 @@ class TestApi(unittest.TestCase):
             params={},
             headers={'Authorization': invalid_token},
             data=json.dumps({
-                'query': 'for v in example_vertices sort rand() limit @count return v._id',
+                'query': 'for v in test_vertex sort rand() limit @count return v._id',
                 'count': 1
             })
         ).json()
@@ -279,7 +279,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'@collection': 'example_vertices'}),
+            data=json.dumps({'@collection': 'test_vertex'}),
             headers=headers_non_admin
         ).json()
         self.assertEqual(len(resp['results']), 3)
@@ -294,7 +294,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'@collection': 'example_vertices'}),
+            data=json.dumps({'@collection': 'test_vertex'}),
             headers=headers_non_admin
         ).json()
         cursor_id = resp['cursor_id']
@@ -325,7 +325,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'nonexistent'},
-            data=json.dumps({'@collection': 'example_vertices'}),
+            data=json.dumps({'@collection': 'test_vertex'}),
             headers=headers_non_admin
         ).json()
         self.assertEqual(resp['error'], 'View does not exist.')
@@ -336,7 +336,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'xyz': 'example_vertices'}),
+            data=json.dumps({'xyz': 'test_vertex'}),
             headers=headers_non_admin
         ).json()
         self.assertEqual(resp['error'], 'ArangoDB server error.')
