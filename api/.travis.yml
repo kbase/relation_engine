@@ -2,8 +2,6 @@ sudo: required
 services:
 - docker
 language: python
-env:
-  - SPEC_RELEASE_URL=https://github.com/kbase/relation_engine_spec/archive/v0.0.4.tar.gz
 python:
 - 3.6
 script:

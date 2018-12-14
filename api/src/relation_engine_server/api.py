@@ -83,11 +83,11 @@ def refresh_specs():
     Auth: admin
     """
     auth.require_auth_token(['RE_ADMIN'])
-    status = pull_spec.download_latest(
+    pull_spec.download_latest(
         reset='reset' in flask.request.args,
         init_collections='init_collections' in flask.request.args
     )
-    return flask.jsonify({'status': status})
+    return flask.jsonify({'status': 'updated'})
 
 
 @api.route('/documents', methods=['PUT'])

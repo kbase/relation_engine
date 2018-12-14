@@ -17,6 +17,7 @@ services:
     environment:
       - KBASE_AUTH_URL=http://auth:5000
       - PYTHONUNBUFFERED=true
+      - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
       - DB_URL=http://arangodb:8529
       - DB_USER=root
       - DB_PASS=password

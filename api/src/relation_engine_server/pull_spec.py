@@ -18,17 +18,20 @@ def download_latest(reset=False, init_collections=True):
     os.makedirs(_spec_dir, exist_ok=True)
     # Download and extract a new release to /spec/repo
     spec_repo_path = os.path.join(_spec_dir, 'repo')
-    if 'SPEC_RELEASE_URL' in os.environ:
-        tarball_url = os.environ['SPEC_RELEASE_URL']
+    if 'SPEC_RELEASE_PATH' in os.environ:
+        _extract_tarball(os.environ['SPEC_RELEASE_PATH'], _spec_dir)
     else:
-        tarball_url = _fetch_github_release_url()
-    resp = requests.get(tarball_url, stream=True)
-    with tempfile.NamedTemporaryFile() as temp_file:
-        # The temp file will be closed/deleted when the context ends
-        # Download from the tarball url to the temp file
-        _download_file(resp, temp_file.name)
-        # Extract the downloaded tarball into the spec path
-        _extract_tarball(temp_file.name, _spec_dir)
+        if 'SPEC_RELEASE_URL' in os.environ:
+            tarball_url = os.environ['SPEC_RELEASE_URL']
+        else:
+            tarball_url = _fetch_github_release_url()
+        resp = requests.get(tarball_url, stream=True)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            # The temp file will be closed/deleted when the context ends
+            # Download from the tarball url to the temp file
+            _download_file(resp, temp_file.name)
+            # Extract the downloaded tarball into the spec path
+            _extract_tarball(temp_file.name, _spec_dir)
     # The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
     # We want to move that to /spec/repo
     _rename_directories(_spec_dir, spec_repo_path)
@@ -36,7 +39,6 @@ def download_latest(reset=False, init_collections=True):
     if init_collections:
         schemas = spec_loader.get_schema_names()
         arango_client.init_collections(schemas)
-    return 'updated from ' + tarball_url
 
 
 def _fetch_github_release_url():
