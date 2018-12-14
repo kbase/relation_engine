@@ -1,4 +1,4 @@
-// Find reactions similar to a query reaction by structure fingerprint and return the proteins
+// Find reactions similar to a query reaction by structure fingerprint and return the dna
 // sequences that encode for genes related to the reaction
 // Args:
 //   rid - reaction id to use as query origin
@@ -26,7 +26,7 @@ for c in rxn_gene_complex
 let sequences = (
 for g in ncbi_gene
    filter g._key IN genes
-   return g.translation
+   return g.protein_translation
 )
 
 return {sequences: sequences, count: COUNT(sequences)}
