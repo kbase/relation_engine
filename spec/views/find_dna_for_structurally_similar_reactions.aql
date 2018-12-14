@@ -1,12 +1,12 @@
-// Find reactions similar to a query reaction by difference fingerprint and return the protein
+// Find reactions similar to a query reaction by structure fingerprint and return the protein
 // sequences that encode for genes related to the reaction
 // Args:
 //   rid - reaction id to use as query origin
-//   df_sim - the minimum similarity of reactions as determined by difference fingerprint
+//   sf_sim - the minimum similarity of reactions as determined by structure fingerprint
 
 let similar_rxn_ids = (
 for e in rxn_similar_to_reaction
-   filter e.df_similarity >= @df_sim
+   filter e.sf_similarity >= @sf_sim
    filter e._to == @rid || e._from == @rid
    return e._to == @rid ? e._from : e._to
 )
@@ -26,7 +26,7 @@ for c in rxn_gene_complex
 let sequences = (
 for g in ncbi_gene
    filter g._key IN genes
-   return g.protein_translation
+   return g.dna_sequence
 )
 
 return {sequences: sequences, count: COUNT(sequences)}
