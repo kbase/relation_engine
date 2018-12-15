@@ -83,10 +83,7 @@ def refresh_specs():
     Auth: admin
     """
     auth.require_auth_token(['RE_ADMIN'])
-    pull_spec.download_latest(
-        reset='reset' in flask.request.args,
-        init_collections='init_collections' in flask.request.args
-    )
+    pull_spec.download_latest(init_collections='init_collections' in flask.request.args)
     return flask.jsonify({'status': 'updated'})
 
 

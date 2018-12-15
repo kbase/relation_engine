@@ -11,11 +11,12 @@ _api_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
 _release_id_path = os.path.join(_spec_dir, '.release_id')
 
 
-def download_latest(reset=False, init_collections=True):
+def download_latest(init_collections=True):
     """Check and download the latest spec and extract it to the spec path."""
-    if reset and os.path.exists(_spec_dir):
-        shutil.rmtree(_spec_dir)
-    os.makedirs(_spec_dir, exist_ok=True)
+    # Remove the spec directory, ignoring if it is already missing
+    shutil.rmtree(_spec_dir, ignore_errors=True)
+    # Recreate the spec directory so we have a clean slate, avoiding name conflicts
+    os.makedirs(_spec_dir)
     # Download and extract a new release to /spec/repo
     spec_repo_path = os.path.join(_spec_dir, 'repo')
     if 'SPEC_RELEASE_PATH' in os.environ:
