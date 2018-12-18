@@ -74,7 +74,7 @@ def server_error(err):
 
 
 @app.after_request
-def log_response(response):
+def after_request(response):
     """Simple log of each request's response."""
     print(' '.join([flask.request.method, flask.request.path, '->', response.status]))
     # Enable CORS
