@@ -74,7 +74,15 @@ def server_error(err):
 
 
 @app.after_request
-def log_response(response):
+def after_request(response):
     """Simple log of each request's response."""
     print(' '.join([flask.request.method, flask.request.path, '->', response.status]))
+    # Enable CORS
+    # Content type and length
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    env_allowed_headers = os.environ.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', 'authorization')
+    response.headers['Access-Control-Allow-Headers'] = env_allowed_headers
+    # Set JSON content type and response length
+    response.headers['Content-Type'] = 'application/json'
+    response.headers['Content-Length'] = response.calculate_content_length()
     return response
