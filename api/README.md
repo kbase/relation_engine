@@ -90,7 +90,7 @@ Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a
 _Example rquest_
 
 ```sh
-$ curl -X POST -d '{"argument": "value"}' http://relation_engine/api/query?view=example
+$ curl -X POST -d '{"argument": "value"}' http://relation_engine/api/query_results?view=example
 ```
 
 _Query params_
@@ -157,9 +157,8 @@ Results are limited to 100 items. To continue fetching additional results, use t
 System admins can run ad-hoc queries by specifying a "query" property in the JSON request body.
 
 ```sh
-$ curl -X POST \
-    -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
-    http://relation_engine/api/query?view=example
+$ curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
+    http://relation_engine/api/query_results
 ```
 
 This will return the same form of results as above.
