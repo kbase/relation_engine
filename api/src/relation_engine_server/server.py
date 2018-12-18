@@ -75,10 +75,9 @@ def server_error(err):
 
 @app.after_request
 def after_request(response):
-    """Simple log of each request's response."""
+    """Actions to perform on the response after the request handler finishes running."""
     print(' '.join([flask.request.method, flask.request.path, '->', response.status]))
     # Enable CORS
-    # Content type and length
     response.headers['Access-Control-Allow-Origin'] = '*'
     env_allowed_headers = os.environ.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', 'authorization')
     response.headers['Access-Control-Allow-Headers'] = env_allowed_headers
