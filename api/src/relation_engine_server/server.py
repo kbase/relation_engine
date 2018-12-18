@@ -82,7 +82,7 @@ def after_request(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     env_allowed_headers = os.environ.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', 'authorization')
     response.headers['Access-Control-Allow-Headers'] = env_allowed_headers
-    # Set JSON content type and responseonse length
+    # Set JSON content type and response length
     response.headers['Content-Type'] = 'application/json'
     response.headers['Content-Length'] = response.calculate_content_length()
     return response
