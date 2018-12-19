@@ -1,0 +1,34 @@
+// Return genes associated with reactions similar to a query reaction
+// Args:
+//   rid - reaction id
+//   sf_sim - minimum structural fingerprint similarity score
+//   df_sim - minimum difference fingerprint similarity score
+//   exclude_self - if true, don't include the query reactions genes
+
+let similar_rxn_ids = (
+for e in rxn_similar_to_reaction
+   filter e.sf_similarity >= @sf_sim
+   filter e.df_similarity >= @df_sim
+   filter e._to == @rid || e._from == @rid
+   return e._to == @rid ? e._from : e._to
+)
+let self = @exclude_self ? "no_self" : @rid
+let similar_complex_ids = (
+for e in rxn_reaction_within_complex
+   filter e._from in similar_rxn_ids || e._from == self
+   return e._to
+)
+
+let genes = FLATTEN(
+for c in rxn_gene_complex
+   filter c._id IN similar_complex_ids
+   return c.genes
+)
+
+let sequences = (
+for g in ncbi_gene
+   filter g._key IN genes
+   return {key: g._key, seq: g.protein_translation}
+)
+
+return {count: COUNT(sequences), sequences: sequences}
