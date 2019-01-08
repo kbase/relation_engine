@@ -1,0 +1,24 @@
+// Find all linked objects to a given object
+// Returns links of level 1, plus all child links of any nested level ("sublinks")
+// Each sublink has a "parent_id" key that points to its parent object
+// Args:
+//  key - wsprov_object key to find links for
+//  link_limit - how many 1st-level links to return
+//  sublink_limit - how many child links to return for each link
+
+let obj_id = CONCAT("wsprov_object/", @key)
+let links = (
+  for obj in 1..1 any obj_id wsprov_links
+    filter obj
+    limit @link_limit
+    return obj
+)
+let sublinks = (
+  for obj in wsprov_object
+    filter obj in links
+    for obj1 in 1..100 any obj wsprov_links
+      filter obj1
+      limit @sublink_limit
+      return distinct {parent_id: obj._id, obj: obj1}
+)
+return {links: links, sublinks: sublinks}
