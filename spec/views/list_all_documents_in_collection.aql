@@ -1,6 +1,0 @@
-// Return *all* full documents in a collection
-// Args:
-//   collection - name of collection to count docs
-
-for v in @@collection
-  return v
