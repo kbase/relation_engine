@@ -20,7 +20,7 @@
     },
     "source": {
       "type": "array",
-      "examples": ["ModelSeed", "KEGG"],
+      "examples": ["ModelSEED", "KEGG"],
       "description": "The source of the gene complex information."
     }
   } 
