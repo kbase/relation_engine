@@ -1,0 +1,7 @@
+// Fetch a wsprov_object
+// Args:
+//   key - key of the object to fetch
+
+for o in wsprov_object
+  filter o._key == @key
+  return o
