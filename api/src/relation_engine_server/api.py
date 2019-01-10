@@ -21,7 +21,8 @@ def show_views():
 def run_query():
     """
     Run a stored view as a query against the database.
-    Auth: only kbase users (any role)
+    Auth: only kbase re admins for ad-hoc queries
+    Public for views (views will have access controls within them based on params)
     """
     # Note that flask.request.json only works if the request Content-Type is application/json
     json_body = json.loads(flask.request.get_data() or '{}')
@@ -32,7 +33,7 @@ def run_query():
         del json_body['query']
         resp_body = arango_client.run_query(query_text=query_text, bind_vars=json_body)
         return flask.jsonify(resp_body)
-    auth.require_auth_token(roles=[])
+    # auth.require_auth_token(roles=[])
     if 'view' in flask.request.args:
         # Run a query from a view name
         view_name = flask.request.args['view']
