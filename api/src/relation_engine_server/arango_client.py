@@ -6,6 +6,7 @@ import json
 import os
 
 db_url = os.environ.get('DB_URL', 'http://localhost:8529')
+db_url += '/_db/' + os.environ.get('DB_NAME', '_system')
 db_user = os.environ.get('DB_USER', 'root')
 db_pass = os.environ.get('DB_PASS', 'password')
 
