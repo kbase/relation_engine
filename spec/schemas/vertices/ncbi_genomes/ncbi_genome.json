@@ -24,7 +24,7 @@
     },
     "domain": {
       "type": "string",
-      "enum": ["Archaea", "Bacteria", "Eukarya"]
+      "enum": ["Archaea", "Bacteria", "Eukarya", "Unknown"]
     },
     "feature_counts": {
       "type": "object",
