@@ -23,10 +23,10 @@
       "type": "integer",
       "description": "Length of protein_translation"
     },
-    "protein_hash": {
+    "md5_hash": {
       "type": "string",
-      "title": "Protein content hash",
-      "description": "Hash of the protein sequence that this feature encodes."
+      "title": "DNA content hash",
+      "description": "md5 hash of the dna sequence that this feature encodes."
     },
     "note": {
       "type": "string",
@@ -88,30 +88,24 @@
       "description": "Total character/nucleotide length of dna_sequence"
     },
     "db_xrefs": {
-      "type": "array",
       "title": "Database cross-references",
       "description": "IDs for these feature in other databases, grouped by database",
-      "items": {
-        "type": "object",
-        "patternProperties": {
-          ".*": {
-            "type": "array",
-            "items": {"type": "string"}
-          }
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "array",
+          "items": {"type": "string"}
         }
       }
     },
     "aliases": {
-      "type": "array",
       "description": "Aliases for these feature, grouped by alias type",
-      "items": {
-        "type": "object",
-        "description": "All values are arrays of strings",
-        "patternProperties": {
-          ".*": {
-            "type": "array",
-            "items": {"type": "string"}
-          }
+      "type": "object",
+      "description": "All values are arrays of strings",
+      "patternProperties": {
+        ".*": {
+          "type": "array",
+          "items": {"type": "string"}
         }
       }
     }

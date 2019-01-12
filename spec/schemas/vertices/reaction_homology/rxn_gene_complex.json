@@ -3,20 +3,25 @@
   "type": "object",
   "additionalProperties": false,
   "description": "Groups of genes that take part in producing a chemical reaction in the cell.",
-  "required": ["_key", "conjunctions"],
+  "required": ["_key", "genes"],
   "properties": {
     "_key": {
       "type": "string",
       "description": "Hash of the conjunctions."
     },
-    "conjunctions": {
+    "genes": {
       "type": "array",
       "examples": [["SO_0001", "SO_0001"]],
-      "description": "Array of conjunctions of genes. Eg: (A AND B AND C AND D).",
+      "description": "Array of genes.",
       "items": {
         "type": "string",
         "description": "Gene vertex _key"
       }
+    },
+    "source": {
+      "type": "array",
+      "examples": ["ModelSEED", "KEGG"],
+      "description": "The source of the gene complex information."
     }
-  }
+  } 
 }
