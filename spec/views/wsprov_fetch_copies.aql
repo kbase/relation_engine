@@ -3,22 +3,15 @@
 // Also returns all linked objects of those copies of any nested level.
 // Each sublink result has a 'parent_id' point to the copy that it is linked from.
 // Args:
+//   ws_ids - array of private workspace ids the user has access to
 //   obj_key - key of the object (eg "1:2:3")
-//   copy_limit - limit the amount of copy results
-//   sublink_limit - limit the amount of sublink object results
+//   copy_limit - max results of copies (recommended 10-20)
 
-let obj_id = CONCAT("wsprov_object/", @obj_key)
-let copies = (
-  for obj in 1..100 any obj_id wsprov_copied_into
-    filter obj
-    return obj
-)
-let sublinks = (
-  for obj in wsprov_object
-  filter obj in copies
-  for obj1 in 1..100 any obj wsprov_links
-    filter obj1
-    limit @sublink_limit
-    return distinct {parent_id: obj._id, obj: obj1}
-)
-return {copies: copies, sublinks: sublinks}
+for o in wsprov_object
+  filter o._key == @obj_key
+  filter o.is_public || (o.workspace_id IN @ws_ids)
+  for copy in 1..100 any o wsprov_copied_into
+    filter copy // no nulls
+    limit @copy_limit
+    collect parent_id = o._id into groups = copy
+    return distinct { copies: groups, parent_id }
