@@ -4,5 +4,5 @@
 //            (this is a special param set by the relation engine API)
 
 for o in test_vertex
-  filter o.ws_id IN @ws_ids
+  filter o.is_public || o.ws_id IN @ws_ids
   return o
