@@ -4,7 +4,9 @@
   "required": ["_key"],
   "description": "An example vertex schema for testing",
   "properties": {
-    "_key": {"type": "string"}
+    "_key": {"type": "string"},
+    "is_public": {"type": "boolean"},
+    "ws_id": {"type": "integer"}
   }
 }
 
