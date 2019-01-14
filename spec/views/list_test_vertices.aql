@@ -1,0 +1,8 @@
+// Test query -- lists all test vertices
+// Args:
+//   ws_ids - list of workspace ids the user has access to
+//            (this is a special param set by the relation engine API)
+
+for o in test_vertex
+  filter o.ws_id IN @ws_ids
+  return o
