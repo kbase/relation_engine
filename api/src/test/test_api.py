@@ -342,13 +342,17 @@ class TestApi(unittest.TestCase):
         requests.put(
             url + '/api/documents',
             params={'overwrite': True, 'collection': 'test_vertex'},
-            data='{"name": "requires_auth", "_key": "1", "ws_id": %s}' % ws_id,
+            data=json.dumps({
+                'name': 'requires_auth',
+                '_key': '123',
+                'ws_id': ws_id
+            }),
             headers=headers_admin
         )
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'list_test_vertices'},
-            headers={'Authorization': 'valid_token'}
+            headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 1)
         self.assertEqual(resp['results'][0]['ws_id'], ws_id)
@@ -365,7 +369,7 @@ class TestApi(unittest.TestCase):
         resp = requests.post(
             url + '/api/query_results',
             params={'view': 'list_test_vertices'},
-            headers={'Authorization': 'valid_token'}
+            headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 0)
 
