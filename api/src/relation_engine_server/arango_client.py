@@ -6,6 +6,7 @@ import json
 import os
 
 db_url = os.environ.get('DB_URL', 'http://localhost:8529')
+db_url += '/_db/' + os.environ.get('DB_NAME', '_system')
 db_user = os.environ.get('DB_USER', 'root')
 db_pass = os.environ.get('DB_PASS', 'password')
 
@@ -94,10 +95,6 @@ def create_collection(name, is_edge):
 
 def import_from_file(file_path, query):
     """Make a generic arango post request."""
-    # Unloading and then reloading the collection before import seems to
-    # prevent the error "cluster internal HTTP connection broken", at least
-    # with arango 3.3 and MMFiles
-    _reload_collections(query['collection'])
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
             db_url + '/_api/import',
@@ -108,15 +105,6 @@ def import_from_file(file_path, query):
     if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
-
-
-def _reload_collections(collection):
-    """
-    Unload and then reload a collection.
-    Docs: https://docs.arangodb.com/3.4/HTTP/Collection/Modifying.html
-    """
-    requests.put(db_url + '/_api/collection/' + collection + '/unload')
-    requests.put(db_url + '/_api/collection/' + collection + '/load')
 
 
 class ArangoServerError(Exception):
