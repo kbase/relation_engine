@@ -2,10 +2,13 @@
 Authorization and authentication utilities.
 """
 import os
+import json
 import flask
 import requests
 
 from .exceptions import MissingHeader, UnauthorizedAccess
+
+_WS_URL = os.environ.get('KBASE_WORKSPACE_URL', 'https://ci.kbase.us/services/ws')
 
 
 def require_auth_token(roles=[]):
@@ -40,3 +43,28 @@ def check_roles(required, given, auth_url):
         if role in given:
             return
     raise UnauthorizedAccess(auth_url)
+
+
+def get_auth_header():
+    return flask.request.headers.get('Authorization', '').replace('Bearer', '').strip()
+
+
+def get_workspace_ids(auth_token):
+    """Get a list of workspace IDs that the given username is allowed to access in the workspace."""
+    ws_url = _WS_URL + '/api/V2'
+    # Make an admin request to the workspace (command is 'listWorkspaceIds')
+    payload = {
+        'method': 'Workspace.list_workspace_ids',
+        'params': [{'perm': 'r'}],
+        'version': '1.1'
+    }
+    headers = {'Authorization': auth_token}
+    resp = requests.post(
+        ws_url,
+        data=json.dumps(payload),
+        headers=headers
+    )
+    # TODO error handling
+    resp_json = resp.json()
+    ws_ids = resp_json['result'][0]['workspaces']
+    return ws_ids

@@ -23,7 +23,7 @@ headers_admin = {'Authorization': 'Bearer ' + admin_token, 'Content-Type': 'appl
 def create_test_docs(count):
     """Produce some test documents."""
     def doc(i):
-        return '{"name": "name", "_key": "%s"}' % i
+        return '{"name": "name", "_key": "%s", "is_public": true}' % i
     return '\n'.join(doc(i) for i in range(0, count))
 
 
@@ -82,12 +82,12 @@ class TestApi(unittest.TestCase):
     def test_list_views(self):
         """Test the listing out of saved AQL views."""
         resp = requests.get(url + '/api/views').json()
-        self.assertTrue('list_all_documents_in_collection' in resp)
+        self.assertTrue('list_test_vertices' in resp)
 
     def test_show_view(self):
         """Test the endpoint that displays AQL source code for one view."""
-        resp = requests.get(url + '/api/views/count_documents_in_collection').text
-        self.assertTrue('Return count of documents' in resp)
+        resp = requests.get(url + '/api/views/list_test_vertices').text
+        self.assertTrue('test_vertex' in resp)
 
     def test_list_schemas(self):
         """Test the listing out of registered JSON schemas for vertices and edges."""
@@ -278,9 +278,7 @@ class TestApi(unittest.TestCase):
         save_test_docs(3)
         resp = requests.post(
             url + '/api/query_results',
-            params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'@collection': 'test_vertex'}),
-            headers=headers_non_admin
+            params={'view': 'list_test_vertices'}
         ).json()
         self.assertEqual(len(resp['results']), 3)
         self.assertEqual(resp['count'], 3)
@@ -293,9 +291,7 @@ class TestApi(unittest.TestCase):
         save_test_docs(count=200)
         resp = requests.post(
             url + '/api/query_results',
-            params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'@collection': 'test_vertex'}),
-            headers=headers_non_admin
+            params={'view': 'list_test_vertices'}
         ).json()
         cursor_id = resp['cursor_id']
         self.assertTrue(resp['cursor_id'])
@@ -324,9 +320,7 @@ class TestApi(unittest.TestCase):
         """Test a query error with a view name that does not exist."""
         resp = requests.post(
             url + '/api/query_results',
-            params={'view': 'nonexistent'},
-            data=json.dumps({'@collection': 'test_vertex'}),
-            headers=headers_non_admin
+            params={'view': 'nonexistent'}
         ).json()
         self.assertEqual(resp['error'], 'View does not exist.')
         self.assertEqual(resp['name'], 'nonexistent')
@@ -335,20 +329,42 @@ class TestApi(unittest.TestCase):
         """Test a query error with a missing bind variable."""
         resp = requests.post(
             url + '/api/query_results',
-            params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'xyz': 'test_vertex'}),
-            headers=headers_non_admin
+            params={'view': 'list_test_vertices'},
+            data=json.dumps({'xyz': 'test_vertex'})
         ).json()
         self.assertEqual(resp['error'], 'ArangoDB server error.')
         self.assertTrue(resp['arango_message'])
 
-    def test_query_incorrect_collection(self):
-        """Test a query error with an invalid collection name."""
+    def test_auth_query_with_access(self):
+        """Test the case where we query a collection with specific workspace access."""
+        ws_id = 3
+        # Remove all test vertices and create one with a ws_id
+        requests.put(
+            url + '/api/documents',
+            params={'overwrite': True, 'collection': 'test_vertex'},
+            data='{"name": "requires_auth", "_key": "1", "ws_id": %s}' % ws_id,
+            headers=headers_admin
+        )
         resp = requests.post(
             url + '/api/query_results',
-            params={'view': 'list_all_documents_in_collection'},
-            data=json.dumps({'@collection': 123}),
-            headers=headers_non_admin
+            params={'view': 'list_test_vertices'},
+            headers={'Authorization': 'valid_token'}
         ).json()
-        self.assertEqual(resp['error'], 'ArangoDB server error.')
-        self.assertTrue(resp['arango_message'])
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(resp['results'][0]['ws_id'], ws_id)
+
+    def test_auth_query_no_access(self):
+        """Test the case where we try to query a collection without the right workspace access."""
+        # Remove all test vertices and create one with a ws_id
+        requests.put(
+            url + '/api/documents',
+            params={'overwrite': True, 'collection': 'test_vertex'},
+            data='{"name": "requires_auth", "_key": "1", "ws_id": 9999}',
+            headers=headers_admin
+        )
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'view': 'list_test_vertices'},
+            headers={'Authorization': 'valid_token'}
+        ).json()
+        self.assertEqual(resp['count'], 0)
