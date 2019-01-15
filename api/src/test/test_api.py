@@ -389,3 +389,19 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': 'valid_token'}
         ).json()
         self.assertEqual(resp['count'], 0)
+
+    def test_auth_query_invalid_token(self):
+        """Test the case where we try to authorize a query using an invalid auth token."""
+        requests.put(
+            url + '/api/documents',
+            params={'overwrite': True, 'collection': 'test_vertex'},
+            data='{"name": "requires_auth", "_key": "1", "ws_id": 99}',
+            headers=headers_admin
+        )
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'view': 'list_test_vertices'},
+            data=json.dumps({'ws_ids': [1]}),
+            headers={'Authorization': 'invalid_token'}
+        ).json()
+        self.assertEqual(resp['count'], 0)

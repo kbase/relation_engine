@@ -64,7 +64,10 @@ def get_workspace_ids(auth_token):
         data=json.dumps(payload),
         headers=headers
     )
-    # TODO error handling
-    resp_json = resp.json()
-    ws_ids = resp_json['result'][0]['workspaces']
-    return ws_ids
+    try:
+        resp_json = resp.json()
+        return resp_json['result'][0]['workspaces']
+    except Exception:
+        # For any problem parsing the auth response, treat it as failed authorization for now.
+        # In the future, this can return a response with an explicit/descriptive error if we need.
+        return []
