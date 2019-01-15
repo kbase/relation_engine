@@ -2,7 +2,7 @@
   {
     "methods": ["POST"],
     "path": "/api/V2",
-    "headers": {"Authorization": "valid_token"},
+    "headers": {"Authorization": "admin_token"},
     "body": {
       "method": "Workspace.list_workspace_ids",
       "version": "1.1",

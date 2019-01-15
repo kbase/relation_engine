@@ -27,6 +27,12 @@ def run_query():
     """
     # Note that flask.request.json only works if the request Content-Type is application/json
     json_body = json.loads(flask.request.get_data() or '{}')
+    # Don't allow the user to set the special 'ws_ids' field
+    json_body['ws_ids'] = []
+    auth_token = auth.get_auth_header()
+    if auth_token:
+        # Handle workspace authentication
+        json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
     if 'query' in json_body:
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
@@ -36,23 +42,18 @@ def run_query():
         return flask.jsonify(resp_body)
     if 'view' in flask.request.args:
         # Run a query from a view name
-        json_body['ws_ids'] = []
-        auth_token = auth.get_auth_header()
-        if auth_token:
-            # Handle workspace authentication
-            json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
         view_name = flask.request.args['view']
         view_source = spec_loader.get_view(view_name)
         resp_body = arango_client.run_query(query_text=view_source, bind_vars=json_body)
         return flask.jsonify(resp_body)
-    elif 'cursor_id' in flask.request.args:
+    if 'cursor_id' in flask.request.args:
         # Run a query from a cursor ID
         cursor_id = flask.request.args['cursor_id']
         resp_body = arango_client.run_query(cursor_id=cursor_id)
         return flask.jsonify(resp_body)
     # No valid options were passed
     resp_body = {'error': 'Pass in a view or a cursor_id'}
-    return (flask.jsonify(resp_body), 500)
+    return (flask.jsonify(resp_body), 400)
 
 
 @api.route('/schemas', methods=['GET'])

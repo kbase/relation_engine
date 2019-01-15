@@ -244,6 +244,7 @@ class TestApi(unittest.TestCase):
                 'count': 1
             })
         ).json()
+        print(resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
@@ -405,3 +406,21 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': 'invalid_token'}
         )
         self.assertEqual(resp.status_code, 403)
+
+    def test_auth_adhoc_query(self):
+        """Test that RE_ADMINs can access objects with any ws_id."""
+        ws_id = 3
+        requests.put(
+            url + '/api/documents',
+            params={'overwrite': True, 'collection': 'test_vertex'},
+            data=json.dumps({'name': 'requires_auth', 'key': '1', 'ws_id': ws_id}),
+            headers={'Authorization': 'valid_token'}
+        )
+        # This is the same query as list_test_vertices.aql in the spec
+        query = 'for o in test_vertex filter o.is_public || o.ws_id IN @ws_ids return o'
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'query': query},
+            headers={'Authorization': 'valid_token'}
+        ).json()
+        self.assertEqual(resp['count'], 0)
