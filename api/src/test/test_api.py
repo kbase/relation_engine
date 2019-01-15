@@ -368,3 +368,20 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': 'valid_token'}
         ).json()
         self.assertEqual(resp['count'], 0)
+
+    def test_query_cannot_pass_ws_ids(self):
+        """Test that users cannot set the ws_ids param."""
+        ws_id = 99
+        requests.put(
+            url + '/api/documents',
+            params={'overwrite': True, 'collection': 'test_vertex'},
+            data='{"name": "requires_auth", "_key": "1", "ws_id": 99}',
+            headers=headers_admin
+        )
+        resp = requests.post(
+            url + '/api/query_results',
+            params={'view': 'list_test_vertices'},
+            data=json.dumps({'ws_ids': [ws_id]}),
+            headers={'Authorization': 'valid_token'}
+        ).json()
+        self.assertEqual(resp['count'], 0)
