@@ -403,5 +403,5 @@ class TestApi(unittest.TestCase):
             params={'view': 'list_test_vertices'},
             data=json.dumps({'ws_ids': [1]}),
             headers={'Authorization': 'invalid_token'}
-        ).json()
-        self.assertEqual(resp['count'], 0)
+        )
+        self.assertEqual(resp.status_code, 403)

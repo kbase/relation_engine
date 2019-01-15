@@ -14,5 +14,6 @@ class MissingHeader(Exception):
 
 class UnauthorizedAccess(Exception):
 
-    def __init__(self, auth_url):
+    def __init__(self, auth_url, response):
         self.auth_url = auth_url
+        self.response = response

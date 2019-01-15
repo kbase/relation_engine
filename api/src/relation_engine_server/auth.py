@@ -32,7 +32,7 @@ def require_auth_token(roles=[]):
     if not auth_resp.ok:
         print('-' * 80)
         print(auth_resp.text)
-        raise UnauthorizedAccess(kbase_auth_url)
+        raise UnauthorizedAccess(kbase_auth_url, auth_resp.text)
     auth_json = auth_resp.json()
     if len(roles):
         check_roles(required=roles, given=auth_json['customroles'], auth_url=kbase_auth_url)
@@ -42,7 +42,7 @@ def check_roles(required, given, auth_url):
     for role in required:
         if role in given:
             return
-    raise UnauthorizedAccess(auth_url)
+    raise UnauthorizedAccess(auth_url, 'Missing role')
 
 
 def get_auth_header():
@@ -64,10 +64,6 @@ def get_workspace_ids(auth_token):
         data=json.dumps(payload),
         headers=headers
     )
-    try:
-        resp_json = resp.json()
-        return resp_json['result'][0]['workspaces']
-    except Exception:
-        # For any problem parsing the auth response, treat it as failed authorization for now.
-        # In the future, this can return a response with an explicit/descriptive error if we need.
-        return []
+    if not resp.ok:
+        raise UnauthorizedAccess(ws_url, resp.text)
+    return resp.json()['result'][0]['workspaces']
