@@ -24,7 +24,7 @@ def require_auth_token(roles=[]):
     if not flask.request.headers.get('Authorization'):
         # No authorization token was provided in the headers
         raise MissingHeader('Authorization')
-    token = flask.request.headers.get('Authorization').replace('Bearer', '').strip()
+    token = get_auth_header()
     # Make an authorization request to the kbase auth2 server
     headers = {'Authorization': token}
     url = kbase_auth_url + '/api/V2/me'
