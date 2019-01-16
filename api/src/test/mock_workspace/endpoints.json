@@ -2,7 +2,7 @@
   {
     "methods": ["POST"],
     "path": "/api/V2",
-    "headers": {"Authorization": "admin_token"},
+    "headers": {"Authorization": "valid_token"},
     "body": {
       "method": "Workspace.list_workspace_ids",
       "version": "1.1",
@@ -40,6 +40,23 @@
           "message": "Token validation failed!",
           "error": "..."
         }
+      }
+    }
+  },
+  {
+    "methods": ["POST"],
+    "path": "/api/V2",
+    "headers": {"Authorization": "admin_token"},
+    "body": {
+      "method": "Workspace.list_workspace_ids",
+      "version": "1.1",
+      "params": [{"perm": "r"}]
+    },
+    "response": {
+      "status": "200",
+      "body": {
+        "version": "1.1",
+        "result": [{"workspaces": [99], "pub": []}]
       }
     }
   }

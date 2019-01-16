@@ -30,12 +30,14 @@ def run_query():
     # Don't allow the user to set the special 'ws_ids' field
     json_body['ws_ids'] = []
     auth_token = auth.get_auth_header()
-    if auth_token:
-        # Handle workspace authentication
-        json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
-    if 'query' in json_body:
-        # Run an adhoc query for a sysadmin
+    is_adhoc_query = 'query' in json_body
+    # Authorize for RE_ADMIN before fetching any workspace IDs
+    if is_adhoc_query:
         auth.require_auth_token(roles=['RE_ADMIN'])
+    # Fetch any authorized workspace IDs using a KBase auth token, if present
+    json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
+    if is_adhoc_query:
+        # Run an adhoc query for a sysadmin
         query_text = json_body['query']
         del json_body['query']
         resp_body = arango_client.run_query(query_text=query_text, bind_vars=json_body)

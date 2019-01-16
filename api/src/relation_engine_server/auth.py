@@ -51,12 +51,14 @@ def get_auth_header():
 
 def get_workspace_ids(auth_token):
     """Get a list of workspace IDs that the given username is allowed to access in the workspace."""
+    if not auth_token:
+        return []  # anonymous users
     ws_url = _WS_URL + '/api/V2'
     # Make an admin request to the workspace (command is 'listWorkspaceIds')
     payload = {
         'method': 'Workspace.list_workspace_ids',
-        'params': [{'perm': 'r'}],
-        'version': '1.1'
+        'version': '1.1',
+        'params': [{'perm': 'r'}]
     }
     headers = {'Authorization': auth_token}
     resp = requests.post(
