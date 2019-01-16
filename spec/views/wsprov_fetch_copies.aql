@@ -7,11 +7,10 @@
 //   obj_key - key of the object (eg "1:2:3")
 //   copy_limit - max results of copies (recommended 10-20)
 
-for o in wsprov_object
-  filter o._key == @obj_key
-  filter o.is_public || (o.workspace_id IN @ws_ids)
-  for copy in 1..100 any o wsprov_copied_into
-    filter copy // no nulls
-    limit @copy_limit
-    collect parent_id = o._id into groups = copy
-    return distinct { copies: groups, parent_id }
+with wsprov_object
+let obj_id = CONCAT('wsprov_object/', @obj_key)
+for copy in 1..10 any obj_id wsprov_copied_into
+  filter copy.is_public || (copy.workspace_id IN @ws_ids)
+  limit @copy_limit
+  collect parent_id = obj_id into copies = copy
+  return distinct { copies, parent_id }
