@@ -16,6 +16,7 @@ services:
       - ${PWD}:/app
     environment:
       - KBASE_AUTH_URL=http://auth:5000
+      - KBASE_WORKSPACE_URL=http://workspace:5000
       - PYTHONUNBUFFERED=true
       - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
       - DB_URL=http://arangodb:8529
@@ -37,3 +38,9 @@ services:
     image: mockservices/mock_json_service
     volumes:
       - ${PWD}/src/test/mock_auth:/config
+
+  # Mock workspace server (see src/test/mock_workspace/endpoints.json)
+  workspace:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/src/test/mock_workspace:/config

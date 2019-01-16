@@ -21,33 +21,41 @@ def show_views():
 def run_query():
     """
     Run a stored view as a query against the database.
-    Auth: only kbase re admins for ad-hoc queries
-    Public for views (views will have access controls within them based on params)
+    Auth:
+     - only kbase re admins for ad-hoc queries
+     - public for views (views will have access controls within them based on params)
     """
     # Note that flask.request.json only works if the request Content-Type is application/json
     json_body = json.loads(flask.request.get_data() or '{}')
-    if 'query' in json_body:
-        # Run an adhoc query for a sysadmin
+    # Don't allow the user to set the special 'ws_ids' field
+    json_body['ws_ids'] = []
+    auth_token = auth.get_auth_header()
+    is_adhoc_query = 'query' in json_body
+    # Authorize for RE_ADMIN before fetching any workspace IDs
+    if is_adhoc_query:
         auth.require_auth_token(roles=['RE_ADMIN'])
+    # Fetch any authorized workspace IDs using a KBase auth token, if present
+    json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
+    if is_adhoc_query:
+        # Run an adhoc query for a sysadmin
         query_text = json_body['query']
         del json_body['query']
         resp_body = arango_client.run_query(query_text=query_text, bind_vars=json_body)
         return flask.jsonify(resp_body)
-    # auth.require_auth_token(roles=[])
     if 'view' in flask.request.args:
         # Run a query from a view name
         view_name = flask.request.args['view']
         view_source = spec_loader.get_view(view_name)
         resp_body = arango_client.run_query(query_text=view_source, bind_vars=json_body)
         return flask.jsonify(resp_body)
-    elif 'cursor_id' in flask.request.args:
+    if 'cursor_id' in flask.request.args:
         # Run a query from a cursor ID
         cursor_id = flask.request.args['cursor_id']
         resp_body = arango_client.run_query(cursor_id=cursor_id)
         return flask.jsonify(resp_body)
     # No valid options were passed
     resp_body = {'error': 'Pass in a view or a cursor_id'}
-    return (flask.jsonify(resp_body), 500)
+    return (flask.jsonify(resp_body), 400)
 
 
 @api.route('/schemas', methods=['GET'])

@@ -37,7 +37,8 @@ def root():
 def unauthorized_access(err):
     resp = {
         'error': '403 - Unauthorized',
-        'auth_url': err.auth_url
+        'auth_url': err.auth_url,
+        'auth_response': err.response
     }
     return (flask.jsonify(resp), 403)
 
