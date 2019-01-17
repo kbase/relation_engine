@@ -5,7 +5,6 @@
 //   ws_ids - array of private workspace ids the user has access to
 //   obj_keys - wsprov_object key to find links for
 //   link_limit - number of link results (10-20 recommended)
-//   sublink_limit - number of sublink results (10-20 recommended)
 
 for o in wsprov_object
   filter o._key in @obj_keys
