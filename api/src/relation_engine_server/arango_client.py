@@ -5,8 +5,8 @@ import requests
 import json
 import os
 
-db_url = os.environ.get('DB_URL', 'http://localhost:8529')
-db_url += '/_db/' + os.environ.get('DB_NAME', '_system')
+arango_url = os.environ.get('DB_URL', 'http://localhost:8529')
+db_url = arango_url + '/_db/' + os.environ.get('DB_NAME', '_system')
 db_user = os.environ.get('DB_USER', 'root')
 db_pass = os.environ.get('DB_PASS', 'password')
 
@@ -14,7 +14,7 @@ db_pass = os.environ.get('DB_PASS', 'password')
 def server_status():
     """Get the status of our connection and authorization to the ArangoDB server."""
     try:
-        resp = requests.get(db_url + '/_api/endpoint', auth=(db_user, db_pass))
+        resp = requests.get(arango_url + '/_api/endpoint', auth=(db_user, db_pass))
     except requests.exceptions.ConnectionError:
         return 'no_connection'
     if resp.ok:
