@@ -1,17 +1,15 @@
-// Find all linked objects to a given object
+// Find all linked objects to a given set of objects
 // Returns links of level 1, plus all child links of any nested level ("sublinks")
 // Each sublink has a "parent_id" key that points to its parent object
 // Args:
 //   ws_ids - array of private workspace ids the user has access to
 //   obj_keys - wsprov_object key to find links for
 //   link_limit - number of link results (10-20 recommended)
-//   sublink_limit - number of sublink results (10-20 recommended)
 
 for o in wsprov_object
-  filter o._key IN @obj_keys
-  filter o.is_public || (o.workspace_id IN @ws_ids)
-  for link in 1..100 any o wsprov_links
+  filter o._key in @obj_keys
+  for link in 1..10 any o wsprov_links
+    filter link.is_public || link.workspace_id IN @ws_ids
     limit @link_limit
-    filter link // no nulls
-    collect parent_id = o._id into groups = link
-    return distinct { links: groups, parent_id }
+    collect parent_id = o._id into links = link
+    return { links, parent_id }
