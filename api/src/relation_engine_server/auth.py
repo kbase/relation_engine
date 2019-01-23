@@ -8,7 +8,9 @@ import requests
 
 from .exceptions import MissingHeader, UnauthorizedAccess
 
-_WS_URL = os.environ.get('KBASE_WORKSPACE_URL', 'https://ci.kbase.us/services/ws')
+_KBASE_ENDPOINT = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
+_KBASE_AUTH_URL = os.environ.get('KBASE_AUTH_URL', _KBASE_ENDPOINT + '/auth')
+_WS_URL = os.environ.get('KBASE_WORKSPACE_URL', _KBASE_ENDPOINT + '/ws')
 
 
 def require_auth_token(roles=[]):
@@ -19,23 +21,21 @@ def require_auth_token(roles=[]):
 
     Raises some exception if any auth requirement is not met.
     """
-    kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
-    kbase_auth_url = os.environ.get('KBASE_AUTH_URL', kbase_endpoint + '/auth')
     if not flask.request.headers.get('Authorization'):
         # No authorization token was provided in the headers
         raise MissingHeader('Authorization')
     token = get_auth_header()
     # Make an authorization request to the kbase auth2 server
     headers = {'Authorization': token}
-    url = kbase_auth_url + '/api/V2/me'
-    auth_resp = requests.get(url, headers=headers)
+    auth_url = _KBASE_AUTH_URL + '/api/V2/me'
+    auth_resp = requests.get(auth_url, headers=headers)
     if not auth_resp.ok:
         print('-' * 80)
         print(auth_resp.text)
-        raise UnauthorizedAccess(kbase_auth_url, auth_resp.text)
+        raise UnauthorizedAccess(_KBASE_AUTH_URL, auth_resp.text)
     auth_json = auth_resp.json()
     if len(roles):
-        check_roles(required=roles, given=auth_json['customroles'], auth_url=kbase_auth_url)
+        check_roles(required=roles, given=auth_json['customroles'], auth_url=_KBASE_AUTH_URL)
 
 
 def check_roles(required, given, auth_url):
@@ -50,7 +50,8 @@ def get_auth_header():
 
 
 def get_workspace_ids(auth_token):
-    """Get a list of workspace IDs that the given username is allowed to access in the workspace."""
+    """Get a list of workspace IDs that the given username is allowed to access in
+    the workspace."""
     if not auth_token:
         return []  # anonymous users
     ws_url = _WS_URL + '/api/V2'
