@@ -1,16 +1,12 @@
 """
 Authorization and authentication utilities.
 """
-import os
 import json
 import flask
 import requests
 
-from .exceptions import MissingHeader, UnauthorizedAccess
-
-_KBASE_ENDPOINT = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
-_KBASE_AUTH_URL = os.environ.get('KBASE_AUTH_URL', _KBASE_ENDPOINT + '/auth')
-_WS_URL = os.environ.get('KBASE_WORKSPACE_URL', _KBASE_ENDPOINT + '/ws')
+from .config import get_config
+from ..exceptions import MissingHeader, UnauthorizedAccess
 
 
 def require_auth_token(roles=[]):
@@ -21,21 +17,22 @@ def require_auth_token(roles=[]):
 
     Raises some exception if any auth requirement is not met.
     """
+    config = get_config()
     if not flask.request.headers.get('Authorization'):
         # No authorization token was provided in the headers
         raise MissingHeader('Authorization')
     token = get_auth_header()
     # Make an authorization request to the kbase auth2 server
     headers = {'Authorization': token}
-    auth_url = _KBASE_AUTH_URL + '/api/V2/me'
+    auth_url = config['auth_url'] + '/api/V2/me'
     auth_resp = requests.get(auth_url, headers=headers)
     if not auth_resp.ok:
         print('-' * 80)
         print(auth_resp.text)
-        raise UnauthorizedAccess(_KBASE_AUTH_URL, auth_resp.text)
+        raise UnauthorizedAccess(config['auth_url'], auth_resp.text)
     auth_json = auth_resp.json()
     if len(roles):
-        check_roles(required=roles, given=auth_json['customroles'], auth_url=_KBASE_AUTH_URL)
+        check_roles(required=roles, given=auth_json['customroles'], auth_url=config['auth_url'])
 
 
 def check_roles(required, given, auth_url):
@@ -54,7 +51,8 @@ def get_workspace_ids(auth_token):
     the workspace."""
     if not auth_token:
         return []  # anonymous users
-    ws_url = _WS_URL + '/api/V2'
+    config = get_config()
+    ws_url = config['workspace_url'] + '/api/V2'
     # Make an admin request to the workspace (command is 'listWorkspaceIds')
     payload = {
         'method': 'Workspace.list_workspace_ids',

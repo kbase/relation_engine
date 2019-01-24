@@ -5,22 +5,19 @@ import tempfile
 import shutil
 
 from . import arango_client, spec_loader
-
-_spec_dir = os.environ.get('SPEC_PATH', '/spec')
-_api_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
-_release_id_path = os.path.join(_spec_dir, '.release_id')
+from .config import get_config
 
 
 def download_latest(init_collections=True):
     """Check and download the latest spec and extract it to the spec path."""
+    config = get_config()
     # Remove the spec directory, ignoring if it is already missing
-    shutil.rmtree(_spec_dir, ignore_errors=True)
+    shutil.rmtree(config['spec_paths']['root'], ignore_errors=True)
     # Recreate the spec directory so we have a clean slate, avoiding name conflicts
-    os.makedirs(_spec_dir)
+    os.makedirs(config['spec_paths']['root'])
     # Download and extract a new release to /spec/repo
-    spec_repo_path = os.path.join(_spec_dir, 'repo')
     if 'SPEC_RELEASE_PATH' in os.environ:
-        _extract_tarball(os.environ['SPEC_RELEASE_PATH'], _spec_dir)
+        _extract_tarball(os.environ['SPEC_RELEASE_PATH'], config['spec_paths']['root'])
     else:
         if 'SPEC_RELEASE_URL' in os.environ:
             tarball_url = os.environ['SPEC_RELEASE_URL']
@@ -32,10 +29,10 @@ def download_latest(init_collections=True):
             # Download from the tarball url to the temp file
             _download_file(resp, temp_file.name)
             # Extract the downloaded tarball into the spec path
-            _extract_tarball(temp_file.name, _spec_dir)
+            _extract_tarball(temp_file.name, config['spec_paths']['root'])
     # The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
     # We want to move that to /spec/repo
-    _rename_directories(_spec_dir, spec_repo_path)
+    _rename_directories(config['spec_paths']['root'], config['spec_paths']['repo'])
     # Initialize all the collections
     if init_collections:
         schemas = spec_loader.get_schema_names()
@@ -43,8 +40,9 @@ def download_latest(init_collections=True):
 
 
 def _fetch_github_release_url():
+    config = get_config()
     # Download information about the latest release
-    release_resp = requests.get(_api_url + '/releases/latest')
+    release_resp = requests.get(config['spec_url'] + '/releases/latest')
     release_info = release_resp.json()
     if release_resp.status_code != 200:
         # This may be a github API rate usage limit, or some other error
@@ -80,9 +78,10 @@ def _rename_directories(dir_path, dest_path):
 
 def _has_latest_spec(info):
     """Check if downloaded release info matches the latest downloaded spec."""
+    config = get_config()
     release_id = str(info['id'])
-    if os.path.exists(_release_id_path):
-        with open(_release_id_path, 'r') as fd:
+    if os.path.exists(config['spec_paths']['release_id']):
+        with open(config['spec_paths']['release_id'], 'r') as fd:
             current_release_id = fd.read()
         if release_id == current_release_id:
             return True
@@ -92,6 +91,7 @@ def _has_latest_spec(info):
 def _save_release_id(info):
     """Save a release ID as the latest downloaded spec."""
     release_id = str(info['id'])
+    config = get_config()
     # Write the release ID to /spec/.release_id
-    with open(_release_id_path, 'w') as fd:
+    with open(config['spec_release_id_path'], 'w') as fd:
         fd.write(release_id)
