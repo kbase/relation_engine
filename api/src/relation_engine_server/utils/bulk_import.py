@@ -19,11 +19,10 @@ def bulk_import(query_params):
     with tempfile.NamedTemporaryFile(mode='a', delete=False) as temp_fd:
         # temp_fd is closed and deleted when the context ends
         for line in flask.request.stream:
-            print('line', line)
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
             json_line = _write_edge_key(json_line)
-            print(temp_fd.write(json.dumps(json_line) + '\n'))
+            temp_fd.write(json.dumps(json_line) + '\n')
     resp_text = import_from_file(temp_fd.name, query_params)
     os.remove(temp_fd.name)
     return resp_text
