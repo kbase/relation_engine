@@ -68,6 +68,16 @@ class TestApi(unittest.TestCase):
         self.assertTrue(resp['commit_hash'])
         self.assertTrue(resp['repo_url'])
 
+    def test_config(self):
+        """Test config fetch."""
+        resp = requests.get(URL + '/config').json()
+        self.assertTrue(len(resp['auth_url']))
+        self.assertTrue(len(resp['workspace_url']))
+        self.assertTrue(len(resp['kbase_endpoint']))
+        self.assertTrue(len(resp['db_url']))
+        self.assertTrue(len(resp['db_name']))
+        self.assertTrue(len(resp['spec_url']))
+
     def test_update_specs(self):
         """Test the endpoint that triggers an update on the specs."""
         resp = requests.get(
