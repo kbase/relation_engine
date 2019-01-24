@@ -3,18 +3,15 @@ Make ajax requests to the ArangoDB server.
 """
 import requests
 import json
-import os
 
-arango_url = os.environ.get('DB_URL', 'http://localhost:8529')
-db_url = arango_url + '/_db/' + os.environ.get('DB_NAME', '_system')
-db_user = os.environ.get('DB_USER', 'root')
-db_pass = os.environ.get('DB_PASS', 'password')
+from .config import get_config
 
 
 def server_status():
     """Get the status of our connection and authorization to the ArangoDB server."""
+    config = get_config()
     try:
-        resp = requests.get(arango_url + '/_api/endpoint', auth=(db_user, db_pass))
+        resp = requests.get(config['db_url'] + '/_api/endpoint', auth=(config['db_user'], config['db_pass']))
     except requests.exceptions.ConnectionError:
         return 'no_connection'
     if resp.ok:
@@ -27,7 +24,8 @@ def server_status():
 
 def run_query(query_text=None, cursor_id=None, bind_vars={}):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
-    url = db_url + '/_api/cursor'
+    config = get_config()
+    url = config['db_url'] + '/_api/cursor'
     req_json = {
         'batchSize': 100,
         'memoryLimit': 16000000000  # 16gb
@@ -45,7 +43,7 @@ def run_query(query_text=None, cursor_id=None, bind_vars={}):
         method,
         url,
         data=json.dumps(req_json),
-        auth=(db_user, db_pass)
+        auth=(config['db_user'], config['db_pass'])
     )
     if not resp.ok:
         raise ArangoServerError(resp.text)
@@ -76,7 +74,8 @@ def create_collection(name, is_edge):
     Create a single collection by name using some basic defaults.
     We ignore duplicates. For any other server error, an exception is thrown.
     """
-    url = db_url + '/_api/collection'
+    config = get_config()
+    url = config['db_url'] + '/_api/collection'
     # collection types:
     #   2 is a document collection
     #   3 is an edge collection
@@ -86,7 +85,7 @@ def create_collection(name, is_edge):
         'name': name,
         'type': collection_type
     })
-    resp = requests.post(url, data, auth=(db_user, db_pass)).json()
+    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass'])).json()
     if resp['error']:
         if 'duplicate' not in resp['errorMessage']:
             # Unable to create a collection
@@ -95,11 +94,12 @@ def create_collection(name, is_edge):
 
 def import_from_file(file_path, query):
     """Make a generic arango post request."""
+    config = get_config()
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
-            db_url + '/_api/import',
+            config['db_url'] + '/_api/import',
             data=file_desc,
-            auth=(db_user, db_pass),
+            auth=(config['db_user'], config['db_pass']),
             params=query
         )
     if not resp.ok:

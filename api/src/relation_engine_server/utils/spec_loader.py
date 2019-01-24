@@ -5,40 +5,38 @@ import glob
 import os
 import json
 
-_spec_root_dir = os.environ.get('SPEC_PATH', '/spec')
-_spec_dir = os.path.join(_spec_root_dir, 'repo')  # /spec/repo
-_view_dir = os.path.join(_spec_dir, 'views')  # /spec/repo/views
-_schema_dir = os.path.join(_spec_dir, 'schemas')  # /spec/repo/schemas
-_vertex_dir = os.path.join(_schema_dir, 'vertices')  # /spec/repo/schemas/vertices
-_edge_dir = os.path.join(_schema_dir, 'edges')  # /spec/repo/schemas/edges
+from .config import get_config
 
 
 def get_schema_names():
     """Return a dict of vertex and edge base names."""
+    config = get_config()
     return {
         'vertices': [
             _get_file_name(path)
-            for path in _find_paths(_vertex_dir, '*.json')
+            for path in _find_paths(config['spec_paths']['vertices'], '*.json')
         ],
         'edges': [
             _get_file_name(path)
-            for path in _find_paths(_edge_dir, '*.json')
+            for path in _find_paths(config['spec_paths']['edges'], '*.json')
         ]
     }
 
 
 def get_view_names():
     """Return an array of all view base names."""
+    config = get_config()
     return [
         _get_file_name(path)
-        for path in _find_paths(_view_dir, '*.aql')
+        for path in _find_paths(config['spec_paths']['views'], '*.aql')
     ]
 
 
 def get_schema(name):
     """Get JSON content for a specific schema. Throws an error if nonexistent."""
+    config = get_config()
     try:
-        path = _find_paths(_schema_dir, name + '.json')[0]
+        path = _find_paths(config['spec_paths']['schemas'], name + '.json')[0]
     except IndexError:
         raise SchemaNonexistent(name)
     with open(path, 'r', encoding='utf8') as fd:
@@ -47,8 +45,9 @@ def get_schema(name):
 
 def get_view(name):
     """Get AQL content for a specific view. Throws an error if nonexistent."""
+    config = get_config()
     try:
-        path = _find_paths(_view_dir, name + '.aql')[0]
+        path = _find_paths(config['spec_paths']['views'], name + '.aql')[0]
     except IndexError:
         raise ViewNonexistent(name)
     with open(path, 'r', encoding='utf8') as fd:
