@@ -7,7 +7,7 @@ import traceback
 from jsonschema.exceptions import ValidationError
 
 from .exceptions import MissingHeader, UnauthorizedAccess
-from .utils import arango_client, spec_loader, auth, bulk_import, pull_spec
+from .utils import arango_client, spec_loader, auth, bulk_import, pull_spec, config
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -29,6 +29,19 @@ def root():
         'arangodb_status': arangodb_status,
         'commit_hash': commit_hash,
         'repo_url': repo_url
+    })
+
+
+@app.route('/config', methods=['GET'])
+def show_config():
+    conf = config.get_config()
+    return flask.jsonify({
+        'auth_url': conf['auth_url'],
+        'workspace_url': conf['workspace_url'],
+        'kbase_endpoint': conf['kbase_endpoint'],
+        'db_url': conf['db_url'],
+        'db_name': conf['db_name'],
+        'spec_url': conf['spec_url']
     })
 
 
