@@ -9,7 +9,7 @@
 
 with wsprov_object
 let obj_id = CONCAT('wsprov_object/', @obj_key)
-for copy in 1..10 any obj_id wsprov_copied_into
+for copy in 1..10 any obj_id wsprov_copied_into options {uniqueVertices: 'global', bfs: true}
   filter copy.is_public || (copy.workspace_id IN @ws_ids)
   limit @copy_limit
   collect parent_id = obj_id into copies = copy

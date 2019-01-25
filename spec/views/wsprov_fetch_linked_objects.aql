@@ -8,7 +8,7 @@
 
 for o in wsprov_object
   filter o._key in @obj_keys
-  for link in 1..10 any o wsprov_links
+  for link in 1..10 any o wsprov_links options {uniqueVertices: 'global', bfs: true}
     filter link.is_public || link.workspace_id IN @ws_ids
     limit @link_limit
     collect parent_id = o._id into links = link
