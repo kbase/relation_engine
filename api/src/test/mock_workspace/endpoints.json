@@ -1,7 +1,7 @@
 [
   {
     "methods": ["POST"],
-    "path": "/api/V2",
+    "path": "/",
     "headers": {"Authorization": "valid_token"},
     "body": {
       "method": "Workspace.list_workspace_ids",
@@ -23,7 +23,7 @@
   },
   {
     "methods": ["POST"],
-    "path": "/api/V2",
+    "path": "/",
     "headers": {"Authorization": "invalid_token"},
     "body": {
       "method": "Workspace.list_workspace_ids",
@@ -45,7 +45,7 @@
   },
   {
     "methods": ["POST"],
-    "path": "/api/V2",
+    "path": "/",
     "headers": {"Authorization": "admin_token"},
     "body": {
       "method": "Workspace.list_workspace_ids",
