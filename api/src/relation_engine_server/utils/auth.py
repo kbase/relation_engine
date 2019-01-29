@@ -52,7 +52,7 @@ def get_workspace_ids(auth_token):
     if not auth_token:
         return []  # anonymous users
     config = get_config()
-    ws_url = config['workspace_url'] + '/api/V2'
+    ws_url = config['workspace_url']
     # Make an admin request to the workspace (command is 'listWorkspaceIds')
     payload = {
         'method': 'Workspace.list_workspace_ids',
