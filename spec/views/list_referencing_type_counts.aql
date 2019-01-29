@@ -1,0 +1,21 @@
+// Fetch the counts of a ws_objects in the RE that is linked to a wsprov_object
+// Args:
+//   ws_ids - array of private workspace ids the user has access to (autofilled by RE-API)
+//   key - key of the object to start from
+//   is_private - if present, limit to objects in workspaces that a user has access to
+//   is_public - if present, limit to objects in public workspaces
+//   *** if both is_private and is_public are true this will be treated as an OR ***
+//   owners - if present, limit to objects with owner in list
+//   simplify_type - if true, strip out the module and version before collecting
+
+WITH wsprov_object
+FOR v IN 1..10
+    INBOUND CONCAT('wsprov_object/', @key) wsprov_links
+    OPTIONS {'uniqueVertices': 'global', 'bfs':true}
+    // If both is_private and is_public, return if either is true
+    FILTER (@is_private && @is_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
+        (!@is_private || v.workspace_id IN @ws_ids) && (!@is_public || v.is_public)
+    FILTER (!@owners || v.owner IN @owners)
+    LET ws_type = @simplify_type ? SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1] : v.ws_type
+    COLLECT type = ws_type WITH COUNT INTO type_count
+    RETURN {type, type_count}
