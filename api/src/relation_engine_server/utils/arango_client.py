@@ -22,12 +22,12 @@ def server_status():
         return 'unknown_failure'
 
 
-def run_query(query_text=None, cursor_id=None, bind_vars={}):
+def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
     config = get_config()
     url = config['db_url'] + '/_api/cursor'
     req_json = {
-        'batchSize': 100,
+        'batchSize': min(5000, batch_size),
         'memoryLimit': 16000000000  # 16gb
     }
     if cursor_id:
@@ -36,8 +36,9 @@ def run_query(query_text=None, cursor_id=None, bind_vars={}):
     else:
         method = 'POST'
         req_json['count'] = True
-        req_json['bindVars'] = bind_vars
         req_json['query'] = query_text
+        if bind_vars:
+            req_json['bindVars'] = bind_vars
 
     resp = requests.request(
         method,
