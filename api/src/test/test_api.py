@@ -278,25 +278,25 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['error'], '403 - Unauthorized')
 
     def test_query_with_cursor(self):
-        """Test getting more data via a query cursor."""
-        save_test_docs(count=200)
+        """Test getting more data via a query cursor and setting batch size."""
+        save_test_docs(count=20)
         resp = requests.post(
             URL + '/api/query_results',
-            params={'view': 'list_test_vertices'}
+            params={'view': 'list_test_vertices', 'batch_size': 10}
         ).json()
-        cursor_id = resp['cursor_id']
         self.assertTrue(resp['cursor_id'])
         self.assertEqual(resp['has_more'], True)
-        self.assertEqual(resp['count'], 200)
-        self.assertTrue(len(resp['results']), 100)
+        self.assertEqual(resp['count'], 20)
+        self.assertTrue(len(resp['results']), 10)
+        cursor_id = resp['cursor_id']
         resp = requests.post(
             URL + '/api/query_results',
             params={'cursor_id': cursor_id}
         ).json()
-        self.assertEqual(resp['count'], 200)
+        self.assertEqual(resp['count'], 20)
         self.assertEqual(resp['has_more'], False)
         self.assertEqual(resp['cursor_id'], None)
-        self.assertTrue(len(resp['results']), 100)
+        self.assertTrue(len(resp['results']), 10)
         # Try to get the same cursor again
         resp = requests.post(
             URL + '/api/query_results',

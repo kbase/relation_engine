@@ -67,23 +67,26 @@ def run_query():
     # Don't allow the user to set the special 'ws_ids' field
     json_body['ws_ids'] = []
     auth_token = auth.get_auth_header()
-    is_adhoc_query = 'query' in json_body
-    # Authorize for RE_ADMIN before fetching any workspace IDs
-    if is_adhoc_query:
-        auth.require_auth_token(roles=['RE_ADMIN'])
     # Fetch any authorized workspace IDs using a KBase auth token, if present
     json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
-    if is_adhoc_query:
+    # fetch number of documents to return
+    batch_size = int(flask.request.args.get('batch_size', 100))
+    if 'query' in json_body:
         # Run an adhoc query for a sysadmin
+        auth.require_auth_token(roles=['RE_ADMIN'])
         query_text = json_body['query']
         del json_body['query']
-        resp_body = arango_client.run_query(query_text=query_text, bind_vars=json_body)
+        resp_body = arango_client.run_query(query_text=query_text,
+                                            bind_vars=json_body,
+                                            batch_size=batch_size)
         return flask.jsonify(resp_body)
     if 'view' in flask.request.args:
         # Run a query from a view name
         view_name = flask.request.args['view']
         view_source = spec_loader.get_view(view_name)
-        resp_body = arango_client.run_query(query_text=view_source, bind_vars=json_body)
+        resp_body = arango_client.run_query(query_text=view_source,
+                                            bind_vars=json_body,
+                                            batch_size=batch_size)
         return flask.jsonify(resp_body)
     if 'cursor_id' in flask.request.args:
         # Run a query from a cursor ID
