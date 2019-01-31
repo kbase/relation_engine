@@ -3,7 +3,7 @@
 // Also returns all linked objects of those copies of any nested level.
 // Args:
 //   ws_ids - array of private workspace ids the user has access to
-//   obj_keys - wsprov_object key to find links for
+//   obj_key - wsprov_object key to find links for
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_private - limit to objects in public workspaces
 //   *** if both show_private and show_private are true this will be treated as an OR ***
