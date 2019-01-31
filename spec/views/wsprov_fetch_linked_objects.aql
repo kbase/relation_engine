@@ -1,15 +1,17 @@
-// Find all linked objects to a given set of objects
-// Returns links of level 1, plus all child links of any nested level ("sublinks")
-// Each sublink has a "parent_id" key that points to its parent object
+// Find all linked objects to a object
 // Args:
 //   ws_ids - array of private workspace ids the user has access to
 //   obj_keys - wsprov_object key to find links for
-//   link_limit - number of link results (10-20 recommended)
-
-for o in wsprov_object
-  filter o._key in @obj_keys
-  for link in 1..10 any o wsprov_links options {uniqueVertices: 'global', bfs: true}
-    filter link.is_public || link.workspace_id IN @ws_ids
-    limit @link_limit
-    collect parent_id = o._id into links = link
-    return { links, parent_id }
+//   show_private - limit to objects in workspaces that a user has access to
+//   show_private - limit to objects in public workspaces
+//   *** if both show_private and show_private are true this will be treated as an OR ***
+//   types - simplified workspace types to return (e.g. Genome, Assembly)
+WITH wsprov_object
+LET obj_id = CONCAT('wsprov_object/', @obj_key)
+FOR v IN 1..10 ANY obj_id wsprov_links
+    OPTIONS {uniqueVertices: 'global', bfs: true}
+    LET simple_type = SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1]
+    FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
+        (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+    FILTER (!@types || simple_type IN @types)
+    RETURN v
