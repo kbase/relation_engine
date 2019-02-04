@@ -15,6 +15,9 @@ services:
     volumes:
       - ${PWD}:/app
     environment:
+      - DEVELOPMENT=1
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
       - KBASE_AUTH_URL=http://auth:5000
       - KBASE_WORKSPACE_URL=http://workspace:5000
       - PYTHONUNBUFFERED=true
@@ -22,8 +25,6 @@ services:
       - DB_URL=http://arangodb:8529
       - DB_USER=root
       - DB_PASS=password
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
 
   # For running (and testing against) ArangoDB
   arangodb:
