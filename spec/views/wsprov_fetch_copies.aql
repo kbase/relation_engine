@@ -7,7 +7,7 @@
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_public - limit to objects in public workspaces
 //   *** if both show_private and show_public are true this will be treated as an OR ***
-//   limit - result limit
+//   result_limit - result limit
 //   offset - result offset
 
 WITH wsprov_object
@@ -18,5 +18,5 @@ FOR v, e, p IN 1..10 ANY obj_id wsprov_copied_into
     FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
         (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
     FILTER p.vertices[*].ws_type != "KBaseGenomeAnnotations.Taxon-1.0"
-    LIMIT @offset, @limit
+    LIMIT @offset, @result_limit
     RETURN v
