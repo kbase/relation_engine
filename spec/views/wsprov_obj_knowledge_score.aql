@@ -1,0 +1,14 @@
+let ws_ids = @ws_ids
+for o in wsprov_object
+    filter o._id IN @obj_ids
+    let length_out = FIRST(
+        for v in 1..100 outbound o._id wsprov_links, wsprov_copied_into
+            collect with count into length
+            return length
+    )
+    let length_in = FIRST(
+        for v in 1..100 outbound o._id wsprov_links, wsprov_copied_into
+            collect with count into length
+            return length
+    )
+    return {object_id: o._id, score: length_out + length_in}

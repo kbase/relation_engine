@@ -5,8 +5,9 @@
 //   ws_ids - array of private workspace ids the user has access to
 //   obj_key - wsprov_object key to find links for
 //   show_private - limit to objects in workspaces that a user has access to
-//   show_private - limit to objects in public workspaces
-//   *** if both show_private and show_private are true this will be treated as an OR ***
+//   show_public - limit to objects in public workspaces
+//   *** if both show_private and show_public are true this will be treated as an OR ***
+//   limit - result limit
 
 WITH wsprov_object
 LET obj_id = CONCAT('wsprov_object/', @obj_key)
@@ -15,4 +16,5 @@ FOR v IN 1..10 ANY obj_id wsprov_copied_into
     LET simple_type = SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1]
     FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
         (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+    LIMIT @limit
     RETURN v
