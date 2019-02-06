@@ -5,15 +5,19 @@
 //   ws_ids - array of private workspace ids the user has access to
 //   obj_key - wsprov_object key to find links for
 //   show_private - limit to objects in workspaces that a user has access to
-//   show_private - limit to objects in public workspaces
-//   *** if both show_private and show_private are true this will be treated as an OR ***
+//   show_public - limit to objects in public workspaces
+//   *** if both show_private and show_public are true this will be treated as an OR ***
+//   result_limit - result limit
+//   offset - result offset
 
 WITH wsprov_object
 LET obj_id = CONCAT('wsprov_object/', @obj_key)
-FOR v, e, p IN 1..10 ANY obj_id wsprov_copied_into
+FOR v, e, p IN 1..3 ANY obj_id wsprov_copied_into
     OPTIONS {uniqueVertices: 'global', bfs: true}
     LET simple_type = SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1]
     FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
         (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
-    FILTER p.vertices[*].ws_type != "KBaseGenomeAnnotations.Taxon-1.0"
+    FILTER (!@types || simple_type IN @types)
+    FILTER p.vertices[*].ws_type none == "KBaseGenomeAnnotations.Taxon-1.0"
+    LIMIT @offset, @result_limit
     RETURN v
