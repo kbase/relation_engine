@@ -11,7 +11,6 @@ LET obj_id = CONCAT("wsprov_object/", @obj_key)
 FOR v, e, p in 1..100
   INBOUND obj_id wsprov_links, wsprov_copied_into
   OPTIONS {uniqueVertices: "global", bfs: true}
-  FILTER p.vertices[1].is_taxon != true
   FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
       (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
   COLLECT type = v.ws_type with count into type_count
