@@ -1,18 +1,33 @@
 // Fetch the counts by type of ws_objects that refference an object
 // Args:
-//   ws_ids - array of private workspace ids the user has access to
-//   obj_key - wsprov_object key to count associations for
-//   show_private - limit to objects in workspaces that a user has access to
-//   show_public - limit to objects in public workspaces
-//      *** if both show_private and show_public are true, this will be treated as an OR ***
+//   ws_ids - array of private workspace ids the user has access to (autofilled by RE-API)
+//   key - key of the object to start from
+//   show_private - if present, limit to objects in workspaces that a user has access to
+//   show_public - if present, limit to objects in public workspaces
+//   *** if both show_private and show_private are true this will be treated as an OR ***
+//   owners - if truthy, limit to objects with owner in list
+//   simplify_type - if true, strip out the module and version before collecting
 
 WITH wsprov_object
-LET obj_id = CONCAT("wsprov_object/", @obj_key)
-FOR v, e, p in 1..100
-  INBOUND obj_id wsprov_links, wsprov_copied_into
-  OPTIONS {uniqueVertices: "global", bfs: true}
-  FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
-      (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
-  COLLECT type = v.ws_type with count into type_count
-  SORT type_count DESC
-  RETURN {type, type_count}
+LET ws_objects = (
+    FOR v IN 1..10
+        INBOUND CONCAT('wsprov_object/', @key) wsprov_links
+        OPTIONS {'uniqueVertices': 'global', 'bfs':true}
+        // If both show_private and show_public, return if either is true
+        FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
+            (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+        FILTER (!@owners || v.owner IN @owners)
+        return v
+)
+
+LET types = (
+    FOR v in ws_objects
+        LET ws_type = @simplify_type ? SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1] : v.ws_type
+        COLLECT type = ws_type WITH COUNT INTO type_count
+        RETURN {type, type_count}
+)
+LET narrs = (
+    FOR v in ws_objects
+    RETURN DISTINCT v.narr_name
+)
+RETURN PUSH(types, {'type': 'Narrative', 'type_count': COUNT(narrs)})
