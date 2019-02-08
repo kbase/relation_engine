@@ -1,22 +1,39 @@
 // Find all linked objects to a object
 // Args:
 //   ws_ids - array of private workspace ids the user has access to
-//   obj_keys - wsprov_object key to find links for
+//   obj_key - wsprov_object key to find links for
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_public - limit to objects in public workspaces
-//      *** if both show_private and show_public are true this will be treated as an OR ***
-//   types - simplified workspace types to return (e.g. Genome, Assembly)
-//   result_limit - result limit
+//      *** if both show_private and show_public are true, this will be treated as an OR ***
+//   type - ws type to filter on
+//   owners - list of usernames to filter by owner
+//   results_limit - limit of total results
 //   offset - result offset
 
 WITH wsprov_object
-LET obj_id = CONCAT('wsprov_object/', @obj_key)
-FOR v, e, p IN 1..3 any obj_id wsprov_links
-    OPTIONS {uniqueVertices: 'global', bfs: true}
-    LET simple_type = SPLIT(SPLIT(v.ws_type, '-', 1)[0], '.')[1]
-    FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
-        (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
-    FILTER (!@types || simple_type IN @types)
-    FILTER p.vertices[*].ws_type none == "KBaseGenomeAnnotations.Taxon-1.0"
-    LIMIT @offset, @result_limit
-    RETURN v
+LET obj_id = CONCAT("wsprov_object/", @obj_key)
+FOR v, e, p IN 1..100
+    INBOUND obj_id wsprov_links, wsprov_copied_into
+    OPTIONS {uniqueVertices: "global", bfs: true}
+    FILTER (!@type || v.ws_type == @type)
+    FILTER (!@owners || v.owner IN @owners)
+    FILTER (@show_private && @show_public)
+      ? (v.is_public || v.workspace_id IN @ws_ids)
+      : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+    LIMIT @offset, @results_limit
+    RETURN {
+        vertex: {
+            _key: v._key,
+            is_public: v.is_public,
+            narr_name: v.narr_name,
+            obj_name: v.obj_name,
+            owner: v.owner,
+            save_date: v.save_date,
+            workspace_id: v.workspace_id,
+            ws_type: v.ws_type
+        },
+        path: {
+            edges: p.edges[*]._id,
+            verts: p.vertices[*]._id
+        }
+    }
