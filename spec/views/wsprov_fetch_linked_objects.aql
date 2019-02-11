@@ -32,8 +32,5 @@ FOR v, e, p IN 1..100
             workspace_id: v.workspace_id,
             ws_type: v.ws_type
         },
-        path: {
-            edges: p.edges[*]._id,
-            verts: p.vertices[*]._id
-        }
+        type_path: p.vertices[*].ws_type
     }
