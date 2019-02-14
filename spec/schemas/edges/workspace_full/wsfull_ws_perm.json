@@ -6,9 +6,9 @@
   "properties": {
     "perm": {
       "type": "string",
-      "enum": ["a", "w", "r", "n"],
+      "enum": ["a", "w", "r"],
       "title": "Permissions",
-      "description": "Represents the permissions a user has on a workspace, where 'a' is 'administrator', 'w' is read/write, 'r' is readonly, and 'n' is 'none'."
+      "description": "Represents the permissions a user has on a workspace, where 'a' is 'administrator', 'w' is read/write, 'r' is readonly."
     },
     "_from": {
       "type": "string",
