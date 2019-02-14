@@ -12,25 +12,55 @@
 
 WITH wsprov_object
 LET obj_id = CONCAT("wsprov_object/", @obj_key)
-FOR v, e, p IN 1..100
-    INBOUND obj_id wsprov_links, wsprov_copied_into
-    OPTIONS {uniqueVertices: "global", bfs: true}
-    FILTER (!@type || v.ws_type == @type)
-    FILTER (!@owners || v.owner IN @owners)
-    FILTER (@show_private && @show_public)
-      ? (v.is_public || v.workspace_id IN @ws_ids)
-      : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
-    LIMIT @offset, @results_limit
-    RETURN {
-        vertex: {
-            _key: v._key,
-            is_public: v.is_public,
-            narr_name: v.narr_name,
-            obj_name: v.obj_name,
-            owner: v.owner,
-            save_date: v.save_date,
-            workspace_id: v.workspace_id,
-            ws_type: v.ws_type
-        },
-        type_path: p.vertices[*].ws_type
-    }
+
+let out = (
+    FOR v, e, p IN 1..100
+        OUTBOUND obj_id wsprov_links, wsprov_copied_into
+        OPTIONS {uniqueVertices: "global", bfs: true}
+        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@owners || v.owner IN @owners)
+        FILTER (@show_private && @show_public)
+          ? (v.is_public || v.workspace_id IN @ws_ids)
+          : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+        LIMIT @offset, @results_limit
+        RETURN {
+            vertex: {
+                _key: v._key,
+                is_public: v.is_public,
+                narr_name: v.narr_name,
+                obj_name: v.obj_name,
+                owner: v.owner,
+                save_date: v.save_date,
+                workspace_id: v.workspace_id,
+                ws_type: v.ws_type
+            },
+            path: p
+        }
+)
+
+let inb = (
+    FOR v, e, p IN 1..100
+        OUTBOUND obj_id wsprov_links, wsprov_copied_into
+        OPTIONS {uniqueVertices: "global", bfs: true}
+        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@owners || v.owner IN @owners)
+        FILTER (@show_private && @show_public)
+          ? (v.is_public || v.workspace_id IN @ws_ids)
+          : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+        LIMIT @offset, @results_limit
+        RETURN {
+            vertex: {
+                _key: v._key,
+                is_public: v.is_public,
+                narr_name: v.narr_name,
+                obj_name: v.obj_name,
+                owner: v.owner,
+                save_date: v.save_date,
+                workspace_id: v.workspace_id,
+                ws_type: v.ws_type
+            },
+            path: p
+        }
+)
+
+return APPEND(out, inb)
