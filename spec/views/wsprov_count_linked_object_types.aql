@@ -5,6 +5,8 @@
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_public - limit to objects in public workspaces
 //      *** if both show_private and show_public are true, this will be treated as an OR ***
+//   type - ws type to filter on
+//   owners - list of usernames to filter by owner
 
 WITH wsprov_object
 LET obj_id = concat('wsprov_object/', @obj_key)
