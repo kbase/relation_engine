@@ -5,14 +5,36 @@
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_public - limit to objects in public workspaces
 //      *** if both show_private and show_public are true, this will be treated as an OR ***
+//   type - ws type to filter on
+//   owners - list of usernames to filter by owner
 
 WITH wsprov_object
-LET obj_id = CONCAT("wsprov_object/", @obj_key)
-FOR v, e, p in 1..100
-  INBOUND obj_id wsprov_links, wsprov_copied_into
-  OPTIONS {uniqueVertices: "global", bfs: true}
-  FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN @ws_ids) :
-      (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
-  COLLECT type = v.ws_type with count into type_count
-  SORT type_count DESC
-  RETURN {type, type_count}
+LET obj_id = concat('wsprov_object/', @obj_key)
+
+let out = FIRST(
+    for v, e, p in 1..100
+        OUTBOUND obj_id wsprov_links, wsprov_copied_into
+        OPTIONS {bfs: true, uniqueVertices: 'global'}
+        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@owners || v.owner IN @owners)
+        FILTER (@show_private && @show_public)
+          ? (v.is_public || v.workspace_id IN @ws_ids)
+          : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+        COLLECT type = v.ws_type with count into type_count
+        RETURN {type, type_count}
+)
+
+let inb = FIRST(
+    for v, e, p in 1..100
+        INBOUND obj_id wsprov_links, wsprov_copied_into
+        OPTIONS {bfs: true, uniqueVertices: 'global'}
+        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@owners || v.owner IN @owners)
+        FILTER (@show_private && @show_public)
+          ? (v.is_public || v.workspace_id IN @ws_ids)
+          : (!@show_private || v.workspace_id IN @ws_ids) && (!@show_public || v.is_public)
+        COLLECT type = v.ws_type with count into type_count
+        RETURN {type, type_count}
+)
+
+return {out, inb}
