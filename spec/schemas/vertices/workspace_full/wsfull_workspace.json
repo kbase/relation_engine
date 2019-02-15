@@ -1,13 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "_key",
-    "name",
-    "mod_epoch",
-    "public"
-  ],
+  "required": ["_key"],
   "properties": {
     "_key": {
       "type": "string",
@@ -16,6 +10,22 @@
         "35414"
       ],
       "pattern": "^\\d+$"
+    },
+    "narr_name": {
+      "type": "string",
+      "title": "Narrative name"
+    },
+    "owner": {
+      "type": "string",
+      "title": "Username of workspace owner"
+    },
+    "max_obj_id": {
+      "type": "integer",
+      "title": "Maximum object ID in this workspace"
+    },
+    "lock_status": {
+      "type": "string",
+      "title": "Status of the workspace lock"
     },
     "name": {
       "type": "string",
@@ -26,13 +36,14 @@
     },
     "mod_epoch": {
       "type": "integer",
-      "description": "Epoch when the Workspace was last modified",
+      "title": "Modified date epoch",
+      "description": "Timestamp of when the workspace was last modified",
       "minimum": 0
     },
-    "public": {
+    "is_public": {
       "type": "boolean"
     },
-    "deleted": {
+    "is_deleted": {
       "type": "boolean"
     }
   }

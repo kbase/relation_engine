@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "The user has permissions on a workspace.",
+  "required": ["_from", "_to", "perm"],
+  "properties": {
+    "perm": {
+      "type": "string",
+      "enum": ["a", "w", "r"],
+      "title": "Permissions",
+      "description": "Represents the permissions a user has on a workspace, where 'a' is 'administrator', 'w' is read/write, 'r' is readonly."
+    },
+    "_from": {
+      "type": "string",
+      "examples": [
+        "wsfull_user/jjeffryes"
+      ],
+      "description": "A username"
+    },
+    "_to": {
+      "type": "string",
+      "examples": [
+        "wsfull_workspace/35414"
+      ],
+      "description": "A workspace"
+    }
+  }
+}
