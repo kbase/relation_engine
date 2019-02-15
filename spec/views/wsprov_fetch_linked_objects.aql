@@ -40,7 +40,7 @@ let out = (
 
 let inb = (
     FOR v, e, p IN 1..100
-        OUTBOUND obj_id wsprov_links, wsprov_copied_into
+        INBOUND obj_id wsprov_links, wsprov_copied_into
         OPTIONS {uniqueVertices: "global", bfs: true}
         FILTER (!@type || v.ws_type == @type)
         FILTER (!@owners || v.owner IN @owners)
