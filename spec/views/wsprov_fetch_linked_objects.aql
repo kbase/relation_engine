@@ -5,8 +5,8 @@
 //   show_private - limit to objects in workspaces that a user has access to
 //   show_public - limit to objects in public workspaces
 //      *** if both show_private and show_public are true, this will be treated as an OR ***
-//   type - ws type to filter on
-//   owners - list of usernames to filter by owner
+//   types - list of ws types to filter on (set as false to disable)
+//   owners - list of usernames to filter by owner (set as false to disable)
 //   results_limit - limit of total results
 //   offset - result offset
 
@@ -17,7 +17,7 @@ let out = (
     FOR v, e, p IN 1..100
         OUTBOUND obj_id wsprov_links, wsprov_copied_into
         OPTIONS {uniqueVertices: "global", bfs: true}
-        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@types || v.ws_type IN @types)
         FILTER (!@owners || v.owner IN @owners)
         FILTER (@show_private && @show_public)
           ? (v.is_public || v.workspace_id IN @ws_ids)
@@ -42,7 +42,7 @@ let inb = (
     FOR v, e, p IN 1..100
         INBOUND obj_id wsprov_links, wsprov_copied_into
         OPTIONS {uniqueVertices: "global", bfs: true}
-        FILTER (!@type || v.ws_type == @type)
+        FILTER (!@types || v.ws_type IN @types)
         FILTER (!@owners || v.owner IN @owners)
         FILTER (@show_private && @show_public)
           ? (v.is_public || v.workspace_id IN @ws_ids)
