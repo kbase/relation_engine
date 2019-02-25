@@ -311,7 +311,7 @@ Where the file contains multiple JSON documents separated by line-breaks.
 
 Copy `.env.example` to `.env`. Start the server with `docker-compose up`.
 
-Run tests with `make test`.
+Run tests with `make test` (the server should be running in another terminal using `docker-compose up --build`).
 
 The docker image is pushed to Docker Hub when new commits are made to master. The script that runs when pushing to docker hub is found in `hooks/build`.
 
