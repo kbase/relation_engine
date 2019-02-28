@@ -8,7 +8,7 @@ from . import arango_client, spec_loader
 from .config import get_config
 
 
-def download_latest(init_collections=True):
+def download_specs(init_collections=True, release_url=None):
     """Check and download the latest spec and extract it to the spec path."""
     config = get_config()
     # Remove the spec directory, ignoring if it is already missing
@@ -19,6 +19,8 @@ def download_latest(init_collections=True):
     if 'SPEC_RELEASE_PATH' in os.environ:
         _extract_tarball(os.environ['SPEC_RELEASE_PATH'], config['spec_paths']['root'])
     else:
+        if release_url:
+            tarball_url = release_url
         if 'SPEC_RELEASE_URL' in os.environ:
             tarball_url = os.environ['SPEC_RELEASE_URL']
         else:
@@ -40,13 +42,14 @@ def download_latest(init_collections=True):
 
 
 def _fetch_github_release_url():
+    """Find the latest relation engine spec release using the github api."""
     config = get_config()
     # Download information about the latest release
     release_resp = requests.get(config['spec_url'] + '/releases/latest')
     release_info = release_resp.json()
     if release_resp.status_code != 200:
         # This may be a github API rate usage limit, or some other error
-        raise Exception(release_info['message'])
+        raise RuntimeError(release_info['message'])
     return release_info['tarball_url']
 
 
