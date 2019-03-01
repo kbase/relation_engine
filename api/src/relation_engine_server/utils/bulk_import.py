@@ -1,9 +1,9 @@
+import os
 import tempfile
 import flask
 import json
 import jsonschema
 import hashlib
-import os
 
 from . import spec_loader
 from .arango_client import import_from_file
@@ -16,16 +16,25 @@ def bulk_import(query_params):
     arango client.
     """
     schema = spec_loader.get_schema(query_params['collection'])
-    with tempfile.NamedTemporaryFile(mode='a', delete=False) as temp_fd:
-        # temp_fd is closed and deleted when the context ends
+    # We can't use a context manager here
+    # We need to close the file to have the file contents readable
+    #  and we need to prevent deletion of the temp file on close (default behavior of tempfiles)
+    temp_fd = tempfile.NamedTemporaryFile(mode='a', delete=False)
+    try:
+        # Stream request data line-by-line
+        # Parse each line to json, validate the schema, and write to a file
         for line in flask.request.stream:
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
             json_line = _write_edge_key(json_line)
             temp_fd.write(json.dumps(json_line) + '\n')
-    resp_text = import_from_file(temp_fd.name, query_params)
-    os.remove(temp_fd.name)
-    return resp_text
+        temp_fd.close()
+        resp_text = import_from_file(temp_fd.name, query_params)
+        resp_json = json.loads(resp_text)
+    finally:
+        # Always remove the temp file
+        os.remove(temp_fd.name)
+    return resp_json
 
 
 def _write_edge_key(json_line):
