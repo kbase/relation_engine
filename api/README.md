@@ -20,7 +20,7 @@ Return a list of view names.
 _Example request_
 
 ```sh
-$ curl -X GET http://{root_url}/api/views
+curl -X GET {root_url}/api/views
 ```
 
 _Example response_
@@ -35,7 +35,7 @@ Fetch the registered schema names.
 
 _Example request_
 ```sh
-$ curl -X GET http://{root_url}/api/schemas
+curl -X GET {root_url}/api/schemas
 ```
 
 _Example response_
@@ -54,7 +54,7 @@ Get the AQL source code for a view
 _Example request_
 
 ```sh
-$ curl http://{root_url}/api/views/example_view1
+curl {root_url}/api/views/example_view1
 ```
 
 Response has mimetype of text/plain
@@ -75,7 +75,7 @@ Get the JSON source for a registered schema by name.
 _Example request_
 
 ```sh
-$ curl http://{root_url}/api/schemas/vertex_examples1
+curl {root_url}/api/schemas/vertex_examples1
 ```
 
 _Example response_
@@ -95,7 +95,7 @@ Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a
 _Example rquest_
 
 ```sh
-$ curl -X POST -d '{"argument": "value"}' http://{root_url}/api/query_results?view=example
+curl -X POST -d '{"argument": "value"}' {root_url}/api/query_results?view=example
 ```
 
 _Query params_
@@ -162,8 +162,8 @@ Results are limited to 100 items. To continue fetching additional results, use t
 System admins can run ad-hoc queries by specifying a "query" property in the JSON request body.
 
 ```sh
-$ curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
-    http://{root_url}/api/query_results
+curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
+    {root_url}/api/query_results
 ```
 
 This will return the same form of results as above.
@@ -175,7 +175,7 @@ Bulk-update documents by either creating, replacing, or updating.
 _Example_
 
 ```sh
-$ curl -X PUT http://{root_url}/api/documents?collection=genes&on_duplicate=update
+curl -X PUT {root_url}/api/documents?collection=genes&on_duplicate=update
 ```
 
 _Query params_
@@ -238,7 +238,7 @@ Manually check and pull spec updates. Requires sysadmin auth.
 _Example_
 
 ```
-$ curl http://{root_url}/api/update_specs
+curl {root_url}/api/update_specs
 ```
 
 _Query params_
