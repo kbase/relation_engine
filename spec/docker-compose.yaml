@@ -1,0 +1,50 @@
+version: '3'
+
+# This docker-compose is for developer convenience and testing, not for running in production.
+
+services:
+
+  # ArangoDB
+  arangodb:
+    image: arangodb:3.4
+    ports:
+      - 8529:8529
+    environment:
+      - ARANGO_ROOT_PASSWORD=password
+
+  # Relation Engine API
+  re_api:
+    image: kbase/relation_engine_api:latest
+    ports:
+      - 5000:5000
+    environment:
+      - ARANGO_ROOT_PASSWORD=password
+    environment:
+      - DEVELOPMENT=1
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - KBASE_AUTH_URL=http://auth:5000
+      - KBASE_WORKSPACE_URL=http://workspace:5000
+      - PYTHONUNBUFFERED=true
+      - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
+      - DB_URL=http://arangodb:8529
+      - DB_USER=root
+      - DB_PASS=password
+
+  # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
+  auth:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/test/mock_services/mock_auth:/config
+
+  # Mock workspace server (see src/test/mock_workspace/endpoints.json)
+  workspace:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/test/mock_services/mock_workspace:/config
+
+  # General python container for executing tests
+  spec:
+    build: .
+    volumes:
+      - ${PWD}:/app
