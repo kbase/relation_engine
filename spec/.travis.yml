@@ -4,4 +4,6 @@ python:
 before_script:
 - pip install jsonschema
 script:
+- docker-compose up --build -d
+- sleep 15
 - make test
