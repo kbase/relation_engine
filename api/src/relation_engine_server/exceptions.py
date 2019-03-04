@@ -12,7 +12,7 @@ class InvalidParameters(Exception):
 
 
 class MissingHeader(Exception):
-    """Missing required header ina  request."""
+    """Missing required header in a request."""
 
     def __init__(self, header_name):
         self.header_name = header_name
