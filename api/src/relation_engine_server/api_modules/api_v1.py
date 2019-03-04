@@ -112,4 +112,3 @@ endpoints = {
     'specs': {'handler': update_specs, 'methods': {'PUT'}},
     'documents': {'handler': save_documents, 'methods': {'PUT'}}
 }
-deprecations = {}  # type: ignore

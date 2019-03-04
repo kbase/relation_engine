@@ -13,7 +13,6 @@ from .api_modules import api_v1
 
 # All api version modules, from oldest to newest
 _API_VERSIONS = [api_v1.endpoints]
-_API_DEPRECATIONS = [api_v1.deprecations]
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -46,46 +45,35 @@ def api_call(path):
 
     Versioning system:
     - Every API version is a discrete python module that contains an 'endpoints' dictionary.
-    - New versions don't need to redefine previous endpoints.
-        - If an endpoint is not defined, we fall back to a previous version.
-    - New versions can overwrite existing methods and add new ones.
     - Versions are simple incrementing integers. We only need a new version for breaking changes.
-    - New modules can deprecate paths by putting them under the 'deprecations' key
     Note that endpoints cannot be removed with new versions, only overwritten or added.
     """
     path_parts = path.split('/')
     version_int = _get_version(path_parts[0])
     # Get the path and version number
     api_path = '/'.join(path_parts[1:])
-    # Flag for whether the endpoint we find is deprecated
-    deprecated = False
     # Find our method in the various versioned modules
     # If it is not present in a later version, fall back to a previous version
     # Iterates by starting at (version-1), stopping at 0, and stepping backwards
-    # Note: the mypy type checker has difficulties with the path_funcs dicts, so we ignore type checking below
-    for ver in range(version_int - 1, -1, -1):
-        path_funcs = _API_VERSIONS[ver]
-        deprecations = _API_DEPRECATIONS[ver]
-        if api_path in deprecations:
-            # We found a deprecation flag on the endpoint
-            deprecated = True
-        if api_path in path_funcs:
-            methods = path_funcs[api_path].get('methods', {'GET'})  # type: ignore
-            # Mypy is not able to infer that `methods` will always be a set
-            if flask.request.method not in methods:  # type: ignore
-                return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
-            # We found a matching function for the endpoint and method
-            func = path_funcs[api_path]['handler']  # type: ignore
-            # Mypy is not able to infer that this is a function
-            result = func()  # type: ignore
-            return _json_resp(result, 200, deprecated)
-    body = {'error': f'path not found: {api_path}'}
-    return _json_resp(body, 404)
+    # Note: the mypy type checker has difficulties with the endpoints dicts, so we ignore type checking below
+    endpoints = _API_VERSIONS[version_int]
+    if api_path not in endpoints:
+        body = {'error': f'path not found: {api_path}'}
+        return _json_resp(body, 404)
+    methods = endpoints[api_path].get('methods', {'GET'})  # type: ignore
+    # Mypy is not able to infer that `methods` will always be a set
+    if flask.request.method not in methods:  # type: ignore
+        return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
+    # We found a matching function for the endpoint and method
+    func = endpoints[api_path]['handler']  # type: ignore
+    # Mypy is not able to infer that this is a function
+    result = func()  # type: ignore
+    return _json_resp(result, 200)
 
 
 def _get_version(version_str):
     """From a list of path parts, initialize and validate a version int for the api."""
-    ver_len = len(_API_VERSIONS)
+    max_version = len(_API_VERSIONS)
     # Make sure the version looks like 'v12'
     if not re.match(r'^v\d+$', version_str):
         raise InvalidParameters('Make a request with the format /api/<version>/<path...>')
@@ -94,18 +82,15 @@ def _get_version(version_str):
     # Make sure the version number is valid
     if version_int <= 0:
         raise InvalidParameters('API version must be > 0')
-    if version_int > ver_len:
-        raise InvalidParameters(f'Invalid api version; max is {ver_len}')
+    if version_int > max_version:
+        raise InvalidParameters(f'Invalid api version; max is {max_version}')
     return version_int
 
 
-def _json_resp(result, status=200, deprecated=False):
+def _json_resp(result, status=200):
     """Send a json response back to the requester with the proper headers."""
     resp = flask.Response(json.dumps(result))
     resp.status_code = status
-    if deprecated:
-        # Add a deprecation warning in the headers
-        resp.headers['Warning'] = 'DEPRECATED'
     print(' '.join([flask.request.method, flask.request.path, '->', resp.status]))
     # Enable CORS
     resp.headers['Access-Control-Allow-Origin'] = '*'
