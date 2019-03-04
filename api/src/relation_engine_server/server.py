@@ -47,26 +47,23 @@ def api_call(path):
     - Every API version is a discrete python module that contains an 'endpoints' dictionary.
     - Versions are simple incrementing integers. We only need a new version for breaking changes.
     """
+    # Get the path and version number
     path_parts = path.split('/')
     version_int = _get_version(path_parts[0])
-    # Get the path and version number
     api_path = '/'.join(path_parts[1:])
     # Find our method in the various versioned modules
-    # If it is not present in a later version, fall back to a previous version
-    # Iterates by starting at (version-1), stopping at 0, and stepping backwards
-    # Note: the mypy type checker has difficulties with the endpoints dicts, so we ignore type checking below
-    endpoints = _API_VERSIONS[version_int - 1]
+    # Note: the mypy type checker has difficulties with the endpoints dict, so we ignore type checking below
+    endpoints = _API_VERSIONS[version_int - 1]  # index 0 == version 1
     if api_path not in endpoints:
-        body = {'error': f'path not found: {api_path}'}
+        body = {'error': f'Path not found: {api_path}.'}
         return _json_resp(body, 404)
     methods = endpoints[api_path].get('methods', {'GET'})  # type: ignore
     # Mypy is not able to infer that `methods` will always be a set
     if flask.request.method not in methods:  # type: ignore
         return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
     # We found a matching function for the endpoint and method
-    func = endpoints[api_path]['handler']  # type: ignore
     # Mypy is not able to infer that this is a function
-    result = func()  # type: ignore
+    result = endpoints[api_path]['handler']()  # type: ignore
     return _json_resp(result, 200)
 
 
