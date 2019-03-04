@@ -2,6 +2,6 @@
 
 test:
 	python test/validate.py
-
-test-server:
-	echo "TODO run a single-node arango database server with pre-loaded test data"
+	echo "Running view tests"
+	docker-compose run spec python /app/test/views/init_spec.py
+	docker-compose run spec python -m unittest discover /app/test/views
