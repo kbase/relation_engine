@@ -56,7 +56,7 @@ def api_call(path):
     # If it is not present in a later version, fall back to a previous version
     # Iterates by starting at (version-1), stopping at 0, and stepping backwards
     # Note: the mypy type checker has difficulties with the endpoints dicts, so we ignore type checking below
-    endpoints = _API_VERSIONS[version_int]
+    endpoints = _API_VERSIONS[version_int - 1]
     if api_path not in endpoints:
         body = {'error': f'path not found: {api_path}'}
         return _json_resp(body, 404)
