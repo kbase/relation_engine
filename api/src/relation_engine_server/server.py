@@ -46,7 +46,6 @@ def api_call(path):
     Versioning system:
     - Every API version is a discrete python module that contains an 'endpoints' dictionary.
     - Versions are simple incrementing integers. We only need a new version for breaking changes.
-    Note that endpoints cannot be removed with new versions, only overwritten or added.
     """
     path_parts = path.split('/')
     version_int = _get_version(path_parts[0])
