@@ -4,6 +4,11 @@ A simple API that allows KBase community developers to interact with the Relatio
 
 ## HTTP API
 
+The API is a small, rest-ish service where all data is in JSON format. Replace the `{root_url}` in the examples below with one of:
+ * Production: `https://kbase.us/services/relation_engine_api`
+ * Staging: `https://ci.kbase.us/services/relation_engine_api`
+ * App-dev: `https://appdev.kbase.us/services/relation_engine_api`
+
 ### GET /
 
 Returns server status info
@@ -15,7 +20,7 @@ Return a list of view names.
 _Example request_
 
 ```sh
-$ curl -X GET http://relation_engine/api/views
+curl -X GET {root_url}/api/views
 ```
 
 _Example response_
@@ -30,7 +35,7 @@ Fetch the registered schema names.
 
 _Example request_
 ```sh
-$ curl -X GET http://relation_engine/api/schemas
+curl -X GET {root_url}/api/schemas
 ```
 
 _Example response_
@@ -49,7 +54,7 @@ Get the AQL source code for a view
 _Example request_
 
 ```sh
-$ curl http://relation_engine/api/views/example_view1
+curl {root_url}/api/views/example_view1
 ```
 
 Response has mimetype of text/plain
@@ -70,7 +75,7 @@ Get the JSON source for a registered schema by name.
 _Example request_
 
 ```sh
-$ curl http://relation_engine/api/schemas/vertex_examples1
+curl {root_url}/api/schemas/vertex_examples1
 ```
 
 _Example response_
@@ -90,7 +95,7 @@ Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a
 _Example rquest_
 
 ```sh
-$ curl -X POST -d '{"argument": "value"}' http://relation_engine/api/query_results?view=example
+curl -X POST -d '{"argument": "value"}' {root_url}/api/query_results?view=example
 ```
 
 _Query params_
@@ -157,8 +162,8 @@ Results are limited to 100 items. To continue fetching additional results, use t
 System admins can run ad-hoc queries by specifying a "query" property in the JSON request body.
 
 ```sh
-$ curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
-    http://relation_engine/api/query_results
+curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
+    {root_url}/api/query_results
 ```
 
 This will return the same form of results as above.
@@ -170,7 +175,7 @@ Bulk-update documents by either creating, replacing, or updating.
 _Example_
 
 ```sh
-$ curl -X PUT http://relation_engine/api/documents?collection=genes&on_duplicate=update
+curl -X PUT {root_url}/api/documents?collection=genes&on_duplicate=update
 ```
 
 _Query params_
@@ -233,7 +238,7 @@ Manually check and pull spec updates. Requires sysadmin auth.
 _Example_
 
 ```
-$ curl http://relation_engine/api/update_specs
+curl {root_url}/api/update_specs
 ```
 
 _Query params_
@@ -322,25 +327,18 @@ The following environment variables should be configured:
 
 ## Development
 
-Copy `.env.example` to `.env`. Start the server with `docker-compose up`.
+See the [Contribution Guidelines](/.github/CONTRIBUTING.md).
 
-Run tests with `make test` (the server should be running in another terminal using `docker-compose up --build`).
+**Start the server** with `docker-compose up --build`.
+
+**Run tests** with `make test` (the server should be running in another terminal using `docker-compose up --build`).
+
+## Deployment
 
 The docker image is pushed to Docker Hub when new commits are made to master. The script that runs when pushing to docker hub is found in `hooks/build`.
-
-## Building and publishing the client
-
-The client package is built with setuptools and published to anaconda, where it can then be installed via pip or conda.
-
-```sh
-$ make build-client
-$ make publish-client
-```
 
 ## Project anatomy
 
 * Source code is in `./src`
 * Tests are in  `./src/test`
-* The main server code is in `./src/relation_engine_server/__main__.py`
-* API v1 endpoints are in `./src/relation_engine_server/api/api_v1.py`
-* A python client package is in `./src/relation_engine_client`
+* The main server code is in `./src/relation_engine_server`.
