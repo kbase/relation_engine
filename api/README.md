@@ -309,6 +309,17 @@ save_results = rec.save_documents(
 
 Where the file contains multiple JSON documents separated by line-breaks.
 
+## Administration
+
+The following environment variables should be configured:
+
+* `KBASE_AUTH_URL` - url of the KBase authentication (auth2) server to use
+* `SHARD_COUNT` - number of shards to use when creating new collections
+* `KBASE_WORKSPACE_URL` - url of the KBase workspace server to use (for authenticating workspace access)
+* `DB_URL` - url of the arangodb database to use for http API access
+* `DB_USER` - username for the arangodb database
+* `DB_PASS` - password for the arangodb database
+
 ## Development
 
 Copy `.env.example` to `.env`. Start the server with `docker-compose up`.
