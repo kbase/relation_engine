@@ -1,4 +1,5 @@
 """The main entrypoint for running the Flask server."""
+import re
 import flask
 import json
 import os
@@ -6,8 +7,12 @@ from uuid import uuid4
 import traceback
 from jsonschema.exceptions import ValidationError
 
-from .exceptions import MissingHeader, UnauthorizedAccess
-from .utils import arango_client, spec_loader, auth, bulk_import, pull_spec, config
+from .exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters
+from .utils import arango_client, spec_loader
+from .api_modules import api_v1
+
+# All api version modules, from oldest to newest
+_API_VERSIONS = [api_v1.endpoints]
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -25,137 +30,72 @@ def root():
         commit_hash = 'unknown'
     arangodb_status = arango_client.server_status()
     repo_url = 'https://github.com/kbase/relation_engine_api.git'
-    return flask.jsonify({
+    body = {
         'arangodb_status': arangodb_status,
         'commit_hash': commit_hash,
         'repo_url': repo_url
-    })
+    }
+    return _json_resp(body)
 
 
-@app.route('/config', methods=['GET'])
-def show_config():
-    conf = config.get_config()
-    return flask.jsonify({
-        'auth_url': conf['auth_url'],
-        'workspace_url': conf['workspace_url'],
-        'kbase_endpoint': conf['kbase_endpoint'],
-        'db_url': conf['db_url'],
-        'db_name': conf['db_name'],
-        'spec_url': conf['spec_url']
-    })
-
-
-@app.route('/api/views', methods=['GET'])
-def show_views():
+@app.route('/api/<path:path>', methods=['GET', 'PUT', 'POST', 'DELETE'])
+def api_call(path):
     """
-    Fetch view names and content.
-    Auth: public
+    Handle an api request, dispatching it to the appropriate versioned module.
+
+    Versioning system:
+    - Every API version is a discrete python module that contains an 'endpoints' dictionary.
+    - Versions are simple incrementing integers. We only need a new version for breaking changes.
     """
-    return flask.jsonify(spec_loader.get_view_names())
+    # Get the path and version number
+    path_parts = path.split('/')
+    version_int = _get_version(path_parts[0])
+    api_path = '/'.join(path_parts[1:])
+    # Find our method in the various versioned modules
+    # Note: the mypy type checker has difficulties with the endpoints dict, so we ignore type checking below
+    endpoints = _API_VERSIONS[version_int - 1]  # index 0 == version 1
+    if api_path not in endpoints:
+        body = {'error': f'Path not found: {api_path}.'}
+        return _json_resp(body, 404)
+    methods = endpoints[api_path].get('methods', {'GET'})  # type: ignore
+    # Mypy is not able to infer that `methods` will always be a set
+    if flask.request.method not in methods:  # type: ignore
+        return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
+    # We found a matching function for the endpoint and method
+    # Mypy is not able to infer that this is a function
+    result = endpoints[api_path]['handler']()  # type: ignore
+    return _json_resp(result, 200)
 
 
-@app.route('/api/query_results', methods=['POST'])
-def run_query():
-    """
-    Run a stored view as a query against the database.
-    Auth:
-     - only kbase re admins for ad-hoc queries
-     - public for views (views will have access controls within them based on params)
-    """
-    # Note that flask.request.json only works if the request Content-Type is application/json
-    json_body = json.loads(flask.request.get_data() or '{}')
-    # Don't allow the user to set the special 'ws_ids' field
-    json_body['ws_ids'] = []
-    auth_token = auth.get_auth_header()
-    # Fetch any authorized workspace IDs using a KBase auth token, if present
-    json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
-    # fetch number of documents to return
-    batch_size = int(flask.request.args.get('batch_size', 100))
-    if 'query' in json_body:
-        # Run an adhoc query for a sysadmin
-        auth.require_auth_token(roles=['RE_ADMIN'])
-        query_text = json_body['query']
-        del json_body['query']
-        resp_body = arango_client.run_query(query_text=query_text,
-                                            bind_vars=json_body,
-                                            batch_size=batch_size)
-        return flask.jsonify(resp_body)
-    if 'view' in flask.request.args:
-        # Run a query from a view name
-        view_name = flask.request.args['view']
-        view_source = spec_loader.get_view(view_name)
-        resp_body = arango_client.run_query(query_text=view_source,
-                                            bind_vars=json_body,
-                                            batch_size=batch_size)
-        return flask.jsonify(resp_body)
-    if 'cursor_id' in flask.request.args:
-        # Run a query from a cursor ID
-        cursor_id = flask.request.args['cursor_id']
-        resp_body = arango_client.run_query(cursor_id=cursor_id)
-        return flask.jsonify(resp_body)
-    # No valid options were passed
-    resp_body = {'error': 'Pass in a view or a cursor_id'}
-    return (flask.jsonify(resp_body), 400)
+def _get_version(version_str):
+    """From a list of path parts, initialize and validate a version int for the api."""
+    max_version = len(_API_VERSIONS)
+    # Make sure the version looks like 'v12'
+    if not re.match(r'^v\d+$', version_str):
+        raise InvalidParameters('Make a request with the format /api/<version>/<path...>')
+    # Parse to an int
+    version_int = int(version_str.replace('v', ''))
+    # Make sure the version number is valid
+    if version_int <= 0:
+        raise InvalidParameters('API version must be > 0')
+    if version_int > max_version:
+        raise InvalidParameters(f'Invalid api version; max is {max_version}')
+    return version_int
 
 
-@app.route('/api/schemas', methods=['GET'])
-def show_schemas():
-    """
-    Fetch schema names and content.
-    Auth: public
-    """
-    return flask.jsonify(spec_loader.get_schema_names())
-
-
-@app.route('/api/schemas/<name>', methods=['GET'])
-def show_schema(name):
-    """
-    Fetch the JSON for a single schema.
-    Auth: public
-    """
-    return flask.jsonify(spec_loader.get_schema(name))
-
-
-@app.route('/api/views/<name>', methods=['GET'])
-def show_view(name):
-    """
-    Fetch the AQL for a single view.
-    Auth: public
-    """
-    return flask.Response(spec_loader.get_view(name), mimetype='text/plain')
-
-
-@app.route('/api/update_specs', methods=['GET'])
-def refresh_specs():
-    """
-    Manually check for updates, download spec releases, and init new collections.
-    Auth: admin
-    """
-    auth.require_auth_token(['RE_ADMIN'])
-    init_collections = 'init_collections' in flask.request.args
-    release_url = flask.request.args.get('release_url')
-    pull_spec.download_specs(init_collections, release_url)
-    return flask.jsonify({'status': 'updated'})
-
-
-@app.route('/api/documents', methods=['PUT'])
-def save_documents():
-    """
-    Create, update, or replace many documents in a batch.
-    Auth: admin
-    """
-    auth.require_auth_token(['RE_ADMIN'])
-    collection_name = flask.request.args['collection']
-    query = {'collection': collection_name, 'type': 'documents'}
-    if flask.request.args.get('display_errors'):
-        # Display an array of error messages
-        query['details'] = 'true'
-    if flask.request.args.get('on_duplicate'):
-        query['onDuplicate'] = flask.request.args['on_duplicate']
-    if flask.request.args.get('overwrite'):
-        query['overwrite'] = 'true'
-    resp_text = bulk_import.bulk_import(query)
-    return resp_text
+def _json_resp(result, status=200):
+    """Send a json response back to the requester with the proper headers."""
+    resp = flask.Response(json.dumps(result))
+    resp.status_code = status
+    print(' '.join([flask.request.method, flask.request.path, '->', resp.status]))
+    # Enable CORS
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    env_allowed_headers = os.environ.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', 'authorization')
+    resp.headers['Access-Control-Allow-Headers'] = env_allowed_headers
+    # Set JSON content type and response length
+    resp.headers['Content-Type'] = 'application/json'
+    resp.headers['Content-Length'] = resp.calculate_content_length()
+    return resp
 
 
 @app.errorhandler(json.decoder.JSONDecodeError)
@@ -168,7 +108,7 @@ def json_decode_error(err):
         'lineno': err.lineno,
         'colno': err.colno
     }
-    return (flask.jsonify(resp), 400)
+    return _json_resp(resp, 400)
 
 
 @app.errorhandler(arango_client.ArangoServerError)
@@ -177,18 +117,22 @@ def arango_server_error(err):
         'error': str(err),
         'arango_message': err.resp_json['errorMessage']
     }
-    return (flask.jsonify(resp), 400)
+    return _json_resp(resp, 400)
+
+
+@app.errorhandler(InvalidParameters)
+def invalid_params(err):
+    """Invalid request body json params."""
+    resp = {'error': str(err)}
+    return _json_resp(resp, 400)
 
 
 @app.errorhandler(spec_loader.SchemaNonexistent)
 @app.errorhandler(spec_loader.ViewNonexistent)
 def view_does_not_exist(err):
     """General error cases."""
-    resp = {
-        'error': str(err),
-        'name': err.name
-    }
-    return (flask.jsonify(resp), 400)
+    resp = {'error': str(err), 'name': err.name}
+    return _json_resp(resp, 400)
 
 
 @app.errorhandler(ValidationError)
@@ -201,7 +145,7 @@ def validation_error(err):
         'validator_value': err.validator_value,
         'schema': err.schema
     }
-    return (flask.jsonify(resp), 400)
+    return _json_resp(resp, 400)
 
 
 @app.errorhandler(UnauthorizedAccess)
@@ -211,22 +155,22 @@ def unauthorized_access(err):
         'auth_url': err.auth_url,
         'auth_response': err.response
     }
-    return (flask.jsonify(resp), 403)
+    return _json_resp(resp, 403)
 
 
 @app.errorhandler(404)
 def page_not_found(err):
-    return (flask.jsonify({'error': '404 - Not found.'}), 404)
+    return _json_resp({'error': '404 - Not found.'}, 404)
 
 
 @app.errorhandler(405)
 def method_not_allowed(err):
-    return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
+    return _json_resp({'error': '405 - Method not allowed.'}, 405)
 
 
 @app.errorhandler(MissingHeader)
 def generic_400(err):
-    return (flask.jsonify({'error': str(err)}), 400)
+    return _json_resp({'error': str(err)}, 400)
 
 
 # Any other unhandled exceptions -> 500
@@ -242,18 +186,4 @@ def server_error(err):
     # if os.environ.get('FLASK_DEBUG'):  TODO
     resp['error_class'] = err.__class__.__name__
     resp['error_details'] = str(err)
-    return (flask.jsonify(resp), 500)
-
-
-@app.after_request
-def after_request(response):
-    """Actions to perform on the response after the request handler finishes running."""
-    print(' '.join([flask.request.method, flask.request.path, '->', response.status]))
-    # Enable CORS
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    env_allowed_headers = os.environ.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', 'authorization')
-    response.headers['Access-Control-Allow-Headers'] = env_allowed_headers
-    # Set JSON content type and response length
-    response.headers['Content-Type'] = 'application/json'
-    response.headers['Content-Length'] = response.calculate_content_length()
-    return response
+    return _json_resp(resp, 500)
