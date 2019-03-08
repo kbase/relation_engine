@@ -325,6 +325,14 @@ See the [Contribution Guidelines](/.github/CONTRIBUTING.md).
 
 **Run tests** with `make test` (the server should be running in another terminal using `docker-compose up --build`).
 
+To do a hard reset of your docker build, do:
+
+```sh
+docker-compose rm -vf
+docker-compose build --no-cache
+docker-compose up
+```
+
 ## Deployment
 
 The docker image is pushed to Docker Hub when new commits are made to master. The script that runs when pushing to docker hub is found in `hooks/build`.
