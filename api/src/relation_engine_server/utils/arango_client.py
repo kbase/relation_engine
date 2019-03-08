@@ -112,7 +112,7 @@ def import_from_file(file_path, query):
 
 def _init_readonly_user():
     """
-    Using the root user, initialize an admin readonly user for use with ad-hoc queries.
+    Using the admin user, initialize an admin readonly user for use with ad-hoc queries.
 
     If the user cannot be created, we raise an ArangoServerError
     If the user already exists, or is successfully created, we return None and do not raise.
