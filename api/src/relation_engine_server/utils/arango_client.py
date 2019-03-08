@@ -137,7 +137,7 @@ def _init_readonly_user():
     # Grant read access to the current database
     resp = requests.put(
         config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name'],
-        data=json.dumps({'grant': 'ro'}),
+        data='{"grant": "ro"}',
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 200:
