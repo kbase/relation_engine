@@ -414,3 +414,15 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': ADMIN_TOKEN}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 1)
+
+    def test_queries_are_readonly(self):
+        """Test that ad-hoc admin queries cannot do any writing."""
+        save_test_docs(1)
+        query = 'let ws_ids = @ws_ids for v in test_vertex remove v in test_vertex'
+        resp = requests.post(
+            API_URL + '/query_results',
+            headers=HEADERS_ADMIN,
+            data=json.dumps({'query': query})
+        ).json()
+        self.assertTrue(resp['error'])
+        self.assertTrue('read only' in resp['arango_message'])

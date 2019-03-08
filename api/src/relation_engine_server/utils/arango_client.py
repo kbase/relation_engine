@@ -39,12 +39,14 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
         req_json['query'] = query_text
         if bind_vars:
             req_json['bindVars'] = bind_vars
-
+    # Initialize the readonly user
+    _init_readonly_user()
+    # Run the query as the readonly user
     resp = requests.request(
         method,
         url,
         data=json.dumps(req_json),
-        auth=(config['db_user'], config['db_pass'])
+        auth=(config['db_readonly_user'], config['db_readonly_pass'])
     )
     if not resp.ok:
         raise ArangoServerError(resp.text)
@@ -106,6 +108,40 @@ def import_from_file(file_path, query):
     if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
+
+
+def _init_readonly_user():
+    """
+    Using the root user, initialize an admin readonly user for use with ad-hoc queries.
+
+    If the user cannot be created, we raise an ArangoServerError
+    If the user already exists, or is successfully created, we return None and do not raise.
+    """
+    config = get_config()
+    user = config['db_readonly_user']
+    # Check if the user exists, in which case this is a no-op
+    resp = requests.get(
+        config['db_url'] + '/_api/user/' + user,
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code == 200:
+        return
+    # Create the user
+    resp = requests.post(
+        config['db_url'] + '/_api/user',
+        data=json.dumps({'user': user, 'passwd': config['db_readonly_user']}),
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 201:
+        raise ArangoServerError(resp.text)
+    # Grant read access to the current database
+    resp = requests.put(
+        config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name'],
+        data=json.dumps({'grant': 'ro'}),
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 200:
+        raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):
