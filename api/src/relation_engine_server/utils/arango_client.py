@@ -1,6 +1,7 @@
 """
 Make ajax requests to the ArangoDB server.
 """
+import os
 import requests
 import json
 
@@ -77,7 +78,9 @@ def create_collection(name, is_edge):
     """
     Create a single collection by name using some basic defaults.
     We ignore duplicates. For any other server error, an exception is thrown.
+    Shard the new collection based on the number of db nodes (10 shards for each).
     """
+    num_shards = os.environ.get('SHARD_COUNT', 30)
     config = get_config()
     url = config['db_url'] + '/_api/collection'
     # collection types:
@@ -87,7 +90,8 @@ def create_collection(name, is_edge):
     data = json.dumps({
         'keyOptions': {'allowUserKeys': True},
         'name': name,
-        'type': collection_type
+        'type': collection_type,
+        'numberOfShards': num_shards
     })
     resp = requests.post(url, data, auth=(config['db_user'], config['db_pass'])).json()
     if resp['error']:
