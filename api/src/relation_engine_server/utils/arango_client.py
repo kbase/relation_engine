@@ -42,9 +42,7 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
     # Initialize the readonly user
     _init_readonly_user()
     # Run the query as the readonly user
-    # XXX REMOVE ME
-    print('auth', config['db_readonly_user'], config['db_readonly_pass'])
-    # XXX REMOVE ME
+    print('auth', config['db_readonly_user'], config['db_readonly_pass'])  # XXX remove me
     resp = requests.request(
         method,
         url,
@@ -128,7 +126,7 @@ def _init_readonly_user():
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code == 200:
-        print('xyz user exists')
+        print('xyz user exists')  # XXX remove me
         return
     # Create the user
     resp = requests.post(
@@ -137,9 +135,9 @@ def _init_readonly_user():
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 201:
-        print('xyz error creating ro user')
+        print('xyz error creating ro user')  # XXX remove me
         raise ArangoServerError(resp.text)
-    print('xyz created ro user')
+    print('xyz created ro user')  # XXX remove me
     # Grant read access to the current database
     resp = requests.put(
         config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name'],
@@ -147,9 +145,9 @@ def _init_readonly_user():
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 200:
-        print('xyz error granting ro user')
+        print('xyz error granting ro user')  # XXX remove me
         raise ArangoServerError(resp.text)
-    print('xyz granted ro user')
+    print('xyz granted ro user')  # XXX remove me
 
 
 class ArangoServerError(Exception):

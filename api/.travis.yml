@@ -1,11 +1,7 @@
 sudo: required
 services:
 - docker
-language: python
-python:
-- 3.6
 script:
-- cp .env.example .env
 - docker-compose up --build -d
 - sleep 15
 - make test
