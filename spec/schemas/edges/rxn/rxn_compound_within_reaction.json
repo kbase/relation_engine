@@ -14,7 +14,7 @@
       "description": "The ID of the reaction"
     },
     "stoichiometry": {
-      "type": "float",
+      "type": "number",
       "description": "The stochiometry of compound in the reaction"
     }
   }
