@@ -1,12 +1,12 @@
 import requests
 
-_API_URL = 'http://re_api:5000/api'
+_API_URL = 'http://re_api:5000/api/v1'
 
 
 if __name__ == '__main__':
-    resp = requests.get(
-        _API_URL + '/update_specs',
+    resp = requests.put(
+        _API_URL + '/specs',
         headers={'Authorization': 'admin_token'},
         params={'init_collections': '1'}
     )
-    print(resp)
+    print(resp.text)

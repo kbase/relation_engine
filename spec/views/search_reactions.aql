@@ -1,4 +1,4 @@
-\\ Use ArangoSearch to search documents in the Reactions index. Returns documents in their natural order
+\\ Use ArangoSearch to search documents in the Reactions index. Returns documents by ascending id.
 \\ include_obsolete - should obsolete documents be included
 \\ offset - how many documents to skip
 \\ result_limit - Maximum documents to return
@@ -7,5 +7,6 @@ FOR doc IN Reactions
                OR PHRASE(doc.name, @search_text)
                OR PHRASE(doc.aliases, @search_text), 'text_en')
   FILTER @include_obsolete || doc.is_obsolete == 0
+  SORT doc.id
   LIMIT @offset, @result_limit
   RETURN doc
