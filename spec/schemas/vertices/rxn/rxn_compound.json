@@ -63,21 +63,26 @@
     },
     "mass": {
       "type": ["number", "null"],
+      "description": "Molecular mass of compound"
     },
     "name": {
-      "type": "string",
+      "type": "string"
     },
     "pka": {
       "type": "string",
+      "description": "Acid dissociation constants of compound"
     },
     "pkb": {
       "type": "string",
+      "description": "Base dissociation constants of compound"
     },
     "smiles": {
       "type": "string",
+      "description": "Structure of the compound in Simplified Molecular Input Line Entry System"
     },
     "source": {
       "type": "string",
+      "description": "Does this compound come from a primary database or a metabolic model?"
     },
   }
 }
