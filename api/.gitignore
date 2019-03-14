@@ -7,6 +7,6 @@
 *.pyc
 .mypy_cache/
 .cache/
-tmp/*
+/tmp/
 coverage_report/
 .coverage

@@ -40,12 +40,14 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
         req_json['query'] = query_text
         if bind_vars:
             req_json['bindVars'] = bind_vars
-
+    # Initialize the readonly user
+    _init_readonly_user()
+    # Run the query as the readonly user
     resp = requests.request(
         method,
         url,
         data=json.dumps(req_json),
-        auth=(config['db_user'], config['db_pass'])
+        auth=(config['db_readonly_user'], config['db_readonly_pass'])
     )
     if not resp.ok:
         raise ArangoServerError(resp.text)
@@ -90,15 +92,17 @@ def create_collection(name, is_edge):
         'type': collection_type,
         'numberOfShards': num_shards
     })
-    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass'])).json()
-    if resp['error']:
-        if 'duplicate' not in resp['errorMessage']:
+    print('authh', config)
+    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass']))
+    resp_json = resp.json()
+    if not resp.ok:
+        if 'duplicate' not in resp_json['errorMessage']:
             # Unable to create a collection
             raise ArangoServerError(resp.text)
 
 
 def import_from_file(file_path, query):
-    """Make a generic arango post request."""
+    """Import documents from a file."""
     config = get_config()
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
@@ -110,6 +114,49 @@ def import_from_file(file_path, query):
     if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
+
+
+def _init_readonly_user():
+    """
+    Using the admin user, initialize an admin readonly user for use with ad-hoc queries.
+
+    If the user cannot be created, we raise an ArangoServerError
+    If the user already exists, or is successfully created, we return None and do not raise.
+    """
+    config = get_config()
+    user = config['db_readonly_user']
+    # Check if the user exists, in which case this is a no-op
+    resp = requests.get(
+        config['db_url'] + '/_api/user/' + user,
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code == 200:
+        return
+    # Create the user
+    resp = requests.post(
+        config['db_url'] + '/_api/user',
+        data=json.dumps({'user': user, 'passwd': config['db_readonly_user']}),
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 201:
+        raise ArangoServerError(resp.text)
+    db_grant_path = config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name']
+    # Grant read access to the current database
+    resp = requests.put(
+        db_grant_path,
+        data='{"grant": "ro"}',
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 200:
+        raise ArangoServerError(resp.text)
+    # Grant read access to all collections
+    resp = requests.put(
+        db_grant_path + '/*',
+        data='{"grant": "ro"}',
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 200:
+        raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):

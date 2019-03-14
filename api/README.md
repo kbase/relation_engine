@@ -155,7 +155,8 @@ _Response JSON schema_
 }
 ```
 
-Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` below:
+Results are limited to 100 items. To continue fetching additional results, use the `cursor_id` parameter.
+
 
 #### Ad-hoc sysadmin queries
 
@@ -167,6 +168,8 @@ curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1
 ```
 
 This will return the same form of results as above.
+
+**Note:** Currently, all queries are read-only. This includes view queries and ad-hoc admin queries. Commands like `UPDATE` or `REMOVE` will fail.
 
 ### PUT /api/documents
 
@@ -332,6 +335,14 @@ See the [Contribution Guidelines](/.github/CONTRIBUTING.md).
 **Start the server** with `docker-compose up --build`.
 
 **Run tests** with `make test` (the server should be running in another terminal using `docker-compose up --build`).
+
+To do a hard reset of your docker build, do:
+
+```sh
+docker-compose rm -vf
+docker-compose build --no-cache
+docker-compose up
+```
 
 ## Deployment
 

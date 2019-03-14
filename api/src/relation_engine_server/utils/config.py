@@ -17,7 +17,9 @@ def get_config():
     db_url = os.environ.get('DB_URL', 'http://localhost:8529')
     db_name = os.environ.get('DB_NAME', '_system')
     db_user = os.environ.get('DB_USER', 'root')
-    db_pass = os.environ.get('DB_PASS', 'password')
+    db_pass = os.environ.get('DB_PASS', '')
+    db_readonly_user = os.environ.get('DB_READONLY_USER', 'readonly')
+    db_readonly_pass = os.environ.get('DB_READONLY_PASS', 'readonly')
     return {
         'auth_url': auth_url,
         'workspace_url': workspace_url,
@@ -26,6 +28,8 @@ def get_config():
         'db_name': db_name,
         'db_user': db_user,
         'db_pass': db_pass,
+        'db_readonly_user': db_readonly_user,
+        'db_readonly_pass': db_readonly_pass,
         'spec_url': spec_url,
         'spec_paths': {
             'release_id': os.path.join(spec_path, '.release_id'),
