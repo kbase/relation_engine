@@ -2,7 +2,7 @@
 
 A simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
 
-## HTTP API
+## HTTP API v1
 
 The API is a small, rest-ish service where all data is in JSON format. Replace the `{root_url}` in the examples below with one of:
  * Production: `https://kbase.us/services/relation_engine_api`
@@ -47,14 +47,14 @@ _Example response_
 }
 ```
 
-### GET /api/views/<name>
+### GET /api/v1/specs/views/<name>
 
 Get the AQL source code for a view
 
 _Example request_
 
 ```sh
-curl {root_url}/api/views/example_view1
+curl {root_url}/api/v1/specs/views/example_view1
 ```
 
 Response has mimetype of text/plain
@@ -68,14 +68,14 @@ for x in @@collection
   return x
 ```
 
-### GET /api/schemas/<name>
+### GET /api/v1/specs/schemas/<name>
 
 Get the JSON source for a registered schema by name.
 
 _Example request_
 
 ```sh
-curl {root_url}/api/schemas/vertex_examples1
+curl {root_url}/api/v1/specs/schemas/vertex_examples1
 ```
 
 _Example response_
@@ -88,14 +88,35 @@ _Example response_
 }
 ```
 
-### POST /api/query_results
+### GET /api/v1/config/
+
+Check the current public service configuration.
+
+_Example_
+
+```
+curl {root_url}/api/config
+```
+
+_Example response_
+
+```json
+{ "auth_url": "http://auth:5000", 
+  "workspace_url": "http://workspace:5000", 
+  "kbase_endpoint": "https://ci.kbase.us/services", 
+  "db_url": "http://arangodb:8529", 
+  "db_name": "_system", 
+  "spec_url": "https://api.github.com/repos/kbase/relation_engine_spec"}
+```
+
+### POST /api/v1/query_results
 
 Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
 
 _Example rquest_
 
 ```sh
-curl -X POST -d '{"argument": "value"}' {root_url}/api/query_results?view=example
+curl -X POST -d '{"argument": "value"}' {root_url}/api/v1/query_results?view=example
 ```
 
 _Query params_
@@ -171,7 +192,7 @@ This will return the same form of results as above.
 
 **Note:** Currently, all queries are read-only. This includes view queries and ad-hoc admin queries. Commands like `UPDATE` or `REMOVE` will fail.
 
-### PUT /api/documents
+### PUT /api/v1/documents
 
 Bulk-update documents by either creating, replacing, or updating.
 
@@ -234,7 +255,7 @@ _Response JSON schema_
 }
 ```
 
-### GET /api/update_specs
+### PUT /api/v1/specs/
 
 Manually check and pull spec updates. Requires sysadmin auth.
 
