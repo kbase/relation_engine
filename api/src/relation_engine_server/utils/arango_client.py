@@ -92,15 +92,17 @@ def create_collection(name, is_edge):
         'type': collection_type,
         'numberOfShards': num_shards
     })
-    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass'])).json()
-    if resp['error']:
-        if 'duplicate' not in resp['errorMessage']:
+    print('authh', config)
+    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass']))
+    resp_json = resp.json()
+    if not resp.ok:
+        if 'duplicate' not in resp_json['errorMessage']:
             # Unable to create a collection
             raise ArangoServerError(resp.text)
 
 
 def import_from_file(file_path, query):
-    """Make a generic arango post request."""
+    """Import documents from a file."""
     config = get_config()
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(

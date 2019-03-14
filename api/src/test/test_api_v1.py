@@ -424,6 +424,5 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN,
             data=json.dumps({'query': query})
         ).json()
-        print('READONLY_RESP', resp)
         self.assertTrue(resp['error'])
         self.assertTrue('read only' in resp['arango_message'])

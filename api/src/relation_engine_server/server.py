@@ -183,7 +183,6 @@ def server_error(err):
     traceback.print_exc()
     print('=' * 80)
     resp = {'error': '500 - Unexpected server error'}
-    # if os.environ.get('FLASK_DEBUG'):  TODO
     resp['error_class'] = err.__class__.__name__
     resp['error_details'] = str(err)
     return _json_resp(resp, 500)
