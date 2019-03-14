@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["_key"],
+  "description": "Chemical reactions",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "examples": ["cpd02201"],
+      "title": "ModelSeed ID",
+      "pattern": "^cpd\\d+$"
+    },
+    "abbreviation": {
+      "type": "string",
+      "examples": ["phpyr"]
+    },
+    "aliases": {
+      "type": "string",
+      "examples": ["AraCyc:PYRUVATE;BiGG:pyr;BrachyCyc:PYRUVATE;KEGG:C00022"]
+    },
+    "charge": {
+      "type": ["integer"],
+      "examples": ["-1"]
+    },
+    "deltag": {
+      "type": ["number", "null"],
+      "description": "The change in Free Energy of Formation"
+    },
+    "deltagerr": {
+      "type": ["number", "null"],
+      "description": "The error associated with the Free Energy of Formation"
+    },
+    "formula": {
+      "type": "string",
+      "examples": ["C6H6"]
+    },
+    "id": {
+      "type": "string",
+      "examples": ["cpd02201"],
+      "title": "ModelSeed ID",
+      "pattern": "^cpd\\d+$"
+    },
+    "inchikey": {
+      "type": "string",
+      "examples": ["LCTONWCANYUPML-UHFFFAOYSA-M"]
+    },
+    "is_cofactor": {
+      "type": "integer",
+      "description": "The compound is a cofactor"
+    },
+    "is_core": {
+      "type": "integer",
+      "description": "The compound is involved in core metabolism"
+    },
+    "is_obsolete": {
+      "type": "integer",
+      "description": "The compound is a deprecated"
+    },
+    "linked_compound": {
+      "type": ["string", "null"],
+      "description": "If the compound is deprecated, the compound that supersedes this entry"
+    },
+    "mass": {
+      "type": ["number", "null"],
+      "description": "Molecular mass of compound"
+    },
+    "name": {
+      "type": "string"
+    },
+    "pka": {
+      "type": "string",
+      "description": "Acid dissociation constants of compound"
+    },
+    "pkb": {
+      "type": "string",
+      "description": "Base dissociation constants of compound"
+    },
+    "smiles": {
+      "type": "string",
+      "description": "Structure of the compound in Simplified Molecular Input Line Entry System"
+    },
+    "source": {
+      "type": "string",
+      "description": "Does this compound come from a primary database or a metabolic model?"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["_from", "_to"],
+  "description": "A compound is a memeber of a reaction",
+  "additionalProperties": true,
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The ID of the compound"
+    },
+    "_to": {
+      "type": "string",
+      "description": "The ID of the reaction"
+    },
+    "stoichiometry": {
+      "type": "number",
+      "description": "The stochiometry of compound in the reaction"
+    }
+  }
+}
+
