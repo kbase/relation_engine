@@ -43,7 +43,6 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
     # Initialize the readonly user
     _init_readonly_user()
     # Run the query as the readonly user
-    print('auth', config['db_readonly_user'], config['db_readonly_pass'])  # XXX remove me
     resp = requests.request(
         method,
         url,
@@ -130,7 +129,6 @@ def _init_readonly_user():
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code == 200:
-        print('xyz user exists')  # XXX remove me
         return
     # Create the user
     resp = requests.post(
@@ -139,19 +137,24 @@ def _init_readonly_user():
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 201:
-        print('xyz error creating ro user')  # XXX remove me
         raise ArangoServerError(resp.text)
-    print('xyz created ro user')  # XXX remove me
+    db_grant_path = config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name']
     # Grant read access to the current database
     resp = requests.put(
-        config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name'],
+        db_grant_path,
         data='{"grant": "ro"}',
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 200:
-        print('xyz error granting ro user')  # XXX remove me
         raise ArangoServerError(resp.text)
-    print('xyz granted ro user')  # XXX remove me
+    # Grant read access to all collections
+    resp = requests.put(
+        db_grant_path + '/*',
+        data='{"grant": "ro"}',
+        auth=(config['db_user'], config['db_pass'])
+    )
+    if resp.status_code != 200:
+        raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):
