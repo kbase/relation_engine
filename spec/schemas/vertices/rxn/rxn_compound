@@ -24,11 +24,11 @@
       "examples": ["-1"]
     },
     "deltag": {
-      "type": ["float", "null"],
+      "type": ["number", "null"],
       "description": "The change in Free Energy of Formation"
     },
     "deltagerr": {
-      "type": ["float", "null"],
+      "type": ["number", "null"],
       "description": "The error associated with the Free Energy of Formation"
     },
     "formula": {
@@ -62,7 +62,7 @@
       "description": "If the compound is deprecated, the compound that supersedes this entry"
     },
     "mass": {
-      "type": ["float", "null"],
+      "type": ["number", "null"],
     },
     "name": {
       "type": "string",

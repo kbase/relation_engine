@@ -4,6 +4,7 @@
 \\ result_limit - Maximum documents to return
 FOR doc IN Compounds
   SEARCH ANALYZER(PHRASE(doc.id, @search_text)
+               OR PHRASE(doc.name, @search_text)
                OR PHRASE(doc.abbreviation, @search_text)
                OR PHRASE(doc.aliases, @search_text), 'text_en')
   FILTER @include_obsolete || doc.is_obsolete == 0
