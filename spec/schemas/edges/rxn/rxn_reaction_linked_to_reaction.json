@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": ["_from", "_to"],
+  "description": "Generally these linkages indicate a that one reaction has been made obsolete and replaced with the linked reaction. This may arise from duplicates in the database or errors in the obsolete entity",
   "properties": {
     "_from": {
       "type": "string",

@@ -83,6 +83,6 @@
     "source": {
       "type": "string",
       "description": "Does this compound come from a primary database or a metabolic model?"
-    },
+    }
   }
 }
