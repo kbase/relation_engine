@@ -426,3 +426,18 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertTrue(resp['error'])
         self.assertTrue('read only' in resp['arango_message'])
+
+    def test_no_version_in_path(self):
+        """Test that leaving out api version in the path falls back to v1"""
+        # TODO XXX temporary
+        save_test_docs(1)
+        query = 'let ws_ids = @ws_ids for v in test_vertex sort rand() limit @count return v._id'
+        url = '/'.join([URL, 'api'])  # Leaving off version
+        resp = requests.post(
+            url + '/query_results',
+            params={},
+            headers=HEADERS_ADMIN,
+            data=json.dumps({'query': query, 'count': 1})
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(len(resp['results']), 1)

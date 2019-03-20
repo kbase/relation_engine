@@ -49,8 +49,7 @@ def api_call(path):
     """
     # Get the path and version number
     path_parts = path.split('/')
-    version_int = _get_version(path_parts[0])
-    api_path = '/'.join(path_parts[1:])
+    (version_int, api_path) = _get_version_and_path(path_parts)
     # Find our method in the various versioned modules
     # Note: the mypy type checker has difficulties with the endpoints dict, so we ignore type checking below
     endpoints = _API_VERSIONS[version_int - 1]  # index 0 == version 1
@@ -67,12 +66,19 @@ def api_call(path):
     return _json_resp(result, 200)
 
 
-def _get_version(version_str):
-    """From a list of path parts, initialize and validate a version int for the api."""
+def _get_version_and_path(path_parts):
+    """
+    From a list of path parts, initialize and validate a version int for the api.
+    Returns pair of (version_int, path_str)
+    """
+    version_str = path_parts[0]
     max_version = len(_API_VERSIONS)
     # Make sure the version looks like 'v12'
     if not re.match(r'^v\d+$', version_str):
-        raise InvalidParameters('Make a request with the format /api/<version>/<path...>')
+        # Fallback to v1 for paths like /api/<path...> with no version option
+        # TODO temporary
+        return (1, '/'.join(path_parts))
+        # raise InvalidParameters('Make a request with the format /api/<version>/<path...>')
     # Parse to an int
     version_int = int(version_str.replace('v', ''))
     # Make sure the version number is valid
@@ -80,7 +86,8 @@ def _get_version(version_str):
         raise InvalidParameters('API version must be > 0')
     if version_int > max_version:
         raise InvalidParameters(f'Invalid api version; max is {max_version}')
-    return version_int
+    path_str = '/'.join(path_parts[1:])
+    return (version_int, path_str)
 
 
 def _json_resp(result, status=200):
