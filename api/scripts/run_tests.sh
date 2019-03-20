@@ -2,7 +2,7 @@
 
 set -e
 
-flake8 --max-complexity 5 src
+flake8 src
 mypy --ignore-missing-imports src
 python -m pyflakes src
 bandit -r src
