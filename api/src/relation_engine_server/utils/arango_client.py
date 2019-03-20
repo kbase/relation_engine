@@ -92,7 +92,6 @@ def create_collection(name, is_edge):
         'type': collection_type,
         'numberOfShards': num_shards
     })
-    print('authh', config)
     resp = requests.post(url, data, auth=(config['db_user'], config['db_pass']))
     resp_json = resp.json()
     if not resp.ok:
