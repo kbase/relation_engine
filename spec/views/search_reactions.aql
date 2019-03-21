@@ -4,6 +4,7 @@
 // include_obsolete - should obsolete documents be included
 // offset - how many documents to skip
 // result_limit - Maximum documents to return
+LET ws_ids = @ws_ids
 FOR doc IN Reactions
   SEARCH ANALYZER(PHRASE(doc.id, @search_text)
                OR PHRASE(doc.name, @search_text)
