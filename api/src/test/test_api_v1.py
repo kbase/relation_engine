@@ -284,7 +284,7 @@ class TestApi(unittest.TestCase):
         save_test_docs(count=20)
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices', 'batch_size': 10}
+            params={'view': 'list_test_vertices', 'batch_size': 10, 'full_count': True}
         ).json()
         self.assertTrue(resp['cursor_id'])
         self.assertEqual(resp['has_more'], True)
