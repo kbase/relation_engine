@@ -122,6 +122,7 @@ curl -X POST -d '{"argument": "value"}' {root_url}/api/v1/query_results?view=exa
 _Query params_
 * `view` - required - string - name of the view to run as a query against the database
 * `cursor_id` - required - string - ID of a cursor that was returned from a previous query with >100 results
+* `full_count` - optional - bool - If true, return a count of the total documents before any LIMIT is applied (for example, in pagination). This might make some queries run more slowly
 
 Pass one of `view` or `cursor_id` -- not both.
 

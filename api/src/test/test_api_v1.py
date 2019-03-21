@@ -284,11 +284,12 @@ class TestApi(unittest.TestCase):
         save_test_docs(count=20)
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices', 'batch_size': 10}
+            params={'view': 'list_test_vertices', 'batch_size': 10, 'full_count': True}
         ).json()
         self.assertTrue(resp['cursor_id'])
         self.assertEqual(resp['has_more'], True)
         self.assertEqual(resp['count'], 20)
+        self.assertEqual(resp['stats']['fullCount'], 20)
         self.assertTrue(len(resp['results']), 10)
         cursor_id = resp['cursor_id']
         resp = requests.post(
@@ -296,6 +297,7 @@ class TestApi(unittest.TestCase):
             params={'cursor_id': cursor_id}
         ).json()
         self.assertEqual(resp['count'], 20)
+        self.assertEqual(resp['stats']['fullCount'], 20)
         self.assertEqual(resp['has_more'], False)
         self.assertEqual(resp['cursor_id'], None)
         self.assertTrue(len(resp['results']), 10)

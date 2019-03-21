@@ -34,6 +34,7 @@ def run_query():
     json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
     # fetch number of documents to return
     batch_size = int(flask.request.args.get('batch_size', 100))
+    full_count = flask.request.args.get('full_count', False)
     if 'query' in json_body:
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
@@ -41,7 +42,8 @@ def run_query():
         del json_body['query']
         resp_body = arango_client.run_query(query_text=query_text,
                                             bind_vars=json_body,
-                                            batch_size=batch_size)
+                                            batch_size=batch_size,
+                                            full_count=full_count)
         return resp_body
     if 'view' in flask.request.args:
         # Run a query from a view name
@@ -49,7 +51,8 @@ def run_query():
         view_source = spec_loader.get_view(view_name)
         resp_body = arango_client.run_query(query_text=view_source,
                                             bind_vars=json_body,
-                                            batch_size=batch_size)
+                                            batch_size=batch_size,
+                                            full_count=full_count)
         return resp_body
     if 'cursor_id' in flask.request.args:
         # Run a query from a cursor ID

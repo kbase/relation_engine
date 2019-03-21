@@ -23,13 +23,13 @@ def server_status():
         return 'unknown_failure'
 
 
-def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
+def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, full_count=False):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
     config = get_config()
     url = config['db_url'] + '/_api/cursor'
     req_json = {
         'batchSize': min(5000, batch_size),
-        'memoryLimit': 16000000000  # 16gb
+        'memoryLimit': 16000000000,  # 16gb
     }
     if cursor_id:
         method = 'PUT'
@@ -38,6 +38,8 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
         method = 'POST'
         req_json['count'] = True
         req_json['query'] = query_text
+        if full_count:
+            req_json['options'] = {'fullCount': True}
         if bind_vars:
             req_json['bindVars'] = bind_vars
     # Initialize the readonly user
@@ -49,10 +51,8 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
         data=json.dumps(req_json),
         auth=(config['db_readonly_user'], config['db_readonly_pass'])
     )
-    if not resp.ok:
-        raise ArangoServerError(resp.text)
     resp_json = resp.json()
-    if resp_json['error']:
+    if not resp.ok or resp_json['error']:
         raise ArangoServerError(resp.text)
     return {
         'results': resp_json['result'],
@@ -154,7 +154,7 @@ def _init_readonly_user():
         data='{"grant": "ro"}',
         auth=(config['db_user'], config['db_pass'])
     )
-    if resp.status_code != 200:
+    if not resp.ok:
         raise ArangoServerError(resp.text)
 
 
