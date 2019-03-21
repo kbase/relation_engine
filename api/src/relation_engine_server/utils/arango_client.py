@@ -29,7 +29,8 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100):
     url = config['db_url'] + '/_api/cursor'
     req_json = {
         'batchSize': min(5000, batch_size),
-        'memoryLimit': 16000000000  # 16gb
+        'memoryLimit': 16000000000,  # 16gb
+        'options': {'fullCount': True}
     }
     if cursor_id:
         method = 'PUT'
