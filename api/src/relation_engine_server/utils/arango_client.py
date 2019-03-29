@@ -26,7 +26,7 @@ def server_status():
 def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, full_count=False):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
     config = get_config()
-    url = config['db_url'] + '/_api/cursor'
+    url = config['api_url'] + '/cursor'
     req_json = {
         'batchSize': min(5000, batch_size),
         'memoryLimit': 16000000000,  # 16gb
@@ -81,7 +81,7 @@ def create_collection(name, is_edge):
     """
     num_shards = os.environ.get('SHARD_COUNT', 30)
     config = get_config()
-    url = config['db_url'] + '/_api/collection'
+    url = config['api_url'] + '/collection'
     # collection types:
     #   2 is a document collection
     #   3 is an edge collection
@@ -105,7 +105,7 @@ def import_from_file(file_path, query):
     config = get_config()
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
-            config['db_url'] + '/_api/import',
+            config['api_url'] + '/import',
             data=file_desc,
             auth=(config['db_user'], config['db_pass']),
             params=query
@@ -126,20 +126,20 @@ def _init_readonly_user():
     user = config['db_readonly_user']
     # Check if the user exists, in which case this is a no-op
     resp = requests.get(
-        config['db_url'] + '/_api/user/' + user,
+        config['api_url'] + '/user/' + user,
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code == 200:
         return
     # Create the user
     resp = requests.post(
-        config['db_url'] + '/_api/user',
+        config['api_url'] + '/user',
         data=json.dumps({'user': user, 'passwd': config['db_readonly_user']}),
         auth=(config['db_user'], config['db_pass'])
     )
     if resp.status_code != 201:
         raise ArangoServerError(resp.text)
-    db_grant_path = config['db_url'] + '/_api/user/' + user + '/database/' + config['db_name']
+    db_grant_path = config['api_url'] + '/user/' + user + '/database/' + config['db_name']
     # Grant read access to the current database
     resp = requests.put(
         db_grant_path,
