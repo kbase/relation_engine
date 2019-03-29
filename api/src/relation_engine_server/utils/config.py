@@ -18,6 +18,7 @@ def get_config():
     db_name = os.environ.get('DB_NAME', '_system')
     db_user = os.environ.get('DB_USER', 'root')
     db_pass = os.environ.get('DB_PASS', '')
+    api_url = db_url + '/_db/' + db_name + '/_api'
     db_readonly_user = os.environ.get('DB_READONLY_USER', 'readonly')
     db_readonly_pass = os.environ.get('DB_READONLY_PASS', 'readonly')
     return {
@@ -25,6 +26,7 @@ def get_config():
         'workspace_url': workspace_url,
         'kbase_endpoint': kbase_endpoint,
         'db_url': db_url,
+        'api_url': api_url,
         'db_name': db_name,
         'db_user': db_user,
         'db_pass': db_pass,
