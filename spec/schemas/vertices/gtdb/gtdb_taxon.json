@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A entry in the GTDB taxonomy tree.",
+  "required": ["_key", "type", "name"],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Taxon type abbreviation plus name",
+      "examples": ["d:Bacteria", "p:Firmicutes"]
+    },
+    "name": {
+      "type": "string",
+      "title": "Taxon name.",
+      "examples": ["Bacteria", "Firmicutes"]
+    },
+    "type": {
+      "type": "string",
+      "title": "Taxon type.",
+      "examples": ["Domain", "Phylum"]
+    }
+  }
+}
