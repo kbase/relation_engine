@@ -2,6 +2,4 @@ sudo: required
 services:
 - docker
 script:
-- docker-compose up --build -d
-- sleep 15
 - make test

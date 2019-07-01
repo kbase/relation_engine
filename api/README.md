@@ -354,16 +354,12 @@ The following environment variables should be configured:
 
 See the [Contribution Guidelines](/.github/CONTRIBUTING.md).
 
-**Start the server** with `docker-compose up --build`.
-
-**Run tests** with `make test` (the server should be running in another terminal using `docker-compose up --build`).
+**Run tests** with `make test`
 
 To do a hard reset of your docker build, do:
 
 ```sh
-docker-compose rm -vf
-docker-compose build --no-cache
-docker-compose up
+docker-compose down --rmi all -v
 ```
 
 ## Deployment
