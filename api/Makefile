@@ -1,10 +1,10 @@
 .PHONY: test reset
 
 test:
+	docker-compose down
 	docker-compose run web sh scripts/run_tests.sh
+	docker-compose down
 
 reset:
-	docker-compose down
-	docker-compose rm -vf
-	docker-compose build --no-cache
-	docker-compose up
+	docker-compose --rmi all -v
+	docker-compose build

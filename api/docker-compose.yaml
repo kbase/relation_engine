@@ -14,7 +14,12 @@ services:
       - 5000:5000
     volumes:
       - ${PWD}:/app
+    depends_on:
+      - auth
+      - workspace
+      - arangodb
     environment:
+      - WORKERS=2
       - DEVELOPMENT=1
       - FLASK_ENV=development
       - FLASK_DEBUG=1

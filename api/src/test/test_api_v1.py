@@ -14,7 +14,7 @@ ADMIN_TOKEN = 'admin_token'
 INVALID_TOKEN = 'invalid_token'
 
 # Use the docker-compose url of the running flask server
-URL = os.environ.get('TEST_URL', 'http://web:5000')
+URL = os.environ.get('TEST_URL', 'http://localhost:5000')
 VERSION = 'v1'
 API_URL = '/'.join([URL, 'api', VERSION])
 

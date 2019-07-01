@@ -1,3 +1,4 @@
+import time
 import os
 import tempfile
 import flask
@@ -27,6 +28,7 @@ def bulk_import(query_params):
             json_line = json.loads(line)
             jsonschema.validate(json_line, schema)
             json_line = _write_edge_key(json_line)
+            json_line['updated_at'] = int(time.time() * 1000)
             temp_fd.write(json.dumps(json_line) + '\n')
         temp_fd.close()
         resp_text = import_from_file(temp_fd.name, query_params)
