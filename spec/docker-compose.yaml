@@ -4,22 +4,25 @@ version: '3'
 
 services:
 
-  # ArangoDB
-  arangodb:
-    image: arangodb:3.4
-    ports:
-      - 8529:8529
-    environment:
-      - ARANGO_ROOT_PASSWORD=password
+  # General python container for executing tests
+  spec:
+    build: .
+    volumes:
+      - ${PWD}:/app
+    depends_on:
+      - re_api
 
   # Relation Engine API
   re_api:
     image: kbase/relation_engine_api:latest
     ports:
       - 5000:5000
+    depends_on:
+      - arangodb
+      - auth
+      - workspace
     environment:
       - ARANGO_ROOT_PASSWORD=password
-    environment:
       - DEVELOPMENT=1
       - FLASK_ENV=development
       - FLASK_DEBUG=1
@@ -30,6 +33,14 @@ services:
       - DB_URL=http://arangodb:8529
       - DB_USER=root
       - DB_PASS=password
+
+  # ArangoDB
+  arangodb:
+    image: arangodb:3.4
+    ports:
+      - 8529:8529
+    environment:
+      - ARANGO_ROOT_PASSWORD=password
 
   # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
   auth:
@@ -42,9 +53,3 @@ services:
     image: mockservices/mock_json_service
     volumes:
       - ${PWD}/test/mock_services/mock_workspace:/config
-
-  # General python container for executing tests
-  spec:
-    build: .
-    volumes:
-      - ${PWD}:/app

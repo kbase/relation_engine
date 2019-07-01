@@ -1,6 +1,7 @@
 import json
 import unittest
 import requests
+import time
 
 _API_URL = 'http://re_api:5000/api'
 _VERSION = 'v1'
@@ -18,6 +19,24 @@ def create_test_docs(docs):
 
 
 class TestListTestVertices(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # Wait for the API to come online
+        timeout = int(time.time()) + 60
+        api_up = False
+        while not api_up:
+            try:
+                requests.get('http://re_api:5000').raise_for_status()
+                requests.get('http://auth:5000')
+                requests.get('http://workspace:5000')
+                api_up = True
+            except Exception as err:
+                print(err)
+                print('Waiting for RE API to come online..')
+                if int(time.time()) > timeout:
+                    raise RuntimeError("Timed out waiting for RE API.")
+                time.sleep(2)
 
     def test_valid(self):
         """Test a valid query."""
