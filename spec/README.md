@@ -14,6 +14,4 @@ the database's collections.
 
 ### Running tests
 
-The tests will validate JSON schema syntax and will look for any duplicate schema or view names.
-
-Using python 3.5+, run `make test`.
+Run tests with `make test`.
