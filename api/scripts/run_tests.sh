@@ -6,5 +6,5 @@ flake8 --max-complexity 10 src
 mypy --ignore-missing-imports src
 bandit -r src
 sh scripts/start_server.sh &
-python -m src.relation_engine_server.wait_for_services
+python -m src.test.wait_for_api
 python -m unittest discover src/test/

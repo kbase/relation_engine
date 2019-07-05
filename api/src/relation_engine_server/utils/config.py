@@ -14,7 +14,7 @@ def get_config():
     kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
     auth_url = os.environ.get('KBASE_AUTH_URL', urljoin(kbase_endpoint + '/', 'auth'))
     workspace_url = os.environ.get('KBASE_WORKSPACE_URL', urljoin(kbase_endpoint + '/', 'ws'))
-    db_url = os.environ.get('DB_URL', 'http://localhost:8529')
+    db_url = os.environ.get('DB_URL', 'http://arangodb:8529')
     db_name = os.environ.get('DB_NAME', '_system')
     db_user = os.environ.get('DB_USER', 'root')
     db_pass = os.environ.get('DB_PASS', '')
