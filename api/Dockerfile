@@ -33,5 +33,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       us.kbase.vcs-branch=$BRANCH \
       maintainer="KBase Team"
 
+EXPOSE 5000
 ENTRYPOINT ["/usr/local/bin/dockerize"]
 CMD ["sh", "-x", "scripts/start_server.sh"]
