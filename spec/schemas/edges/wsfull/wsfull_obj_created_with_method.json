@@ -19,7 +19,7 @@
       "description": "A version of a module with a method."
     },
     "method_params": {
-      "type": "object",
+      "type": ["array", "object", "null"],
       "description": "The input parameters for the method used to create the object."
     }
   }
