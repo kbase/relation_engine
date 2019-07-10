@@ -3,22 +3,28 @@ from ..utils import arango_client, spec_loader, auth, bulk_import, pull_spec, co
 from ..exceptions import InvalidParameters
 
 
+api_v1 = flask.Blueprint('api_v1', __name__)
+
+
+@api_v1.route('/specs/views', methods=['GET'])
 def show_views():
-    """Handle /views."""
+    """Show the current stored query names loaded from the spec."""
     name = flask.request.args.get('name')
     if name:
         return {'view': spec_loader.get_view(name)}
-    return spec_loader.get_view_names()
+    return flask.jsonify(spec_loader.get_view_names())
 
 
+@api_v1.route('/specs/schemas', methods=['GET'])
 def show_schemas():
-    """Handle /schemas."""
+    """Show the current schema names (edges and vertices) loaded from the spec."""
     name = flask.request.args.get('name')
     if name:
         return spec_loader.get_schema(name)
-    return spec_loader.get_schema_names()
+    return flask.jsonify(spec_loader.get_schema_names())
 
 
+@api_v1.route('/query_results', methods=['POST'])
 def run_query():
     """
     Run a stored view as a query against the database.
@@ -44,7 +50,7 @@ def run_query():
                                             bind_vars=json_body,
                                             batch_size=batch_size,
                                             full_count=full_count)
-        return resp_body
+        return flask.jsonify(resp_body)
     if 'view' in flask.request.args:
         # Run a query from a view name
         view_name = flask.request.args['view']
@@ -53,16 +59,17 @@ def run_query():
                                             bind_vars=json_body,
                                             batch_size=batch_size,
                                             full_count=full_count)
-        return resp_body
+        return flask.jsonify(resp_body)
     if 'cursor_id' in flask.request.args:
         # Run a query from a cursor ID
         cursor_id = flask.request.args['cursor_id']
         resp_body = arango_client.run_query(cursor_id=cursor_id)
-        return resp_body
+        return flask.jsonify(resp_body)
     # No valid options were passed
     raise InvalidParameters('Pass in a view or a cursor_id')
 
 
+@api_v1.route('/specs', methods=['PUT'])
 def update_specs():
     """
     Manually check for updates, download spec releases, and init new collections.
@@ -72,9 +79,10 @@ def update_specs():
     init_collections = 'init_collections' in flask.request.args
     release_url = flask.request.args.get('release_url')
     pull_spec.download_specs(init_collections, release_url)
-    return {'status': 'updated'}
+    return flask.jsonify({'status': 'updated'})
 
 
+@api_v1.route('/documents', methods=['PUT'])
 def save_documents():
     """
     Create, update, or replace many documents in a batch.
@@ -91,27 +99,18 @@ def save_documents():
     if flask.request.args.get('overwrite'):
         query['overwrite'] = 'true'
     resp_text = bulk_import.bulk_import(query)
-    return resp_text
+    return flask.jsonify(resp_text)
 
 
+@api_v1.route('/config', methods=['GET'])
 def show_config():
     """Show public config data."""
     conf = config.get_config()
-    return {
+    return flask.jsonify({
         'auth_url': conf['auth_url'],
         'workspace_url': conf['workspace_url'],
         'kbase_endpoint': conf['kbase_endpoint'],
         'db_url': conf['db_url'],
         'db_name': conf['db_name'],
         'spec_url': conf['spec_url']
-    }
-
-
-endpoints = {
-    'query_results': {'handler': run_query, 'methods': {'POST'}},
-    'specs/schemas': {'handler': show_schemas},
-    'specs/views': {'handler': show_views},
-    'config': {'handler': show_config},
-    'specs': {'handler': update_specs, 'methods': {'PUT'}},
-    'documents': {'handler': save_documents, 'methods': {'PUT'}}
-}
+    })
