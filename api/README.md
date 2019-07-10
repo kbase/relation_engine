@@ -13,102 +13,6 @@ The API is a small, rest-ish service where all data is in JSON format. Replace t
 
 Returns server status info
 
-### GET /api/views
-
-Return a list of view names.
-
-_Example request_
-
-```sh
-curl -X GET {root_url}/api/views
-```
-
-_Example response_
-
-```json
-["example_view1", "example_view1"]
-```
-
-### GET /api/schemas
-
-Fetch the registered schema names.
-
-_Example request_
-```sh
-curl -X GET {root_url}/api/schemas
-```
-
-_Example response_
-
-```json
-{
-  "vertices": ["vertex_examples1", "vertex_examples2"],
-  "edges": ["edge_example1", "edge_example2"]
-}
-```
-
-### GET /api/v1/specs/views/<name>
-
-Get the AQL source code for a view
-
-_Example request_
-
-```sh
-curl {root_url}/api/v1/specs/views/example_view1
-```
-
-Response has mimetype of text/plain
-
-_Example response_
-
-```json
-// This is some AQL source code
-
-for x in @@collection
-  return x
-```
-
-### GET /api/v1/specs/schemas/<name>
-
-Get the JSON source for a registered schema by name.
-
-_Example request_
-
-```sh
-curl {root_url}/api/v1/specs/schemas/vertex_examples1
-```
-
-_Example response_
-
-```json
-{
-  "type": "object",
-  "required": ["_key"],
-  "properties": {"_key": {"type": "string"}}
-}
-```
-
-### GET /api/v1/config/
-
-Check the current public service configuration.
-
-_Example_
-
-```
-curl {root_url}/api/config
-```
-
-_Example response_
-
-```json
-{ "auth_url": "http://auth:5000", 
-  "workspace_url": "http://workspace:5000", 
-  "kbase_endpoint": "https://ci.kbase.us/services", 
-  "db_url": "http://arangodb:8529", 
-  "db_name": "_system", 
-  "spec_url": "https://api.github.com/repos/kbase/relation_engine_spec"}
-```
-
 ### POST /api/v1/query_results
 
 Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
@@ -272,94 +176,27 @@ _Query params_
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
 
-## Python client API
-
-> NOTE: Work in progress -- this is not yet available
-
-A python client is provided and published on anaconda, installable via pip or conda:
-
-```sh
-$ pip install --extra-index-url https://pypi.anaconda.org/kbase/simple relation_engine_client==0.1
-```
-
-Then import it:
-
-```py
-import relation_engine_client as rec
-```
-
-You can set the environment variable `RELATION_ENGINE_URL` to set the URL of the HTTP API you want to use.
-
-List out all the current relation engine views:
-
-```py
-views = rec.get_views(show_source=True)
-```
-
-List out all the current schemas
-
-```py
-schemas = rec.get_schemas(show_source=True)
-```
-
-Run a query:
-
-```py
-results = rec.query(view=view_name, bind_vars={'@collection': 'genes', 'value': 123})
-```
-
-Get more results from a cursor:
-
-```py
-more_results = rec.run_query(cursor_id=results['cursor_id'])
-```
-
-Save documents from python dictionaries:
-
-```py
-save_results = rec.save_documents(
-  collection='genes',
-  on_duplicate='update',
-  docs=[
-    {'_key': 'x', 'name': 'x'},
-    {'_key': 'y', 'name': 'y'}
-  ]
-)
-```
-
-Bulk-save documents from a file:
-
-```py
-save_results = rec.save_documents(
-  collection='genes',
-  on_duplicate='update',
-  from_file='my-file-path.json'
-)
-```
-
-Where the file contains multiple JSON documents separated by line-breaks.
-
 ## Administration
 
 The following environment variables should be configured:
 
 * `KBASE_AUTH_URL` - url of the KBase authentication (auth2) server to use
 * `SHARD_COUNT` - number of shards to use when creating new collections
-* `KBASE_WORKSPACE_URL` - url of the KBase workspace server to use (for authenticating workspace access)
+* `KBASE_WORKSPACE_URL` - url of the KBase workspace server to use (for authorizing workspace access)
 * `DB_URL` - url of the arangodb database to use for http API access
 * `DB_USER` - username for the arangodb database
 * `DB_PASS` - password for the arangodb database
+* `DB_READONLY_USER` - read-only username for the arangodb database
+* `DB_READONLY_PASS` - read-only password for the arangodb database
 
 ## Development
 
 See the [Contribution Guidelines](/.github/CONTRIBUTING.md).
 
-**Run tests** with `make test`
-
-To do a hard reset of your docker build, do:
+Run tests with:
 
 ```sh
-docker-compose down --rmi all -v
+make test
 ```
 
 ## Deployment
