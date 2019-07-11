@@ -96,11 +96,6 @@ class TestApi(unittest.TestCase):
         resp = requests.get(API_URL + '/specs/views').json()
         self.assertTrue('list_test_vertices' in resp)
 
-    def test_show_view(self):
-        """Test the endpoint that displays AQL source code for one view."""
-        resp = requests.get(API_URL + '/specs/views?name=list_test_vertices').text
-        self.assertTrue('test_vertex' in resp)
-
     def test_list_schemas(self):
         """Test the listing out of registered JSON schemas for vertices and edges."""
         resp = requests.get(API_URL + '/specs/schemas').json()
@@ -108,13 +103,6 @@ class TestApi(unittest.TestCase):
         self.assertTrue('test_edge' in resp['edges'])
         self.assertFalse('error' in resp)
         self.assertTrue(len(resp))
-
-    def test_show_schema(self):
-        """Test the endpoint that displays the JSON source for one schema."""
-        resp = requests.get(API_URL + '/specs/schemas?name=test_edge').text
-        self.assertTrue('_from' in resp)
-        resp = requests.get(API_URL + '/specs/schemas?name=test_vertex').text
-        self.assertTrue('_key' in resp)
 
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
@@ -428,18 +416,3 @@ class TestApi(unittest.TestCase):
         ).json()
         self.assertTrue(resp['error'])
         self.assertTrue('read only' in resp['arango_message'])
-
-    def test_no_version_in_path(self):
-        """Test that leaving out api version in the path falls back to v1"""
-        # TODO XXX temporary
-        save_test_docs(1)
-        query = 'let ws_ids = @ws_ids for v in test_vertex sort rand() limit @count return v._id'
-        url = '/'.join([URL, 'api'])  # Leaving off version
-        resp = requests.post(
-            url + '/query_results',
-            params={},
-            headers=HEADERS_ADMIN,
-            data=json.dumps({'query': query, 'count': 1})
-        ).json()
-        self.assertEqual(resp['count'], 1)
-        self.assertEqual(len(resp['results']), 1)

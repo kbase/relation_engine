@@ -15,4 +15,4 @@ gunicorn \
   --workers $workers \
   --bind :5000 \
   ${DEVELOPMENT:+"--reload"} \
-  src.relation_engine_server.server:app
+  src.relation_engine_server.main:app
