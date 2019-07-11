@@ -22,7 +22,7 @@ services:
       - auth
       - workspace
     environment:
-      - ARANGO_ROOT_PASSWORD=password
+      - WORKERS=2
       - DEVELOPMENT=1
       - FLASK_ENV=development
       - FLASK_DEBUG=1
@@ -32,15 +32,14 @@ services:
       - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
       - DB_URL=http://arangodb:8529
       - DB_USER=root
-      - DB_PASS=password
 
-  # ArangoDB
+  # Arangodb server in cluster mode
   arangodb:
     image: arangodb:3.4
     ports:
       - 8529:8529
-    environment:
-      - ARANGO_ROOT_PASSWORD=password
+    command: sh -c "arangodb create jwt-secret --secret=jwtSecret &&
+                    arangodb --starter.local --auth.jwt-secret=./jwtSecret"
 
   # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
   auth:
