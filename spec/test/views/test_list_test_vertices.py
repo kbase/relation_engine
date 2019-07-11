@@ -51,7 +51,7 @@ class TestListTestVertices(unittest.TestCase):
         ).json()
         self.assertEqual(resp['count'], 2)
         # 'c' is inaccessible
-        self.assertEqual([r['_key'] for r in resp['results']], ['a', 'b'])
+        self.assertEqual({r['_key'] for r in resp['results']}, {'a', 'b'})
 
     def test_no_auth(self):
         """Test with blank auth."""
