@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": ["_from", "_to", "child_type"],
-  "description": "Edges which create the taxonomy tree for GTDB taxons.",
+  "description": "Edges which create the taxonomy tree for NCBI taxons.",
   "properties": {
     "_from": {
       "type": "string",
