@@ -16,7 +16,7 @@
       "examples": ["bac_taxonomy_r83", "bac120_taxonomy_r89"]
     },
     "name": {
-      "type": ["list"],
+      "type": ["array"],
       "title": "Taxon name.",
       "examples": [["bacteria"], ["streptococcus", "pneumoniae"]]
     },
