@@ -1,0 +1,12 @@
+params:
+  type: object
+  required: [taxon_key]
+  properties:
+    taxon_key: {type: string}
+query: |
+  WITH ncbi_child_of_taxon, ncbi_taxon
+  let taxon_key = @taxon_key
+  for t in ncbi_taxon
+    filter t._key == taxon_key
+    for parent in 1..10 outbound t ncbi_child_of_taxon
+      return parent.scientific_name

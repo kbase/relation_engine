@@ -1,0 +1,12 @@
+params:
+  type: object
+  required: [sci_name]
+  properties:
+    sci_name: {type: string}
+query: |
+  // Get the taxon ID from scientific name
+  WITH ncbi_child_of_taxon, ncbi_taxon
+  let sci_name = @sci_name
+  for t in ncbi_taxon
+    filter t.scientific_name == sci_name
+    return t._key
