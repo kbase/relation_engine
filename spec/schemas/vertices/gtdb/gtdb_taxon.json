@@ -1,40 +1,67 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Template for a vertex entry in the GTDB taxonomy tree.",
-  "required": ["_key", "scientific_name", "rank"],
+  "description": "A entry for vertices in the GTDB taxonomy tree.",
+  "required": ["_key", "release", "rank", "name"],
+  "optional": ["domain", "phylum", "class", "order", "family", "genus", "species"],
   "properties": {
     "_key": {
       "type": "string",
       "description": "Taxon type abbreviation plus name",
-      "examples": ["d:Bacteria", "p:Firmicutes"]
+      "examples": ["d:bacteria", "s:salmonella_enterica"]
     },
-    "scientific_name": {
+    "release": {
       "type": "string",
-      "title": "Taxon name.",
-      "examples": ["Methylophilus methylotrophus", "Bacteria", "Firmicutes"]
+      "description": "Name of the tsv file.",
+      "examples": ["bac_taxonomy_r83", "bac120_taxonomy_r89"]
     },
-    "canonical_scientific_name": {
+    "name": {
       "type": "array",
-      "title": "Canonicalized scientific name",
-      "examples": [ [ "methylophilus", "methylotrophus" ], 
-                    ["Bacteria"], 
-                    ["Firmicutes"]
-                  ],
-      "items": { "type": "string" }
+      "title": "Taxon name.",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["bacteria"], ["streptococcus", "pneumoniae"]]
     },
     "rank": {
       "type": "string",
-      "title": "Taxonomic rank",
-      "examples": ["Domain", "Phylum"]
+      "title": "Taxon rank.",
+      "examples": ["domain", "species"]
     },
-    "numeric_rank": {
-      "type": "integer",
-      "title": "Taxonomic level"
+    "domain": {
+      "type": "string",
+      "title": "Taxon domain.",
+      "example": ["bacteria"]
     },
-    "genetic_code": {
-      "type": "integer",
-      "title": "genetic code"
+    "phylum": {
+      "type": "string",
+      "title": "Taxon phylum.",
+      "example": ["firmicutes", "proteobacteria"]
+    },
+    "class": {
+      "type": "string",
+      "title": "Taxon class.",
+      "example": ["bacilli", "gammaproteobacteria"]
+    },
+    "order": {
+      "type": "string",
+      "title": "Taxon order.",
+      "example": ["lactobacillales", "enterobacterales"]
+    },
+    "family": {
+      "type": "string",
+      "title": "Taxon family.",
+      "example": ["streptococcaceae", "enterobacteriaceae"]
+    },
+    "genus": {
+      "type": "string",
+      "title": "Taxon genus.",
+      "example": ["streptococcus", "salmonella"]
+    },
+    "species": {
+      "type": ["string"],
+      "title": "Taxon species.",
+      "example": ["streptococcus_pneumoniae", "salmonella_enterica"]
     }
   }
 }
