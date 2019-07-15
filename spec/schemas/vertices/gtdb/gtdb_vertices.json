@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A entry for vertices in the GTDB taxonomy tree.",
+  "required": ["_key", "release", "type", "name"],
+  "optional": ["domain", "phylum", "class", "order", "family", "genus", "species"]
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Taxon type abbreviation plus name",
+      "examples": ["d:bacteria", "s:['salmonella', 'enterica']"]
+    },
+    "release": {
+      "type": "string",
+      "description": "Name of the tsv file.",
+      "examples": ["bac_taxonomy_r83", "bac120_taxonomy_r89"]
+    },
+    "name": {
+      "type": ["string", "list"],
+      "title": "Taxon name.",
+      "examples": ["bacteria", ["streptococcus", "pneumoniae"]]
+    },
+    "type": {
+      "type": "string",
+      "title": "Taxon type.",
+      "examples": ["domain", "species"]
+    }, 
+    "domain": {
+    "type": "string",
+    "title": "Taxon domain.",
+    "example": ["bacteria"]
+    },
+    "phylum": {
+    "type": "string",
+    "title": "Taxon phylum.",
+    "example": ["firmicutes"]
+    },
+     "class": {
+    "type": "string",
+    "title": "Taxon class.",
+    "example": ["bacilli"]
+    },
+    "order": {
+    "type": "string",
+    "title": "Taxon order.",
+    "example": ["lactobacillales"]
+    },
+    "family": {
+    "type": "string",
+    "title": "Taxon family.",
+    "example": ["streptococcaceae"]
+    },
+    "genus": {
+    "type": "string",
+    "title": "Taxon genus.",
+    "example": ["streptococcus"]
+    },
+    "species": {
+    "type": ["string", "list"],
+    "title": "Taxon species.",
+    "example": ["streptococcus", "pneumoniae"]
+    }
+  }
+}
