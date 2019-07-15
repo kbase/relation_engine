@@ -3,12 +3,12 @@
   "type": "object",
   "description": "A entry for vertices in the GTDB taxonomy tree.",
   "required": ["_key", "release", "type", "name"],
-  "optional": ["domain", "phylum", "class", "order", "family", "genus", "species"]
+  "optional": ["domain", "phylum", "class", "order", "family", "genus", "species"],
   "properties": {
     "_key": {
       "type": "string",
       "description": "Taxon type abbreviation plus name",
-      "examples": ["d:bacteria", "s:['salmonella', 'enterica']"]
+      "examples": ["d:bacteria", "s:salmonella_enterica"]
     },
     "release": {
       "type": "string",
@@ -16,11 +16,11 @@
       "examples": ["bac_taxonomy_r83", "bac120_taxonomy_r89"]
     },
     "name": {
-      "type": ["string", "list"],
+      "type": ["list"],
       "title": "Taxon name.",
-      "examples": ["bacteria", ["streptococcus", "pneumoniae"]]
+      "examples": [["bacteria"], ["streptococcus", "pneumoniae"]]
     },
-    "type": {
+    "rank": {
       "type": "string",
       "title": "Taxon type.",
       "examples": ["domain", "species"]
@@ -30,35 +30,35 @@
     "title": "Taxon domain.",
     "example": ["bacteria"]
     },
-    "phylum": {
-    "type": "string",
-    "title": "Taxon phylum.",
-    "example": ["firmicutes"]
-    },
-     "class": {
-    "type": "string",
-    "title": "Taxon class.",
-    "example": ["bacilli"]
-    },
-    "order": {
-    "type": "string",
-    "title": "Taxon order.",
-    "example": ["lactobacillales"]
-    },
-    "family": {
-    "type": "string",
-    "title": "Taxon family.",
-    "example": ["streptococcaceae"]
-    },
-    "genus": {
-    "type": "string",
-    "title": "Taxon genus.",
-    "example": ["streptococcus"]
-    },
-    "species": {
-    "type": ["string", "list"],
-    "title": "Taxon species.",
-    "example": ["streptococcus", "pneumoniae"]
-    }
+      "phylum": {
+      "type": "string",
+      "title": "Taxon phylum.",
+      "example": ["firmicutes", "proteobacteria"]
+      },
+        "class": {
+        "type": "string",
+        "title": "Taxon class.",
+        "example": ["bacilli", "gammaproteobacteria"]
+        },
+          "order": {
+          "type": "string",
+          "title": "Taxon order.",
+          "example": ["lactobacillales", "enterobacterales"]
+          },
+            "family": {
+            "type": "string",
+            "title": "Taxon family.",
+            "example": ["streptococcaceae", "enterobacteriaceae"]
+            },
+              "genus": {
+              "type": "string",
+              "title": "Taxon genus.",
+              "example": ["streptococcus", "salmonella"]
+              },
+                "species": {
+                "type": ["string"],
+                "title": "Taxon species.",
+                "example": ["streptococcus_pneumoniae", "salmonella_enterica"]
+                }
   }
 }
