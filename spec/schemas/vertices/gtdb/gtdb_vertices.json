@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "description": "A entry for vertices in the GTDB taxonomy tree.",
-  "required": ["_key", "release", "type", "name"],
+  "required": ["_key", "release", "rank", "name"],
   "optional": ["domain", "phylum", "class", "order", "family", "genus", "species"],
   "properties": {
     "_key": {
@@ -16,7 +16,7 @@
       "examples": ["bac_taxonomy_r83", "bac120_taxonomy_r89"]
     },
     "name": {
-      "type": ["list"],
+      "type": ["array"],
       "title": "Taxon name.",
       "examples": [["bacteria"], ["streptococcus", "pneumoniae"]]
     },
