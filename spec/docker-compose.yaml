@@ -16,7 +16,7 @@ services:
   re_api:
     image: kbase/relation_engine_api:latest
     ports:
-      - 5000:5000
+      - "127.0.0.1:5000:5000"
     depends_on:
       - arangodb
       - auth
@@ -37,7 +37,7 @@ services:
   arangodb:
     image: arangodb:3.4
     ports:
-      - 8529:8529
+      - "127.0.0.1:8529:8529"
     command: sh -c "arangodb create jwt-secret --secret=jwtSecret &&
                     arangodb --starter.local --auth.jwt-secret=./jwtSecret"
 
