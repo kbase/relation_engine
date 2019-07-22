@@ -1,18 +1,13 @@
 # Relation Engine Document Schemas
 
 Document schemas define a required format for each collection in the database. Schemas use the
-[JSON Schema](https://json-schema.org/specification.html) specification and follow the [JSON5
-format](https://json5.org/)
+[JSON Schema](https://json-schema.org/specification.html) specification.
 
 ## Guidelines
 
-- The filename should be the name of the collection that the schema applies to.
-- All schemas should be in [JSON5 format](https://json5.org/) and follow the [JSON
-  Schema](https://json-schema.org/) specification.
-- You can add reusable JSON schema definitions by placing them in the
-  [`./definitions`](/src/schemas/definitions) directory.
-- When writing a new schema, also make a [migration script](/src/migrations) that can update the
-  database.
+- Every schema file should have `name`, `type` ("vertex" or "edge"), and `schema` (JSON schema) fields
+- Every JSON schema should have a "$schema" field
+- You can add reusable JSON schema definitions by placing them in the [`./definitions`](/src/schemas/definitions) directory.
 
 ## Testing your schema format
 

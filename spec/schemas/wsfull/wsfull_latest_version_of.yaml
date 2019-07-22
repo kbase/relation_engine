@@ -1,0 +1,25 @@
+name: wsfull_latest_version_of
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: false
+  required: [_from, _to]
+  properties:
+    _from:
+      type: string
+      examples:
+      - wsfull_type_version/KBaseGenomes.Genome‑9.0
+      - wsfull_module_version/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433
+      description: |
+        A versioned entity, representing the most recent version of an entity
+        in a group (most likely a workspace object, module, or workspace type).
+    _to:
+      type: string
+      examples:
+      - wsfull_type/KBaseGenomes.Genome
+      - wsfull_module/kb_uploadmethods
+      description: |
+        The non-versioned entity group, where all members of the group are
+        different versions of something (eg. a workspace object, module, or workspace
+        type)

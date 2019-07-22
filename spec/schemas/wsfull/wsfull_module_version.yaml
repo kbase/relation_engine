@@ -1,0 +1,38 @@
+name: wsfull_module_version
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  description: Versioned SDK Module.
+  additionalProperties: false
+  required: [_key, name, commit, ver, code_url]
+  properties:
+    _key:
+      type: string
+      examples:
+      - kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433
+      description: "<module_name>:<module_commit>"
+      pattern: "^\\w+:\\w+$"
+    name:
+      type: string
+      title: Module name
+      examples:
+      - kb_uploadmethods
+      pattern: "^\\w+$"
+    commit:
+      type: string
+      examples:
+      - 8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433
+      description: Git commit hash
+      pattern: "^\\w+$"
+    ver:
+      type: string
+      examples:
+      - 1.0.13
+      description: Module semantic version
+      pattern: "^\\d+\\.\\d+\\.\\d+$"
+    code_url:
+      type: string
+      examples:
+      - https://github.com/kbaseapps/kb_uploadmethods
+      description: URL of source code

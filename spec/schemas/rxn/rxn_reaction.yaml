@@ -1,0 +1,53 @@
+name: rxn_reaction
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: Chemical reactions
+  properties:
+    _key:
+      type: string
+      examples: [rxn02201]
+      title: ModelSeed ID
+      pattern: "^rxn\\d+$"
+    direction:
+      type: string
+      enum: [">", "<", "="]
+    name:
+      type: string
+      description: Chemical names
+      examples: ["trans-2-Methyl-5-isopropylhexa-2,5-dienal dehydrogenase_c0"]
+    gpr:
+      type: string
+      examples: [PGN_RS01070]
+    ec_number:
+      type: string
+      examples: ["2.7.3.7"]
+      title: Enzyme Commission Number
+      pattern: "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
+    bbcwn:
+      type: number
+      examples: [-108]
+    equation:
+      type: string
+      description: Reaction formula using compound IDs (eg. cd00443)
+      examples:
+        - "(1) cpd00443[c0] + (1) cpd02920[c0] => (1) cpd00012[c0] + (1) cpd00067[c0] + (1) cpd00683[c0]"
+    definition:
+      type: string
+      description: Reaction formula. Same as equation, but with compound IDs replaced with chemical names.
+    bigg_id:
+      type: string
+      examples: [DHPS2]
+    kegg_id:
+      type: string
+      examples: [R03067]
+    kegg_pathways:
+      type: string
+      examples: ["Folate biosynthesis"]
+    metacyc_pathways:
+      type: array
+      items: {type: string}
+      examples: [["AMINE-DEG", "Creatinine-Degradation", "Degradation"]]

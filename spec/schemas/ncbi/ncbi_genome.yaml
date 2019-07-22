@@ -1,0 +1,100 @@
+name: ncbi_genome
+type: vertex
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  additionalProperties: false
+  description: Whole-genome metadata (genes are separate vertices)
+  required:
+  - _key
+  - scientific_name
+  - domain
+  properties:
+    _key:
+      type: string
+      description: Hash of the full set of data contained in this genome.
+    refseq_id:
+      type: string
+      examples:
+      - NC_008270.1
+      description: RefSeq database accession id
+    scientific_name:
+      type: string
+      examples:
+      - Haloferax Volcanii
+    domain:
+      type: string
+      enum:
+      - Archaea
+      - Bacteria
+      - Eukarya
+      - Unknown
+    feature_counts:
+      type: object
+      additionalProperties: true
+      description: A count of the number of instances of each feature type such as CDSs,
+        repeats etc.
+      patternProperties:
+        ".*":
+          type: integer
+    dna_size:
+      type: integer
+      title: Nucleotide count
+    num_contigs:
+      type: integer
+      title: Number of contigs
+      description: Number of consensus regions of the DNA.
+    molecule_type:
+      type: string
+      title: Molecule type
+      examples:
+      - DNA
+      description: Can include genomic DNA, genomic RNA, precursor RNA, mRNA (cDNA),
+        ribosomal RNA, transfer RNA, small nuclear RNA, and small cytoplasmic RNA
+    contig_lengths:
+      type: array
+      description: Nucleotide length of each contig
+      items:
+        type: integer
+    contig_ids:
+      type: array
+      description: The ids of each contig in the associated assembly
+      items:
+        type: string
+    source:
+      type: string
+      description: The tool or database that produced the genome
+      examples:
+      - RefSeq
+      - Ensembl
+      - Phytozome
+      - RAST
+      - Prokka
+      - User_upload
+    source_id:
+      type: string
+      description: The ID assigned the to the genome by that source
+    release:
+      type: string
+      description: The release version of the source database for this genome if applicable
+    taxonomy:
+      type: array
+      description: Full taxonomy parent-to-child linkage up to the domain
+      examples:
+      - - Bacteria
+        - Actinobacteria
+        - Corynebacteriales
+        - Nocardiaceae
+        - Rhodococcus
+      items:
+        type: string
+    gc_content:
+      type: number
+      description: Fraction of GC pairs in the genome
+    is_suspect:
+      type: boolean
+      description: Flag indicating that the genome has failed to pass one or more validation
+        tests
+    notes:
+      type: string
+      description: Free text notes from the genome upload

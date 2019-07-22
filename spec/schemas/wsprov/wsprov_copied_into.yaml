@@ -1,0 +1,14 @@
+name: wsprov_copied_into
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to]
+  description: The object was copied into another object
+  properties:
+    _from:
+      type: string
+      examples: ['wsprov_object/1:2:3']
+    _to:
+      type: string
+      examples: ['wsprov_object/1:2:3']

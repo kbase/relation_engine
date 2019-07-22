@@ -1,0 +1,14 @@
+name: wsprov_input_in
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to]
+  description: The workspace object was input in a provenance action
+  properties:
+    _from:
+      type: string
+      examples: ['wsprov_object/1:2:3']
+    _to:
+      type: string
+      examples: ['wsprov_action/1:2:3']
