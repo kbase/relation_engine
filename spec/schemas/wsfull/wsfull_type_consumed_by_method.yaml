@@ -1,0 +1,15 @@
+name: wsfull_type_consumed_by_method
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [_from, _to]
+  description: The _from type is consumed by the _to SDK method
+  additionalProperties: true
+  properties:
+    _from:
+      type: string
+      description: The ID of the type that is consumed.
+    _to:
+      type: string
+      description: The ID of the SDK method that consumes the type.

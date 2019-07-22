@@ -1,0 +1,16 @@
+name: wsfull_obj_created_with_module
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  additionalProperties: false
+  required: [_from, _to]
+  description: The _from WS versioned object was created with the _to SDK versioned
+    module.
+  properties:
+    _from:
+      type: string
+      description: The WS versioned object that was created.
+    _to:
+      type: string
+      description: The SDK versioned module that created the object.

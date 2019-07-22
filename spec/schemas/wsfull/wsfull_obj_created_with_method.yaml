@@ -1,0 +1,23 @@
+name: wsfull_obj_created_with_method
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  additionalProperties: false
+  required: [_from, _to, method_params]
+  description: The _from WS versioned object was created by the _to SDK versioned method.
+  properties:
+    _from:
+      type: string
+      examples:
+      - wsfull_object_version/35414:73:1
+      description: A versioned workspace object.
+    _to:
+      type: string
+      examples:
+      - wsfull_method_version/kb_uploadmethods:8ebb66e4f2c27bc4a9b7cddff7d7b0f27f4ee433.import_genbank_from_staging
+      - wsfull_method_version/kb_uploadmethods:UNKNOWN.import_genbank_from_staging
+      description: A version of a module with a method.
+    method_params:
+      type: [array, object, 'null']
+      description: The input parameters for the method used to create the object.

@@ -1,0 +1,34 @@
+name: gtdb_taxon
+type: vertex
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: Template for a vertex entry in the GTDB taxonomy tree.
+  required: [_key, scientific_name, rank]
+  properties:
+    _key:
+      type: string
+      description: Taxon type abbreviation plus name
+      examples: ['d:Bacteria', 'p:Firmicutes']
+    scientific_name:
+      type: string
+      title: Taxon name.
+      examples:
+      - Methylophilus methylotrophus
+      - Bacteria
+      - Firmicutes
+    canonical_scientific_name:
+      type: array
+      title: Canonicalized scientific name
+      examples: [[methylophilus, methylotrophus], [Bacteria], [Firmicutes]]
+      items: {type: string}
+    rank:
+      type: string
+      title: Taxonomic rank
+      examples: [Domain, Phylum]
+    numeric_rank:
+      type: integer
+      title: Taxonomic level
+    genetic_code:
+      type: integer
+      title: genetic code

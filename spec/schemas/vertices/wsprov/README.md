@@ -1,1 +1,0 @@
-# Simple workspace provenance data
