@@ -1,0 +1,95 @@
+# Find all linked objects to a given object
+# *** if both show_private and show_public are true, this will be treated as an OR ***
+name: wsprov_fetch_linked_objects
+params:
+  type: object
+  required: [obj_key]
+  properties:
+    obj_key:
+      type: string
+      description: array of private workspace ids the user has access to
+    show_private:
+      type: boolean
+      description: limit to objects in workspaces that a user has access to
+      default: true
+    show_public:
+      type: boolean
+      description: limit to objects in public workspaces
+      default: true
+    types:
+      description: list of ws types to filter on (set as null to disable)
+      default: null
+      anyOf:
+        - {type: 'null'}
+        - type: array
+          items: {type: string}
+    owners:
+      description: list of usernames to filter by owner (set as null to disable)
+      default: null
+      anyOf:
+        - {type: 'null'}
+        - type: array
+          items: {type: string}
+    results_limit:
+      default: 10
+      type: integer
+      description: limit of total results
+    offset:
+      default: 0
+      type: integer
+      description: result offset
+query: |
+  WITH wsprov_object
+  LET obj_id = CONCAT("wsprov_object/", @obj_key)
+
+  let out = (
+      FOR v, e, p IN 1..100
+          OUTBOUND obj_id wsprov_links, wsprov_copied_into
+          OPTIONS {uniqueVertices: "global", bfs: true}
+          FILTER (!@types || v.ws_type IN @types)
+          FILTER (!@owners || v.owner IN @owners)
+          FILTER (@show_private && @show_public)
+            ? (v.is_public || v.workspace_id IN ws_ids)
+            : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+          LIMIT @offset, @results_limit
+          RETURN {
+              vertex: {
+                  _key: v._key,
+                  is_public: v.is_public,
+                  narr_name: v.narr_name,
+                  obj_name: v.obj_name,
+                  owner: v.owner,
+                  save_date: v.save_date,
+                  workspace_id: v.workspace_id,
+                  ws_type: v.ws_type
+              },
+              path: p
+          }
+  )
+
+  let inb = (
+      FOR v, e, p IN 1..100
+          INBOUND obj_id wsprov_links, wsprov_copied_into
+          OPTIONS {uniqueVertices: "global", bfs: true}
+          FILTER (!@types || v.ws_type IN @types)
+          FILTER (!@owners || v.owner IN @owners)
+          FILTER (@show_private && @show_public)
+            ? (v.is_public || v.workspace_id IN ws_ids)
+            : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+          LIMIT @offset, @results_limit
+          RETURN {
+              vertex: {
+                  _key: v._key,
+                  is_public: v.is_public,
+                  narr_name: v.narr_name,
+                  obj_name: v.obj_name,
+                  owner: v.owner,
+                  save_date: v.save_date,
+                  workspace_id: v.workspace_id,
+                  ws_type: v.ws_type
+              },
+              path: p
+          }
+  )
+
+  return APPEND(out, inb)

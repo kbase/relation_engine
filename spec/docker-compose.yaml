@@ -11,6 +11,9 @@ services:
       - ${PWD}:/app
     depends_on:
       - re_api
+    environment:
+      - DB_URL=http://arangodb:8529
+      - DB_USER=root
 
   # Relation Engine API
   re_api:
