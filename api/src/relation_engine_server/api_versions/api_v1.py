@@ -19,9 +19,13 @@ def show_stored_queries():
 def show_schemas():
     """Show the current schema names (edges and vertices) loaded from the spec."""
     name = flask.request.args.get('name')
+    doc_id = flask.request.args.get('doc_id')
     if name:
-        return spec_loader.get_schema(name)
-    return flask.jsonify(spec_loader.get_schema_names())
+        return flask.jsonify(spec_loader.get_schema(name))
+    elif doc_id:
+        return flask.jsonify(spec_loader.get_schema_for_doc(doc_id))
+    else:
+        return flask.jsonify(spec_loader.get_schema_names())
 
 
 @api_v1.route('/query_results', methods=['POST'])
@@ -45,6 +49,7 @@ def run_query():
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
         query_text = json_body['query']
+        query_text = 'LET ws_ids = @ws_ids ' + query_text
         del json_body['query']
         resp_body = arango_client.run_query(query_text=query_text,
                                             bind_vars=json_body,

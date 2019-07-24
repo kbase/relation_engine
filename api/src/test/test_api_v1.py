@@ -94,6 +94,14 @@ class TestApi(unittest.TestCase):
         self.assertFalse('error' in resp)
         self.assertTrue(len(resp))
 
+    def test_fetch_schema_for_doc(self):
+        """Given a document ID, fetch its schema."""
+        resp = requests.get(API_URL + '/specs/schemas', params={'doc_id': 'test_vertex/123'})
+        resp = resp.json()  # type: dict
+        self.assertEqual(resp['name'], 'test_vertex')
+        self.assertEqual(resp['type'], 'vertex')
+        self.assertTrue(resp['schema'])
+
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
         resp = requests.put(
@@ -225,19 +233,20 @@ class TestApi(unittest.TestCase):
     def test_admin_query(self):
         """Test an ad-hoc query made by an admin."""
         save_test_docs(1)
-        query = 'let ws_ids = @ws_ids for v in test_vertex sort rand() limit @count return v._id'
+        query = 'for v in test_vertex sort rand() limit @count return v._id'
         resp = requests.post(
             API_URL + '/query_results',
             params={},
             headers=HEADERS_ADMIN,
             data=json.dumps({'query': query, 'count': 1})
         ).json()
+        print('resp!?', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
     def test_admin_query_non_admin(self):
         """Test an ad-hoc query error as a non-admin."""
-        query = 'let ws_ids = @ws_ids for v in test_vertex sort rand() limit @count return v._id'
+        query = 'for v in test_vertex sort rand() limit @count return v._id'
         resp = requests.post(
             API_URL + '/query_results',
             params={},
@@ -248,7 +257,7 @@ class TestApi(unittest.TestCase):
 
     def test_admin_query_invalid_auth(self):
         """Test the error response for an ad-hoc admin query without auth."""
-        query = 'let ws_ids = @ws_ids for v in test_vertex sort rand() limit @count return v._id'
+        query = 'for v in test_vertex sort rand() limit @count return v._id'
         resp = requests.post(
             API_URL + '/query_results',
             params={},
@@ -387,7 +396,7 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': 'valid_token'}
         )
         # This is the same query as list_test_vertices.aql in the spec
-        query = 'for o in test_vertex filter o.is_public || o.ws_id IN @ws_ids return o'
+        query = 'for o in test_vertex filter o.is_public || o.ws_id IN ws_ids return o'
         resp = requests.post(
             API_URL + '/query_results',
             data=json.dumps({'query': query}),
@@ -398,7 +407,7 @@ class TestApi(unittest.TestCase):
     def test_queries_are_readonly(self):
         """Test that ad-hoc admin queries cannot do any writing."""
         save_test_docs(1)
-        query = 'let ws_ids = @ws_ids for v in test_vertex remove v in test_vertex'
+        query = 'for v in test_vertex remove v in test_vertex'
         resp = requests.post(
             API_URL + '/query_results',
             headers=HEADERS_ADMIN,

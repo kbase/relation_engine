@@ -176,6 +176,54 @@ _Query params_
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
 
+### GET /api/v1/schemas
+
+Get all schema names (returns an array of strings):
+
+```sh
+GET {root_url}/api/v1/schemas
+```
+
+Example response:
+
+```json
+["test_vertex", "test_edge"]
+```
+
+Get the contents of a specific schema
+
+```sh
+GET "{root_url}/api/v1/schemas?name=test_vertex"
+```
+
+Example response:
+
+```json
+{
+  "name": "test_vertex",
+  "type": "vertex",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["_key"],
+    "description": "An example vertex schema for testing",
+    "properties": {
+      "_key": {"type": "string"},
+      "is_public": {"type": "boolean"},
+      "ws_id": {"type": "integer"}
+    }
+  }
+}
+```
+
+Get the schema for a particular document by its full ID
+
+```sh
+GET "{root_url}/api/v1/schemas?doc_id=test_vertex/1"
+```
+
+The response will have the same format as the example response above
+
 ## Administration
 
 The following environment variables should be configured:

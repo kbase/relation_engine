@@ -36,6 +36,13 @@ def get_schema(name):
         return yaml.safe_load(fd)
 
 
+def get_schema_for_doc(doc_id):
+    """Get the schema for a particular document by its full ID."""
+    (coll_name, _) = doc_id.split('/')
+    ret = get_schema(coll_name)
+    return ret
+
+
 def get_stored_query(name):
     """Get AQL content for a specific stored query. Throws an error if nonexistent."""
     try:
