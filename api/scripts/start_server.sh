@@ -8,6 +8,7 @@ calc_workers="$(($(nproc) * 2 + 1))"
 workers=${WORKERS:-$calc_workers}
 
 python -m src.relation_engine_server.wait_for_services
+python -m src.relation_engine_server.utils.pull_spec
 
 gunicorn \
   --worker-class gevent \

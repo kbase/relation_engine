@@ -10,6 +10,8 @@ from urllib.parse import urljoin
 def get_config():
     """Load environment configuration data."""
     spec_path = os.environ.get('SPEC_PATH', '/spec')
+    spec_release_url = os.environ.get('SPEC_RELEASE_URL')
+    spec_release_path = os.environ.get('SPEC_RELEASE_PATH')
     spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
     spec_schemas_path = os.path.join(spec_repo_path, 'schemas')  # /spec/repo/schemas
     stored_queries_path = os.path.join(spec_repo_path, 'stored_queries')  # /spec/repo/stored_queries
@@ -36,6 +38,8 @@ def get_config():
         'db_readonly_user': db_readonly_user,
         'db_readonly_pass': db_readonly_pass,
         'spec_url': spec_url,
+        'spec_release_url': spec_release_url,
+        'spec_release_path': spec_release_path,
         'spec_paths': {
             'release_id': os.path.join(spec_path, '.release_id'),
             'root': spec_path,

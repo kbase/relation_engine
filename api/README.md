@@ -90,7 +90,7 @@ System admins can run ad-hoc queries by specifying a "query" property in the JSO
 
 ```sh
 curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1}' \
-    {root_url}/api/query_results
+    {root_url}/api/v1/query_results
 ```
 
 This will return the same form of results as above.
@@ -104,7 +104,7 @@ Bulk-update documents by either creating, replacing, or updating.
 _Example_
 
 ```sh
-curl -X PUT {root_url}/api/documents?collection=genes&on_duplicate=update
+curl -X PUT {root_url}/api/v1/documents?collection=genes&on_duplicate=update
 ```
 
 _Query params_
@@ -167,7 +167,7 @@ Manually check and pull spec updates. Requires sysadmin auth.
 _Example_
 
 ```
-curl {root_url}/api/update_specs
+curl {root_url}/api/v1/update_specs
 ```
 
 _Query params_
@@ -188,6 +188,15 @@ The following environment variables should be configured:
 * `DB_PASS` - password for the arangodb database
 * `DB_READONLY_USER` - read-only username for the arangodb database
 * `DB_READONLY_PASS` - read-only password for the arangodb database
+
+### Update specs
+
+To update specs while the server is running, use this curl command with an RE_ADMIN token:
+
+```sh
+curl -X PUT -H "Authorization: <mytoken>" \
+  "https://ci.kbase.us/services/relation_engine_api/api/v1/specs?init_collections=1
+```
 
 ## Development
 
