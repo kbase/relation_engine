@@ -65,7 +65,7 @@ def invalid_params(err):
 
 
 @app.errorhandler(spec_loader.SchemaNonexistent)
-@app.errorhandler(spec_loader.ViewNonexistent)
+@app.errorhandler(spec_loader.StoredQueryNonexistent)
 def view_does_not_exist(err):
     """General error cases."""
     resp = {'error': str(err), 'name': err.name}

@@ -2,14 +2,17 @@
 Load configuration data from environment variables.
 """
 import os
+import functools
 from urllib.parse import urljoin
 
 
+@functools.lru_cache(maxsize=1)
 def get_config():
     """Load environment configuration data."""
     spec_path = os.environ.get('SPEC_PATH', '/spec')
     spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
     spec_schemas_path = os.path.join(spec_repo_path, 'schemas')  # /spec/repo/schemas
+    stored_queries_path = os.path.join(spec_repo_path, 'stored_queries')  # /spec/repo/stored_queries
     spec_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
     kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
     auth_url = os.environ.get('KBASE_AUTH_URL', urljoin(kbase_endpoint + '/', 'auth'))
@@ -37,9 +40,8 @@ def get_config():
             'release_id': os.path.join(spec_path, '.release_id'),
             'root': spec_path,
             'repo': spec_repo_path,
-            'views': os.path.join(spec_repo_path, 'views'),
             'schemas': spec_schemas_path,
-            'vertices': os.path.join(spec_schemas_path, 'vertices'),
-            'edges': os.path.join(spec_schemas_path, 'edges')
+            'stored_queries': stored_queries_path,
+            'vertices': os.path.join(spec_schemas_path, 'vertices')
         }
     }

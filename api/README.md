@@ -15,24 +15,24 @@ Returns server status info
 
 ### POST /api/v1/query_results
 
-Run a query using a view or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
+Run a query using a stored query or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
 
 _Example rquest_
 
 ```sh
-curl -X POST -d '{"argument": "value"}' {root_url}/api/v1/query_results?view=example
+curl -X POST -d '{"argument": "value"}' {root_url}/api/v1/query_results?stored_query=example
 ```
 
 _Query params_
-* `view` - required - string - name of the view to run as a query against the database
+* `stored_query` - required - string - name of the stored query to run as a query against the database
 * `cursor_id` - required - string - ID of a cursor that was returned from a previous query with >100 results
 * `full_count` - optional - bool - If true, return a count of the total documents before any LIMIT is applied (for example, in pagination). This might make some queries run more slowly
 
-Pass one of `view` or `cursor_id` -- not both.
+Pass one of `stored_query` or `cursor_id` -- not both.
 
 _Request body_
 
-When running a new query with a view, the request body should be a JSON object of all bind variables for the query. Anything with a `@name` in the query source should have an entry in the object here. For example, a query with bind vars for `@@collection` and `@value`, you will need to pass:
+When running a new query, the request body can be a JSON object of all bind variables for the query. Anything with a `@name` in the query source should have an entry in the object here. For example, a query with bind vars for `@@collection` and `@value`, you will need to pass:
 
 ```json
 { "@collection": "collection_name", "value": "my_value"}
@@ -95,7 +95,7 @@ curl -d '{"query": "for v in coll sort rand() limit @count return v", "count": 1
 
 This will return the same form of results as above.
 
-**Note:** Currently, all queries are read-only. This includes view queries and ad-hoc admin queries. Commands like `UPDATE` or `REMOVE` will fail.
+**Note:** Currently, all queries are read-only. This includes stored queries and ad-hoc admin queries. Commands like `UPDATE` or `REMOVE` will fail.
 
 ### PUT /api/v1/documents
 

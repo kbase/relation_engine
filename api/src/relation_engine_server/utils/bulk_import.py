@@ -26,7 +26,7 @@ def bulk_import(query_params):
         # Parse each line to json, validate the schema, and write to a file
         for line in flask.request.stream:
             json_line = json.loads(line)
-            jsonschema.validate(json_line, schema)
+            jsonschema.validate(json_line, schema['schema'])
             json_line = _write_edge_key(json_line)
             json_line['updated_at'] = int(time.time() * 1000)
             temp_fd.write(json.dumps(json_line) + '\n')

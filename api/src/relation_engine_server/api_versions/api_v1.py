@@ -1,18 +1,18 @@
 import flask
+import jsonschema
 from ..utils import arango_client, spec_loader, auth, bulk_import, pull_spec, config, parse_json
 from ..exceptions import InvalidParameters
-
 
 api_v1 = flask.Blueprint('api_v1', __name__)
 
 
-@api_v1.route('/specs/views', methods=['GET'])
-def show_views():
+@api_v1.route('/specs/stored_queries', methods=['GET'])
+def show_stored_queries():
     """Show the current stored query names loaded from the spec."""
     name = flask.request.args.get('name')
     if name:
-        return {'view': spec_loader.get_view(name)}
-    return flask.jsonify(spec_loader.get_view_names())
+        return {'stored_query': spec_loader.get_stored_query(name)}
+    return flask.jsonify(spec_loader.get_stored_query_names())
 
 
 @api_v1.route('/specs/schemas', methods=['GET'])
@@ -27,10 +27,10 @@ def show_schemas():
 @api_v1.route('/query_results', methods=['POST'])
 def run_query():
     """
-    Run a stored view as a query against the database.
+    Run a stored query as a query against the database.
     Auth:
      - only kbase re admins for ad-hoc queries
-     - public for views (views will have access controls within them based on params)
+     - public stored queries (these have access controls within them based on params)
     """
     json_body = parse_json.get_json_body() or {}
     # Don't allow the user to set the special 'ws_ids' field
@@ -51,11 +51,17 @@ def run_query():
                                             batch_size=batch_size,
                                             full_count=full_count)
         return flask.jsonify(resp_body)
-    if 'view' in flask.request.args:
-        # Run a query from a view name
-        view_name = flask.request.args['view']
-        view_source = spec_loader.get_view(view_name)
-        resp_body = arango_client.run_query(query_text=view_source,
+    if ('stored_query' in flask.request.args) or ('view' in flask.request.args):
+        # Run a query from a query name
+        # Note: we are maintaining backwards compatibility here with the "view" arg.
+        # "stored_query" is the more accurate name
+        query_name = flask.request.args.get('stored_query') or flask.request.args.get('view')
+        stored_query = spec_loader.get_stored_query(query_name)
+        stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
+        if 'params' in stored_query:
+            # Validate the user params for the query
+            jsonschema.validate(json_body, stored_query['params'])
+        resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,
                                             batch_size=batch_size,
                                             full_count=full_count)
@@ -66,7 +72,7 @@ def run_query():
         resp_body = arango_client.run_query(cursor_id=cursor_id)
         return flask.jsonify(resp_body)
     # No valid options were passed
-    raise InvalidParameters('Pass in a view or a cursor_id')
+    raise InvalidParameters('Pass in a query name or a cursor_id')
 
 
 @api_v1.route('/specs', methods=['PUT'])

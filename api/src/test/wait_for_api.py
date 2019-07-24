@@ -6,14 +6,13 @@ import time
 
 
 def main():
-    started = False
     timeout = int(time.time()) + 60
-    while not started:
+    while True:
         try:
             requests.get('http://localhost:5000').raise_for_status()
-            started = True
-        except Exception as err:
-            print('Waiting for services:', err)
+            break
+        except Exception:
+            print('Waiting for app to start..')
             if int(time.time()) > timeout:
                 raise RuntimeError('Timed out waiting for services.')
             time.sleep(3)

@@ -4,15 +4,18 @@ Make ajax requests to the ArangoDB server.
 import os
 import requests
 import json
+import glob
+import yaml
 
 from .config import get_config
+
+_CONF = get_config()
 
 
 def server_status():
     """Get the status of our connection and authorization to the ArangoDB server."""
-    config = get_config()
     try:
-        resp = requests.get(config['db_url'] + '/_api/endpoint', auth=(config['db_user'], config['db_pass']))
+        resp = requests.get(_CONF['db_url'] + '/_api/endpoint', auth=(_CONF['db_user'], _CONF['db_pass']))
     except requests.exceptions.ConnectionError:
         return 'no_connection'
     if resp.ok:
@@ -25,8 +28,7 @@ def server_status():
 
 def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, full_count=False):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
-    config = get_config()
-    url = config['api_url'] + '/cursor'
+    url = _CONF['api_url'] + '/cursor'
     req_json = {
         'batchSize': min(5000, batch_size),
         'memoryLimit': 16000000000,  # 16gb
@@ -49,7 +51,7 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, f
         method,
         url,
         data=json.dumps(req_json),
-        auth=(config['db_readonly_user'], config['db_readonly_pass'])
+        auth=(_CONF['db_readonly_user'], _CONF['db_readonly_pass'])
     )
     resp_json = resp.json()
     if not resp.ok or resp_json['error']:
@@ -63,14 +65,15 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, f
     }
 
 
-def init_collections(schemas):
+def init_collections():
     """Initialize any uninitialized collections in the database from a set of schemas."""
-    edges = schemas['edges']
-    vertices = schemas['vertices']
-    for edge_name in edges:
-        create_collection(edge_name, is_edge=True)
-    for vertex_name in vertices:
-        create_collection(vertex_name, is_edge=False)
+    pattern = os.path.join(_CONF['spec_paths']['schemas'], '**', '*.yaml')
+    for path in glob.iglob(pattern):
+        coll_name = os.path.basename(os.path.splitext(path)[0])
+        with open(path) as fd:
+            config = yaml.safe_load(fd)
+        is_edge = config['type'] == 'edge'
+        create_collection(coll_name, is_edge=is_edge)
 
 
 def create_collection(name, is_edge):
@@ -80,19 +83,19 @@ def create_collection(name, is_edge):
     Shard the new collection based on the number of db nodes (10 shards for each).
     """
     num_shards = os.environ.get('SHARD_COUNT', 30)
-    config = get_config()
-    url = config['api_url'] + '/collection'
+    url = _CONF['api_url'] + '/collection'
     # collection types:
     #   2 is a document collection
     #   3 is an edge collection
     collection_type = 3 if is_edge else 2
+    print(f"Creating collection {name} (edge: {is_edge})")
     data = json.dumps({
         'keyOptions': {'allowUserKeys': True},
         'name': name,
         'type': collection_type,
         'numberOfShards': num_shards
     })
-    resp = requests.post(url, data, auth=(config['db_user'], config['db_pass']))
+    resp = requests.post(url, data, auth=(_CONF['db_user'], _CONF['db_pass']))
     resp_json = resp.json()
     if not resp.ok:
         if 'duplicate' not in resp_json['errorMessage']:
@@ -102,12 +105,11 @@ def create_collection(name, is_edge):
 
 def import_from_file(file_path, query):
     """Import documents from a file."""
-    config = get_config()
     with open(file_path, 'rb') as file_desc:
         resp = requests.post(
-            config['api_url'] + '/import',
+            _CONF['api_url'] + '/import',
             data=file_desc,
-            auth=(config['db_user'], config['db_pass']),
+            auth=(_CONF['db_user'], _CONF['db_pass']),
             params=query
         )
     if not resp.ok:
@@ -122,29 +124,28 @@ def _init_readonly_user():
     If the user cannot be created, we raise an ArangoServerError
     If the user already exists, or is successfully created, we return None and do not raise.
     """
-    config = get_config()
-    user = config['db_readonly_user']
+    user = _CONF['db_readonly_user']
     # Check if the user exists, in which case this is a no-op
     resp = requests.get(
-        config['api_url'] + '/user/' + user,
-        auth=(config['db_user'], config['db_pass'])
+        _CONF['api_url'] + '/user/' + user,
+        auth=(_CONF['db_user'], _CONF['db_pass'])
     )
     if resp.status_code == 200:
         return
     # Create the user
     resp = requests.post(
-        config['api_url'] + '/user',
-        data=json.dumps({'user': user, 'passwd': config['db_readonly_user']}),
-        auth=(config['db_user'], config['db_pass'])
+        _CONF['api_url'] + '/user',
+        data=json.dumps({'user': user, 'passwd': _CONF['db_readonly_user']}),
+        auth=(_CONF['db_user'], _CONF['db_pass'])
     )
     if resp.status_code != 201:
         raise ArangoServerError(resp.text)
-    db_grant_path = config['api_url'] + '/user/' + user + '/database/' + config['db_name']
+    db_grant_path = _CONF['api_url'] + '/user/' + user + '/database/' + _CONF['db_name']
     # Grant read access to the current database
     resp = requests.put(
         db_grant_path,
         data='{"grant": "ro"}',
-        auth=(config['db_user'], config['db_pass'])
+        auth=(_CONF['db_user'], _CONF['db_pass'])
     )
     if resp.status_code != 200:
         raise ArangoServerError(resp.text)
@@ -152,7 +153,7 @@ def _init_readonly_user():
     resp = requests.put(
         db_grant_path + '/*',
         data='{"grant": "ro"}',
-        auth=(config['db_user'], config['db_pass'])
+        auth=(_CONF['db_user'], _CONF['db_pass'])
     )
     if not resp.ok:
         raise ArangoServerError(resp.text)

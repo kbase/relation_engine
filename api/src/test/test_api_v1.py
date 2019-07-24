@@ -91,16 +91,16 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(len(resp_json['status']))
 
-    def test_list_views(self):
-        """Test the listing out of saved AQL views."""
-        resp = requests.get(API_URL + '/specs/views').json()
+    def test_list_stored_queries(self):
+        """Test the listing out of saved AQL stored queries."""
+        resp = requests.get(API_URL + '/specs/stored_queries').json()
         self.assertTrue('list_test_vertices' in resp)
 
     def test_list_schemas(self):
         """Test the listing out of registered JSON schemas for vertices and edges."""
         resp = requests.get(API_URL + '/specs/schemas').json()
-        self.assertTrue('test_vertex' in resp['vertices'])
-        self.assertTrue('test_edge' in resp['edges'])
+        self.assertTrue('test_vertex' in resp)
+        self.assertTrue('test_edge' in resp)
         self.assertFalse('error' in resp)
         self.assertTrue(len(resp))
 
@@ -272,7 +272,7 @@ class TestApi(unittest.TestCase):
         save_test_docs(count=20)
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices', 'batch_size': 10, 'full_count': True}
+            params={'stored_query': 'list_test_vertices', 'batch_size': 10, 'full_count': True}
         ).json()
         self.assertTrue(resp['cursor_id'])
         self.assertEqual(resp['has_more'], True)
@@ -298,19 +298,19 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['arango_message'], 'cursor not found')
 
     def test_query_no_name(self):
-        """Test a query error with a view name that does not exist."""
+        """Test a query error with a stored query name that does not exist."""
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'nonexistent'}
+            params={'stored_query': 'nonexistent'}
         ).json()
-        self.assertEqual(resp['error'], 'View does not exist.')
+        self.assertEqual(resp['error'], 'Stored query does not exist.')
         self.assertEqual(resp['name'], 'nonexistent')
 
     def test_query_missing_bind_var(self):
         """Test a query error with a missing bind variable."""
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices'},
+            params={'stored_query': 'list_test_vertices'},
             data=json.dumps({'xyz': 'test_vertex'})
         ).json()
         self.assertEqual(resp['error'], 'ArangoDB server error.')
@@ -332,7 +332,7 @@ class TestApi(unittest.TestCase):
         )
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices'},
+            params={'stored_query': 'list_test_vertices'},
             headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 1)
@@ -349,7 +349,7 @@ class TestApi(unittest.TestCase):
         )
         resp = requests.post(
             API_URL + '/query_results',
-            params={'view': 'list_test_vertices'},
+            params={'stored_query': 'list_test_vertices'},
             headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 0)

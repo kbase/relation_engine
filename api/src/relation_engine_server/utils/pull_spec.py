@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 import shutil
 
-from . import arango_client, spec_loader
+from . import arango_client
 from .config import get_config
 
 
@@ -37,8 +37,7 @@ def download_specs(init_collections=True, release_url=None):
     _rename_directories(config['spec_paths']['root'], config['spec_paths']['repo'])
     # Initialize all the collections
     if init_collections:
-        schemas = spec_loader.get_schema_names()
-        arango_client.init_collections(schemas)
+        arango_client.init_collections()
 
 
 def _fetch_github_release_url():
