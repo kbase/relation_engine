@@ -1,6 +1,7 @@
 """
 Test helpers
 """
+import sys
 import os
 import time
 import requests
@@ -11,6 +12,7 @@ import functools
 def get_config():
     """Return configuration data for tests."""
     return {
+        're_api_url': os.environ['RE_API_URL'],
         'db_url': os.environ['DB_URL'],
         'db_auth': (os.environ['DB_USER'], os.environ.get('DB_PASS', ''))
     }
@@ -32,3 +34,26 @@ def wait_for_arangodb():
             if time.time() > timeout:
                 raise RuntimeError('Timed out waiting for arangodb')
             time.sleep(3)
+
+
+def wait_for_api():
+    # Wait for the API to come online
+    conf = get_config()
+    timeout = int(time.time()) + 60
+    while True:
+        try:
+            requests.get(conf['re_api_url']).raise_for_status()
+            requests.get('http://auth:5000')
+            requests.get('http://workspace:5000')
+            break
+        except Exception as err:
+            print(err)
+            print('Waiting for RE API to come online..')
+            if int(time.time()) > timeout:
+                raise RuntimeError("Timed out waiting for RE API.")
+            time.sleep(2)
+
+
+if __name__ == '__main__':
+    if sys.argv[1] == 'wait_for_api':
+        wait_for_api()

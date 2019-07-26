@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
+python -m test.helpers wait_for_api
 python -m test.validate
-python /app/test/views/init_spec.py
-python -m unittest discover /app/test/views
+python -m unittest discover /app/test/stored_queries
