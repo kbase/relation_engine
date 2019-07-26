@@ -3,9 +3,9 @@ import os
 import tempfile
 import flask
 import json
-import jsonschema
 import hashlib
 
+from src.relation_engine_server.utils import json_validation
 from . import spec_loader
 from .arango_client import import_from_file
 
@@ -26,7 +26,7 @@ def bulk_import(query_params):
         # Parse each line to json, validate the schema, and write to a file
         for line in flask.request.stream:
             json_line = json.loads(line)
-            jsonschema.validate(json_line, schema['schema'])
+            json_validation.Validator(schema['schema']).validate(json_line)
             json_line = _write_edge_key(json_line)
             json_line['updated_at'] = int(time.time() * 1000)
             temp_fd.write(json.dumps(json_line) + '\n')

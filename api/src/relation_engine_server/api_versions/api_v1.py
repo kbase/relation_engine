@@ -1,6 +1,14 @@
 import flask
-import jsonschema
-from ..utils import arango_client, spec_loader, auth, bulk_import, pull_spec, config, parse_json
+from src.relation_engine_server.utils import (
+    json_validation,
+    arango_client,
+    spec_loader,
+    auth,
+    bulk_import,
+    pull_spec,
+    config,
+    parse_json
+)
 from ..exceptions import InvalidParameters
 
 api_v1 = flask.Blueprint('api_v1', __name__)
@@ -65,7 +73,7 @@ def run_query():
         stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
-            jsonschema.validate(json_body, stored_query['params'])
+            json_validation.Validator(json_body).validate(stored_query['params'])
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,
                                             batch_size=batch_size,
