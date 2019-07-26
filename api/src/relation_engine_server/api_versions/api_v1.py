@@ -73,9 +73,12 @@ def run_query():
         stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
-            json_validation.Validator(json_body).validate(stored_query['params'])
+            params = json_validation.Validator(stored_query).validate(json_body)
+        else:
+            # Skip validation if the query doesn't need it
+            params = json_body
         resp_body = arango_client.run_query(query_text=stored_query_source,
-                                            bind_vars=json_body,
+                                            bind_vars=params,
                                             batch_size=batch_size,
                                             full_count=full_count)
         return flask.jsonify(resp_body)
