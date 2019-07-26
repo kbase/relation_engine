@@ -49,7 +49,7 @@ def run_query():
     json_body['ws_ids'] = []
     auth_token = auth.get_auth_header()
     # Fetch any authorized workspace IDs using a KBase auth token, if present
-    json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
+    ws_ids = auth.get_workspace_ids(auth_token)
     # fetch number of documents to return
     batch_size = int(flask.request.args.get('batch_size', 100))
     full_count = flask.request.args.get('full_count', False)
@@ -59,6 +59,7 @@ def run_query():
         query_text = json_body['query']
         query_text = 'LET ws_ids = @ws_ids ' + query_text
         del json_body['query']
+        json_body['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=query_text,
                                             bind_vars=json_body,
                                             batch_size=batch_size,
@@ -73,10 +74,13 @@ def run_query():
         stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
+            print('params before', json_body)
             params = json_validation.Validator(stored_query).validate(json_body)
+            print('params after', params)
         else:
-            # Skip validation if the query doesn't need it
+            # Skip validation if the query doesn't require it
             params = json_body
+        params['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=params,
                                             batch_size=batch_size,
