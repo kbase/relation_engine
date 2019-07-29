@@ -8,7 +8,7 @@ params:
       type: string
       description: text to match to document fields
     all_documents:
-      type: string
+      type: boolean
       description: ignore the search_text and return all documents
       default: false
     include_obsolete:
