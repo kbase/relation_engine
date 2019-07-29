@@ -74,9 +74,7 @@ def run_query():
         stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
-            print('params before', json_body)
-            json_validation.Validator(stored_query).validate(json_body)
-            print('params after', json_body)
+            json_validation.Validator(stored_query['params']).validate(json_body)
         json_body['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,

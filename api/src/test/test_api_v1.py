@@ -96,8 +96,7 @@ class TestApi(unittest.TestCase):
 
     def test_fetch_schema_for_doc(self):
         """Given a document ID, fetch its schema."""
-        resp = requests.get(API_URL + '/specs/schemas', params={'doc_id': 'test_vertex/123'})
-        resp = resp.json()  # type: dict
+        resp = requests.get(API_URL + '/specs/schemas', params={'doc_id': 'test_vertex/123'}).json()
         self.assertEqual(resp['name'], 'test_vertex')
         self.assertEqual(resp['type'], 'vertex')
         self.assertTrue(resp['schema'])
