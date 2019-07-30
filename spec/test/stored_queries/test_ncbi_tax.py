@@ -51,6 +51,7 @@ class TestNcbiTax(unittest.TestCase):
             {'_key': '4', 'scientific_name': 'Proteobacteria', 'rank': 'Phylum'},
             {'_key': '5', 'scientific_name': 'Alphaproteobacteria', 'rank': 'Class'},
             {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class'},
+            {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class'},
         ]
         child_docs = [
             {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'child_type': 't'},
@@ -58,6 +59,7 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'child_type': 't'},
             {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'child_type': 't'},
             {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
         ]
         create_test_docs(taxon_docs, child_docs)
 
@@ -91,8 +93,46 @@ class TestNcbiTax(unittest.TestCase):
             params={'stored_query': 'ncbi_taxon_get_descendants'},
             data=json.dumps({'key': '1', 'levels': 2}),
         ).json()
-        self.assertEqual(resp['count'], 5)
+        self.assertEqual(resp['count'], 6)
         ranks = {r['rank'] for r in resp['results']}
         names = {r['scientific_name'] for r in resp['results']}
         self.assertEqual(ranks, {'Phylum', 'Class'})
-        self.assertEqual(names, {'Firmicutes', 'Proteobacteria', 'Bacilli', 'Alphaproteobacteria', 'Gammaproteobacteria'})  # noqa
+        self.assertEqual(names, {
+            'Firmicutes',
+            'Proteobacteria',
+            'Bacilli',
+            'Alphaproteobacteria',
+            'Gammaproteobacteria',
+            'Deltaproteobacteria',
+        })
+
+    def test_siblings_valid(self):
+        """Test a valid query for siblings."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_siblings'},
+            data=json.dumps({'key': '5'}),  # Querying from "Alphaproteobacteria"
+        ).json()
+        self.assertEqual(resp['count'], 2)
+        ranks = {r['rank'] for r in resp['results']}
+        names = {r['scientific_name'] for r in resp['results']}
+        self.assertEqual(ranks, {'Class'})
+        self.assertEqual(names, {'Gammaproteobacteria', 'Deltaproteobacteria'})
+
+    def test_siblings_root(self):
+        """Test a query for siblings on the root node with no parent."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_siblings'},
+            data=json.dumps({'key': '1'}),  # Querying from "Bacteria"
+        ).json()
+        self.assertEqual(resp['count'], 0)
+
+    def test_siblings_nonexistent_node(self):
+        """Test a query for siblings on the root node with no parent."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_siblings'},
+            data=json.dumps({'key': 'xyz'}),  # Nonexistent node
+        ).json()
+        self.assertEqual(resp['count'], 0)

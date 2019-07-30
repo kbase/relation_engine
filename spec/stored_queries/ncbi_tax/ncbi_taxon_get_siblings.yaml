@@ -1,0 +1,22 @@
+# Get the array of siblings for a taxon
+# Results are limited to 10k
+name: ncbi_taxon_get_siblings
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Key of the taxon vertex for which you want to find siblings
+query: |
+  // First find the taxon in the tree
+  for t in ncbi_taxon
+    filter t._key == @key
+    // Now traverse to the parent
+    for parent in 1..1 OUTBOUND t ncbi_child_of_taxon
+      // Then traverse back down to the siblings
+      for c in 1..1 INBOUND parent ncbi_child_of_taxon
+        filter c != t
+        limit 10000
+        return c
