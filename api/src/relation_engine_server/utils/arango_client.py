@@ -72,16 +72,16 @@ def init_collections():
         coll_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = yaml.safe_load(fd)
-        is_edge = config['type'] == 'edge'
-        create_collection(coll_name, is_edge=is_edge)
+        create_collection(coll_name, config)
 
 
-def create_collection(name, is_edge):
+def create_collection(name, config):
     """
     Create a single collection by name using some basic defaults.
     We ignore duplicates. For any other server error, an exception is thrown.
     Shard the new collection based on the number of db nodes (10 shards for each).
     """
+    is_edge = config['type'] == 'edge'
     num_shards = os.environ.get('SHARD_COUNT', 30)
     url = _CONF['api_url'] + '/collection'
     # collection types:
@@ -101,6 +101,19 @@ def create_collection(name, is_edge):
         if 'duplicate' not in resp_json['errorMessage']:
             # Unable to create a collection
             raise ArangoServerError(resp.text)
+    if config.get('indexes'):
+        _create_indexes(name, config)
+
+
+def _create_indexes(coll_name, config):
+    """Create indexes for a collection"""
+    url = _CONF['api_url'] + '/index'
+    for (idx_name, idx_conf) in config['indexes'].items():
+        idx_type = idx_conf['type']
+        idx_url = url + '#' + idx_type
+        resp = requests.post(idx_url, params={'collection-name': coll_name}, data=json.dumps(idx_conf))
+        if not resp.ok:
+            raise RuntimeError(resp.text)
 
 
 def import_from_file(file_path, query):
