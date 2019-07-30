@@ -41,21 +41,58 @@ def create_test_docs(ncbi_taxon, ncbi_child_of_taxon):
 
 class TestNcbiTax(unittest.TestCase):
 
-    def test_valid(self):
-        """Test a valid query."""
+    @classmethod
+    def setUpClass(cls):
+        """Create test documents"""
         taxon_docs = [
             {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain'},
-            {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum'}
+            {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum'},
+            {'_key': '3', 'scientific_name': 'Bacilli', 'rank': 'Class'},
+            {'_key': '4', 'scientific_name': 'Proteobacteria', 'rank': 'Phylum'},
+            {'_key': '5', 'scientific_name': 'Alphaproteobacteria', 'rank': 'Class'},
+            {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class'},
         ]
         child_docs = [
-                {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'child_type': 't'}
+            {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
         ]
         create_test_docs(taxon_docs, child_docs)
+
+    def test_ancestors_valid(self):
+        """Test a valid query of taxon ancestors."""
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_ancestors'},
             data=json.dumps({'key': '2'}),
-            headers={'Authorization': 'valid_token'}  # gives access to workspaces [1,2,3]
         ).json()
         self.assertEqual(resp['count'], 1)
         self.assertEqual(resp['results'][0]['rank'], 'Domain')
+
+    def test_descendants_valid(self):
+        """Test a valid query of taxon descendants."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_descendants'},
+            data=json.dumps({'key': '1'}),
+        ).json()
+        self.assertEqual(resp['count'], 2)
+        ranks = {r['rank'] for r in resp['results']}
+        names = {r['scientific_name'] for r in resp['results']}
+        self.assertEqual(ranks, {'Phylum'})
+        self.assertEqual(names, {'Firmicutes', 'Proteobacteria'})
+
+    def test_descendants_2levels_valid(self):
+        """Test a valid query for descendants with 2 levels."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_descendants'},
+            data=json.dumps({'key': '1', 'levels': 2}),
+        ).json()
+        self.assertEqual(resp['count'], 5)
+        ranks = {r['rank'] for r in resp['results']}
+        names = {r['scientific_name'] for r in resp['results']}
+        self.assertEqual(ranks, {'Phylum', 'Class'})
+        self.assertEqual(names, {'Firmicutes', 'Proteobacteria', 'Bacilli', 'Alphaproteobacteria', 'Gammaproteobacteria'})  # noqa
