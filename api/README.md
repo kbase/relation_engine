@@ -171,7 +171,7 @@ curl {root_url}/api/v1/update_specs
 ```
 
 _Query params_
-* `init_collections` - optional - boolean - defaults to true - whether to initialize any new collections in arango
+* `init_collections` - optional - boolean - defaults to true - whether to initialize any new collections in arango (also creates indexes)
 * `spec_url` - optional - string - the specific url of the release to download and use (as a tarball). If left blank, then the latest release from github is used (not including any pre-releases or drafts).
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
