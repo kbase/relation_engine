@@ -108,8 +108,7 @@ def create_collection(name, config):
 def _create_indexes(coll_name, config):
     """Create indexes for a collection"""
     url = _CONF['api_url'] + '/index'
-    for (idx_name, idx_conf) in config['indexes'].items():
-        idx_type = idx_conf['type']
+    for (idx_type, idx_conf) in config['indexes'].items():
         idx_url = url + '#' + idx_type
         resp = requests.post(idx_url, params={'collection': coll_name}, data=json.dumps(idx_conf))
         if not resp.ok:
