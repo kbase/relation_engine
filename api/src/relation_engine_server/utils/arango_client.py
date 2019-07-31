@@ -110,7 +110,13 @@ def _create_indexes(coll_name, config):
     url = _CONF['api_url'] + '/index'
     for (idx_type, idx_conf) in config['indexes'].items():
         idx_url = url + '#' + idx_type
-        resp = requests.post(idx_url, params={'collection': coll_name}, data=json.dumps(idx_conf))
+        idx_conf['type'] = idx_type
+        resp = requests.post(
+            idx_url,
+            params={'collection': coll_name},
+            data=json.dumps(idx_conf),
+            auth=(_CONF['db_user'], _CONF['db_pass'])
+        )
         if not resp.ok:
             raise RuntimeError(resp.text)
 
