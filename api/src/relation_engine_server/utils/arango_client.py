@@ -111,7 +111,7 @@ def _create_indexes(coll_name, config):
     for (idx_name, idx_conf) in config['indexes'].items():
         idx_type = idx_conf['type']
         idx_url = url + '#' + idx_type
-        resp = requests.post(idx_url, params={'collection-name': coll_name}, data=json.dumps(idx_conf))
+        resp = requests.post(idx_url, params={'collection': coll_name}, data=json.dumps(idx_conf))
         if not resp.ok:
             raise RuntimeError(resp.text)
 
