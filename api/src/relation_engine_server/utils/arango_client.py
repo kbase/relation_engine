@@ -108,7 +108,8 @@ def create_collection(name, config):
 def _create_indexes(coll_name, config):
     """Create indexes for a collection"""
     url = _CONF['api_url'] + '/index'
-    for (idx_type, idx_conf) in config['indexes'].items():
+    for idx_conf in config['indexes']:
+        idx_type = idx_conf['type']
         idx_url = url + '#' + idx_type
         idx_conf['type'] = idx_type
         resp = requests.post(
