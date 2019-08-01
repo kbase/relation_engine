@@ -136,3 +136,64 @@ class TestNcbiTax(unittest.TestCase):
             data=json.dumps({'key': 'xyz'}),  # Nonexistent node
         ).json()
         self.assertEqual(resp['count'], 0)
+
+    def test_search_sciname_prefix(self):
+        """Test a query to search sciname."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': 'prefix:bact'}),
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(resp['results'][0]['scientific_name'], 'Bacteria')
+
+    def test_search_sciname_nonexistent(self):
+        """Test a query to search sciname for empty results."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': 'xyzabc'}),
+        ).json()
+        self.assertEqual(resp['count'], 0)
+
+    def test_search_sciname_wrong_type(self):
+        """Test a query to search sciname with the wrong type for the search_text param."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': 123})
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()['error'], "123 is not of type 'string'")
+
+    def test_search_sciname_missing_search(self):
+        """Test a query to search sciname with the search_text param missing."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({})
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()['error'], "'search_text' is a required property")
+
+    def test_search_sciname_more_complicated(self):
+        """Test a query to search sciname with some more keyword options."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': "prefix:gamma,|prefix:alpha,|prefix:delta"})
+        ).json()
+        self.assertEqual(resp['count'], 3)
+        names = {r['scientific_name'] for r in resp['results']}
+        self.assertEqual(names, {'Gammaproteobacteria', 'Alphaproteobacteria', 'Deltaproteobacteria'})
+
+    def test_search_sciname_offset_limit(self):
+        """Test a query to search sciname with an invalid offset (greater than max)."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': "prefix:bact", "offset": 10001})
+        )
+        print('resp!', resp)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()['error'], "10001 is greater than the maximum of 10000")

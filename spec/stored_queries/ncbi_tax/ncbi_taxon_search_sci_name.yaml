@@ -1,0 +1,22 @@
+# Search for an ncbi taxon with a scientific name
+# Offset is limited to 10k
+name: ncbi_taxon_search_sci_name
+params:
+  type: object
+  required: [search_text]
+  properties:
+    search_text:
+      type: string
+      title: Search text
+      description: Text to search on for the scientific name
+    offset:
+      type: integer
+      default: 0
+      maximum: 10000
+    limit:
+      type: integer
+      default: 20
+query: |
+  FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
+    LIMIT @offset, @limit
+    return doc
