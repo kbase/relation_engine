@@ -16,6 +16,7 @@ params:
     limit:
       type: integer
       default: 20
+      maximum: 100
 query: |
   FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
     LIMIT @offset, @limit

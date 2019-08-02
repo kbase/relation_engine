@@ -187,13 +187,32 @@ class TestNcbiTax(unittest.TestCase):
         names = {r['scientific_name'] for r in resp['results']}
         self.assertEqual(names, {'Gammaproteobacteria', 'Alphaproteobacteria', 'Deltaproteobacteria'})
 
-    def test_search_sciname_offset_limit(self):
+    def test_search_sciname_offset_max(self):
         """Test a query to search sciname with an invalid offset (greater than max)."""
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_search_sci_name'},
             data=json.dumps({'search_text': "prefix:bact", "offset": 10001})
         )
-        print('resp!', resp)
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp.json()['error'], "10001 is greater than the maximum of 10000")
+
+    def test_search_sciname_limit_max(self):
+        """Test a query to search sciname with an invalid offset (greater than max)."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps({'search_text': "prefix:bact", "limit": 101})
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()['error'], "101 is greater than the maximum of 100")
+
+    def test_fetch_taxon(self):
+        """Test a valid query to fetch a taxon."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_fetch_taxon'},
+            data=json.dumps({'key': '1'})
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        self.assertEqual(resp['results'][0]['_id'], 'ncbi_taxon/1')

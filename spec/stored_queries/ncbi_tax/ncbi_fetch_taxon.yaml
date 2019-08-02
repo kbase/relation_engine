@@ -1,0 +1,14 @@
+# Fetch a taxon document by taxonomy ID
+name: ncbi_fetch_taxon
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Taxonomy ID (document _key) for the taxon to fetch
+query: |
+  for t in ncbi_taxon
+      filter t._key == @key
+      return t
