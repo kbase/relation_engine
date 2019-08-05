@@ -45,8 +45,7 @@ def validate_json_schemas():
         jsonschema.validate(data, schema_schema)
         # Check for any duplicate schema names
         if name in names:
-            print('Duplicate schemas for name ' + name)
-            exit(1)
+            _fatal('Duplicate schemas for name ' + name)
         else:
             names.add(name)
         # Make sure it can be used as a JSON schema
@@ -63,16 +62,15 @@ def validate_json_schemas():
             exit(1)
         # All schemas must be object types
         if data['schema']['type'] != 'object':
-            print('Schemas must be an object. Schema in %s is not an object.' % path)
-            exit(1)
+            _fatal('Schemas must be an object. Schema in %s is not an object.' % path)
         required = data['schema'].get('required', [])
         # Edges must require _from and _to while vertices must require _key
-        if data['type'] == 'edge' and ('_from' not in required or '_to' not in required):
-            print('Edge schemas must require _from and _to attributes in ' + path)
-            exit(1)
-        elif data['type'] == 'vertex' and '_key' not in required:
-            print('Vertex schemas must require the _key attribute in ' + path)
-            exit(1)
+        has_from_underscore = ('_from' in required and '_to' in required)
+        has_from = ('from' in required and 'to' in required)
+        if data['type'] == 'edge' and not has_from_underscore and not has_from:
+            _fatal('Edge schemas must require _from and _to attributes in ' + path)
+        elif data['type'] == 'vertex' and '_key' not in required and 'id' not in required:
+            _fatal('Vertex schemas must require the _key attribute in ' + path)
         print(f'✓ {name} is valid.')
     print('..all valid.')
 
@@ -99,8 +97,7 @@ def validate_stored_queries():
         jsonschema.validate(data, stored_query_schema)
         name = data['name']
         if name in names:
-            print(f'Duplicate queries named {name}')
-            exit(1)
+            _fatal(f'Duplicate queries named {name}')
         else:
             names.add(name)
         # Make sure `params` can be used as a JSON schema
