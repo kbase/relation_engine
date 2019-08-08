@@ -1,0 +1,15 @@
+# Get information/metadata of a particular ontology term (see spec for available fields) 
+
+name: GO_get_metadata
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Get information/metadata of a particular ontology term 
+query: |
+  FOR v IN GO_test_term
+      FILTER v._key == @key
+      RETURN v

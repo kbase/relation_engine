@@ -1,0 +1,37 @@
+# Get the direct hierarchical parent 
+# resources for this term. Hierarchical parents include is-a and 
+# other related parents, such as part-of/develops-from, that imply 
+# a hierarchical relationship.
+
+name: GO_get_hierarchicalParents
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: GO id of the term you want to get all the hierarchical parents of 
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit 
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+query: |
+  WITH GO_test_term 
+      LET results1 = (
+      FOR v_relationship, e_relationship IN 1..1 OUTBOUND CONCAT("GO_test_term/", @key) GO_test_edges_relationship
+          FILTER e_relationship.relationship_type == 'part_of' OR e_relationship.relationship_type == 'has_part' OR e_relationship.relationship_type == 'occurs_in'
+          RETURN {term: v_relationship, edge: e_relationship})
+      LET results2 = (
+      FOR v_isa, e_isa IN 1..1 OUTBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa 
+          RETURN {term: v_isa, edge: e_isa} )
+      FOR x IN UNION(results1, results2)
+        SORT x._key ASC
+        LIMIT @offset, @limit
+        RETURN DISTINCT x

@@ -1,0 +1,28 @@
+# Get all siblings of this term 
+name: GO_get_siblings
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Get all siblings of this term
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit 
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+query: |
+  WITH GO_test_term 
+      FOR v_parent, e_parent IN 1..1 OUTBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa
+          FOR v_child, e_child in 1..1 INBOUND e_parent._to GO_test_edges_isa
+            FILTER e_child._from != CONCAT("GO_test_term/", @key)
+            SORT v_child._key ASC
+            LIMIT @offset, @limit
+            RETURN v_child._key
