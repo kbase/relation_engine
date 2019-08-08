@@ -12,12 +12,12 @@ params:
     offset:
       type: integer
       default: 0
-      maximum: 10000
+      maximum: 100000
     limit:
       type: integer
       default: 20
-      maximum: 100
+      maximum: 1000
 query: |
   FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
     LIMIT @offset, @limit
-    return doc
+    RETURN doc

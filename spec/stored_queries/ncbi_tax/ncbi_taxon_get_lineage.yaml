@@ -1,0 +1,22 @@
+# Get the lineage array for a taxon
+# Returns an array where the top-most (closest to the root) taxon is at the beginning
+name: ncbi_taxon_get_ancestors
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Key of the taxon vertex for which you want to find ancestors
+query: |
+  let ps = (
+    for t in ncbi_taxon
+      filter t._key == @key
+      for p in 1..10 outbound t ncbi_child_of_taxon
+        filter p.rank != 'no rank'
+        return distinct p
+  )
+  // doing return reverse(ps) returns an array of an array for some reason,
+  // which we don't want
+  for d in reverse(ps) return d

@@ -9,6 +9,16 @@ params:
       type: string
       title: Document key
       description: Key of the taxon vertex for which you want to find siblings
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
 query: |
   // First find the taxon in the tree
   for t in ncbi_taxon
@@ -18,5 +28,6 @@ query: |
       // Then traverse back down to the siblings
       for c in 1..1 INBOUND parent ncbi_child_of_taxon
         filter c != t
-        limit 10000
+        sort c.scientific_name asc
+        limit @offset, @limit
         return c

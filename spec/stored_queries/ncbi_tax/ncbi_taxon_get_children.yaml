@@ -1,0 +1,28 @@
+# Get the array of direct descendants for any taxon
+name: ncbi_taxon_get_descendants
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Key of the taxon vertex for which you want to find descendants
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit 
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+query: |
+  for t in ncbi_taxon
+      filter t._key == @key
+      for c in 1..1 INBOUND t ncbi_child_of_taxon
+        sort c.scientific_name asc
+        limit @offset, @limit
+        return c
+
