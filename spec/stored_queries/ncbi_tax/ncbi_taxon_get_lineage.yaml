@@ -14,7 +14,6 @@ query: |
     for t in ncbi_taxon
       filter t._key == @key
       for p in 1..10 outbound t ncbi_child_of_taxon
-        filter p.rank != 'no rank'
         return distinct p
   )
   // doing return reverse(ps) returns an array of an array for some reason,
