@@ -20,14 +20,27 @@ params:
       description: Result offset for pagination
       maximum: 100000
 query: |
-  // First find the taxon in the tree
-  for t in ncbi_taxon
-    filter t._key == @key
-    // Now traverse to the parent
-    for parent in 1..1 OUTBOUND t ncbi_child_of_taxon
-      // Then traverse back down to the siblings
-      for c in 1..1 INBOUND parent ncbi_child_of_taxon
-        filter c != t
-        sort c.scientific_name asc
-        limit @offset, @limit
-        return c
+  let tax_id = CONCAT('ncbi_taxon/', @key)
+  // First fetch the ID of the parent document
+  let parent_id = first(
+    for t in ncbi_taxon
+      filter t._key == @key
+      for parent in 1..1 outbound t ncbi_child_of_taxon
+        limit 1
+        return parent._id
+  )
+  // Then find the child IDs through the edge fields
+  let child_ids = (
+    for e in ncbi_child_of_taxon
+      filter e._to == parent_id AND e._from != tax_id
+      return e._from
+  )
+  // Sort and filter the children
+  let sorted = (
+    for tax in ncbi_taxon
+      filter tax._id in child_ids
+      sort tax.scientific_name asc
+      limit @offset, @limit
+      return tax
+  )
+  return {total_count: COUNT(child_ids), results: sorted}

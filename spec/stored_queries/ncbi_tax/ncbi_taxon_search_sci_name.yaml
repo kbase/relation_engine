@@ -18,6 +18,16 @@ params:
       default: 20
       maximum: 1000
 query: |
-  FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
-    LIMIT @offset, @limit
-    RETURN doc
+  // Search using the fulltext index on scientific_name
+  // Don't limit the results yet so we can get the total_count below
+  let results = (
+    FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
+      return doc
+  )
+  // Limit the results
+  let limited = (
+    for r in results
+      limit @offset, @limit
+      return r
+  )
+  return  {results: limited, total_count: COUNT(results)}
