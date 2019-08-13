@@ -1,6 +1,6 @@
 # Get the lineage array for a taxon
 # Returns an array where the top-most (closest to the root) taxon is at the beginning
-name: ncbi_taxon_get_ancestors
+name: ncbi_taxon_get_lineage
 params:
   type: object
   required: [key]

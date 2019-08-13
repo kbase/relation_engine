@@ -10,15 +10,15 @@ params:
       title: Document key
       description: GO id of the term you want to get the children of
     limit:
-        type: integer
-        default: 20
-        description: Maximum result limit 
-        maximum: 1000
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
     offset:
-        type: integer
-        default: 0
-        description: Result offset for pagination
-        maximum: 100000
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
 query_prefix: WITH GO_test_term
 query: |
   FOR v, e IN 1..1 INBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa

@@ -1,4 +1,4 @@
-# Get all hierarchical descendents
+# Get all hierarchical descendants
 # resources for this term. Hierarchical children include is-a
 # and other related children, such as part-of/develops-from,
 # that imply a hierarchical relationship
@@ -10,7 +10,7 @@ params:
     key:
       type: string
       title: Document key
-      description: GO id of the term you want to get all the hierarchical descendents of
+      description: GO id of the term you want to get all the hierarchical descendants of
     limit:
         type: integer
         default: 20

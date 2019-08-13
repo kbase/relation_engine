@@ -1,5 +1,5 @@
 # Get the array of direct descendants for any taxon
-name: ncbi_taxon_get_descendants
+name: ncbi_taxon_get_children
 params:
   type: object
   required: [key]
@@ -11,13 +11,17 @@ params:
     limit:
       type: integer
       default: 20
-      description: Maximum result limit 
+      description: Maximum result limit
       maximum: 1000
     offset:
       type: integer
       default: 0
       description: Result offset for pagination
       maximum: 100000
+    search_text:
+      type: string
+      description: Search scientific name
+      default: ''
 query: |
   let tax_id = CONCAT("ncbi_taxon/", @key)
   // Fetch the child IDs using the edge attributes
@@ -27,11 +31,21 @@ query: |
         return e._from
   )
   // Sort and filter the children
-  let sorted = (
-      for tax in ncbi_taxon
-        sort tax.scientific_name asc
+  let searched = (
+      for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
         filter tax._id in child_ids
-        limit @offset, @limit
         return tax
   )
-  return {total_count: COUNT(child_ids), results: sorted}
+  let not_searched = (
+      for tax in ncbi_taxon
+        filter tax._id in child_ids
+        return tax
+  )
+  let filtered = @search_text ? searched : not_searched
+  let results = (
+    for tax in filtered
+      sort tax.scientific_name asc
+      limit @offset, @limit
+      return tax
+  )
+  return {total_count: COUNT(filtered), results: results}

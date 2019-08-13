@@ -81,7 +81,7 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_children'},
-            data=json.dumps({'key': '1'}),
+            data=json.dumps({'key': '1', 'search_text': 'firmicutes,|proteobacteria'}),
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 2)
@@ -89,6 +89,15 @@ class TestNcbiTax(unittest.TestCase):
         names = [r['scientific_name'] for r in result['results']]
         self.assertEqual(ranks, {'Phylum'})
         self.assertEqual(names, ['Firmicutes', 'Proteobacteria'])
+
+    def test_get_children_cursor(self):
+        """Test a valid query to get children with a cursor."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_children_cursor'},
+            data=json.dumps({'key': '1'})
+        ).json()
+        self.assertEqual(len(resp['results']), 2)
 
     def test_siblings_valid(self):
         """Test a valid query for siblings."""

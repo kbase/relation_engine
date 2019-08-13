@@ -1,0 +1,21 @@
+# Get all children for a taxon, using a cursor
+name: ncbi_taxon_get_children_cursor
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: Document key
+      description: Key of the taxon vertex for which you want to find descendants
+query: |
+  let tax_id = CONCAT("ncbi_taxon/", @key)
+  // Fetch the child IDs using the edge attributes
+  let child_ids = (
+    for e in ncbi_child_of_taxon
+      filter e._to == tax_id
+      return e._from
+  )
+  for tax in ncbi_taxon
+    filter tax._id in child_ids
+    return tax
