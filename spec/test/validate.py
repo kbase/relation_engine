@@ -81,6 +81,7 @@ stored_query_schema = {
     'properties': {
         'name': {'type': 'string'},
         'params': {'type': 'object'},
+        'query_prefix': {'type': 'string'},
         'query': {'type': 'string'}
     }
 }

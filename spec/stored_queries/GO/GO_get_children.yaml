@@ -19,8 +19,9 @@ params:
         default: 0
         description: Result offset for pagination
         maximum: 100000
+query_prefix: WITH GO_test_term
 query: |
-  WITH GO_test_term FOR v, e IN 1..1 INBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa
+  FOR v, e IN 1..1 INBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa
     SORT v._key ASC
     LIMIT @offset, @limit
     RETURN {term: v, edge: e}

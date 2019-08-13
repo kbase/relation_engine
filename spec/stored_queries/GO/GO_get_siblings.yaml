@@ -1,4 +1,4 @@
-# Get all siblings of this term 
+# Get all siblings of this term
 name: GO_get_siblings
 params:
   type: object
@@ -11,18 +11,19 @@ params:
     limit:
         type: integer
         default: 20
-        description: Maximum result limit 
+        description: Maximum result limit
         maximum: 1000
     offset:
         type: integer
         default: 0
         description: Result offset for pagination
         maximum: 100000
+query_prefix: WITH GO_test_term
 query: |
-  WITH GO_test_term 
-      FOR v_parent, e_parent IN 1..1 OUTBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa
-          FOR v_child, e_child in 1..1 INBOUND e_parent._to GO_test_edges_isa
-            FILTER e_child._from != CONCAT("GO_test_term/", @key)
-            SORT v_child._key ASC
-            LIMIT @offset, @limit
-            RETURN v_child._key
+  LET term_id = CONCAT("GO_test_term/", @key)
+  FOR v_parent, e_parent IN 1..1 OUTBOUND term_id GO_test_edges_isa
+    FOR v_child, e_child in 1..1 INBOUND e_parent._to GO_test_edges_isa
+      FILTER e_child._from != term_id
+      SORT v_child._key ASC
+      LIMIT @offset, @limit
+      RETURN v_child._key
