@@ -71,7 +71,7 @@ def run_query():
         # "stored_query" is the more accurate name
         query_name = flask.request.args.get('stored_query') or flask.request.args.get('view')
         stored_query = spec_loader.get_stored_query(query_name)
-        stored_query_source = json_body.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + stored_query['query']
+        stored_query_source = stored_query.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
             json_validation.Validator(stored_query['params']).validate(json_body)
