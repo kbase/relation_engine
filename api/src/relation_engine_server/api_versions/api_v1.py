@@ -51,13 +51,13 @@ def run_query():
     # Fetch any authorized workspace IDs using a KBase auth token, if present
     ws_ids = auth.get_workspace_ids(auth_token)
     # fetch number of documents to return
-    batch_size = int(flask.request.args.get('batch_size', 100))
+    batch_size = int(flask.request.args.get('batch_size', 10000))
     full_count = flask.request.args.get('full_count', False)
     if 'query' in json_body:
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
         query_text = json_body['query']
-        query_text = 'LET ws_ids = @ws_ids ' + query_text
+        query_text = json_body.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + query_text
         del json_body['query']
         json_body['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=query_text,
@@ -71,7 +71,7 @@ def run_query():
         # "stored_query" is the more accurate name
         query_name = flask.request.args.get('stored_query') or flask.request.args.get('view')
         stored_query = spec_loader.get_stored_query(query_name)
-        stored_query_source = 'LET ws_ids = @ws_ids ' + stored_query['query']
+        stored_query_source = json_body.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + stored_query['query']
         if 'params' in stored_query:
             # Validate the user params for the query
             json_validation.Validator(stored_query['params']).validate(json_body)

@@ -26,7 +26,7 @@ def server_status():
         return 'unknown_failure'
 
 
-def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=100, full_count=False):
+def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=10000, full_count=False):
     """Run a query using the arangodb http api. Can return a cursor to get more results."""
     url = _CONF['api_url'] + '/cursor'
     req_json = {
