@@ -1,0 +1,29 @@
+---
+name: GO_edges_replaced_by
+type: edge
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: GO_edges_replaced_by
+    type: object
+    description: A entry for replaced_by edges in the Gene Ontology (GO) hierarchy
+    properties:
+      id:
+        type: string
+        description: GO id
+        examples:
+        - GO:0000108__GO:0000109__replaced_by
+        - GO:0000174__GO:0000750__replaced_by
+      from:
+        type: string
+        description: GO id
+        examples:
+        - GO:0023052
+      to:
+        type: string
+        title: GO id
+        examples:
+        - GO:0008150
+    required:
+    - id
+    - from
+    - to

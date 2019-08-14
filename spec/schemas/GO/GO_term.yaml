@@ -75,6 +75,11 @@ schema:
       - - GO:0042254
       - - GO:0008104
         - GO:0051019
+    is_obsolete:
+      type: boolean
+      description: Whether or not this term is obsolete.
+      examples: [true]
+      default: false
     created_by:
       type: string
       description: Optional tag added by OBO-Edit to indicate the creator of the term
