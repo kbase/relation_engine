@@ -1,0 +1,33 @@
+# Get the taxon vertex associated with a versioned workspace object
+
+name: wsfull_get_associated_taxa
+
+params:
+  type: object
+  required: [id]
+  properties:
+    id:
+      type: string
+      title: Object ID
+      description: ID of the wsfull versioned object to find associated taxa
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+
+query_prefix: WITH ncbi_taxon
+query: |
+  for obj in wsfull_object_version
+    filter obj._id == @id
+    for tax, e in 1..1 outbound obj wsfull_obj_version_has_taxon
+      limit @offset, @limit
+      return {
+        taxon: UNSET(tax, "_key", "_rev"),
+        edge: UNSET(e, "_key", "_from", "_to", "_rev")
+      }

@@ -4,39 +4,11 @@ Tests for the ncbi taxonomy stored queries.
 import json
 import unittest
 import requests
-# import time
 
 from test.helpers import get_config
+from test.stored_queries.helpers import create_test_docs
 
 _CONF = get_config()
-
-
-def create_test_docs(ncbi_taxon, ncbi_child_of_taxon):
-    """Create edges and vertices we need for tests."""
-    body = '\n'.join([json.dumps(d) for d in ncbi_taxon])
-    resp = requests.put(
-        _CONF['re_api_url'] + '/api/v1/documents',
-        params={'overwrite': True, 'collection': 'ncbi_taxon'},
-        data=body,
-        headers={'Authorization': 'admin_token'}
-    )
-    if not resp.ok:
-        raise RuntimeError(resp.text)
-    ncbi_taxon_results = resp.json()
-    body = '\n'.join([json.dumps(d) for d in ncbi_child_of_taxon])
-    resp = requests.put(
-        _CONF['re_api_url'] + '/api/v1/documents',
-        params={'overwrite': True, 'collection': 'ncbi_child_of_taxon'},
-        data=body,
-        headers={'Authorization': 'admin_token'}
-    )
-    if not resp.ok:
-        raise RuntimeError(resp.text)
-    ncbi_child_of_taxon_results = resp.json()
-    return {
-        'ncbi_taxon': ncbi_taxon_results,
-        'ncbi_child_of_taxon': ncbi_child_of_taxon_results
-    }
 
 
 class TestNcbiTax(unittest.TestCase):
@@ -61,7 +33,8 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
             {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
         ]
-        create_test_docs(taxon_docs, child_docs)
+        create_test_docs('ncbi_taxon', taxon_docs)
+        create_test_docs('ncbi_child_of_taxon', child_docs)
 
     def test_get_lineage_valid(self):
         """Test a valid query of taxon lineage."""
