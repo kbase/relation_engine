@@ -1,0 +1,44 @@
+# Get the workspace objects associated with a taxon
+
+name: ncbi_taxon_get_associated_ws_objects
+
+params:
+  type: object
+  required: [id]
+  properties:
+    id:
+      type: string
+      title: Taxon ID
+      description: ID of the taxon vertex to find associated taxa
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+
+query_prefix: WITH ncbi_taxon, wsfull_object_version, wsfull_workspace
+query: |
+  let count = COUNT(
+    for tax in ncbi_taxon
+      filter tax._id == @id
+      for obj in 1..1 inbound tax wsfull_obj_version_has_taxon
+        return 1
+  )
+  let results = (
+    for tax in ncbi_taxon
+      filter tax._id == @id
+      for obj, e in 1..1 inbound tax wsfull_obj_version_has_taxon
+        for ws in 1..1 inbound obj wsfull_ws_contains_obj
+          filter ws.is_public or ws._key IN ws_ids
+          limit @offset, @limit
+          return {
+            ws_obj: UNSET(obj, "_key", "_rev"),
+            edge: UNSET(e, "_key", "_from", "_to", "_rev")
+          }
+  )
+  return {results, total_count: count}

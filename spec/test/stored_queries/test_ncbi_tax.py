@@ -11,6 +11,21 @@ from test.stored_queries.helpers import create_test_docs
 _CONF = get_config()
 
 
+def _construct_ws_obj(wsid, objid, ver):
+    """Test helper to create a wsfull_object_version vertex."""
+    return {
+        '_key': f"{wsid}:{objid}:{ver}",
+        'workspace_id': wsid,
+        'object_id': objid,
+        'version': ver,
+        'name': f'obj_name{objid}',
+        'hash': 'xyz',
+        'size': 100,
+        'epoch': 0,
+        'deleted': False
+    }
+
+
 class TestNcbiTax(unittest.TestCase):
 
     @classmethod
@@ -33,8 +48,28 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
             {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
         ]
+        obj_docs = [
+            _construct_ws_obj(1, 1, 1),
+            _construct_ws_obj(1, 1, 2),
+            _construct_ws_obj(2, 1, 1),
+        ]
+        obj_to_taxa_docs = [
+            {'_from': 'wsfull_object_version/1:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn1'},
+            {'_from': 'wsfull_object_version/1:1:2', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
+            {'_from': 'wsfull_object_version/2:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
+        ]
+        ws_docs = [{'_key': '1', 'is_public': True}, {'_key': '2', 'is_public': False}]
+        ws_to_obj = [
+            {'_from': 'wsfull_workspace/1', '_to': 'wsfull_object_version/1:1:1'},
+            {'_from': 'wsfull_workspace/1', '_to': 'wsfull_object_version/1:1:2'},
+            {'_from': 'wsfull_workspace/2', '_to': 'wsfull_object_version/2:1:1'},
+        ]
         create_test_docs('ncbi_taxon', taxon_docs)
         create_test_docs('ncbi_child_of_taxon', child_docs)
+        create_test_docs('wsfull_object_version', obj_docs)
+        create_test_docs('wsfull_obj_version_has_taxon', obj_to_taxa_docs)
+        create_test_docs('wsfull_workspace', ws_docs)
+        create_test_docs('wsfull_ws_contains_obj', ws_to_obj)
 
     def test_get_lineage_valid(self):
         """Test a valid query of taxon lineage."""
@@ -185,3 +220,22 @@ class TestNcbiTax(unittest.TestCase):
         ).json()
         self.assertEqual(resp['count'], 1)
         self.assertEqual(resp['results'][0]['_id'], 'ncbi_taxon/1')
+
+    def test_get_associated_objs(self):
+        """
+        Test a valid query to get associated objects for a taxon.
+        Two objects are public and one is private, so total_count will be 3 while only the public objects are returned.
+        """
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_associated_ws_objects'},
+            data=json.dumps({'id': 'ncbi_taxon/1'}),
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        results = resp['results'][0]
+        self.assertEqual(results['total_count'], 3)
+        self.assertEqual(len(results['results']), 2)
+        assignments = {ret['edge']['assigned_by'] for ret in results['results']}
+        ids = {ret['ws_obj']['_id'] for ret in results['results']}
+        self.assertEqual(assignments, {'assn1', 'assn2'})
+        self.assertEqual(ids, {'wsfull_object_version/1:1:1', 'wsfull_object_version/1:1:2'})
