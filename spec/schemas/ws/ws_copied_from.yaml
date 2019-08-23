@@ -1,4 +1,4 @@
-name: wsfull_copied_from
+name: ws_copied_from
 type: edge
 schema:
   "$schema": http://json-schema.org/draft-07/schema#

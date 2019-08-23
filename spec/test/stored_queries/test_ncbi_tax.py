@@ -11,8 +11,8 @@ from test.stored_queries.helpers import create_test_docs
 _CONF = get_config()
 
 
-def _construct_ws_obj(wsid, objid, ver):
-    """Test helper to create a wsfull_object_version vertex."""
+def _construct_ws_obj(wsid, objid, ver, is_public=False):
+    """Test helper to create a ws_object_version vertex."""
     return {
         '_key': f"{wsid}:{objid}:{ver}",
         'workspace_id': wsid,
@@ -22,7 +22,8 @@ def _construct_ws_obj(wsid, objid, ver):
         'hash': 'xyz',
         'size': 100,
         'epoch': 0,
-        'deleted': False
+        'deleted': False,
+        'is_public': is_public,
     }
 
 
@@ -49,27 +50,27 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
         ]
         obj_docs = [
-            _construct_ws_obj(1, 1, 1),
-            _construct_ws_obj(1, 1, 2),
-            _construct_ws_obj(2, 1, 1),
+            _construct_ws_obj(1, 1, 1, is_public=True),
+            _construct_ws_obj(1, 1, 2, is_public=True),
+            _construct_ws_obj(2, 1, 1, is_public=False),
         ]
         obj_to_taxa_docs = [
-            {'_from': 'wsfull_object_version/1:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn1'},
-            {'_from': 'wsfull_object_version/1:1:2', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
-            {'_from': 'wsfull_object_version/2:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
+            {'_from': 'ws_object_version/1:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn1'},
+            {'_from': 'ws_object_version/1:1:2', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
+            {'_from': 'ws_object_version/2:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
         ]
         ws_docs = [{'_key': '1', 'is_public': True}, {'_key': '2', 'is_public': False}]
         ws_to_obj = [
-            {'_from': 'wsfull_workspace/1', '_to': 'wsfull_object_version/1:1:1'},
-            {'_from': 'wsfull_workspace/1', '_to': 'wsfull_object_version/1:1:2'},
-            {'_from': 'wsfull_workspace/2', '_to': 'wsfull_object_version/2:1:1'},
+            {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:1'},
+            {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:2'},
+            {'_from': 'ws_workspace/2', '_to': 'ws_object_version/2:1:1'},
         ]
         create_test_docs('ncbi_taxon', taxon_docs)
         create_test_docs('ncbi_child_of_taxon', child_docs)
-        create_test_docs('wsfull_object_version', obj_docs)
-        create_test_docs('wsfull_obj_version_has_taxon', obj_to_taxa_docs)
-        create_test_docs('wsfull_workspace', ws_docs)
-        create_test_docs('wsfull_ws_contains_obj', ws_to_obj)
+        create_test_docs('ws_object_version', obj_docs)
+        create_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs)
+        create_test_docs('ws_workspace', ws_docs)
+        create_test_docs('ws_workspace_contains_obj', ws_to_obj)
 
     def test_get_lineage_valid(self):
         """Test a valid query of taxon lineage."""
@@ -238,4 +239,4 @@ class TestNcbiTax(unittest.TestCase):
         assignments = {ret['edge']['assigned_by'] for ret in results['results']}
         ids = {ret['ws_obj']['_id'] for ret in results['results']}
         self.assertEqual(assignments, {'assn1', 'assn2'})
-        self.assertEqual(ids, {'wsfull_object_version/1:1:1', 'wsfull_object_version/1:1:2'})
+        self.assertEqual(ids, {'ws_object_version/1:1:1', 'ws_object_version/1:1:2'})

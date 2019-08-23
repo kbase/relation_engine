@@ -1,4 +1,4 @@
-# Workspace edges (full details)
+# Workspace schemas (full details)
 
 These schemas comprise a full, detailed sync of all the data from the KBase workspace.
 

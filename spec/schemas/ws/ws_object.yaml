@@ -1,4 +1,4 @@
-name: wsfull_object
+name: ws_object
 type: vertex
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
@@ -21,3 +21,6 @@ schema:
       minimum: 1
     deleted:
       type: boolean
+    is_public:
+      type: boolean
+      deafult: false

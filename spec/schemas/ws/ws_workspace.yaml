@@ -1,4 +1,4 @@
-name: wsfull_workspace
+name: ws_workspace
 type: vertex
 schema:
   "$schema": "http://json-schema.org/draft-07/schema#"

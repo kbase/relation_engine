@@ -21,24 +21,23 @@ params:
       description: Result offset for pagination
       maximum: 100000
 
-query_prefix: WITH ncbi_taxon, wsfull_object_version, wsfull_workspace
+query_prefix: WITH ncbi_taxon, ws_object_version, ws_workspace
 query: |
   let count = COUNT(
     for tax in ncbi_taxon
       filter tax._id == @id
-      for obj in 1..1 inbound tax wsfull_obj_version_has_taxon
+      for obj in 1..1 inbound tax ws_obj_version_has_taxon
         return 1
   )
   let results = (
     for tax in ncbi_taxon
       filter tax._id == @id
-      for obj, e in 1..1 inbound tax wsfull_obj_version_has_taxon
-        for ws in 1..1 inbound obj wsfull_ws_contains_obj
-          filter ws.is_public or ws._key IN ws_ids
-          limit @offset, @limit
-          return {
-            ws_obj: UNSET(obj, "_key", "_rev"),
-            edge: UNSET(e, "_key", "_from", "_to", "_rev")
-          }
+      for obj, e in 1..1 inbound tax ws_obj_version_has_taxon
+        filter obj.is_public or obj.workspace_id IN ws_ids
+        limit @offset, @limit
+        return {
+          ws_obj: UNSET(obj, "_key", "_rev"),
+          edge: UNSET(e, "_key", "_from", "_to", "_rev")
+        }
   )
   return {results, total_count: count}

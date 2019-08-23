@@ -1,4 +1,4 @@
-name: wsfull_user
+name: ws_type_module
 type: vertex
 schema:
   "$schema": "http://json-schema.org/draft-07/schema#"
@@ -8,7 +8,5 @@ schema:
   properties:
     _key:
       type: string
-      description: The username for this user
-      examples:
-      - jjeffryes
-      - sean-mccorkle3
+      examples: [KBaseGenomes]
+      pattern: "^\\w+$"

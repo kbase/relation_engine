@@ -1,14 +1,14 @@
-name: wsfull_module_contains_method
+name: ws_workspace_contains_obj
 type: edge
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
-  description: A module contains an SDK method
+  description: A workspace contains an object
   required: [_from, _to]
   properties:
     _from:
       type: string
-      description: The module ID.
+      description: The ID of the workspace
     _to:
       type: string
-      description: The SDK method ID
+      description: The ID of the object

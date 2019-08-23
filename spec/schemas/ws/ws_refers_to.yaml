@@ -1,10 +1,10 @@
-name: wsfull_prov_descendant_of
+name: ws_refers_to
 type: edge
 schema:
   "$schema": "http://json-schema.org/draft-07/schema#"
   type: object
   required: [_from, _to]
-  description: The _from object is a provenance descendant of the _to object (eg. Assembly->Reads).
+  description: The _from object has a reference to the _to object (eg. Genome->Assembly).
   properties:
     _from: {type: string}
     _to: {type: string}

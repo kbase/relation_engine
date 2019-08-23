@@ -1,4 +1,4 @@
-name: wsfull_type_consumed_by_method
+name: ws_type_consumed_by_method
 type: edge
 schema:
   "$schema": "http://json-schema.org/draft-07/schema#"

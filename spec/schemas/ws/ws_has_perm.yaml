@@ -1,4 +1,4 @@
-name: wsfull_ws_perm
+name: ws_has_perm
 type: edge
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
@@ -15,9 +15,9 @@ schema:
         'administrator', 'w' is read/write, 'r' is readonly.
     _from:
       type: string
-      examples: ['wsfull_user/jjeffryes']
+      examples: ['ws_user/jjeffryes']
       description: A username
     _to:
       type: string
-      examples: ['wsfull_workspace/35414']
+      examples: ['ws_workspace/35414']
       description: A workspace
