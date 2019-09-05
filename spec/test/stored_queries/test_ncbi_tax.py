@@ -27,6 +27,18 @@ def _construct_ws_obj(wsid, objid, ver, is_public=False):
     }
 
 
+def _create_delta_test_docs(coll_name, docs, edge=False):
+    """Add in delta required fields."""
+    if edge:
+        for doc in docs:
+            doc['from'] = doc['_from']
+            doc['to'] = doc['_to']
+    else:
+        for doc in docs:
+            doc['id'] = doc['_key']
+    create_test_docs(coll_name, docs)
+
+
 class TestNcbiTax(unittest.TestCase):
 
     @classmethod
@@ -65,12 +77,12 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:2'},
             {'_from': 'ws_workspace/2', '_to': 'ws_object_version/2:1:1'},
         ]
-        create_test_docs('ncbi_taxon', taxon_docs)
-        create_test_docs('ncbi_child_of_taxon', child_docs)
-        create_test_docs('ws_object_version', obj_docs)
-        create_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs)
-        create_test_docs('ws_workspace', ws_docs)
-        create_test_docs('ws_workspace_contains_obj', ws_to_obj)
+        _create_delta_test_docs('ncbi_taxon', taxon_docs)
+        _create_delta_test_docs('ncbi_child_of_taxon', child_docs, edge=True)
+        _create_delta_test_docs('ws_object_version', obj_docs)
+        _create_delta_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs, edge=True)
+        _create_delta_test_docs('ws_workspace', ws_docs)
+        _create_delta_test_docs('ws_workspace_contains_obj', ws_to_obj, edge=True)
 
     def test_get_lineage_valid(self):
         """Test a valid query of taxon lineage."""

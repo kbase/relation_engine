@@ -65,12 +65,16 @@ def validate_json_schemas():
             _fatal('Schemas must be an object. Schema in %s is not an object.' % path)
         required = data['schema'].get('required', [])
         # Edges must require _from and _to while vertices must require _key
-        has_from_underscore = ('_from' in required and '_to' in required)
-        has_from = ('from' in required and 'to' in required)
-        if data['type'] == 'edge' and not has_from_underscore and not has_from:
-            _fatal('Edge schemas must require _from and _to attributes in ' + path)
-        elif data['type'] == 'vertex' and '_key' not in required and 'id' not in required:
-            _fatal('Vertex schemas must require the _key attribute in ' + path)
+        has_edge_fields = ('_from' in required and '_to' in required)
+        has_delta_edge_fields = ('from' in required and 'to' in required)
+        if data['type'] == 'edge' and data.get('delta') and not has_delta_edge_fields:
+            _fatal('Time-travel edge schemas must require "from" and "to" attributes in ' + path)
+        elif data['type'] == 'edge' and not data.get('delta') and not has_edge_fields:
+            _fatal('Edge schemas must require "_from" and "_to" attributes in ' + path)
+        elif data['type'] == 'vertex' and data.get('delta') and 'id' not in required:
+            _fatal('Time-travel vertex schemas must require the "id" attribute in ' + path)
+        elif data['type'] == 'vertex' and not data.get('delta') and '_key' not in required:
+            _fatal('Vertex schemas must require the "_key" attribute in ' + path)
         print(f'✓ {name} is valid.')
     print('..all valid.')
 

@@ -1,15 +1,17 @@
 name: ncbi_child_of_taxon
 type: edge
+delta: true
+
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
-  required: [_from, _to, child_type]
+  required: [from, to, child_type]
   description: Edges which create the taxonomy tree for NCBI taxons.
   properties:
-    _from:
+    from:
       type: string
       description: The child. A gtdb_taxon or gtdb_organism.
-    _to:
+    to:
       type: string
       description: The parent gtdb_taxon
     child_type:
