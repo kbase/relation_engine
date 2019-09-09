@@ -15,7 +15,7 @@ _CONF = get_config()
 def server_status():
     """Get the status of our connection and authorization to the ArangoDB server."""
     try:
-        resp = requests.get(_CONF['db_url'] + '/_api/endpoint', auth=(_CONF['db_user'], _CONF['db_pass']))
+        resp = requests.get(_CONF['db_url'] + '/_api/database/current', auth=(_CONF['db_user'], _CONF['db_pass']))
     except requests.exceptions.ConnectionError:
         return 'no_connection'
     if resp.ok:
