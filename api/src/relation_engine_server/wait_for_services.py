@@ -16,7 +16,7 @@ def main():
             requests.get(_CONFIG['workspace_url'])
             requests.get(_CONFIG['auth_url'])
             auth = (_CONFIG['db_user'], _CONFIG['db_pass'])
-            requests.get(_CONFIG['db_url'] + '/_admin/cluster/health', auth=auth).raise_for_status()
+            requests.get(_CONFIG['db_url'] + '/_api/database/current', auth=auth).raise_for_status()
             break
         except Exception:
             print('Waiting for services..')
