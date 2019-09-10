@@ -57,7 +57,7 @@ def run_query():
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
         query_text = json_body['query']
-        query_text = json_body.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + query_text
+        query_text = _preprocess_stored_query(json_body['query'], json_body)
         del json_body['query']
         json_body['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=query_text,
@@ -71,7 +71,7 @@ def run_query():
         # "stored_query" is the more accurate name
         query_name = flask.request.args.get('stored_query') or flask.request.args.get('view')
         stored_query = spec_loader.get_stored_query(query_name)
-        stored_query_source = stored_query.get('query_prefix', '') + ' LET ws_ids = @ws_ids ' + stored_query['query']
+        stored_query_source = _preprocess_stored_query(stored_query['query'], stored_query)
         if 'params' in stored_query:
             # Validate the user params for the query
             json_validation.Validator(stored_query['params']).validate(json_body)
@@ -135,3 +135,13 @@ def show_config():
         'db_name': conf['db_name'],
         'spec_url': conf['spec_url']
     })
+
+
+def _preprocess_stored_query(query_text, config):
+    """Inject some default code into each stored query."""
+    return (
+        config.get('query_prefix', '') +
+        " LET ws_ids = @ws_ids " +
+        " LET maxint = 9007199254740991 " +
+        query_text
+    )
