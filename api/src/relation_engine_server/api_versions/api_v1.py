@@ -142,6 +142,6 @@ def _preprocess_stored_query(query_text, config):
     return (
         config.get('query_prefix', '') +
         " LET ws_ids = @ws_ids " +
-        " LET maxint = 9007199254740991 " +
+        # " LET maxint = 9007199254740991 " +
         query_text
     )
