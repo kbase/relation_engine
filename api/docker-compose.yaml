@@ -44,8 +44,7 @@ services:
 
   # Arangodb server in cluster mode
   arangodb:
-    image: arangodb:3.4
+    image: arangodb:3.5
     ports:
       - "127.0.0.1:8529:8529"
-    command: sh -c "arangodb create jwt-secret --secret=jwtSecret &&
-                    arangodb --starter.local --auth.jwt-secret=./jwtSecret"
+    command: sh -c "arangodb --starter.local"

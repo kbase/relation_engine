@@ -47,7 +47,7 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=10000,
         if bind_vars:
             req_json['bindVars'] = bind_vars
     # Initialize the readonly user
-    _init_readonly_user()
+    # _init_readonly_user()
     # Run the query as the readonly user
     resp = requests.request(
         method,
@@ -138,46 +138,45 @@ def import_from_file(file_path, query):
     return resp.text
 
 
-def _init_readonly_user():
-    """
-    Using the admin user, initialize an admin readonly user for use with ad-hoc queries.
-
-    If the user cannot be created, we raise an ArangoServerError
-    If the user already exists, or is successfully created, we return None and do not raise.
-    """
-    user = _CONF['db_readonly_user']
-    # Check if the user exists, in which case this is a no-op
-    resp = requests.get(
-        _CONF['api_url'] + '/user/' + user,
-        auth=(_CONF['db_user'], _CONF['db_pass'])
-    )
-    if resp.status_code == 200:
-        return
-    # Create the user
-    resp = requests.post(
-        _CONF['api_url'] + '/user',
-        data=json.dumps({'user': user, 'passwd': _CONF['db_readonly_user']}),
-        auth=(_CONF['db_user'], _CONF['db_pass'])
-    )
-    if resp.status_code != 201:
-        raise ArangoServerError(resp.text)
-    db_grant_path = _CONF['api_url'] + '/user/' + user + '/database/' + _CONF['db_name']
-    # Grant read access to the current database
-    resp = requests.put(
-        db_grant_path,
-        data='{"grant": "ro"}',
-        auth=(_CONF['db_user'], _CONF['db_pass'])
-    )
-    if resp.status_code != 200:
-        raise ArangoServerError(resp.text)
-    # Grant read access to all collections
-    resp = requests.put(
-        db_grant_path + '/*',
-        data='{"grant": "ro"}',
-        auth=(_CONF['db_user'], _CONF['db_pass'])
-    )
-    if not resp.ok:
-        raise ArangoServerError(resp.text)
+# def _init_readonly_user():
+#     """
+#     Using the admin user, initialize an admin readonly user for use with ad-hoc queries.
+#     If the user cannot be created, we raise an ArangoServerError
+#     If the user already exists, or is successfully created, we return None and do not raise.
+#     """
+#     user = _CONF['db_readonly_user']
+#     # Check if the user exists, in which case this is a no-op
+#     resp = requests.get(
+#         _CONF['api_url'] + '/user/' + user,
+#         auth=(_CONF['db_user'], _CONF['db_pass'])
+#     )
+#     if resp.status_code == 200:
+#         return
+#     # Create the user
+#     resp = requests.post(
+#         _CONF['api_url'] + '/user',
+#         data=json.dumps({'user': user, 'passwd': _CONF['db_readonly_user']}),
+#         auth=(_CONF['db_user'], _CONF['db_pass'])
+#     )
+#     if resp.status_code != 201:
+#         raise ArangoServerError(resp.text)
+#     db_grant_path = _CONF['api_url'] + '/user/' + user + '/database/' + _CONF['db_name']
+#     # Grant read access to the current database
+#     resp = requests.put(
+#         db_grant_path,
+#         data='{"grant": "ro"}',
+#         auth=(_CONF['db_user'], _CONF['db_pass'])
+#     )
+#     if resp.status_code != 200:
+#         raise ArangoServerError(resp.text)
+#     # Grant read access to all collections
+#     resp = requests.put(
+#         db_grant_path + '/*',
+#         data='{"grant": "ro"}',
+#         auth=(_CONF['db_user'], _CONF['db_pass'])
+#     )
+#     if not resp.ok:
+#         raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):
