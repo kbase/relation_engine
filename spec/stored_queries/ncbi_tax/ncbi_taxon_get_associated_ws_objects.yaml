@@ -4,11 +4,11 @@ name: ncbi_taxon_get_associated_ws_objects
 
 params:
   type: object
-  required: [id]
+  required: [taxon_id, ts]
   properties:
-    id:
+    taxon_id:
       type: string
-      title: Taxon ID
+      title: NCBI Taxon ID
       description: ID of the taxon vertex to find associated taxa
     limit:
       type: integer
@@ -20,18 +20,24 @@ params:
       default: 0
       description: Result offset for pagination
       maximum: 100000
-
-query_prefix: WITH ncbi_taxon, ws_object_version, ws_workspace
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH ws_object_version
 query: |
   let count = COUNT(
     for tax in ncbi_taxon
-      filter tax._id == @id
+      filter tax.id == @taxon_id
+      filter tax.created <= @ts AND tax.expired >= @ts
+      limit 1
       for obj in 1..1 inbound tax ws_obj_version_has_taxon
         return 1
   )
   let results = (
     for tax in ncbi_taxon
-      filter tax._id == @id
+      filter tax.id == @taxon_id
+      filter tax.created <= @ts AND tax.expired >= @ts
+      limit 1
       for obj, e in 1..1 inbound tax ws_obj_version_has_taxon
         filter obj.is_public or obj.workspace_id IN ws_ids
         limit @offset, @limit

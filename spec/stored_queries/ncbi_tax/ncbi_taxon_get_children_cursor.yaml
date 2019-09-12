@@ -2,20 +2,19 @@
 name: ncbi_taxon_get_children_cursor
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
-      description: Key of the taxon vertex for which you want to find descendants
+      title: Document ID
+      description: ID of the taxon vertex for which you want to find descendants
+    ts:
+      type: integer
+      title: Versioning timestamp
 query: |
-  let tax_id = CONCAT("ncbi_taxon/", @key)
-  // Fetch the child IDs using the edge attributes
-  let child_ids = (
-    for e in ncbi_child_of_taxon
-      filter e._to == tax_id
-      return e._from
-  )
   for tax in ncbi_taxon
-    filter tax._id in child_ids
-    return tax
+    filter tax.id == @id
+    filter tax.created <= @ts AND tax.expired >= @ts
+    limit 1
+    for child in 1..1 inbound tax ncbi_child_of_taxon
+      return tax

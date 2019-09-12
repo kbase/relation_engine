@@ -2,12 +2,12 @@
 name: ncbi_taxon_get_children
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
-      description: Key of the taxon vertex for which you want to find descendants
+      title: Document ID
+      description: ID of the taxon vertex for which you want to find descendants
     limit:
       type: integer
       default: 20
@@ -22,26 +22,27 @@ params:
       type: string
       description: Search scientific name
       default: ''
+    ts:
+      type: integer
+      title: Versioning timestamp
 query: |
-  let tax_id = CONCAT("ncbi_taxon/", @key)
   // Fetch the child IDs using the edge attributes
-  let child_ids = (
-      for e in ncbi_child_of_taxon
-        filter e._to == tax_id
-        return e._from
+  let children = (
+      for parent in ncbi_taxon
+        filter parent.id == @id
+        filter parent.created <= @ts AND parent.expired >= @ts
+        limit 1
+        for tax in 1..1 inbound parent ncbi_child_of_taxon
+            return tax
   )
   // Sort and filter the children
+  // Should only get evaluated if search_text is truthy
   let searched = (
       for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
-        filter tax._id in child_ids
+        filter tax in children
         return tax
   )
-  let not_searched = (
-      for tax in ncbi_taxon
-        filter tax._id in child_ids
-        return tax
-  )
-  let filtered = @search_text ? searched : not_searched
+  let filtered = @search_text ? searched : children
   let results = (
     for tax in filtered
       sort tax.scientific_name asc

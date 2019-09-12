@@ -2,13 +2,17 @@
 name: ncbi_fetch_taxon
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
-      description: Taxonomy ID (document _key) for the taxon to fetch
+      title: NCBI Taxonomy ID
+    ts:
+      type: integer
+      title: Versioning timestamp
 query: |
   for t in ncbi_taxon
-      filter t._key == @key
+      filter t.id == @id
+      filter t.created <= @ts AND t.expired >= @ts
+      limit 1
       return t
