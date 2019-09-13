@@ -12,102 +12,137 @@ schema:
       type: string
       description: The unique id of the current term.
       examples:
-      - GO:0022609
-      - GO:0044848
-    name:
+        - GO:0022609
+        - GO:0044848
+    type:
       type: string
-      description: The term name. Any term may have only one name defined.
+      description: The type of the node.
       examples:
-      - mitochondrial genome maintenance
-      - reproduction
+        - CLASS
+        - INDIVIDUAL
+    name:
+      type: ["null", "string"]   # some OBO classes have no label
+      description: The term name.
+      examples:
+        - mitochondrial genome maintenance
+        - reproduction
     namespace:
-      type: string
+      type: ["null", "string"]   # some OBO classes have no namespace
       description: Denotes which of the three sub-ontologies the term belongs to.
       examples:
         - cellular component
         - biological process
         - molecular function
-    alt_id:
+    alt_ids:
       type: array
+      items:
+        type: string
       description: Defines an alternate id for this term. A term may have any number
         of alternate ids.
       examples:
-      - - GO:0019952
-        - GO:0050876
-      - - GO:0044848
+        - ["GO:0019952"]
+        - ["GO:0050876"]
+        - ["GO:0044848"]
     def:
-      type: string
-      description: 'The definition of the current term. '
-      examples:
-      - "'The directed movement of a ribosomal subunit from the nucleus into the cytoplasm.'
-        [GOC:ai]"
-      - "'Catalysis of the reaction: adenine + H2O = hypoxanthine + NH3.' [EC:3.5.4.2]"
-    comment:
-      type: string
-      description: A comment for this term.
-      examples:
-      - This term was made obsolete because it refers to a class of gene products and
-        a biological process rather than a molecular function.
-    subset:
+      type: ["null", "object"]    # some OBO classes have no definition
+      description: The definition of the current term.
+      required:
+        - val
+      properties:
+        pred:
+          type: string
+          description: The definition predicate
+        val:
+          type: string
+          description: The definition value
+          examples:
+            - Any process that modulates the frequency, rate or extent of glycolysis.
+        xrefs:
+          type: array
+          description: A dbxref that describes an analagous term in another vocabulary
+          items:
+            type: string
+          examples:
+            - ["GOC:go_curators"]
+            - ["ISBN:0815340729"]
+    comments:
       type: array
+      items:
+        type: string
+      description: Comments for this term.
+      examples:
+        - ["This term was made obsolete because it refers to a class of gene products and
+           a biological process rather than a molecular function."]
+    subsets:
+      type: array
+      items:
+        type: string
       description: This tag indicates a term subset to which this term belongs.
       examples:
-      - - goslim_yeast
-      - - goslim_chembl
-        - goslim_metagenomics
-        - goslim_pir
-        - goslim_plant
-    synonym:
-      type: array
+        - ["goslim_yeast"]
+        - ["goslim_chembl"]
+        - ["goslim_metagenomics"]
+        - ["goslim_pir"]
+        - ["goslim_plant"]
+    synonyms:
       description: This tag gives a synonym for this term, some xrefs to describe the
         origins of the synonym, and may indicate a synonym category or scope information.
-      examples:
-      - - "'L-methionine porter activity' RELATED []"
-      - - "'ribonuclease mitochondrial RNA processing complex' EXACT []"
-        - "'RNase MRP complex' EXACT []"
-    xref:
       type: array
-      description: A dbxref that describes an analagous term in another vocabulary
-      examples:
-      - - Wikipedia:Reproduction
-      - - KEGG_REACTION:R05612
-        - RHEA:20836
-      examples:
-      - - GO:0042254
-      - - GO:0008104
-        - GO:0051019
-    is_obsolete:
-      type: boolean
-      description: Whether or not this term is obsolete.
-      examples: [true]
-      default: false
-    created_by:
-      type: string
-      description: Optional tag added by OBO-Edit to indicate the creator of the term
-      examples:
-      - kchris
-    creation_date:
-      type: string
-      description: Optional tag added by OBO-Edit to indicate the creation time and
-        date of the term
-      examples:
-      - '2009-04-28T10:33:25Z'
+      items:
+        type: object
+        required:
+          - val
+        properties:
+          pred:
+            type: string
+            description: The synonym predicate
+            examples:
+              - hasBroadSynonym
+              - hasNarrowSynonym
+          val:
+            type: string
+            description: The synonym value
+            examples:
+              - regulation of blood angiotensin level
+          xrefs:
+            type: array
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+            examples:
+              - ["GOC:TermGenie"]
+    xrefs:
+      description:  DBxrefs that describes an analagous term in another vocabulary
+      type: array
+      items:
+        type: object
+        required:
+          - val
+        properties:
+          pred:
+            type: string
+            description: The xref predicate
+          val:
+            type: string
+            description: The xref value
+            examples:
+              - EC:2.3.1
+              - Reactome:REACT_10010
+          xrefs:
+            type: array
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+            examples:
+              - ["GOC:TermGenie"]
   required:
   - id
+  - type
   - name
-  optional:
-  - alt_id
+  - namespace
+  - alt_ids
   - def
-  - comment
-  - subset
-  - synonym
-  - xref
-  - is_a
-  - intersection_of
-  - disjoint_from
-  - relationship
-  - is_obsolete
-  - replaced_by
-  - consider
-  - created_by
-  - creation_date
+  - comments
+  - subsets
+  - synonyms
+  - xrefs
