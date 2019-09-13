@@ -1,0 +1,34 @@
+name: ws_genome_features
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required:
+    - _key
+    - feature_id
+    - workspace_id
+    - object_id
+    - version
+  properties:
+    _key:
+      type: string
+      description: The UPA and feature ID for this data
+      examples: ["35414:73:1_RSP_4039"]
+      pattern: "^\\d+:\\d+:\\d+_\w*$"  # may need to expand the feature ID part
+    feature_id:
+      type: string
+      description: The unique ID of the feature within the genome
+      examples: ["RSP_4039"]
+      pattern: "^\w*$" # may need to expand
+    workspace_id:
+      type: integer
+      description: The workspace ID for the genome containing this feature
+      minimum: 1
+    object_id:
+      type: integer
+      description: The permanent object id for the genome containing this feature
+      minimum: 1
+    version:
+      type: integer
+      description: The version of the object containing this feature
+      minimum: 1
