@@ -3,13 +3,19 @@
 name: GO_get_metadata
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
+      title: Document ID
       description: Get information/metadata of a particular ontology term
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
 query: |
-  FOR v IN GO_test_term
-    FILTER v._key == @key
-    RETURN v
+  FOR t IN GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    RETURN t

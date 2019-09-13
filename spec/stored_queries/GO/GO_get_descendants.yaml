@@ -2,11 +2,11 @@
 name: GO_get_descendants
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
+      title: Document ID
       description: GO id of the term you want to get all the descendants of 
     limit:
         type: integer
@@ -18,9 +18,18 @@ params:
         default: 0
         description: Result offset for pagination
         maximum: 100000
-query_prefix: WITH GO_test_term
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
 query: |
-  FOR v, e IN 1..1000000 INBOUND CONCAT("GO_test_term/", @key) GO_test_edges_isa
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v, e IN 1..100 INBOUND t GO_edges
+      FILTER e.type == "is_a"
+      FILTER e.created <= @ts AND e.expired >= @ts
       SORT v._key ASC
       LIMIT @offset, @limit
       RETURN {term: v, edge: e}
