@@ -3,7 +3,7 @@
 name: ncbi_taxon_search_sci_name
 params:
   type: object
-  required: [search_text]
+  required: [search_text, ts]
   properties:
     search_text:
       type: string
@@ -17,11 +17,16 @@ params:
       type: integer
       default: 20
       maximum: 1000
+    ts:
+      type: integer
+      title: Versioning timestamp
 query: |
   // Search using the fulltext index on scientific_name
   // Don't limit the results yet so we can get the total_count below
   let results = (
     FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
+      // Filter non-expired docs
+      filter doc.created <= @ts AND doc.expired >= @ts
       return doc
   )
   // Limit the results
