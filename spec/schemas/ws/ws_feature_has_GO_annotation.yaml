@@ -1,0 +1,16 @@
+name: ws_feature_has_GO_annotation
+type: edge
+schema: 
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: A feature in a workspace genome has a Gene Ontology annotation.
+  required: [_from, _to]
+  properties:
+    _from:
+      type: string
+      examples: ['ws_genome_feature/75:82:3_RSP_4039']
+      description: The unique, permanent ID of a genome feature in a version of a workspace object.
+    _to:
+      type: string
+      examples: ['GO_terms/GO:0000002_v2018-03-06']
+      description: A Gene Ontology term.
