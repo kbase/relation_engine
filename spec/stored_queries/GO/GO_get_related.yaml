@@ -27,9 +27,7 @@ query: |
     FILTER t.id == @id
     FILTER t.created <= @ts AND t.expired >= @ts
     limit 1
-    FOR v, e IN 1 ANY t GO_edges, GO_edges_relationship
-      FILTER e.type == "is_a"
-        OR e.relationship_type != null
+    FOR v, e IN 1 ANY t GO_edges
       FILTER e.created <= @ts AND e.expired >= @ts
       SORT v.id ASC
       LIMIT @offset, @limit

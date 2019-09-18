@@ -29,8 +29,8 @@ query: |
     FILTER t.created <= @ts AND t.expired >= @ts
     limit 1
     FOR v, e IN 1..1 OUTBOUND t GO_edges
-      FILTER e.type == "is_a"
       FILTER e.created <= @ts AND e.expired >= @ts
+      FILTER e.type == "is_a"
       SORT v.id ASC
       LIMIT @offset, @limit
       RETURN {term: v, edge: e}

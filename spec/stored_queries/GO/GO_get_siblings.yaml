@@ -28,12 +28,12 @@ query: |
     FILTER t.created <= @ts AND t.expired >= @ts
     limit 1
     FOR v_parent, e_parent IN 1..1 OUTBOUND t GO_edges
-      FILTER e_parent.type == "is_a"
       FILTER e_parent.created <= @ts AND e_parent.expired >= @ts
-      FOR v_child, e_child in 1..1 INBOUND e_parent._to GO_edges
-        FILTER e_child._from != t._id
-        FILTER e_child.type == "is_a"
+      FILTER e_parent.type == "is_a"
+      FOR v_child, e_child in 1..1 INBOUND v_parent GO_edges
         FILTER e_child.created <= @ts AND e_child.expired >= @ts
+        FILTER e_child.type == "is_a"
+        FILTER v_child != t
         SORT v_child.id ASC
         LIMIT @offset, @limit
         RETURN v_child.id

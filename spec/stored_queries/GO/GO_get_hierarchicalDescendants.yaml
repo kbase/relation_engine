@@ -30,21 +30,10 @@ query: |
     FILTER t.id == @id
     FILTER t.created <= @ts AND t.expired >= @ts
     limit 1
-    LET results1 = (
-      FOR v_relationship, e_relationship IN 1..100 INBOUND t GO_edges_relationship
-      FILTER e_relationship.relationship_type == 'part_of'
-        OR e_relationship.relationship_type == 'has_part'
-        OR e_relationship.relationship_type == 'occurs_in'
-        FILTER e_relationship.created <= @ts AND e_relationship.expired >= @ts
-      RETURN {term: v_relationship, edge: e_relationship}
-    )
-    LET results2 = (
-      FOR v_isa, e_isa IN 1..100 INBOUND t GO_edges
-        FILTER e_isa.type == "is_a"
-        FILTER e_isa.created <= @ts AND e_isa.expired >= @ts
-        RETURN {term: v_isa, edge: e_isa}
-    )
-    FOR x IN UNION(results1, results2)
-      SORT x.id ASC
+    FOR v, e, p IN 1..100 INBOUND t GO_edges
+      PRUNE e != NULL AND (e.created > @ts OR e.expired < @ts)
+      FILTER p.edges[*].created ALL <= @ts AND p.edges[*].expired ALL >= @ts
+      FILTER p.edges[*].type ALL != NULL
+      SORT v.id ASC
       LIMIT @offset, @limit
-      RETURN DISTINCT x
+      RETURN {term: v, edge: e}
