@@ -3,7 +3,7 @@ type: edge
 delta: true
 
 indexes:
-  - type: hash  # odn't think this needs to be a skiplist / persistent index
+  - type: hash  # don't think this needs to be a skiplist / persistent index
     fields: [from]
 
 schema:
