@@ -2,11 +2,11 @@
 name: GO_get_siblings
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
+      title: Document ID
       description: Get all siblings of this term
     limit:
         type: integer
@@ -18,12 +18,22 @@ params:
         default: 0
         description: Result offset for pagination
         maximum: 100000
-query_prefix: WITH GO_test_term
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
 query: |
-  LET term_id = CONCAT("GO_test_term/", @key)
-  FOR v_parent, e_parent IN 1..1 OUTBOUND term_id GO_test_edges_isa
-    FOR v_child, e_child in 1..1 INBOUND e_parent._to GO_test_edges_isa
-      FILTER e_child._from != term_id
-      SORT v_child._key ASC
-      LIMIT @offset, @limit
-      RETURN v_child._key
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v_parent, e_parent IN 1..1 OUTBOUND t GO_edges
+      FILTER e_parent.created <= @ts AND e_parent.expired >= @ts
+      FILTER e_parent.type == "is_a"
+      FOR v_child, e_child in 1..1 INBOUND v_parent GO_edges
+        FILTER e_child.created <= @ts AND e_child.expired >= @ts
+        FILTER e_child.type == "is_a"
+        FILTER v_child != t
+        SORT v_child.id ASC
+        LIMIT @offset, @limit
+        RETURN v_child.id

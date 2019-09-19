@@ -5,11 +5,11 @@
 name: GO_get_hierarchicalDescendants
 params:
   type: object
-  required: [key]
+  required: [id, ts]
   properties:
-    key:
+    id:
       type: string
-      title: Document key
+      title: Document ID
       description: GO id of the term you want to get all the hierarchical descendants of
     limit:
         type: integer
@@ -21,21 +21,19 @@ params:
         default: 0
         description: Result offset for pagination
         maximum: 100000
-query_prefix: WITH GO_test_term
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
 query: |
-  LET term_id = CONCAT("GO_test_term/", @key)
-  LET results1 = (
-    FOR v_relationship, e_relationship IN 1..1000000 INBOUND term_id GO_test_edges_relationship
-      FILTER e_relationship.relationship_type == 'part_of'
-        OR e_relationship.relationship_type == 'has_part'
-        OR e_relationship.relationship_type == 'occurs_in'
-      RETURN {term: v_relationship, edge: e_relationship}
-  )
-  LET results2 = (
-    FOR v_isa, e_isa IN 1..1000000 INBOUND term_id GO_test_edges_isa
-      RETURN {term: v_isa, edge: e_isa}
-  )
-  FOR x IN UNION(results1, results2)
-    SORT x._key ASC
-    LIMIT @offset, @limit
-    RETURN DISTINCT x
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v, e, p IN 1..100 INBOUND t GO_edges
+      FILTER p.edges[*].created ALL <= @ts 
+        AND p.edges[*].expired ALL >= @ts 
+        AND p.edges[*].type ALL != NULL
+      SORT v.id ASC
+      LIMIT @offset, @limit
+      RETURN {term: v, edge: e}
