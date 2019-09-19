@@ -12,14 +12,14 @@ params:
       type: integer
       title: Versioning timestamp
     select:
-      type: array
+      type: [array, "null"]
       items: {type: string}
       description: Taxon fields to keep in the results
-      default: []
+      default: null
 query: |
   for tax in ncbi_taxon
     filter tax.id == @id
     filter tax.created <= @ts AND tax.expired >= @ts
     limit 1
     for child in 1..1 inbound tax ncbi_child_of_taxon
-      return KEEP(tax, @select)
+    return @select ? KEEP(tax, @select) : tax

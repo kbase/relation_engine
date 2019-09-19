@@ -21,10 +21,10 @@ params:
       type: integer
       title: Versioning timestamp
     select:
-      type: array
+      type: [array, "null"]
       items: {type: string}
       description: Taxon fields to keep in the results
-      default: []
+      default: null
 query: |
   // Search using the fulltext index on scientific_name
   // Don't limit the results yet so we can get the total_count below
@@ -38,6 +38,6 @@ query: |
   let limited = (
     for r in results
       limit @offset, @limit
-      return KEEP(r, @select)
+      return @select ? KEEP(r, @select) : r
   )
   return  {results: limited, total_count: COUNT(results)}

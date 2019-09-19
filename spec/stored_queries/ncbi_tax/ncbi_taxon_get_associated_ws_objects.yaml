@@ -24,15 +24,15 @@ params:
       type: integer
       title: Versioning timestamp
     select_obj:
-      type: array
+      type: [array, "null"]
       items: {type: string}
       title: WS obj fields to keep in the results
-      default: []
+      default: null
     select_edge:
-      type: array
+      type: [array, "null"]
       items: {type: string}
       description: Taxon edge fields to keep in the results
-      default: []
+      default: null
 query_prefix: WITH ws_object_version
 query: |
   let count = COUNT(
@@ -52,8 +52,8 @@ query: |
         filter obj.is_public or obj.workspace_id IN ws_ids
         limit @offset, @limit
         return {
-          ws_obj: KEEP(obj, @select_obj),
-          edge: KEEP(e, @select_edge)
+          ws_obj: @select_obj ? KEEP(obj, @select_obj) : obj,
+          edge: @select_edge ? KEEP(e, @select_edge) : e
         }
   )
   return {results, total_count: count}

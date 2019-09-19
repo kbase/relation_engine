@@ -215,8 +215,7 @@ class TestNcbiTax(unittest.TestCase):
             params={'stored_query': 'ncbi_taxon_search_sci_name'},
             data=json.dumps({
                 'ts': _NOW,
-                'search_text': "prefix:gamma,|prefix:alpha,|prefix:delta",
-                'select': ['scientific_name'],
+                'search_text': "prefix:gamma,|prefix:alpha,|prefix:delta"
             })
         ).json()
         result = resp['results'][0]
@@ -243,6 +242,19 @@ class TestNcbiTax(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp.json()['error'], "1001 is greater than the maximum of 1000")
+
+    def test_select_fields(self):
+        """Test that the 'select' works properly for one query."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_lineage'},
+            data=json.dumps({'ts': _NOW, 'id': '7', 'select': ['rank']})
+        ).json()
+        self.assertEqual(resp['count'], 2)
+        self.assertEqual(resp['results'], [
+            {'rank': 'Domain'},
+            {'rank': 'Phylum'}
+        ])
 
     def test_fetch_taxon(self):
         """Test a valid query to fetch a taxon."""
