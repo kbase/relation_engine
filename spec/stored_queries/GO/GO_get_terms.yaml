@@ -1,0 +1,22 @@
+# Get a set of terms by the term ID and a timestamp, maximum 10000
+
+name: GO_get_terms
+params:
+  type: object
+  required: [ids, ts]
+  properties:
+    ids:
+      type: list
+      items:
+        type: string
+      title: GO term IDs
+      description: The list of Go term IDs to be fetched
+      maxItems: 10000
+    ts:
+      type: integer
+      title: Versioning timestamp in milliseconds since the Unix epoch
+query: |
+  FOR d IN GO_terms
+    FILTER d.id in @ids
+    FILTER d.expired >= @ts AND d.created <= @ts
+    RETURN d
