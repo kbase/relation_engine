@@ -6,7 +6,7 @@ params:
   required: [ids, ts]
   properties:
     ids:
-      type: list
+      type: array
       items:
         type: string
       title: GO term IDs
