@@ -1,4 +1,4 @@
-# Get a set of 'replaced_by' merge edges from a set of terms by the term IDs , maximum 10000
+# Get a set of 'replaced_by' merge edges for a set of terms by the term IDs, maximum 10000
 
 name: GO_get_merges_from
 params:
