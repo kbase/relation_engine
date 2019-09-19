@@ -95,7 +95,7 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_lineage'},
-            data=json.dumps({'ts': _NOW, 'id': '7'}),
+            data=json.dumps({'ts': _NOW, 'id': '7', 'select': ['rank', 'scientific_name']}),
         ).json()
         self.assertEqual(resp['count'], 2)
         ranks = [r['rank'] for r in resp['results']]
@@ -108,7 +108,12 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_children'},
-            data=json.dumps({'id': '1', 'ts': _NOW, 'search_text': 'firmicutes,|proteobacteria'}),
+            data=json.dumps({
+                'id': '1',
+                'ts': _NOW,
+                'search_text': 'firmicutes,|proteobacteria',
+                'select': ['rank', 'scientific_name']
+            }),
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 2)
@@ -128,10 +133,15 @@ class TestNcbiTax(unittest.TestCase):
 
     def test_siblings_valid(self):
         """Test a valid query for siblings."""
+        # Querying from "Alphaproteobacteria"
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_siblings'},
-            data=json.dumps({'ts': _NOW, 'id': '5'}),  # Querying from "Alphaproteobacteria"
+            data=json.dumps({
+                'ts': _NOW,
+                'id': '5',
+                'select': ['rank', 'scientific_name']
+            })
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 2)
@@ -163,7 +173,7 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_search_sci_name'},
-            data=json.dumps({'ts': _NOW, 'search_text': 'prefix:bact'}),
+            data=json.dumps({'ts': _NOW, 'search_text': 'prefix:bact', 'select': ['scientific_name']}),
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 1)
@@ -203,7 +213,11 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_search_sci_name'},
-            data=json.dumps({'ts': _NOW, 'search_text': "prefix:gamma,|prefix:alpha,|prefix:delta"})
+            data=json.dumps({
+                'ts': _NOW,
+                'search_text': "prefix:gamma,|prefix:alpha,|prefix:delta",
+                'select': ['scientific_name'],
+            })
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 3)
@@ -238,7 +252,7 @@ class TestNcbiTax(unittest.TestCase):
             data=json.dumps({'ts': _NOW, 'id': '1'})
         ).json()
         self.assertEqual(resp['count'], 1)
-        self.assertEqual(resp['results'][0]['_id'], 'ncbi_taxon/1')
+        self.assertEqual(resp['results'][0]['id'], '1')
 
     def test_get_associated_objs(self):
         """
@@ -248,7 +262,7 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_associated_ws_objects'},
-            data=json.dumps({'ts': _NOW, 'taxon_id': '1'}),
+            data=json.dumps({'ts': _NOW, 'taxon_id': '1', 'select_obj': ['_id'], 'select_edge': ['assigned_by']}),
         ).json()
         self.assertEqual(resp['count'], 1)
         results = resp['results'][0]

@@ -22,10 +22,14 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
+    select:
+      type: array
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: []
 query: |
   // Fetch the siblings
-  let siblings = (
-    for t in ncbi_taxon
+  let siblings = ( for t in ncbi_taxon
       filter t.id == @id
       filter t.created <= @ts AND t.expired >= @ts
       limit 1
@@ -41,6 +45,6 @@ query: |
   let limited = (
     for tax in siblings
       limit @offset, @limit
-      return tax
+      return KEEP(tax, @select)
   )
   return {total_count: COUNT(siblings), results: limited}

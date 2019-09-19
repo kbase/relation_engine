@@ -25,6 +25,11 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
+    select:
+      type: array
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: []
 query: |
   // Fetch the child IDs using the edge attributes
   let children = (
@@ -47,6 +52,6 @@ query: |
     for tax in filtered
       sort tax.scientific_name asc
       limit @offset, @limit
-      return tax
+      return KEEP(tax, @select)
   )
   return {total_count: COUNT(filtered), results: results}
