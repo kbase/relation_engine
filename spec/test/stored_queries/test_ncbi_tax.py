@@ -33,8 +33,9 @@ def _create_delta_test_docs(coll_name, docs, edge=False):
     """Add in delta required fields."""
     if edge:
         for doc in docs:
-            doc['from'] = doc['_from']
-            doc['to'] = doc['_to']
+            # Replicate the time-travel system by just setting 'from' and 'to' to the keys
+            doc['from'] = doc['_from'].split('/')[1]
+            doc['to'] = doc['_to'].split('/')[1]
     else:
         for doc in docs:
             doc['id'] = doc['_key']

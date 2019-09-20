@@ -29,22 +29,26 @@ params:
       default: null
 query: |
   // Fetch the siblings
-  let siblings = ( for t in ncbi_taxon
-      filter t.id == @id
-      filter t.created <= @ts AND t.expired >= @ts
+  let parent_id = first(
+    for e in ncbi_child_of_taxon
+      filter e.from == @id
+      filter e.created <= @ts and e.expired >= @ts
       limit 1
-      for parent in 1..1 outbound t ncbi_child_of_taxon
-        filter parent.created <= @ts AND parent.expired >= @ts
-        for child in 1..1 inbound parent ncbi_child_of_taxon
-          filter child != t
-          filter child.created <= @ts AND child.expired >= @ts
-          sort child.scientific_name asc
-          return child
+      return e.to
   )
-  // Apply limits to the results
-  let limited = (
-    for tax in siblings
+  let sibling_ids = (
+    for e in ncbi_child_of_taxon
+      filter e.to == parent_id
+      filter e.created <= @ts and e.expired >= @ts
+      filter e.from != @id
+      return e.from
+  )
+  // Apply sort and limits to the results
+  let siblings = (
+    for tax in ncbi_taxon
+      filter tax.id in sibling_ids
+      sort tax.scientific_name asc
       limit @offset, @limit
-      return @select ? KEEP(tax, @select) : tax
+      return distinct (@select ? KEEP(tax, @select) : tax)
   )
-  return {total_count: COUNT(siblings), results: limited}
+  return {total_count: COUNT(sibling_ids), results: siblings}

@@ -22,4 +22,4 @@ query: |
     filter tax.created <= @ts AND tax.expired >= @ts
     limit 1
     for child in 1..1 inbound tax ncbi_child_of_taxon
-    return @select ? KEEP(tax, @select) : tax
+      return @select ? KEEP(tax, @select) : tax
