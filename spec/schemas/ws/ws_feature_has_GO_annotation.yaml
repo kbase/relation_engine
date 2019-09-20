@@ -4,7 +4,7 @@ schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
   description: A feature in a workspace genome has a Gene Ontology annotation.
-  required: [_from, _to]
+  required: [_from, _to, source]
   properties:
     _from:
       type: string
@@ -14,3 +14,7 @@ schema:
       type: string
       examples: ['GO_terms/GO:0000002_v2018-03-06']
       description: A Gene Ontology term.
+    source:
+      type: string
+      examples: ['kbase_RE_indexer', 'user_name', 'user_name:app_name']
+      description: The source that created this edge
