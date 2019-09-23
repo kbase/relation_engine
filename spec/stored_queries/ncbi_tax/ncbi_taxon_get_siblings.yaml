@@ -47,8 +47,9 @@ query: |
   let siblings = (
     for tax in ncbi_taxon
       filter tax.id in sibling_ids
+      filter tax.created <= @ts AND tax.expired >= @ts
       sort tax.scientific_name asc
       limit @offset, @limit
-      return distinct (@select ? KEEP(tax, @select) : tax)
+      return (@select ? KEEP(tax, @select) : tax)
   )
   return {total_count: COUNT(sibling_ids), results: siblings}

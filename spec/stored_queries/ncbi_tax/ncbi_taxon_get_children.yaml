@@ -49,8 +49,9 @@ query: |
   let results = (
     for tax in ncbi_taxon
       filter tax.id in filtered
+      filter tax.created <= @ts AND tax.expired >= @ts
       sort tax.scientific_name asc
       limit @offset, @limit
-      return distinct (@select ? KEEP(tax, @select) : tax)
+      return (@select ? KEEP(tax, @select) : tax)
   )
   return {total_count: COUNT(filtered), results: results}
