@@ -38,7 +38,7 @@ query: |
       filter e.created <= @ts AND e.expired >= @ts
       return e.from
   )
-  // Sort and filter the children
+  // Sort and filter the childrenj
   // Should only get evaluated if search_text is truthy
   let searched = (
     for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
@@ -49,8 +49,9 @@ query: |
   let results = (
     for tax in ncbi_taxon
       filter tax.id in filtered
+      filter tax.created <= @ts AND tax.expired >= @ts
       sort tax.scientific_name asc
       limit @offset, @limit
-      return distinct (@select ? KEEP(tax, @select) : tax)
+      return (@select ? KEEP(tax, @select) : tax)
   )
   return {total_count: COUNT(filtered), results: results}
