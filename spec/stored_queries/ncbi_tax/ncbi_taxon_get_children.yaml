@@ -38,7 +38,7 @@ query: |
       filter e.created <= @ts AND e.expired >= @ts
       return e.from
   )
-  // Sort and filter the childrenj
+  // Sort and filter the children
   // Should only get evaluated if search_text is truthy
   let searched = (
     for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
