@@ -84,12 +84,22 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:2'},
             {'_from': 'ws_workspace/2', '_to': 'ws_object_version/2:1:1'},
         ]
+        ws_type_version_docs = [
+            {'_key': 'KBaseGenomes.Genome-99.77', 'module_name': 'KBaseGenomes',
+             'type_name': 'Genome', 'maj_ver': 99, 'min_ver': 77}
+        ]
+        ws_obj_instance_of_type_docs = [
+            {'_from': 'ws_object_version/1:1:1', '_to': 'ws_type_version/KBaseGenomes.Genome-99.77'},
+            {'_from': 'ws_object_version/1:1:2', '_to': 'ws_type_version/KBaseGenomes.Genome-99.77'}
+        ]
         _create_delta_test_docs('ncbi_taxon', taxon_docs)
         _create_delta_test_docs('ncbi_child_of_taxon', child_docs, edge=True)
         _create_delta_test_docs('ws_object_version', obj_docs)
         _create_delta_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs, edge=True)
         _create_delta_test_docs('ws_workspace', ws_docs)
         _create_delta_test_docs('ws_workspace_contains_obj', ws_to_obj, edge=True)
+        create_test_docs('ws_obj_instance_of_type', ws_obj_instance_of_type_docs)
+        create_test_docs('ws_type_version', ws_type_version_docs)
 
     def test_get_lineage_valid(self):
         """Test a valid query of taxon lineage."""
@@ -275,7 +285,8 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_associated_ws_objects'},
-            data=json.dumps({'ts': _NOW, 'taxon_id': '1', 'select_obj': ['_id'], 'select_edge': ['assigned_by']}),
+            data=json.dumps({'ts': _NOW, 'taxon_id': '1', 'select_obj': ['_id', 'type'],
+                             'select_edge': ['assigned_by']}),
         ).json()
         self.assertEqual(resp['count'], 1)
         results = resp['results'][0]
@@ -285,3 +296,10 @@ class TestNcbiTax(unittest.TestCase):
         ids = {ret['ws_obj']['_id'] for ret in results['results']}
         self.assertEqual(assignments, {'assn1', 'assn2'})
         self.assertEqual(ids, {'ws_object_version/1:1:1', 'ws_object_version/1:1:2'})
+        self.assertEqual(results['results'][0]['ws_obj']['type'], {
+            'type_name': 'Genome',
+            'module_name': 'KBaseGenomes',
+            'maj_ver': 99,
+            'min_ver': 77,
+            '_key': 'KBaseGenomes.Genome-99.77'
+        })

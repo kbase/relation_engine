@@ -10,3 +10,9 @@ schema:
       type: string
       examples: [KBaseGenomes.Genome]
       pattern: "^\\w+\\.\\w+$"
+    module_name:
+      type: string
+      examples: ['KBaseGenomes']
+    type_name:
+      type: string
+      examples: ['Genome']
