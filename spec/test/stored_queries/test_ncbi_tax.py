@@ -303,3 +303,17 @@ class TestNcbiTax(unittest.TestCase):
             'min_ver': 77,
             '_key': 'KBaseGenomes.Genome-99.77'
         })
+
+        def test_get_taxon_from_ws_obj(self):
+            """Fetch the taxon vertex from a workspace versioned id."""
+            resp = requests.post(
+                _CONF['re_api_url'] + '/api/v1/query_results',
+                params={'stored_query': 'ncbi_taxon_get_taxon_from_ws_obj'},
+                data=json.dumps({'ts': _NOW, 'obj_ref': '1:1:1'})
+            ).json()
+            self.assertEqual(resp['count'], 1)
+            self.assertDictContainsSubset({
+                'id': '1',
+                'scientific_name': 'Bacteria',
+                'rank': 'Domain'
+            }, resp['result'][0])
