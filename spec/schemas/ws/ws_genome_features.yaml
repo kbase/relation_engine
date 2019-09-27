@@ -14,12 +14,11 @@ schema:
       type: string
       description: The UPA and feature ID for this data
       examples: ["35414:73:1_RSP_4039"]
-      pattern: "^\\d+:\\d+:\\d+_\\w*$"  # may need to expand the feature ID part
+      pattern: "^\\d+:\\d+:\\d+_[a-zA-Z0-9_\-:\.@\(\)\+,=;\$!\*'%]*$"
     feature_id:
       type: string
       description: The unique ID of the feature within the genome
       examples: ["RSP_4039"]
-      pattern: "^\\w*$" # may need to expand
     workspace_id:
       type: integer
       description: The workspace ID for the genome containing this feature

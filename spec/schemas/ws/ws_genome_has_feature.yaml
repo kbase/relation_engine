@@ -10,7 +10,7 @@ schema:
       type: string
       examples: ['75:82:3_RSP_4039']
       description: The unique, permanent ID of this edge. Identical to the feature _key entry.
-      pattern: "^\\d+:\\d+:\\d+_\\w*$"  # may need to expand the feature ID part
+      pattern: "^\\d+:\\d+:\\d+_[a-zA-Z0-9_\-:\.@\(\)\+,=;\$!\*'%]*$"
     _from:
       type: string
       examples: ['ws_object_version/75:82:3']
