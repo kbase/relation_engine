@@ -110,7 +110,15 @@ def create_collection(name, config):
 def _create_indexes(coll_name, config):
     """Create indexes for a collection"""
     url = _CONF['api_url'] + '/index'
+    # Fetch existing indexes
+    auth = (_CONF['db_user'], _CONF['db_pass'])
+    resp = requests.get(url, params={'collection': coll_name}, auth=auth)
+    if not resp.ok:
+        raise RuntimeError(resp.text)
+    indexes = resp.json()['indexes']
     for idx_conf in config['indexes']:
+        if _index_exists(idx_conf, indexes):
+            continue
         idx_type = idx_conf['type']
         idx_url = url + '#' + idx_type
         idx_conf['type'] = idx_type
@@ -122,6 +130,19 @@ def _create_indexes(coll_name, config):
         )
         if not resp.ok:
             raise RuntimeError(resp.text)
+        print(f'Created new {idx_type} index on {idx_conf["fields"]} for {coll_name}.')
+
+
+def _index_exists(idx_conf, indexes):
+    """
+    Check if an index for a collection was already created in the database.
+    idx_conf - index config object from a collection schema
+    indexes - result of request to arangodb's /_api/index?collection=coll_name
+    """
+    for idx in indexes:
+        if idx_conf['fields'] == idx['fields'] and idx_conf['type'] == idx['type']:
+            return True
+    return False
 
 
 def import_from_file(file_path, query):
@@ -136,47 +157,6 @@ def import_from_file(file_path, query):
     if not resp.ok:
         raise ArangoServerError(resp.text)
     return resp.text
-
-
-# def _init_readonly_user():
-#     """
-#     Using the admin user, initialize an admin readonly user for use with ad-hoc queries.
-#     If the user cannot be created, we raise an ArangoServerError
-#     If the user already exists, or is successfully created, we return None and do not raise.
-#     """
-#     user = _CONF['db_readonly_user']
-#     # Check if the user exists, in which case this is a no-op
-#     resp = requests.get(
-#         _CONF['api_url'] + '/user/' + user,
-#         auth=(_CONF['db_user'], _CONF['db_pass'])
-#     )
-#     if resp.status_code == 200:
-#         return
-#     # Create the user
-#     resp = requests.post(
-#         _CONF['api_url'] + '/user',
-#         data=json.dumps({'user': user, 'passwd': _CONF['db_readonly_user']}),
-#         auth=(_CONF['db_user'], _CONF['db_pass'])
-#     )
-#     if resp.status_code != 201:
-#         raise ArangoServerError(resp.text)
-#     db_grant_path = _CONF['api_url'] + '/user/' + user + '/database/' + _CONF['db_name']
-#     # Grant read access to the current database
-#     resp = requests.put(
-#         db_grant_path,
-#         data='{"grant": "ro"}',
-#         auth=(_CONF['db_user'], _CONF['db_pass'])
-#     )
-#     if resp.status_code != 200:
-#         raise ArangoServerError(resp.text)
-#     # Grant read access to all collections
-#     resp = requests.put(
-#         db_grant_path + '/*',
-#         data='{"grant": "ro"}',
-#         auth=(_CONF['db_user'], _CONF['db_pass'])
-#     )
-#     if not resp.ok:
-#         raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):
