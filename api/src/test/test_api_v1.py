@@ -8,6 +8,10 @@ import requests
 import json
 import os
 
+from src.relation_engine_server.utils.config import get_config
+
+_CONF = get_config()
+
 # Use the mock auth tokens
 NON_ADMIN_TOKEN = 'non_admin_token'
 ADMIN_TOKEN = 'admin_token'
@@ -80,6 +84,14 @@ class TestApi(unittest.TestCase):
         resp_json = resp.json()
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(len(resp_json['status']))
+        # Test that the indexes get created and not duplicated
+        url = _CONF['db_url'] + '/_api/index'
+        auth = (_CONF['db_user'], _CONF['db_pass'])
+        resp = requests.get(url, params={'collection': 'ncbi_taxon'}, auth=auth).json()
+        indexes = resp['indexes']
+        self.assertEqual(len(indexes), 2)
+        fields = [i['fields'] for i in indexes]
+        self.assertEqual(fields, [['_key'], ['scientific_name']])
 
     def test_list_stored_queries(self):
         """Test the listing out of saved AQL stored queries."""
@@ -239,7 +251,6 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN,
             data=json.dumps({'query': query, 'count': 1})
         ).json()
-        print('resp!?', resp)
         self.assertEqual(resp['count'], 1)
         self.assertEqual(len(resp['results']), 1)
 
