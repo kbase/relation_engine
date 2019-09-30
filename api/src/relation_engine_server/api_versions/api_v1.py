@@ -119,8 +119,11 @@ def save_documents():
         query['onDuplicate'] = flask.request.args['on_duplicate']
     if flask.request.args.get('overwrite'):
         query['overwrite'] = 'true'
-    resp_text = bulk_import.bulk_import(query)
-    return flask.jsonify(resp_text)
+    resp = bulk_import.bulk_import(query)
+    if resp.get('errors') > 0:
+        return (flask.jsonify(resp), 400)
+    else:
+        return flask.jsonify(resp)
 
 
 @api_v1.route('/config', methods=['GET'])

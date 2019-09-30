@@ -31,8 +31,7 @@ def bulk_import(query_params):
             json_line['updated_at'] = int(time.time() * 1000)
             temp_fd.write(json.dumps(json_line) + '\n')
         temp_fd.close()
-        resp_text = import_from_file(temp_fd.name, query_params)
-        resp_json = json.loads(resp_text)
+        resp_json = import_from_file(temp_fd.name, query_params)
     finally:
         # Always remove the temp file
         os.remove(temp_fd.name)

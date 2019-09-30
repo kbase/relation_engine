@@ -87,8 +87,9 @@ class TestApi(unittest.TestCase):
         # Test that the indexes get created and not duplicated
         url = _CONF['db_url'] + '/_api/index'
         auth = (_CONF['db_user'], _CONF['db_pass'])
-        resp = requests.get(url, params={'collection': 'ncbi_taxon'}, auth=auth).json()
-        indexes = resp['indexes']
+        resp = requests.get(url, params={'collection': 'ncbi_taxon'}, auth=auth)
+        resp_json = resp.json()
+        indexes = resp_json['indexes']
         self.assertEqual(len(indexes), 2)
         fields = [i['fields'] for i in indexes]
         self.assertEqual(fields, [['_key'], ['scientific_name']])
@@ -197,10 +198,18 @@ class TestApi(unittest.TestCase):
 
     def test_update_edge(self):
         """Test updating existing edge."""
+        edges = create_test_edges(3)
         resp = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'update', 'collection': 'test_edge'},
             data=create_test_edges(3),
+            headers=HEADERS_ADMIN
+        )
+        self.assertTrue(resp.ok)
+        resp = requests.put(
+            API_URL + '/documents',
+            params={'on_duplicate': 'update', 'collection': 'test_edge'},
+            data=edges,
             headers=HEADERS_ADMIN
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
@@ -413,3 +422,16 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': ADMIN_TOKEN}  # see ./mock_workspace/endpoints.json
         ).json()
         self.assertEqual(resp['count'], 1)
+
+    def test_save_docs_invalid(self):
+        """Test that an invalid bulk save returns a 400 response"""
+        doc = {'_from': '|||', '_to': '|||'}
+        resp = requests.put(
+            API_URL + '/documents',
+            params={'overwrite': True, 'collection': 'test_edge', 'display_errors': 1},
+            data=json.dumps(doc),
+            headers=HEADERS_ADMIN
+        )
+        self.assertEqual(resp.status_code, 400)
+        resp_json = resp.json()
+        self.assertEqual(resp_json['errors'], 1)

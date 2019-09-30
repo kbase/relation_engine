@@ -1,6 +1,7 @@
 """
 Make ajax requests to the ArangoDB server.
 """
+import sys
 import os
 import requests
 import json
@@ -156,7 +157,14 @@ def import_from_file(file_path, query):
         )
     if not resp.ok:
         raise ArangoServerError(resp.text)
-    return resp.text
+    resp_json = resp.json()
+    if resp_json.get('errors', 0) > 0:
+        err_msg = f"{resp_json['errors']} errors creating documents\n"
+        sys.stderr.write(err_msg)
+        details = resp_json.get('details')
+        if details:
+            sys.stderr.write(f"Error details:\n{details[0]}\n")
+    return resp_json
 
 
 class ArangoServerError(Exception):
