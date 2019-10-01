@@ -13,6 +13,22 @@ _CONF = get_config()
 _NOW = int(time.time() * 1000)
 
 
+def _ws_defaults(data):
+    """Set some defaults for the required workspace fields."""
+    defaults = {
+        'owner': 'owner',
+        'max_obj_id': 1,
+        'lock_status': 'n',
+        'name': 'wsname',
+        'mod_epoch': 1,
+        'is_public': True,
+        'is_deleted': False,
+        'metadata': {},
+    }
+    # Merge the data with the above defaults
+    return dict(defaults, **data)
+
+
 def _construct_ws_obj(wsid, objid, ver, is_public=False):
     """Test helper to create a ws_object_version vertex."""
     return {
@@ -78,7 +94,10 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ws_object_version/2:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn2'},
         ]
         # Create workspace objects associated to taxa
-        ws_docs = [{'_key': '1', 'is_public': True}, {'_key': '2', 'is_public': False}]
+        ws_docs = [
+            _ws_defaults({'_key': '1', 'is_public': True}),
+            _ws_defaults({'_key': '2', 'is_public': False}),
+        ]
         ws_to_obj = [
             {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:1'},
             {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:2'},
