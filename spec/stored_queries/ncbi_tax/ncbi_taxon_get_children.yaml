@@ -25,28 +25,33 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
 query: |
   // Fetch the child IDs using the edge attributes
-  let children = (
-      for parent in ncbi_taxon
-        filter parent.id == @id
-        filter parent.created <= @ts AND parent.expired >= @ts
-        limit 1
-        for tax in 1..1 inbound parent ncbi_child_of_taxon
-            return tax
+  let child_ids = (
+    for e in ncbi_child_of_taxon
+      filter e.to == @id
+      filter e.created <= @ts AND e.expired >= @ts
+      return e.from
   )
   // Sort and filter the children
   // Should only get evaluated if search_text is truthy
   let searched = (
-      for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
-        filter tax in children
-        return tax
+    for tax in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
+      filter tax.id in child_ids
+      return tax.id
   )
-  let filtered = @search_text ? searched : children
+  let filtered = @search_text ? searched : child_ids
   let results = (
-    for tax in filtered
+    for tax in ncbi_taxon
+      filter tax.id in filtered
+      filter tax.created <= @ts AND tax.expired >= @ts
       sort tax.scientific_name asc
       limit @offset, @limit
-      return tax
+      return (@select ? KEEP(tax, @select) : tax)
   )
   return {total_count: COUNT(filtered), results: results}

@@ -12,16 +12,21 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
 query: |
   let ps = (
     for t in ncbi_taxon
       filter t.id == @id
       filter t.created <= @ts AND t.expired >= @ts
       limit 1
-      for p, e in 1..10 outbound t ncbi_child_of_taxon
+      for ancestor, e, path in 1..10 outbound t ncbi_child_of_taxon
         options {bfs: true}
-        filter p.created <= @ts AND p.expired >= @ts
-        return distinct p
+        filter path.edges[*].created ALL <= @ts AND path.edges[*].expired ALL >= @ts
+        return (@select ? KEEP(ancestor, @select) : ancestor)
   )
   // doing return reverse(ps) returns an array of an array for some reason,
   // which we don't want

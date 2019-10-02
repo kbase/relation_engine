@@ -1,0 +1,22 @@
+name: ws_genome_has_feature
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: A workspace genome has a feature.
+  required: [_from, _to, _key]
+  properties:
+    _key:
+      type: string
+      examples: ['75:82:3_RSP_4039']
+      description: The unique, permanent ID of this edge. Identical to the feature _key entry.
+      # see https://www.arangodb.com/docs/stable/data-modeling-naming-conventions-document-keys.html
+      pattern: "^\\d+:\\d+:\\d+_[a-zA-Z0-9_\\-:\\.@\\(\\)\\+,=;\\$!\\*'%]*$"
+    _from:
+      type: string
+      examples: ['ws_object_version/75:82:3']
+      description: The unique, permanent ID of a version of a workspace object.
+    _to:
+      type: string
+      examples: ['ws_genome_feature/75:82:3_RSP_4039']
+      description: A genome feature

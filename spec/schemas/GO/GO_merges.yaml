@@ -1,0 +1,41 @@
+name: GO_merges
+type: edge
+delta: true
+
+indexes:
+  - type: hash  # don't think this needs to be a skiplist / persistent index
+    fields: [from]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: GO_merges
+    type: object
+    description: A entry for merge edges in the Gene Ontology (GO) hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+        examples:
+          - GO:0000136::GO:0031501::consider
+          - GO:0000022::GO:0051231::replaced_by
+      type:
+        type: string
+        description: GO merge edge type
+        examples:
+          - consider
+          - replaced_by
+      from:
+        type: string
+        description: GO id
+        examples:
+          - GO:0023052
+      to:
+        type: string
+        title: GO id
+        examples:
+          - GO:0008150
+    required:
+      - id
+      - type
+      - from
+      - to
