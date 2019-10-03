@@ -1,0 +1,39 @@
+# Get the terms from a feature
+
+name: GO_get_terms_from_feature
+params:
+  type: object
+  required: [feature_id, ts]
+  properties:
+    obj_ref:
+      type: string
+      title: Workspace versioned object reference
+    limit:
+      type: integer
+      title: Maximum result limit
+      default: 20
+      maximum: 1000
+    offset:
+      type: integer
+      title: Result offset for pagination
+      default: 0
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: GO_terms
+query: |
+  FOR f in ws_genome_features
+    FILTER f.feature_id == @feature_id
+    LIMIT 1
+    FOR v, e, p IN 1 OUTBOUND f ws_feature_has_GO_annotation
+      FILTER e.created <= @ts AND e.expired >= @ts
+      FILTER v.created <= @ts AND v.expired >= @ts
+      LIMIT @offset, @limit
+      RETURN DISTINCT {
+        term: v,
+        feature: {
+          feature_id: f.feature_id,
+          updated_at: f.updated_at
+        }
+      }
