@@ -58,7 +58,8 @@ query: |
         LET unver_id = CONCAT("ws_object/", TO_STRING(obj.workspace_id), ':', TO_STRING(obj.object_id))
         LET ws_info = FIRST(
           FOR ws IN 1 INBOUND unver_id ws_workspace_contains_obj
-            RETURN KEEP(ws, ['owner', 'metadata', 'is_public', 'is_deleted', 'mod_epoch'])
+            FILTER !ws.is_deleted
+            RETURN KEEP(ws, ['owner', 'metadata', 'is_public', 'mod_epoch'])
         )
         LET o = MERGE(obj, {type, ws_info})
         RETURN {

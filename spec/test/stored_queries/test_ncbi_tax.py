@@ -341,7 +341,6 @@ class TestNcbiTax(unittest.TestCase):
             'owner': 'owner',
             'metadata': {'narrative_nice_name': 'narrname'},
             'is_public': True,
-            'is_deleted': False,
             'mod_epoch': 1
         })
 
