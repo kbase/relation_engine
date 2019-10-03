@@ -33,7 +33,7 @@ params:
       items: {type: string}
       description: Taxon edge fields to keep in the results
       default: null
-query_prefix: WITH ws_object_version, ws_type_version
+query_prefix: WITH ws_object_version, ws_type_version, ws_workspace
 query: |
   let count = COUNT(
     for tax in ncbi_taxon
@@ -51,12 +51,19 @@ query: |
       for obj, e in 1 inbound tax ws_obj_version_has_taxon
         filter obj.is_public or obj.workspace_id IN ws_ids
         limit @offset, @limit
-        for type in 1 outbound obj ws_obj_instance_of_type
-          let t = KEEP(type, ['_key', 'module_name', 'type_name', 'maj_ver', 'min_ver'])
-          let o = MERGE(obj, {type: t})
-          return {
-            ws_obj: @select_obj ? KEEP(o, @select_obj) : o,
-            edge: @select_edge ? KEEP(e, @select_edge) : e
-          }
+        let type = first(
+          for type in 1 outbound obj ws_obj_instance_of_type
+            return KEEP(type, ['_key', 'module_name', 'type_name', 'maj_ver', 'min_ver'])
+        )
+        let unver_id = CONCAT("ws_object/", TO_STRING(obj.workspace_id), ':', TO_STRING(obj.object_id))
+        let ws_info = first(
+          for ws in 1 inbound unver_id ws_workspace_contains_obj
+            return KEEP(ws, ['owner', 'metadata', 'is_public', 'is_deleted', 'mod_epoch'])
+        )
+        let o = MERGE(obj, {type, ws_info})
+        return {
+          ws_obj: @select_obj ? KEEP(o, @select_obj) : o,
+          edge: @select_edge ? KEEP(e, @select_edge) : e
+        }
   )
   return {results, total_count: count}

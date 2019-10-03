@@ -10,7 +10,7 @@ def create_test_docs(coll_name, docs):
     body = '\n'.join([json.dumps(d) for d in docs])
     resp = requests.put(
         _CONF['re_api_url'] + '/api/v1/documents',
-        params={'overwrite': True, 'collection': coll_name},
+        params={'overwrite': True, 'collection': coll_name, 'display_errors': '1'},
         data=body,
         headers={'Authorization': 'admin_token'}
     )

@@ -10,9 +10,6 @@ schema:
       description: The workspace ID for this workspace
       examples: ['35414']
       pattern: "^\\d+$"
-    narr_name:
-      type: string
-      title: Narrative name
     owner:
       type: string
       title: Username of workspace owner
