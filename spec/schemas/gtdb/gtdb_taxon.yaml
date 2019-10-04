@@ -11,7 +11,7 @@ schema:
     id:
       type: string
       description: GTDB Taxon id. For a non-organism node, this is the rank abbreviation joined
-        with ':' and the rank name with spaces replaced by underscores. For an organism node,
+        with ':' and the taxon name with spaces replaced by underscores. For an organism node,
         it is the accession ID.
       examples: ['p:Firmicutes', 's:Sediminibacterium_sp002786355', 'RS_GCF_000169355.1']
     name:
