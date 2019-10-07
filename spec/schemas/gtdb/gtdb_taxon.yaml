@@ -1,34 +1,24 @@
 name: gtdb_taxon
 type: vertex
+delta: true
+
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
   description: Template for a vertex entry in the GTDB taxonomy tree.
-  required: [_key, scientific_name, rank]
+  required: [id, name, rank]
   properties:
-    _key:
+    id:
       type: string
-      description: Taxon type abbreviation plus name
-      examples: ['d:Bacteria', 'p:Firmicutes']
-    scientific_name:
+      description: GTDB Taxon id. For a non-organism node, this is the rank abbreviation joined
+        with ':' and the taxon name with spaces replaced by underscores. For an organism node,
+        it is the accession ID.
+      examples: ['p:Firmicutes', 's:Sediminibacterium_sp002786355', 'RS_GCF_000169355.1']
+    name:
       type: string
-      title: Taxon name.
-      examples:
-      - Methylophilus methylotrophus
-      - Bacteria
-      - Firmicutes
-    canonical_scientific_name:
-      type: array
-      title: Canonicalized scientific name
-      examples: [[methylophilus, methylotrophus], [Bacteria], [Firmicutes]]
-      items: {type: string}
+      description: The name of the taxon. For organisms this is the species name.
+      examples: ['Firmicutes', 'Sediminibacterium sp002786355']
     rank:
       type: string
       title: Taxonomic rank
-      examples: [Domain, Phylum]
-    numeric_rank:
-      type: integer
-      title: Taxonomic level
-    genetic_code:
-      type: integer
-      title: genetic code
+      examples: [domain, phylum]

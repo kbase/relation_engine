@@ -46,12 +46,9 @@ schema:
       type: string
       title: Taxonomic rank
       examples: [Domain, Phylum]
-    numeric_rank:
+    ncbi_taxon_id:
       type: integer
-      title: Taxonomic level
-    NCBI_taxon_id:
+      title: The NCBI taxon ID as a number
+    gencode:
       type: integer
-      title: NCBI_taxon_id
-    genetic_code:
-      type: integer
-      title: genetic code
+      title: The numerc ID of the genetic code for this organism.
