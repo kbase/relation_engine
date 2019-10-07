@@ -33,8 +33,8 @@ query: |
         FILTER v.created <= @ts AND v.expired >= @ts
         LIMIT @offset, @limit
         RETURN DISTINCT {
-          term: v,
-          feature: KEEP(p.vertices[1], ['feature_id', 'updated_at'])
+          term: KEEP(v, 'id', 'name', 'namespace', 'alt_ids', 'def', 'comments',  'synonyms', 'xrefs', 'created', 'expired'),
+          feature: KEEP(p.vertices[1], ['feature_id', 'updated_at', 'workspace_id', 'object_id', 'version'])
         }
   )
   FOR r IN results

@@ -7,7 +7,7 @@ params:
   properties:
     feature_id:
       type: string
-      title: Workspace versioned object reference
+      title: Workspace feature id
     limit:
       type: integer
       title: Maximum result limit
@@ -23,7 +23,7 @@ params:
       title: Versioning timestamp
 query_prefix: WITH GO_terms
 query: |
-  LET results=(
+  LET go_term_results=(
     FOR f in ws_genome_features
       FILTER f.feature_id == @feature_id
       LIMIT 1
@@ -32,11 +32,11 @@ query: |
         FILTER v.created <= @ts AND v.expired >= @ts
         LIMIT @offset, @limit
         RETURN DISTINCT {
-          term: v,
-          feature: KEEP(f, ['feature_id', 'updated_at'])
+          term: KEEP(v, 'id', 'name', 'namespace', 'alt_ids', 'def', 'comments',  'synonyms', 'xrefs', 'created', 'expired'),
+          feature: KEEP(f, ['feature_id', 'updated_at', 'workspace_id', 'object_id', 'version'])
         }
   )
-  FOR r IN results
+  FOR r IN go_term_results
     COLLECT feature=r.feature INTO terms=r.term
     RETURN {
       feature: feature,
