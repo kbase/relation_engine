@@ -21,20 +21,23 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
-query_prefix: WITH GO_terms
+query_prefix: WITH ws_genome_features, GO_terms
 query: |
   LET go_term_results=(
     FOR f in ws_genome_features
       FILTER f._key == @feature_id
       LIMIT 1
-      FOR v, e, p IN 1 OUTBOUND f ws_feature_has_GO_annotation
-        FILTER e.created <= @ts AND e.expired >= @ts
-        FILTER v.created <= @ts AND v.expired >= @ts
-        LIMIT @offset, @limit
-        RETURN DISTINCT {
-          term: KEEP(v, 'id', 'name', 'namespace', 'alt_ids', 'def', 'comments',  'synonyms', 'xrefs', 'created', 'expired'),
-          feature: KEEP(f, ['feature_id', 'updated_at', 'workspace_id', 'object_id', 'version'])
-        }
+      FOR o, oe, op IN 1 INBOUND f ws_genome_has_feature
+        FILTER o.is_public OR o.workspace_id IN ws_ids
+        LIMIT 1
+        FOR t, te, tp IN 1 OUTBOUND op.vertices[0] ws_feature_has_GO_annotation
+          FILTER te.created <= @ts AND te.expired >= @ts
+          FILTER t.created <= @ts AND t.expired >= @ts
+          LIMIT @offset, @limit
+          RETURN DISTINCT {
+            term: KEEP(t, 'id', 'name', 'namespace', 'alt_ids', 'def', 'comments',  'synonyms', 'xrefs', 'created', 'expired'),
+            feature: KEEP(f, ['feature_id', 'updated_at', 'workspace_id', 'object_id', 'version'])
+          }
   )
   FOR r IN go_term_results
     COLLECT feature=r.feature INTO terms=r.term
