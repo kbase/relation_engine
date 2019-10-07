@@ -25,7 +25,7 @@ query_prefix: WITH GO_terms
 query: |
   LET go_term_results=(
     FOR f in ws_genome_features
-      FILTER f.feature_id == @feature_id
+      FILTER f._key == @feature_id
       LIMIT 1
       FOR v, e, p IN 1 OUTBOUND f ws_feature_has_GO_annotation
         FILTER e.created <= @ts AND e.expired >= @ts
