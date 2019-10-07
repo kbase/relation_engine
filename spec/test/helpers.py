@@ -54,6 +54,12 @@ def wait_for_api():
             time.sleep(2)
 
 
+def assert_subset(testCls, subset, _dict):
+    """Replacement for the deprecated `assertDictContainsSubset` method."""
+    for (key, val) in subset.items():
+        testCls.assertEqual(subset.get(key), _dict.get(key))
+
+
 if __name__ == '__main__':
     if sys.argv[1] == 'wait_for_api':
         wait_for_api()

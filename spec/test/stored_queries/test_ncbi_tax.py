@@ -6,7 +6,7 @@ import time
 import unittest
 import requests
 
-from test.helpers import get_config
+from test.helpers import get_config, assert_subset
 from test.stored_queries.helpers import create_test_docs
 
 _CONF = get_config()
@@ -23,13 +23,13 @@ def _ws_defaults(data):
         'mod_epoch': 1,
         'is_public': True,
         'is_deleted': False,
-        'metadata': {},
+        'metadata': {'narrative_nice_name': 'narrname'},
     }
     # Merge the data with the above defaults
     return dict(defaults, **data)
 
 
-def _construct_ws_obj(wsid, objid, ver, is_public=False):
+def _construct_ws_obj_ver(wsid, objid, ver, is_public=False):
     """Test helper to create a ws_object_version vertex."""
     return {
         '_key': f"{wsid}:{objid}:{ver}",
@@ -40,6 +40,17 @@ def _construct_ws_obj(wsid, objid, ver, is_public=False):
         'hash': 'xyz',
         'size': 100,
         'epoch': 0,
+        'deleted': False,
+        'is_public': is_public,
+    }
+
+
+def _construct_ws_obj(wsid, objid, is_public=False):
+    """Test helper to create a ws_object vertex."""
+    return {
+        '_key': f"{wsid}:{objid}",
+        'workspace_id': wsid,
+        'object_id': objid,
         'deleted': False,
         'is_public': is_public,
     }
@@ -76,17 +87,21 @@ class TestNcbiTax(unittest.TestCase):
             {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class'},
         ]
         child_docs = [
-            {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
+            {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'from': '4', 'to': '1', 'id': '4'},
+            {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'from': '3', 'to': '2', 'id': '3'},
+            {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'from': '5', 'to': '4', 'id': '5'},
+            {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'from': '6', 'to': '4', 'id': '6'},
+            {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'from': '7', 'to': '4', 'id': '7'},
+        ]
+        obj_ver_docs = [
+            _construct_ws_obj_ver(1, 1, 1, is_public=True),
+            _construct_ws_obj_ver(1, 1, 2, is_public=True),
+            _construct_ws_obj_ver(2, 1, 1, is_public=False),
         ]
         obj_docs = [
-            _construct_ws_obj(1, 1, 1, is_public=True),
-            _construct_ws_obj(1, 1, 2, is_public=True),
-            _construct_ws_obj(2, 1, 1, is_public=False),
+            _construct_ws_obj(1, 1, is_public=True),
+            _construct_ws_obj(2, 1, is_public=False),
         ]
         obj_to_taxa_docs = [
             {'_from': 'ws_object_version/1:1:1', '_to': 'ncbi_taxon/1', 'assigned_by': 'assn1'},
@@ -99,9 +114,8 @@ class TestNcbiTax(unittest.TestCase):
             _ws_defaults({'_key': '2', 'is_public': False}),
         ]
         ws_to_obj = [
-            {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:1'},
-            {'_from': 'ws_workspace/1', '_to': 'ws_object_version/1:1:2'},
-            {'_from': 'ws_workspace/2', '_to': 'ws_object_version/2:1:1'},
+            {'_from': 'ws_workspace/1', '_to': 'ws_object/1:1'},
+            {'_from': 'ws_workspace/2', '_to': 'ws_object/2:1'},
         ]
         ws_type_version_docs = [
             {'_key': 'KBaseGenomes.Genome-99.77', 'module_name': 'KBaseGenomes',
@@ -113,10 +127,11 @@ class TestNcbiTax(unittest.TestCase):
         ]
         _create_delta_test_docs('ncbi_taxon', taxon_docs)
         _create_delta_test_docs('ncbi_child_of_taxon', child_docs, edge=True)
-        _create_delta_test_docs('ws_object_version', obj_docs)
-        _create_delta_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs, edge=True)
-        _create_delta_test_docs('ws_workspace', ws_docs)
-        _create_delta_test_docs('ws_workspace_contains_obj', ws_to_obj, edge=True)
+        create_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs)
+        create_test_docs('ws_object', obj_docs)
+        create_test_docs('ws_workspace', ws_docs)
+        create_test_docs('ws_workspace_contains_obj', ws_to_obj)
+        create_test_docs('ws_object_version', obj_ver_docs)
         create_test_docs('ws_obj_instance_of_type', ws_obj_instance_of_type_docs)
         create_test_docs('ws_type_version', ws_type_version_docs)
 
@@ -304,7 +319,7 @@ class TestNcbiTax(unittest.TestCase):
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'ncbi_taxon_get_associated_ws_objects'},
-            data=json.dumps({'ts': _NOW, 'taxon_id': '1', 'select_obj': ['_id', 'type'],
+            data=json.dumps({'ts': _NOW, 'taxon_id': '1', 'select_obj': ['_id', 'type', 'ws_info'],
                              'select_edge': ['assigned_by']}),
         ).json()
         self.assertEqual(resp['count'], 1)
@@ -322,17 +337,23 @@ class TestNcbiTax(unittest.TestCase):
             'min_ver': 77,
             '_key': 'KBaseGenomes.Genome-99.77'
         })
+        self.assertEqual(results['results'][0]['ws_obj']['ws_info'], {
+            'owner': 'owner',
+            'metadata': {'narrative_nice_name': 'narrname'},
+            'is_public': True,
+            'mod_epoch': 1
+        })
 
-        def test_get_taxon_from_ws_obj(self):
-            """Fetch the taxon vertex from a workspace versioned id."""
-            resp = requests.post(
-                _CONF['re_api_url'] + '/api/v1/query_results',
-                params={'stored_query': 'ncbi_taxon_get_taxon_from_ws_obj'},
-                data=json.dumps({'ts': _NOW, 'obj_ref': '1:1:1'})
-            ).json()
-            self.assertEqual(resp['count'], 1)
-            self.assertDictContainsSubset({
-                'id': '1',
-                'scientific_name': 'Bacteria',
-                'rank': 'Domain'
-            }, resp['result'][0])
+    def test_get_taxon_from_ws_obj(self):
+        """Fetch the taxon vertex from a workspace versioned id."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_get_taxon_from_ws_obj'},
+            data=json.dumps({'ts': _NOW, 'obj_ref': '1:1:1'})
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        assert_subset(self, {
+            'id': '1',
+            'scientific_name': 'Bacteria',
+            'rank': 'Domain'
+        }, resp['results'][0])

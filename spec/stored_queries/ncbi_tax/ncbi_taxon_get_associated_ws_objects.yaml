@@ -33,30 +33,38 @@ params:
       items: {type: string}
       description: Taxon edge fields to keep in the results
       default: null
-query_prefix: WITH ws_object_version, ws_type_version
+query_prefix: WITH ws_object_version, ws_type_version, ws_workspace
 query: |
-  let count = COUNT(
-    for tax in ncbi_taxon
-      filter tax.id == @taxon_id
-      filter tax.created <= @ts AND tax.expired >= @ts
-      limit 1
-      for obj in 1..1 inbound tax ws_obj_version_has_taxon
-        return 1
+  LET count = COUNT(
+    FOR tax IN ncbi_taxon
+      FILTER tax.id == @taxon_id
+      FILTER tax.created <= @ts AND tax.expired >= @ts
+      LIMIT 1
+      FOR obj IN 1..1 INBOUND tax ws_obj_version_has_taxon
+        RETURN 1
   )
-  let results = (
-    for tax in ncbi_taxon
-      filter tax.id == @taxon_id
-      filter tax.created <= @ts AND tax.expired >= @ts
-      limit 1
-      for obj, e in 1 inbound tax ws_obj_version_has_taxon
-        filter obj.is_public or obj.workspace_id IN ws_ids
-        limit @offset, @limit
-        for type in 1 outbound obj ws_obj_instance_of_type
-          let t = KEEP(type, ['_key', 'module_name', 'type_name', 'maj_ver', 'min_ver'])
-          let o = MERGE(obj, {type: t})
-          return {
-            ws_obj: @select_obj ? KEEP(o, @select_obj) : o,
-            edge: @select_edge ? KEEP(e, @select_edge) : e
-          }
+  LET results = (
+    FOR tax IN ncbi_taxon
+      FILTER tax.id == @taxon_id
+      FILTER tax.created <= @ts AND tax.expired >= @ts
+      LIMIT 1
+      FOR obj, e IN 1 INBOUND tax ws_obj_version_has_taxon
+        FILTER obj.is_public OR obj.workspace_id IN ws_ids
+        LIMIT @offset, @limit
+        LET type = first(
+          FOR type IN 1 OUTBOUND obj ws_obj_instance_of_type
+            RETURN KEEP(type, ['_key', 'module_name', 'type_name', 'maj_ver', 'min_ver'])
+        )
+        LET unver_id = CONCAT("ws_object/", TO_STRING(obj.workspace_id), ':', TO_STRING(obj.object_id))
+        LET ws_info = FIRST(
+          FOR ws IN 1 INBOUND unver_id ws_workspace_contains_obj
+            FILTER !ws.is_deleted
+            RETURN KEEP(ws, ['owner', 'metadata', 'is_public', 'mod_epoch'])
+        )
+        LET o = MERGE(obj, {type, ws_info})
+        RETURN {
+          ws_obj: @select_obj ? KEEP(o, @select_obj) : o,
+          edge: @select_edge ? KEEP(e, @select_edge) : e
+        }
   )
-  return {results, total_count: count}
+  RETURN {results, total_count: count}
