@@ -30,27 +30,35 @@ def wait_for_arangodb():
             resp.raise_for_status()
             break
         except Exception as err:
-            print(err)
+            print('Waiting for arangodb to come online')
             if time.time() > timeout:
+                sys.stderr.write(str(err) + '\n')
                 raise RuntimeError('Timed out waiting for arangodb')
             time.sleep(3)
 
 
 def wait_for_api():
-    # Wait for the API to come online
+    wait_for_arangodb()
+    # Wait for other dependent services to come online
     conf = get_config()
     timeout = int(time.time()) + 60
+    auth_url = 'http://auth:5000'
+    ws_url = 'http://workspace:5000'
     while True:
         try:
-            requests.get(conf['re_api_url']).raise_for_status()
-            requests.get('http://auth:5000')
-            requests.get('http://workspace:5000')
+            # Reassign the `url` variable so we can print which service errored
+            url = conf['re_api_url']
+            requests.get(url).raise_for_status()
+            url = auth_url
+            requests.get(url)
+            url = ws_url
+            requests.get(url)
             break
         except Exception as err:
-            print(err)
-            print('Waiting for RE API to come online..')
+            print(f"Waiting for dependent service to come online: {url}")
             if int(time.time()) > timeout:
-                raise RuntimeError("Timed out waiting for RE API.")
+                sys.stderr.write(str(err) + "\n")
+                raise RuntimeError(f"Timed out waiting for {url}")
             time.sleep(2)
 
 
