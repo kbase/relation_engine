@@ -1,0 +1,45 @@
+# Get the terms from a workspace object reference
+
+name: GO_get_terms_from_ws_obj
+params:
+  type: object
+  required: [obj_ref, ts]
+  properties:
+    obj_ref:
+      type: string
+      title: Workspace versioned object reference
+    limit:
+      type: integer
+      title: Maximum result limit
+      default: 20
+      maximum: 1000
+    offset:
+      type: integer
+      title: Result offset for pagination
+      default: 0
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH ws_genome_features, GO_terms
+query: |
+  LET results=(
+    FOR o in ws_object_version
+      FILTER o._key == @obj_ref
+      FILTER o.is_public OR o.workspace_id IN ws_ids
+      LIMIT 1
+      FOR v, e, p IN 2 OUTBOUND o ws_genome_has_feature, ws_feature_has_GO_annotation
+        FILTER p.edges[1].created <= @ts AND p.edges[1].expired >= @ts
+        FILTER v.created <= @ts AND v.expired >= @ts
+        LIMIT @offset, @limit
+        RETURN DISTINCT {
+          term: KEEP(v, 'id', 'name', 'namespace', 'alt_ids', 'def', 'comments',  'synonyms', 'xrefs', 'created', 'expired'),
+          feature: KEEP(p.vertices[1], ['feature_id', 'updated_at', 'workspace_id', 'object_id', 'version'])
+        }
+  )
+  FOR r IN results
+    COLLECT feature=r.feature INTO terms=r.term
+    RETURN {
+      feature: feature,
+      terms: terms
+    }
