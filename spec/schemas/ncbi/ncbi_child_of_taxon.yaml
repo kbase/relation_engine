@@ -5,16 +5,15 @@ delta: true
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
-  required: [from, to, child_type]
+  required: [from, to, id]
   description: Edges which create the taxonomy tree for NCBI taxons.
   properties:
+    id:
+      type: string
+      description: The id of the edge. This is the same as the from ID for NCBI. 
     from:
       type: string
-      description: The child. A gtdb_taxon or gtdb_organism.
+      description: The child taxon.
     to:
       type: string
-      description: The parent gtdb_taxon
-    child_type:
-      type: string
-      description: type of child node (taxon or organism)
-      enum:  [t, o]
+      description: The parent taxon.

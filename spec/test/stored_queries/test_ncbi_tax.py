@@ -87,12 +87,12 @@ class TestNcbiTax(unittest.TestCase):
             {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class'},
         ]
         child_docs = [
-            {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'child_type': 't'},
-            {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'child_type': 't'},
+            {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
+            {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'from': '4', 'to': '1', 'id': '4'},
+            {'_from': 'ncbi_taxon/3', '_to': 'ncbi_taxon/2', 'from': '3', 'to': '2', 'id': '3'},
+            {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'from': '5', 'to': '4', 'id': '5'},
+            {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'from': '6', 'to': '4', 'id': '6'},
+            {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'from': '7', 'to': '4', 'id': '7'},
         ]
         obj_ver_docs = [
             _construct_ws_obj_ver(1, 1, 1, is_public=True),
