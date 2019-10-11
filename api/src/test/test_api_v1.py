@@ -146,9 +146,9 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN
         ).json()
         self.assertEqual(resp['error'], "'_key' is a required property")
-        self.assertEqual(resp['instance'], {'name': 'x'})
-        self.assertTrue(resp['schema'])
-        self.assertEqual(resp['validator'], 'required')
+        self.assertEqual(resp['failed_validator'], 'required')
+        self.assertEqual(resp['path'], [])
+        self.assertEqual(resp['schema_path'], ['required'])
         self.assertEqual(resp['validator_value'], ['_key'])
 
     def test_save_documents_missing_schema(self):

@@ -17,7 +17,7 @@ Returns server status info
 
 Run a query using a stored query or a cursor ID. Semantically, this is a GET, but it's a POST to allow better support for passing JSON in the request body (eg. Postman doesn't allow request body data in get requests)
 
-_Example rquest_
+_Example request_
 
 ```sh
 curl -X POST -d '{"argument": "value"}' {root_url}/api/v1/query_results?stored_query=example
@@ -159,6 +159,15 @@ _Response JSON schema_
   }
 }
 ```
+
+#### JSON Schema error responses
+
+If you try to update a collection and it fails validation against a JSON schema found in the [relation_engine_spec](https://github.com/kbase/relation_engine_spec/), then you will get a JSON error response with the following fields:
+
+* `"error"` - Human readable message explaining the error
+* `"failed_validator"` - The name of the validator that failed (eg. "required")
+* `"value"` - The (possibly nested) value in your data that failed validation
+* `"path"` - The path into your data where you can find the value that failed validation
 
 ### PUT /api/v1/specs/
 

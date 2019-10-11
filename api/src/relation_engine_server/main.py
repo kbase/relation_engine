@@ -75,12 +75,14 @@ def view_does_not_exist(err):
 @app.errorhandler(ValidationError)
 def validation_error(err):
     """Json Schema validation error."""
+    # Refer to the documentation on jsonschema.exceptions.ValidationError:
+    # https://python-jsonschema.readthedocs.io/en/stable/errors/
     resp = {
-        'error': str(err).split('\n')[0],
-        'instance': err.instance,
-        'validator': err.validator,
+        'error': err.message,
+        'failed_validator': err.validator,
         'validator_value': err.validator_value,
-        'schema': err.schema
+        'path': list(err.absolute_path),
+        'schema_path': list(err.schema_path)
     }
     return (flask.jsonify(resp), 400)
 
