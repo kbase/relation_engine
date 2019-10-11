@@ -75,6 +75,8 @@ def view_does_not_exist(err):
 @app.errorhandler(ValidationError)
 def validation_error(err):
     """Json Schema validation error."""
+    # Refer to the documentation on jsonschema.exceptions.ValidationError:
+    # https://python-jsonschema.readthedocs.io/en/stable/errors/
     resp = {
         'error': err.message,
         'failed_validator': err.validator,
