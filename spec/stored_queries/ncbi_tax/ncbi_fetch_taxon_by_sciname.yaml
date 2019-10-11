@@ -1,0 +1,18 @@
+# Fetch a taxon document by exact match on sciname
+name: ncbi_fetch_taxon_by_sciname
+params:
+  type: object
+  required: [sciname, ts]
+  properties:
+    sciname:
+      type: string
+      title: NCBI scientific name
+    ts:
+      type: integer
+      title: Versioning timestamp
+query: |
+  for t in ncbi_taxon
+      filter t.scientific_name == @sciname
+      filter t.created <= @ts AND t.expired >= @ts
+      limit 1
+      return t

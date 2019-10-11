@@ -85,6 +85,7 @@ class TestNcbiTax(unittest.TestCase):
             {'_key': '5', 'scientific_name': 'Alphaproteobacteria', 'rank': 'Class'},
             {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class'},
             {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class'},
+
         ]
         child_docs = [
             {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
@@ -357,3 +358,43 @@ class TestNcbiTax(unittest.TestCase):
             'scientific_name': 'Bacteria',
             'rank': 'Domain'
         }, resp['results'][0])
+
+    def test_fetch_taxon_by_sciname(self):
+        """Test the ncbi_fetch_taxon_by_sciname query."""
+        sciname = 'Deltaproteobacteria'
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_fetch_taxon_by_sciname'},
+            data=json.dumps({'ts': _NOW, 'sciname': 'Deltaproteobacteria'})
+        ).json()
+        self.assertEqual(resp['count'], 1)
+        assert_subset(self, {
+            'id': '7',
+            'scientific_name': sciname,
+            'rank': 'Class',
+        }, resp['results'][0])
+
+    def test_fetch_taxon_by_sciname_failures(self):
+        """Test invalid cases for ncbi_fetch_taxon_by_sciname."""
+        # No sciname
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_fetch_taxon_by_sciname'},
+            data=json.dumps({'ts': _NOW})
+        ).json()
+        self.assertEqual(resp['error'], "'sciname' is a required property")
+        # No ts
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_fetch_taxon_by_sciname'},
+            data=json.dumps({'sciname': 'Deltaproteobacteria'})
+        ).json()
+        self.assertEqual(resp['error'], "'ts' is a required property")
+        # sciname not found
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_fetch_taxon_by_sciname'},
+            data=json.dumps({'ts': _NOW, 'sciname': 'xyzabc'})
+        ).json()
+        self.assertEqual(resp['count'], 0)
+        self.assertEqual(len(resp['results']), 0)
