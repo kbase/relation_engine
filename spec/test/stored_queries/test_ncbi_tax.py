@@ -78,13 +78,16 @@ class TestNcbiTax(unittest.TestCase):
     def setUpClass(cls):
         """Create test documents"""
         taxon_docs = [
-            {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain'},
-            {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum'},
-            {'_key': '3', 'scientific_name': 'Bacilli', 'rank': 'Class'},
-            {'_key': '4', 'scientific_name': 'Proteobacteria', 'rank': 'Phylum'},
-            {'_key': '5', 'scientific_name': 'Alphaproteobacteria', 'rank': 'Class'},
-            {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class'},
-            {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class'},
+            {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain', 'strain': False},
+            {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum', 'strain': False},
+            {'_key': '3', 'scientific_name': 'Bacilli', 'rank': 'Class', 'strain': False},
+            {'_key': '4', 'scientific_name': 'Proteobacteria', 'rank': 'Phylum', 'strain': False},
+            {'_key': '5', 'scientific_name': 'Alphaproteobacteria',
+             'rank': 'Class', 'strain': False},
+            {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class',
+             'strain': False},
+            {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class',
+             'strain': False},
 
         ]
         child_docs = [
