@@ -88,6 +88,8 @@ class TestNcbiTax(unittest.TestCase):
              'strain': False},
             {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class',
              'strain': False},
+            {'_key': '8', 'scientific_name': 'Bacillus subtilis 168', 'rank': 'no rank',
+             'strain': True}, 
 
         ]
         child_docs = [
@@ -97,6 +99,8 @@ class TestNcbiTax(unittest.TestCase):
             {'_from': 'ncbi_taxon/5', '_to': 'ncbi_taxon/4', 'from': '5', 'to': '4', 'id': '5'},
             {'_from': 'ncbi_taxon/6', '_to': 'ncbi_taxon/4', 'from': '6', 'to': '4', 'id': '6'},
             {'_from': 'ncbi_taxon/7', '_to': 'ncbi_taxon/4', 'from': '7', 'to': '4', 'id': '7'},
+            # a few levels missing here
+            {'_from': 'ncbi_taxon/8', '_to': 'ncbi_taxon/3', 'from': '8', 'to': '3', 'id': '8'},
         ]
         obj_ver_docs = [
             _construct_ws_obj_ver(1, 1, 1, is_public=True),
@@ -291,6 +295,50 @@ class TestNcbiTax(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp.json()['error'], "1001 is greater than the maximum of 1000")
+
+    def test_search_sciname_limit_ranks_implicit_defaults(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname(None, None, 3, {'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
+    
+    def test_search_sciname_limit_ranks_explicit_defaults(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname([], False, 3, {'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
+
+    def test_search_sciname_limit_ranks_2(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname(['Domain', 'Class'], None, 2, {'Bacteria', 'Bacilli'})
+
+    def test_search_sciname_limit_ranks_1(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname(['Class'], None, 1, {'Bacilli'})
+
+    def test_search_sciname_limit_ranks_1_with_strain(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname(['Class'], True, 2, {'Bacilli', 'Bacillus subtilis 168'})
+
+    def test_search_sciname_limit_ranks_1_with_false_strain(self):
+        """ Test queries where the results are limited by the rank or strain flag. """
+        self._run_search_sciname(['Class'], False, 1, {'Bacilli'})
+
+    def _run_search_sciname(self, ranks, include_strains, expected_count, expected_sci_names):
+        data = {
+            'ts': _NOW,
+            'search_text': "prefix:bac"
+        }
+        if ranks is not None:
+            data['ranks'] = ranks
+        if include_strains is not None:
+            data['include_strains'] = include_strains
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'ncbi_taxon_search_sci_name'},
+            data=json.dumps(data)
+            ).json()
+        result = resp['results'][0]
+        self.assertEqual(result['total_count'], expected_count)
+        names = {r['scientific_name'] for r in result['results']}
+        self.assertEqual(names, expected_sci_names)
+
 
     def test_select_fields(self):
         """Test that the 'select' works properly for one query."""
