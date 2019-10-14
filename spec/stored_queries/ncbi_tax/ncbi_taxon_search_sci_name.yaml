@@ -9,6 +9,17 @@ params:
       type: string
       title: Search text
       description: Text to search on for the scientific name
+    ranks:
+      description: Filter the query to include only these ranks. An empty array is ignored.
+      type: array
+      default: []
+      items:
+        type: string
+    include_strains:
+      description: true to include strains in the result, regardless of the ranks field. false
+        to perform no special filtering on strains.
+      type: boolean
+      default: false
     offset:
       type: integer
       default: 0
@@ -28,16 +39,18 @@ params:
 query: |
   // Search using the fulltext index on scientific_name
   // Don't limit the results yet so we can get the total_count below
-  let results = (
-    FOR doc in FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
+  LET results = (
+    FOR doc IN FULLTEXT(ncbi_taxon, "scientific_name", @search_text)
       // Filter non-expired docs
-      filter doc.created <= @ts AND doc.expired >= @ts
-      return doc
+      FILTER doc.created <= @ts AND doc.expired >= @ts
+      FILTER LENGTH(@ranks) > 0 ?
+          (@include_strains ? (doc.rank in @ranks OR doc.strain) : doc.rank in @ranks) : true
+      RETURN doc
   )
   // Limit the results
-  let limited = (
-    for r in results
-      limit @offset, @limit
-      return @select ? KEEP(r, @select) : r
+  LET limited = (
+    FOR r IN results
+      LIMIT @offset, @limit
+      RETURN @select ? KEEP(r, @select) : r
   )
-  return  {results: limited, total_count: COUNT(results)}
+  RETURN {results: limited, total_count: COUNT(results)}
