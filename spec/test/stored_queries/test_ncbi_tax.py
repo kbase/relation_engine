@@ -13,65 +13,6 @@ _CONF = get_config()
 _NOW = int(time.time() * 1000)
 
 
-def _ws_defaults(data):
-    """Set some defaults for the required workspace fields."""
-    defaults = {
-        'owner': 'owner',
-        'max_obj_id': 1,
-        'lock_status': 'n',
-        'name': 'wsname',
-        'mod_epoch': 1,
-        'is_public': True,
-        'is_deleted': False,
-        'metadata': {'narrative_nice_name': 'narrname'},
-    }
-    # Merge the data with the above defaults
-    return dict(defaults, **data)
-
-
-def _construct_ws_obj_ver(wsid, objid, ver, is_public=False):
-    """Test helper to create a ws_object_version vertex."""
-    return {
-        '_key': f"{wsid}:{objid}:{ver}",
-        'workspace_id': wsid,
-        'object_id': objid,
-        'version': ver,
-        'name': f'obj_name{objid}',
-        'hash': 'xyz',
-        'size': 100,
-        'epoch': 0,
-        'deleted': False,
-        'is_public': is_public,
-    }
-
-
-def _construct_ws_obj(wsid, objid, is_public=False):
-    """Test helper to create a ws_object vertex."""
-    return {
-        '_key': f"{wsid}:{objid}",
-        'workspace_id': wsid,
-        'object_id': objid,
-        'deleted': False,
-        'is_public': is_public,
-    }
-
-
-def _create_delta_test_docs(coll_name, docs, edge=False):
-    """Add in delta required fields."""
-    if edge:
-        for doc in docs:
-            # Replicate the time-travel system by just setting 'from' and 'to' to the keys
-            doc['from'] = doc['_from'].split('/')[1]
-            doc['to'] = doc['_to'].split('/')[1]
-    else:
-        for doc in docs:
-            doc['id'] = doc['_key']
-    for doc in docs:
-        doc['expired'] = 9007199254740991
-        doc['created'] = 0
-    create_test_docs(coll_name, docs)
-
-
 class TestNcbiTax(unittest.TestCase):
 
     @classmethod
@@ -82,15 +23,10 @@ class TestNcbiTax(unittest.TestCase):
             {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum', 'strain': False},
             {'_key': '3', 'scientific_name': 'Bacilli', 'rank': 'Class', 'strain': False},
             {'_key': '4', 'scientific_name': 'Proteobacteria', 'rank': 'Phylum', 'strain': False},
-            {'_key': '5', 'scientific_name': 'Alphaproteobacteria',
-             'rank': 'Class', 'strain': False},
-            {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class',
-             'strain': False},
-            {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class',
-             'strain': False},
-            {'_key': '8', 'scientific_name': 'Bacillus subtilis 168', 'rank': 'no rank',
-             'strain': True}, 
-
+            {'_key': '5', 'scientific_name': 'Alphaproteobacteria', 'rank': 'Class', 'strain': False},
+            {'_key': '6', 'scientific_name': 'Gammaproteobacteria', 'rank': 'Class', 'strain': False},
+            {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class', 'strain': False},
+            {'_key': '8', 'scientific_name': 'Bacillus subtilis 168', 'rank': 'no rank', 'strain': True},
         ]
         child_docs = [
             {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
@@ -298,47 +234,57 @@ class TestNcbiTax(unittest.TestCase):
 
     def test_search_sciname_limit_ranks_implicit_defaults(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname(None, None, 3, {'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
-    
+        _run_search_sciname(
+            self,
+            ranks=None,
+            include_strains=None,
+            expected_count=3,
+            expected_sci_names={'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
+
     def test_search_sciname_limit_ranks_explicit_defaults(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname([], False, 3, {'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
+        _run_search_sciname(
+            self,
+            ranks=[],
+            include_strains=False,
+            expected_count=3,
+            expected_sci_names={'Bacteria', 'Bacilli', 'Bacillus subtilis 168'})
 
     def test_search_sciname_limit_ranks_2(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname(['Domain', 'Class'], None, 2, {'Bacteria', 'Bacilli'})
+        _run_search_sciname(
+            self,
+            ranks=['Domain', 'Class'],
+            include_strains=None,
+            expected_count=2,
+            expected_sci_names={'Bacteria', 'Bacilli'})
 
     def test_search_sciname_limit_ranks_1(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname(['Class'], None, 1, {'Bacilli'})
+        _run_search_sciname(
+            self,
+            ranks=['Class'],
+            include_strains=None,
+            expected_count=1,
+            expected_sci_names={'Bacilli'})
 
     def test_search_sciname_limit_ranks_1_with_strain(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname(['Class'], True, 2, {'Bacilli', 'Bacillus subtilis 168'})
+        _run_search_sciname(
+            self,
+            ranks=['Class'],
+            include_strains=True,
+            expected_count=2,
+            expected_sci_names={'Bacilli', 'Bacillus subtilis 168'})
 
     def test_search_sciname_limit_ranks_1_with_false_strain(self):
         """ Test queries where the results are limited by the rank or strain flag. """
-        self._run_search_sciname(['Class'], False, 1, {'Bacilli'})
-
-    def _run_search_sciname(self, ranks, include_strains, expected_count, expected_sci_names):
-        data = {
-            'ts': _NOW,
-            'search_text': "prefix:bac"
-        }
-        if ranks is not None:
-            data['ranks'] = ranks
-        if include_strains is not None:
-            data['include_strains'] = include_strains
-        resp = requests.post(
-            _CONF['re_api_url'] + '/api/v1/query_results',
-            params={'stored_query': 'ncbi_taxon_search_sci_name'},
-            data=json.dumps(data)
-            ).json()
-        result = resp['results'][0]
-        self.assertEqual(result['total_count'], expected_count)
-        names = {r['scientific_name'] for r in result['results']}
-        self.assertEqual(names, expected_sci_names)
-
+        _run_search_sciname(
+            self,
+            ranks=['Class'],
+            include_strains=False,
+            expected_count=1,
+            expected_sci_names={'Bacilli'})
 
     def test_select_fields(self):
         """Test that the 'select' works properly for one query."""
@@ -449,3 +395,88 @@ class TestNcbiTax(unittest.TestCase):
         ).json()
         self.assertEqual(resp['count'], 0)
         self.assertEqual(len(resp['results']), 0)
+
+
+# -- Test helpers
+
+def _run_search_sciname(self, ranks, include_strains, expected_count, expected_sci_names):
+    """
+    Helper to run the ncbi_taxon_search_sci_name query and make some standard
+    assertions on the response.
+    """
+    data = {
+        'ts': _NOW,
+        'search_text': "prefix:bac"
+    }
+    if ranks is not None:
+        data['ranks'] = ranks
+    if include_strains is not None:
+        data['include_strains'] = include_strains
+    resp = requests.post(
+        _CONF['re_api_url'] + '/api/v1/query_results',
+        params={'stored_query': 'ncbi_taxon_search_sci_name'},
+        data=json.dumps(data)
+        ).json()
+    result = resp['results'][0]
+    self.assertEqual(result['total_count'], expected_count)
+    names = {r['scientific_name'] for r in result['results']}
+    self.assertEqual(names, expected_sci_names)
+
+
+def _ws_defaults(data):
+    """Set some defaults for the required workspace fields."""
+    defaults = {
+        'owner': 'owner',
+        'max_obj_id': 1,
+        'lock_status': 'n',
+        'name': 'wsname',
+        'mod_epoch': 1,
+        'is_public': True,
+        'is_deleted': False,
+        'metadata': {'narrative_nice_name': 'narrname'},
+    }
+    # Merge the data with the above defaults
+    return dict(defaults, **data)
+
+
+def _construct_ws_obj_ver(wsid, objid, ver, is_public=False):
+    """Test helper to create a ws_object_version vertex."""
+    return {
+        '_key': f"{wsid}:{objid}:{ver}",
+        'workspace_id': wsid,
+        'object_id': objid,
+        'version': ver,
+        'name': f'obj_name{objid}',
+        'hash': 'xyz',
+        'size': 100,
+        'epoch': 0,
+        'deleted': False,
+        'is_public': is_public,
+    }
+
+
+def _construct_ws_obj(wsid, objid, is_public=False):
+    """Test helper to create a ws_object vertex."""
+    return {
+        '_key': f"{wsid}:{objid}",
+        'workspace_id': wsid,
+        'object_id': objid,
+        'deleted': False,
+        'is_public': is_public,
+    }
+
+
+def _create_delta_test_docs(coll_name, docs, edge=False):
+    """Add in delta required fields."""
+    if edge:
+        for doc in docs:
+            # Replicate the time-travel system by just setting 'from' and 'to' to the keys
+            doc['from'] = doc['_from'].split('/')[1]
+            doc['to'] = doc['_to'].split('/')[1]
+    else:
+        for doc in docs:
+            doc['id'] = doc['_key']
+    for doc in docs:
+        doc['expired'] = 9007199254740991
+        doc['created'] = 0
+    create_test_docs(coll_name, docs)
