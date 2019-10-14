@@ -80,9 +80,8 @@ def validation_error(err):
     resp = {
         'error': err.message,
         'failed_validator': err.validator,
-        'validator_value': err.validator_value,
+        'value': err.instance,
         'path': list(err.absolute_path),
-        'schema_path': list(err.schema_path)
     }
     return (flask.jsonify(resp), 400)
 
