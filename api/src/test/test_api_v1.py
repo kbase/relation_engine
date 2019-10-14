@@ -146,9 +146,9 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN
         ).json()
         self.assertEqual(resp['error'], "'_key' is a required property")
-        self.assertEqual(resp['value'], {'name': 'y'})
+        self.assertEqual(resp['value'], {'name': 'x'})
         self.assertEqual(resp['path'], [])
-        self.assertEqual(resp['failed_validator'], ['required'])
+        self.assertEqual(resp['failed_validator'], 'required')
 
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
