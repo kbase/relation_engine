@@ -1,0 +1,20 @@
+name: rdp_child_of_taxon
+type: edge
+delta: true
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [from, to, id]
+  description: Edges which create the taxonomy tree for RDP taxons.
+  properties:
+    id:
+      type: string
+      description: The id of the edge. This is the id of the from node (e.g. the child node in
+        the tree) for the edge.
+    from:
+      type: string
+      description: The child taxon. The id of the from node for the edge.
+    to:
+      type: string
+      description: The parent taxon. The id of the to node for the edge.
