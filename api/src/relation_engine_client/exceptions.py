@@ -2,6 +2,7 @@ import json
 
 
 class REServerError(Exception):
+    """Server-originated error from RE API (ie. 500+)"""
 
     def __init__(self, resp):
         self.resp = resp
@@ -15,6 +16,7 @@ class REServerError(Exception):
 
 
 class RERequestError(Exception):
+    """Error in the request format or data from the client (ie. 400)"""
 
     def __init__(self, resp):
         self.resp = resp
@@ -32,6 +34,7 @@ class RERequestError(Exception):
 
 
 class RENotFound(Exception):
+    """The user required some results to be returned, but there were none."""
 
     def __init__(self, req_body, req_params):
         self.req_body = req_body
