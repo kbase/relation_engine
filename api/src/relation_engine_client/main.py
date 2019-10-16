@@ -106,6 +106,8 @@ class REClient:
         """
         if isinstance(docs, dict):
             docs = [docs]
+        if not docs:
+            raise TypeError("No documents provided to save")
         params = {'collection': coll}
         if display_errors:
             params['display_errors'] = '1'

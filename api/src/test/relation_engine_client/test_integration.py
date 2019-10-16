@@ -31,25 +31,25 @@ class TestREClientIntegration(unittest.TestCase):
 
     def test_admin_empty_query(self):
         bind_vars = {'id': 'xyz'}
-        with self.assertRaises(RERequestError) as err:
+        with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query("", bind_vars)
-        self.assertEqual(err.resp.status_code, 400)
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     def test_admin_missing_param(self):
         query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
-        with self.assertRaises(RERequestError) as err:
+        with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query(query, bind_vars={})
-        self.assertEqual(err.resp.status_code, 400)
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     def test_admin_raise_not_found(self):
         query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
         _id = str(uuid4())
         bind_vars = {'id': _id}
-        with self.assertRaises(RENotFound) as err:
+        with self.assertRaises(RENotFound) as ctx:
             self.client.admin_query(query, bind_vars, raise_not_found=True)
-        self.assertTrue(_id in err.req_body)
+        self.assertTrue(_id in ctx.exception.req_body)
 
-    def test_admin_bad_params(self):
+    def test_admin_invalid_args(self):
         # No params
         with self.assertRaises(TypeError):
             self.client.admin_query()
@@ -62,47 +62,68 @@ class TestREClientIntegration(unittest.TestCase):
 
     def test_stored_query_ok(self):
         _id = self._save_test_vert()
-        bind_vars = {'id': _id}
+        bind_vars = {'key': _id}
         qname = 'fetch_test_vertex'
         result = self.client.stored_query(qname, bind_vars)
         self.assertEqual(result['count'], 1)
         self.assertEqual(result['results'][0]['_key'], _id)
 
     def test_stored_query_invalid_args(self):
-        # TODO
-        pass
+        with self.assertRaises(TypeError):
+            self.client.stored_query()
+        with self.assertRaises(TypeError):
+            self.client.stored_query(123, 123)
+        with self.assertRaises(TypeError):
+            self.client.stored_query("")
 
     def test_stored_query_unknown_query(self):
-        # TODO
-        pass
+        qname = 'xyz123'
+        with self.assertRaises(RERequestError) as ctx:
+            self.client.admin_query(qname, bind_vars={'key': 0})
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     def test_stored_query_missing_bind_vars(self):
-        # TODO
-        pass
+        qname = 'fetch_test_vertex'
+        with self.assertRaises(RERequestError) as ctx:
+            self.client.admin_query(qname, bind_vars={'x': 'y'})
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     def test_stored_query_raise_not_found(self):
-        # TODO
-        pass
+        _id = str(uuid4())
+        bind_vars = {'key': _id}
+        qname = 'fetch_test_vertex'
+        with self.assertRaises(RENotFound) as ctx:
+            self.client.stored_query(qname, bind_vars, raise_not_found=True)
+        self.assertTrue(_id in ctx.exception.req_body)
 
     def test_save_docs_ok(self):
-        # TODO
-        pass
+        _id = str(uuid4())
+        docs = [{'_key': _id}]
+        results = self.client.save_docs(coll=_VERT_COLL, docs=docs)
+        self.assertEqual(results['created'], 1)
+        self.assertFalse(results['error'])
+        self.assertEqual(results['errors'], 0)
+        self.assertEqual(results['ignored'], 0)
+        self.assertEqual(results['updated'], 0)
 
     def test_save_docs_invalid_args(self):
-        # TODO
-        pass
+        with self.assertRaises(TypeError):
+            self.client.save_docs()
+        with self.assertRaises(TypeError):
+            self.client.save_docs(123, 456)
+        # Empty docs list
+        with self.assertRaises(TypeError):
+            self.client.save_docs(_VERT_COLL, [])
 
     def test_save_docs_unknown_coll(self):
-        # TODO
-        pass
-
-    def test_save_docs_empty_docs(self):
-        # TODO
-        pass
+        with self.assertRaises(RERequestError) as ctx:
+            self.client.save_docs('xyz123', [{'_key': 0}])
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     def test_save_docs_invalid_docs(self):
-        # TODO
-        pass
+        with self.assertRaises(RERequestError) as ctx:
+            self.client.save_docs(_VERT_COLL, [{'hi': 0}])
+        self.assertEqual(ctx.exception.resp.status_code, 400)
 
     # -- Test helpers
 
