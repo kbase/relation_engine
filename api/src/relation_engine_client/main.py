@@ -103,6 +103,9 @@ class REClient:
             display_errors - bool (defaults to False) - whether to respond with
                 document save errors (the response will give you an error for every
                 document that failed to save).
+        Exceptions raised:
+            REServerError - 500 from the RE API
+            RERequestError - 400 from the RE API (client error)
         """
         if isinstance(docs, dict):
             docs = [docs]
