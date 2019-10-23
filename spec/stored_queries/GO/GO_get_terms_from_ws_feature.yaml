@@ -21,7 +21,7 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
-query_prefix: WITH ws_genome_features, GO_terms
+query_prefix: WITH ws_object_version, GO_terms
 query: |
   LET go_term_results=(
     FOR f in ws_genome_features

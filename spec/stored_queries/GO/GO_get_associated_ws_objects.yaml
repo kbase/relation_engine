@@ -8,7 +8,7 @@ params:
     id:
       type: string
       title: Document ID
-      description: GO id of the term you want to get the children of
+      description: GO id of the term you want to get the ws object of
     limit:
       type: integer
       title: Maximum result limit
