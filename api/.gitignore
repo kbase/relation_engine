@@ -4,9 +4,11 @@
 # Caches and temp dirs
 /build/
 /dist/
+/client_src/dist/
 *.pyc
 .mypy_cache/
 .cache/
 /tmp/
 coverage_report/
 .coverage
+*.egg-info/
