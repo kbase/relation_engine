@@ -1,7 +1,6 @@
 import json
 import requests
 from typing import Optional, List, Dict, Union
-from dataclasses import dataclass
 
 from .exceptions import REServerError, RERequestError, RENotFound
 
@@ -11,12 +10,11 @@ _SAVE_METHOD = 'PUT'
 _SAVE_ENDPOINT = '/api/v1/documents'
 
 
-@dataclass
 class REClient:
-    api_url: str
-    token: Optional[str] = None
 
-    def __post_init__(self):
+    def __init__(self, api_url: str, token: str = None):
+        self.api_url = api_url
+        self.token = token
         # Type check the constructor parameters
         if not self.api_url or not isinstance(self.api_url, str):
             raise TypeError("The Relation Engine API URL was not provided.")
