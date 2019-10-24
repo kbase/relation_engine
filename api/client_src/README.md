@@ -99,3 +99,17 @@ The `raise_not_found` argument was set to `True` and no documents were found in 
 Access the `.req_body` and `.req_params` properties of the error object to see the request data, or simply print the error to debug.
 
 ## Development
+
+### Publishing
+
+Increment the semantic version inside `client_src/setup.py`, then build the package with:
+
+```sh
+python setup.py sdist
+```
+
+Publish to the anaconda pypi repository with:
+
+```sh
+anaconda upload -i -u kbase dist/releng-client-{version}.tar.gz
+```
