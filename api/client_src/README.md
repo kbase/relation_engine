@@ -4,10 +4,11 @@ A pip-installable Python client module for accessing the methods of the Relation
 
 ## Installation
 
-Install via pip using the KBase pip server:
+Install with pip:
 
-```
-pip install releng-client --extra-index-url=https://anaconda.org/kbase
+```sh
+pip install --extra-index-url https://pypi.anaconda.org/kbase/simple \
+    releng-client==0.0.1
 ```
 
 ## Usage
@@ -23,7 +24,7 @@ Pass in the URL of the Relation Engine API server you want to use, which is most
 Additionally, pass in a KBase auth token you would like to use for access control and document saving permissions when making requests to the API.
 
 ```py
-from releng_client import REClient
+from relation_engine_client import REClient
 
 re_client = REClient("https://ci.kbase.us/services/relation_engine_api", "xyz_my_token")
 ```
@@ -76,7 +77,7 @@ You must have an auth token set in the client with the RE admin role.
 A few different exceptions can be thrown from each method, which you can import:
 
 ```py
-from releng_client.exceptions import REServerError, RERequestError, RENotFound
+from relation_engine_client.exceptions import REServerError, RERequestError, RENotFound
 ```
 
 #### REServerError
