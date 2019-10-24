@@ -2,6 +2,10 @@
 
 A simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
 
+## Python client
+
+There is a [pip-installable python client](src/relation_engine_client/README.md) that can be used to access the RE API.
+
 ## HTTP API v1
 
 The API is a small, rest-ish service where all data is in JSON format. Replace the `{root_url}` in the examples below with one of:
@@ -111,7 +115,6 @@ _Query params_
 * `collection` - required - string - name of the collection that we want to bulk-import into.
 * `on_duplicate` - optional - "replace", "update", "ignore", "error" - Action to take when we find a duplicate document by `_key`. "replace" replaces the whole document. "update" merges in the new values. "ignore" takes no action. "error" cancels the entire transaction.
 * `display_errors` - optional - bool - whether to return error messages for each document that failed to save in the response. This is disabled by default as it will slow down the response time.
-* `overwrite` - optional - boolean - whether to overwrite the whole collection (that is, delete all documents currently in the collection before creating the documents you provide)
 
 _Request body_
 

@@ -1,4 +1,3 @@
-import os
 import json
 import requests
 from typing import Optional, List, Dict, Union
@@ -14,28 +13,14 @@ _SAVE_ENDPOINT = '/api/v1/documents'
 
 @dataclass
 class REClient:
-    # The `api_url` can be set with the RE_API_URL env var if provided.
-    # We can also use the KBASE_ENDPOINT env var (eg. "https://ci.kbase.us/services/").
-    api_url: Optional[str] = None
-    # Set to the KBASE_TOKEN env var if not provided
+    api_url: str
     token: Optional[str] = None
 
     def __post_init__(self):
-        if self.token is None:
-            self.token = os.environ.get('KBASE_TOKEN')
-        if self.api_url is None:
-            if 'RE_API_URL' in os.environ:
-                self.api_url = os.environ['RE_API_URL']
-            elif 'KBASE_ENDPOINT' in os.environ:
-                # eg. https://ci.kbase.us/services/
-                # Remove any trailing slash and append the RE API service name
-                self.api_url = os.environ['KBASE_ENDPOINT'].strip('/') + '/relation_engine_api'
-        if not self.api_url:
-            raise RuntimeError("The Relation Engine API URL was not provided. "
-                               "Set the `api_url` constructor parameter, the "
-                               "RE_API_URL environment variable, or the "
-                               "KBASE_ENDPOINT environment variable.")
-        # Remove any trailing slash
+        # Type check the constructor parameters
+        if not self.api_url or not isinstance(self.api_url, str):
+            raise TypeError("The Relation Engine API URL was not provided.")
+        # Remove any trailing slash in the API URL so we can append paths
         self.api_url = self.api_url.strip('/')
 
     def admin_query(self, query: str, bind_vars: dict, raise_not_found=False):
@@ -46,10 +31,18 @@ class REClient:
             bind_vars - dict - JSON serializable bind variables for the query
             raise_not_found - bool - Whether to raise an error if there are zero results. Defaults to False
         Exceptions raised:
-            REParamError - raised on invalid parameters to the RE API
-            REServerError - raised on a 500 from the RE API
+            RERequestError - 400-499 error from the RE API
+            REServerError - 500+ error from the RE API
             RENotFound - raised when raise_not_found is True and there are 0 results
         """
+        # Type-check the parameters
+        if not isinstance(query, str):
+            raise TypeError("`query` argument must be a str")
+        if not isinstance(bind_vars, dict):
+            raise TypeError("`bind_vars` argument must be a dict")
+        if not isinstance(raise_not_found, bool):
+            raise TypeError("`raise_not_found` argument must be a bool")
+        # Construct and execute the request
         req_body = dict(bind_vars)
         req_body['query'] = query
         url = str(self.api_url) + _QUERY_ENDPOINT
@@ -69,10 +62,18 @@ class REClient:
             bind_vars - JSON serializable - bind variables for the query (JSON serializable)
             raise_not_found - bool - Whether to raise an error if there are zero results. Defaults to False
         Exceptions raised:
-            REParamError - raised on invalid parameters to the RE API
-            REServerError - raised on a 500 from the RE API
+            RERequestError - 400-499 from the RE API (client error)
+            REServerError - 500+ error from the RE API
             RENotFound - raised when raise_not_found is True and there are 0 results
         """
+        # Type-check the parameters
+        if not isinstance(stored_query, str):
+            raise TypeError("`stored_query` argument must be a str")
+        if not isinstance(bind_vars, dict):
+            raise TypeError("`bind_vars` argument must be a dict")
+        if not isinstance(raise_not_found, bool):
+            raise TypeError("`raise_not_found` argument must be a bool`")
+        # Construct and execute the request
         req_body = dict(bind_vars)
         url = str(self.api_url) + _QUERY_ENDPOINT
         return self._make_request(
@@ -87,35 +88,36 @@ class REClient:
             coll: str,
             docs: Union[Dict, List[Dict]],
             on_duplicate: Optional[str] = None,
-            overwrite=False,
             display_errors=False):
         """
         Save documents to a collection in the relation engine.
+        Requires an auth token with RE admin privileges.
         Params:
             coll - str - collection name to save to
             docs - a single dict or list of dicts - json-serializable documents to save
             on_duplicate - str (defaults to 'error') - what to do when a provided document
                 already exists in the collection. See options here:
                 https://github.com/kbase/relation_engine_api#put-apiv1documents
-            overwrite - bool (defaults to False) - whether to overwrite
-                everything in the collection (ie. remove all contents of the
-                collection before writing new documents)
             display_errors - bool (defaults to False) - whether to respond with
                 document save errors (the response will give you an error for every
                 document that failed to save).
         Exceptions raised:
-            REServerError - 500 from the RE API
-            RERequestError - 400 from the RE API (client error)
+            RERequestError - 400-499 from the RE API (client error)
+            REServerError - 500+ error from the RE API
         """
         if isinstance(docs, dict):
             docs = [docs]
         if not docs:
             raise TypeError("No documents provided to save")
+        if not isinstance(docs, list):
+            raise TypeError("`docs` argument must be a list")
+        if on_duplicate and not isinstance(on_duplicate, str):
+            raise TypeError("`on_duplicate` argument must bea str")
+        if not isinstance(display_errors, bool):
+            raise TypeError("`display_errors` argument must be a bool")
         params = {'collection': coll}
         if display_errors:
             params['display_errors'] = '1'
-        if overwrite:
-            params['overwrite'] = '1'
         params['on_duplicate'] = on_duplicate or 'error'
         req_body = '\n'.join(json.dumps(d) for d in docs)
         url = str(self.api_url) + _SAVE_ENDPOINT

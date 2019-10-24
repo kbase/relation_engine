@@ -6,8 +6,12 @@ from src.relation_engine_client import REClient
 from src.relation_engine_client.exceptions import RERequestError, RENotFound
 
 _API_URL = os.environ.get('RE_API_URL', 'http://localhost:5000')
+# See the test schemas here:
+# https://github.com/kbase/relation_engine_spec/tree/develop/schemas/test
 _VERT_COLL = 'test_vertex'
 _EDGE_COLL = 'test_edge'
+# See the docker-compose.yaml file in the root of this repo
+# See the mock auth endpoints in src/test/mock_auth/*.json
 _TOK_ADMIN = 'admin_token'
 _TOK_USER = 'non_admin_token'
 _TOK_INVALID = 'invalid_token'
@@ -19,7 +23,6 @@ class TestREClientIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = REClient(_API_URL, _TOK_ADMIN)
-        pass
 
     def test_admin_query_ok(self):
         _id = self._save_test_vert()
@@ -29,17 +32,39 @@ class TestREClientIntegration(unittest.TestCase):
         self.assertEqual(result['count'], 1)
         self.assertEqual(result['results'][0]['_key'], _id)
 
+    def test_admin_query_empty_auth(self):
+        client2 = REClient(_API_URL)
+        query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
+        with self.assertRaises(RERequestError) as ctx:
+            client2.admin_query(query, {'id': 'xyz'})
+        self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Missing header: Authorization' in str(ctx.exception))
+
+    def test_admin_query_invalid_auth(self):
+        client2 = REClient(_API_URL, 'xyz')
+        query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
+        with self.assertRaises(RERequestError) as ctx:
+            client2.admin_query(query, {'id': 'xyz'})
+        self.assertEqual(ctx.exception.resp.status_code, 403)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Unauthorized' in str(ctx.exception))
+
     def test_admin_empty_query(self):
         bind_vars = {'id': 'xyz'}
         with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query("", bind_vars)
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     def test_admin_missing_param(self):
         query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
         with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query(query, bind_vars={})
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     def test_admin_raise_not_found(self):
         query = f"FOR vert IN {_VERT_COLL} FILTER vert._key == @id RETURN vert"
@@ -48,6 +73,8 @@ class TestREClientIntegration(unittest.TestCase):
         with self.assertRaises(RENotFound) as ctx:
             self.client.admin_query(query, bind_vars, raise_not_found=True)
         self.assertTrue(_id in ctx.exception.req_body)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Request body:' in str(ctx.exception))
 
     def test_admin_invalid_args(self):
         # No params
@@ -81,12 +108,16 @@ class TestREClientIntegration(unittest.TestCase):
         with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query(qname, bind_vars={'key': 0})
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     def test_stored_query_missing_bind_vars(self):
         qname = 'fetch_test_vertex'
         with self.assertRaises(RERequestError) as ctx:
             self.client.admin_query(qname, bind_vars={'x': 'y'})
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     def test_stored_query_raise_not_found(self):
         _id = str(uuid4())
@@ -95,6 +126,8 @@ class TestREClientIntegration(unittest.TestCase):
         with self.assertRaises(RENotFound) as ctx:
             self.client.stored_query(qname, bind_vars, raise_not_found=True)
         self.assertTrue(_id in ctx.exception.req_body)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Request body:' in str(ctx.exception))
 
     def test_save_docs_ok(self):
         _id = str(uuid4())
@@ -105,6 +138,24 @@ class TestREClientIntegration(unittest.TestCase):
         self.assertEqual(results['errors'], 0)
         self.assertEqual(results['ignored'], 0)
         self.assertEqual(results['updated'], 0)
+
+    def test_save_docs_empty_auth(self):
+        client2 = REClient(_API_URL)
+        docs = [{'_key': 'xyz'}]
+        with self.assertRaises(RERequestError) as ctx:
+            client2.save_docs(coll=_VERT_COLL, docs=docs)
+        self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Missing header: Authorization' in str(ctx.exception))
+
+    def test_save_docs_invalid_auth(self):
+        client2 = REClient(_API_URL, 'xyz')
+        docs = [{'_key': 'xyz'}]
+        with self.assertRaises(RERequestError) as ctx:
+            client2.save_docs(coll=_VERT_COLL, docs=docs)
+        self.assertEqual(ctx.exception.resp.status_code, 403)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Unauthorized' in str(ctx.exception))
 
     def test_save_docs_invalid_args(self):
         with self.assertRaises(TypeError):
@@ -119,11 +170,15 @@ class TestREClientIntegration(unittest.TestCase):
         with self.assertRaises(RERequestError) as ctx:
             self.client.save_docs('xyz123', [{'_key': 0}])
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     def test_save_docs_invalid_docs(self):
         with self.assertRaises(RERequestError) as ctx:
             self.client.save_docs(_VERT_COLL, [{'hi': 0}])
         self.assertEqual(ctx.exception.resp.status_code, 400)
+        # Mostly make sure that the __str__ method does not throw any errs
+        self.assertTrue('Response:' in str(ctx.exception))
 
     # -- Test helpers
 

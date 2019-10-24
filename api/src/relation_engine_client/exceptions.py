@@ -1,5 +1,3 @@
-import json
-
 
 class REServerError(Exception):
     """Server-originated error from RE API (ie. 500+)"""
@@ -10,8 +8,8 @@ class REServerError(Exception):
     def __str__(self):
         return (
             f"Relation engine API server error:\n"
-            f"Request URL: {self.resp.method}\n"
-            f"Response: {self.resp.json()}"
+            f"Status: {self.resp.status_code}\n"
+            f"Response: {self.resp.text}"
         )
 
 
@@ -22,15 +20,11 @@ class RERequestError(Exception):
         self.resp = resp
 
     def __str__(self):
-        try:
-            return (
-                f"Relation engine API client request error:\n"
-                f"Request URL: {self.resp.method}\n"
-                f"Response: {json.dumps(self.resp.json(), indent=2)}"
-            )
-        except Exception as err:
-            print(err)
-            return self.resp.text
+        return (
+            f"Relation engine API client request error:\n"
+            f"Status: {self.resp.status_code}\n"
+            f"Response: {self.resp.text}"
+        )
 
 
 class RENotFound(Exception):
