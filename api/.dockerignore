@@ -23,6 +23,7 @@ __pycache__/
 
 # Distribution / packaging
 /dist/
+/client_src/dist/
 eggs/
 .eggs/
 *.egg-info/

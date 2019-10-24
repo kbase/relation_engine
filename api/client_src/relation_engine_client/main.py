@@ -3,7 +3,7 @@ import requests
 from typing import Optional, List, Dict, Union
 from dataclasses import dataclass
 
-from src.relation_engine_client.exceptions import REServerError, RERequestError, RENotFound
+from .exceptions import REServerError, RERequestError, RENotFound
 
 _QUERY_METHOD = 'POST'
 _QUERY_ENDPOINT = '/api/v1/query_results'

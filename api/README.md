@@ -4,7 +4,7 @@ A simple API that allows KBase community developers to interact with the Relatio
 
 ## Python client
 
-There is a [pip-installable python client](src/relation_engine_client/README.md) that can be used to access the RE API.
+There is a [pip-installable python client](client_src/README.md) that can be used to access the RE API.
 
 ## HTTP API v1
 
