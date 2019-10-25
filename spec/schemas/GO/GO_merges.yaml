@@ -6,9 +6,9 @@ indexes:
   - type: hash  # don't think this needs to be a skiplist / persistent index
     fields: [from]
   - type: persistent
-    fields: [id, created, expired]
+    fields: [id, expired, created]
   - type: persistent
-    fields: [created, expired, last_version]
+    fields: [expired, created, last_version]
 
 schema:
     "$schema": http://json-schema.org/draft-07/schema#
