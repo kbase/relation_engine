@@ -4,9 +4,9 @@ delta: true
 
 indexes:
   - type: persistent
-    fields: [id, created, expired]
+    fields: [id, expired, created]
   - type: persistent
-    fields: [created, expired, last_version]
+    fields: [expired, created, last_version]
 
 schema:
     "$schema": http://json-schema.org/draft-07/schema#
