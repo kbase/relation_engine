@@ -1,0 +1,8 @@
+name: delta_load_registry
+type: vertex
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: delta_load_registry
+  type: object
+  description: Don't touch this. It's for the exlusive use of delta loaders.
