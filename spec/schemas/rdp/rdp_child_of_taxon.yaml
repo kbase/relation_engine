@@ -2,6 +2,12 @@ name: rdp_child_of_taxon
 type: edge
 delta: true
 
+indexes:
+  - type: persistent
+    fields: [id, created, expired]
+  - type: persistent
+    fields: [created, expired, last_version]
+
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object

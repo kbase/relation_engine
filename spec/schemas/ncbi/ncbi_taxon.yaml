@@ -5,6 +5,10 @@ delta: true
 indexes:
   - type: fulltext
     fields: [scientific_name]
+  - type: persistent
+    fields: [id, created, expired]
+  - type: persistent
+    fields: [created, expired, last_version]
 
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
