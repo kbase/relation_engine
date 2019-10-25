@@ -6,3 +6,9 @@ schema:
   title: delta_load_registry
   type: object
   description: Don't touch this. It's for the exlusive use of delta loaders.
+  properties:
+    _key:
+      type: string
+      description: required to pass validator.
+  required:
+    - _key
