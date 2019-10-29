@@ -85,7 +85,7 @@ def create_collection(name, config):
     Shard the new collection based on the number of db nodes (10 shards for each).
     """
     is_edge = config['type'] == 'edge'
-    num_shards = os.environ.get('SHARD_COUNT', 30)
+    num_shards = int(os.environ.get('SHARD_COUNT', 30))
     url = _CONF['api_url'] + '/collection'
     # collection types:
     #   2 is a document collection
