@@ -1,0 +1,5 @@
+name: ncbi_taxonomy
+category: taxonomy
+namespace_title: NCBI Taxonomy
+home_url: https://www.ncbi.nlm.nih.gov/taxonomy
+data_url: ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/

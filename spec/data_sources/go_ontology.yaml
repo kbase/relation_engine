@@ -1,0 +1,5 @@
+name: go_ontology
+category: ontology
+namespace_title: Gene Ontology
+home_url: http://geneontology.org/
+data_url: http://release.geneontology.org/
