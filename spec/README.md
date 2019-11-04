@@ -9,6 +9,7 @@ by KBase apps to fetch data from the database.
 * **Schemas** are [JSON schemas](https://json-schema.org/) that define what form of data can be stored in
 the database's collections.
 * **Migrations** are python modules that connect to the database and are responsible for transitioning the data in a collection from an old schema to a newer one.
+* **Data sources** (in `data_sources/`) contains some general information about where some of our imported data comes from.
 
 ## Development
 
