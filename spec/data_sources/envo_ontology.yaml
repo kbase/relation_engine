@@ -1,6 +1,6 @@
 name: envo_ontology
 category: ontology
-namespace_title: Environment Ontology
+title: Environment Ontology
 home_url: http://www.obofoundry.org/ontology/envo.html
 data_url: https://github.com/EnvironmentOntology/envo/releases
 logo_path: /images/third-party-data-sources/envo/logo-119-64.png
