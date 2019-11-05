@@ -189,7 +189,7 @@ Response JSON schema:
 { "type": "object",
   "properties": {
     "data_sources": {
-      "type: "array",
+      "type": "array",
       "items": { "type": "string" }
     }
   }
@@ -221,27 +221,27 @@ Response JSON schema:
 { "type": "object",
   "properties": {
     "name": {
-      "type: "string",
+      "type": "string",
       "description": "canonical identifier for this data source"
     },
     "category": {
-      "type: "string",
+      "type": "string",
       "description": "parent category, such as taxonomy or ontology"
     },
     "title": {
-      "type: "string",
+      "type": "string",
       "description": "human readable name for the data source"
     },
     "home_url": {
-      "type: "string",
+      "type": "string",
       "description": "full URL of the home page for the data source"
     },
     "data_url": {
-      "type: "string",
+      "type": "string",
       "description": "full URL from where the data can be downloaded"
     },
     "logo_url": {
-      "type: "string",
+      "type": "string",
       "description": "the URL of a logo image representing this data source"
     },
   }
