@@ -4,6 +4,7 @@ Load the `data_sources` info from the relation engine spec.
 The spec holds some information about some of the source data for the RE, such
 as NCBI taxonomy, Gene Ontology, etc. This info may be used in the UI.
 """
+import re
 import yaml
 import os
 import glob
@@ -36,6 +37,7 @@ def fetch_one(name):
     except FileNotFoundError:
         raise NotFound(f"The data source with name '{name}' does not exist.")
     # Append the logo root url to be the ui-assets server url with the correct environment
-    contents['logo_url'] = _CONF['kbase_endpoint'] + '/ui-assets' + contents['logo_path']
+    base_logo_url = re.sub(r'\/services\/?', '/ui-assets', _CONF['kbase_endpoint'])
+    contents['logo_url'] = base_logo_url + contents['logo_path']
     del contents['logo_path']
     return contents

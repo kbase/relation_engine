@@ -460,9 +460,7 @@ class TestApi(unittest.TestCase):
             'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
         })
         self.assertTrue(
-            resp_json['data_source']['logo_url'].startswith(
-                _CONF['kbase_endpoint'] + '/ui-assets/images/third-party-data-sources/ncbi'
-            )
+            '/ui-assets/images/third-party-data-sources/ncbi' in resp_json['data_source']['logo_url']
         )
 
     def test_show_data_source_unknown(self):
