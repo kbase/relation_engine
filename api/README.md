@@ -173,6 +173,81 @@ If you try to update a collection and it fails validation against a JSON schema 
 * `"value"` - The (possibly nested) value in your data that failed validation
 * `"path"` - The path into your data where you can find the value that failed validation
 
+### GET /api/v1/data_sources
+
+Fetch a list of data source names. Will return an array of strings.
+
+Example response body:
+
+```json
+{"data_sources": ["x", "y", "z"]}
+```
+
+Response JSON schema:
+
+```json
+{ "type": "object",
+  "properties": {
+    "data_sources": {
+      "type: "array",
+      "items": { "type": "string" }
+    }
+  }
+}
+```
+
+### GET /api/v1/data_sources/<name>
+
+Fetch the details for a data source by name. Will return an object of key/value details.
+
+Example response body:
+
+```json
+{
+  "data_source": {
+    "name": "envo_ontology",
+    "category": "ontology",
+    "title": "Environment Ontology",
+    "home_url": "http://www.obofoundry.org/ontology/envo.html",
+    "data_url": "https://github.com/EnvironmentOntology/envo/releases",
+    "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/envo/logo-119-64.png"
+  }
+}
+```
+
+Response JSON schema:
+
+```json
+{ "type": "object",
+  "properties": {
+    "name": {
+      "type: "string",
+      "description": "canonical identifier for this data source"
+    },
+    "category": {
+      "type: "string",
+      "description": "parent category, such as taxonomy or ontology"
+    },
+    "title": {
+      "type: "string",
+      "description": "human readable name for the data source"
+    },
+    "home_url": {
+      "type: "string",
+      "description": "full URL of the home page for the data source"
+    },
+    "data_url": {
+      "type: "string",
+      "description": "full URL from where the data can be downloaded"
+    },
+    "logo_url": {
+      "type: "string",
+      "description": "the URL of a logo image representing this data source"
+    },
+  }
+}
+```
+
 ### PUT /api/v1/specs/
 
 Manually check and pull spec updates. Requires sysadmin auth.

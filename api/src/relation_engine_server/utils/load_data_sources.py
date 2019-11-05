@@ -35,4 +35,7 @@ def fetch_one(name):
             contents = yaml.safe_load(fd)
     except FileNotFoundError:
         raise NotFound(f"The data source with name '{name}' does not exist.")
+    # Append the logo root url to be the ui-assets server url with the correct environment
+    contents['logo_url'] = _CONF['kbase_endpoint'] + '/ui-assets' + contents['logo_path']
+    del contents['logo_path']
     return contents

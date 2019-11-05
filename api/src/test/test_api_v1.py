@@ -446,7 +446,6 @@ class TestApi(unittest.TestCase):
 
     def test_list_data_sources(self):
         resp = requests.get(API_URL + '/data_sources')
-        print('xyz test_list_data_source', resp.text)
         self.assertTrue(resp.ok)
         resp_json = resp.json()
         self.assertTrue(len(resp_json['data_sources']) > 0)
@@ -454,13 +453,17 @@ class TestApi(unittest.TestCase):
 
     def test_show_data_source(self):
         resp = requests.get(API_URL + '/data_sources/ncbi_taxonomy')
-        print('xyz test_show_data_source', resp.text)
         self.assertTrue(resp.ok)
         resp_json = resp.json()
         self.assertEqual(type(resp_json['data_source']), dict)
         self.assertEqual(set(resp_json['data_source'].keys()), {
-            'name', 'category', 'title', 'home_url', 'data_url', 'logo_path'
+            'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
         })
+        self.assertTrue(
+            resp_json['data_source']['logo_url'].startswith(
+                _CONF['kbase_endpoint'] + '/ui-assets/images/third-party-data-sources/ncbi'
+            )
+        )
 
     def test_show_data_source_unknown(self):
         """Unknown data source name should yield 404 status."""
