@@ -348,6 +348,8 @@ make test
 
 The docker image is pushed to Docker Hub when new commits are made to master. The script that runs when pushing to docker hub is found in `hooks/build`.
 
+Alternatively, set the image name in `scripts/local-build.sh` and run it to build and deploy locally, which may be a lot faster.
+
 ## Project anatomy
 
 * Source code is in `./src`
