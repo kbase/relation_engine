@@ -23,7 +23,7 @@ query: |
       filter t.id == @id
       filter t.created <= @ts AND t.expired >= @ts
       limit 1
-      for ancestor, e, path in 1..10 outbound t ncbi_child_of_taxon
+      for ancestor, e, path in 1..100 outbound t ncbi_child_of_taxon
         options {bfs: true}
         filter path.edges[*].created ALL <= @ts AND path.edges[*].expired ALL >= @ts
         return (@select ? KEEP(ancestor, @select) : ancestor)
