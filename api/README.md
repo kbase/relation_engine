@@ -196,7 +196,7 @@ Response JSON schema:
 }
 ```
 
-### GET /api/v1/data_sources/<name>
+### GET /api/v1/data_sources/{name}
 
 Fetch the details for a data source by name. Will return an object of key/value details.
 
