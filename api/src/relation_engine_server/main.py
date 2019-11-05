@@ -7,7 +7,7 @@ import traceback
 from jsonschema.exceptions import ValidationError
 
 from .api_versions.api_v1 import api_v1
-from .exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters
+from .exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters, NotFound
 from .utils import arango_client, spec_loader
 
 app = flask.Flask(__name__)
@@ -89,26 +89,38 @@ def validation_error(err):
 @app.errorhandler(UnauthorizedAccess)
 def unauthorized_access(err):
     resp = {
-        'error': '403 - Unauthorized',
-        'auth_url': err.auth_url,
-        'auth_response': err.response
+        'error': {
+            'status': 403,
+            'message': 'Unauthorized',
+            'auth_url': err.auth_url,
+            'auth_response': err.response,
+        },
     }
     return (flask.jsonify(resp), 403)
 
 
+@app.errorhandler(NotFound)
 @app.errorhandler(404)
 def page_not_found(err):
-    return (flask.jsonify({'error': '404 - Not found.'}), 404)
+    resp = {
+        'error': {
+            'message': 'Not found',
+            'status': 404,
+        }
+    }
+    if hasattr(err, 'details'):
+        resp['error']['details'] = err.details
+    return (flask.jsonify(resp), 404)
 
 
 @app.errorhandler(405)
 def method_not_allowed(err):
-    return (flask.jsonify({'error': '405 - Method not allowed.'}), 405)
+    return (flask.jsonify({'error': {'message': 'Method not allowed', 'status': 405}}), 405)
 
 
 @app.errorhandler(MissingHeader)
 def generic_400(err):
-    return (flask.jsonify({'error': str(err)}), 400)
+    return (flask.jsonify({'error': {'message': str(err), 'status': 400}}), 400)
 
 
 # Any other unhandled exceptions -> 500
@@ -120,9 +132,10 @@ def server_error(err):
     print('-' * 80)
     traceback.print_exc()
     print('=' * 80)
-    resp = {'error': '500 - Unexpected server error'}
-    resp['error_class'] = err.__class__.__name__
-    resp['error_details'] = str(err)
+    resp = {'error': {'status': 500, 'message': 'Unexpected server error'}}
+    # TODO only set below two fields in dev mode
+    resp['error']['class'] = err.__class__.__name__
+    resp['error']['details'] = str(err)
     return (flask.jsonify(resp), 500)
 
 

@@ -90,9 +90,14 @@ class TestApi(unittest.TestCase):
         resp = requests.get(url, params={'collection': 'ncbi_taxon'}, auth=auth)
         resp_json = resp.json()
         indexes = resp_json['indexes']
-        self.assertEqual(len(indexes), 2)
+        self.assertEqual(len(indexes), 4)
         fields = [i['fields'] for i in indexes]
-        self.assertEqual(fields, [['_key'], ['scientific_name']])
+        self.assertEqual(set(tuple(f) for f in fields), {
+            ('_key',),
+            ('scientific_name',),
+            ('id', 'expired', 'created'),
+            ('expired', 'created', 'last_version')
+        })
 
     def test_list_stored_queries(self):
         """Test the listing out of saved AQL stored queries."""
@@ -119,7 +124,7 @@ class TestApi(unittest.TestCase):
         resp = requests.put(
             API_URL + '/documents?on_duplicate=error&overwrite=true&collection'
         ).json()
-        self.assertEqual(resp['error'], 'Missing header: Authorization')
+        self.assertEqual(resp['error'], {'message': 'Missing header: Authorization', 'status': 400})
 
     def test_save_documents_invalid_auth(self):
         """Test an invalid attempt to save a doc with a bad auth token."""
@@ -127,7 +132,8 @@ class TestApi(unittest.TestCase):
             API_URL + '/documents?on_duplicate=error&overwrite=true&collection',
             headers={'Authorization': 'Bearer ' + INVALID_TOKEN}
         ).json()
-        self.assertEqual(resp['error'], '403 - Unauthorized')
+        self.assertEqual(resp['error']['message'], 'Unauthorized')
+        self.assertEqual(resp['error']['status'], 403)
 
     def test_save_documents_non_admin(self):
         """Test an invalid attempt to save a doc as a non-admin."""
@@ -135,7 +141,8 @@ class TestApi(unittest.TestCase):
             API_URL + '/documents?on_duplicate=error&overwrite=true&collection',
             headers=HEADERS_NON_ADMIN
         ).json()
-        self.assertEqual(resp['error'], '403 - Unauthorized')
+        self.assertEqual(resp['error']['message'], 'Unauthorized')
+        self.assertEqual(resp['error']['status'], 403)
 
     def test_save_documents_invalid_schema(self):
         """Test the case where some documents fail against their schema."""
@@ -271,7 +278,8 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_NON_ADMIN,
             data=json.dumps({'query': query, 'count': 1})
         ).json()
-        self.assertEqual(resp['error'], '403 - Unauthorized')
+        self.assertEqual(resp['error']['message'], 'Unauthorized')
+        self.assertEqual(resp['error']['status'], 403)
 
     def test_admin_query_invalid_auth(self):
         """Test the error response for an ad-hoc admin query without auth."""
@@ -282,7 +290,8 @@ class TestApi(unittest.TestCase):
             headers={'Authorization': INVALID_TOKEN},
             data=json.dumps({'query': query, 'count': 1})
         ).json()
-        self.assertEqual(resp['error'], '403 - Unauthorized')
+        self.assertEqual(resp['error']['message'], 'Unauthorized')
+        self.assertEqual(resp['error']['status'], 403)
 
     def test_query_with_cursor(self):
         """Test getting more data via a query cursor and setting batch size."""
@@ -434,3 +443,39 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         resp_json = resp.json()
         self.assertEqual(resp_json['errors'], 1)
+
+    def test_list_data_sources(self):
+        resp = requests.get(API_URL + '/data_sources')
+        self.assertTrue(resp.ok)
+        resp_json = resp.json()
+        self.assertTrue(len(resp_json['data_sources']) > 0)
+        self.assertEqual(set(type(x) for x in resp_json['data_sources']), {str})
+
+    def test_show_data_source(self):
+        resp = requests.get(API_URL + '/data_sources/ncbi_taxonomy')
+        self.assertTrue(resp.ok)
+        resp_json = resp.json()
+        self.assertEqual(type(resp_json['data_source']), dict)
+        self.assertEqual(set(resp_json['data_source'].keys()), {
+            'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
+        })
+        self.assertTrue(
+            resp_json['data_source']['logo_url'].startswith(
+                _CONF['kbase_endpoint'] + '/ui-assets/images/third-party-data-sources/ncbi'
+            )
+        )
+
+    def test_show_data_source_unknown(self):
+        """Unknown data source name should yield 404 status."""
+        name = 'xyzyxz'
+        resp = requests.get(f"{API_URL}/data_sources/{name}")
+        self.assertEqual(resp.status_code, 404)
+        resp_json = resp.json()
+        # Just assert that it returns any json in the body
+        self.assertEqual(resp_json, {
+            'error': {
+                'message': 'Not found',
+                'status': 404,
+                'details': f"The data source with name '{name}' does not exist.",
+            }
+        })

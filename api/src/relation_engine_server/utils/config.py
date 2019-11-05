@@ -46,6 +46,7 @@ def get_config():
             'repo': spec_repo_path,
             'schemas': spec_schemas_path,
             'stored_queries': stored_queries_path,
-            'vertices': os.path.join(spec_schemas_path, 'vertices')
+            'vertices': os.path.join(spec_schemas_path, 'vertices'),
+            'data_sources': os.path.join(spec_repo_path, 'data_sources'),
         }
     }
