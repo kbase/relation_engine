@@ -3,15 +3,28 @@ from src.relation_engine_server.utils import (
     json_validation,
     arango_client,
     spec_loader,
+    load_data_sources,
     auth,
     bulk_import,
     pull_spec,
     config,
     parse_json
 )
-from ..exceptions import InvalidParameters
+from src.relation_engine_server.exceptions import InvalidParameters
 
 api_v1 = flask.Blueprint('api_v1', __name__)
+
+
+@api_v1.route("/data_sources", methods=["GET"])
+def list_data_sources():
+    data_sources = load_data_sources.list_all()
+    return flask.jsonify({'data_sources': data_sources})
+
+
+@api_v1.route("/data_sources/<name>", methods=["GET"])
+def show_data_source(name):
+    data_source = load_data_sources.fetch_one(name)
+    return flask.jsonify({'data_source': data_source})
 
 
 @api_v1.route('/specs/stored_queries', methods=['GET'])

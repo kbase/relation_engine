@@ -6,9 +6,11 @@ Collection of exception classes for the Relation Engine server.
 class InvalidParameters(Exception):
     """Invalid request parameters."""
 
-    def __init__(self, msg): self.msg = msg
+    def __init__(self, msg):
+        self.msg = msg
 
-    def __str__(self): return self.msg
+    def __str__(self):
+        return self.msg
 
 
 class MissingHeader(Exception):
@@ -27,3 +29,13 @@ class UnauthorizedAccess(Exception):
     def __init__(self, auth_url, response):
         self.auth_url = auth_url
         self.response = response
+
+
+class NotFound(Exception):
+    """A resource was not found (yields a 404 response)."""
+
+    def __init__(self, details):
+        self.details = details
+
+    def __str__(self):
+        return self.details
