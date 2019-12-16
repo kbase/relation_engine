@@ -20,8 +20,8 @@ params:
       description: If true, don't include the query reactions genes
       default: false
 
+query_prefix: WITH rxn_reaction
 query: |
-  WITH rxn_reaction
   LET start = @exclude_self ? 1 : 0
   LET rxns = (
       FOR v, e IN start..1
