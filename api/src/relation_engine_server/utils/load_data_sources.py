@@ -14,7 +14,6 @@ from src.relation_engine_server.exceptions import NotFound
 
 _CONF = get_config()
 _PATH = _CONF['spec_paths']['data_sources']
-print('_PATH is', _PATH)
 
 
 def list_all():
