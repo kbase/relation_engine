@@ -264,12 +264,12 @@ _Query params_
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
 
-### GET /api/v1/schemas
+### GET /api/v1/specs/schemas
 
 Get all schema names (returns an array of strings):
 
 ```sh
-GET {root_url}/api/v1/schemas
+GET {root_url}/api/v1/specs/schemas
 ```
 
 Example response:
@@ -281,7 +281,7 @@ Example response:
 Get the contents of a specific schema
 
 ```sh
-GET "{root_url}/api/v1/schemas?name=test_vertex"
+GET "{root_url}/api/v1/specs/schemas?name=test_vertex"
 ```
 
 Example response:
@@ -307,7 +307,7 @@ Example response:
 Get the schema for a particular document by its full ID
 
 ```sh
-GET "{root_url}/api/v1/schemas?doc_id=test_vertex/1"
+GET "{root_url}/api/v1/specs/schemas?doc_id=test_vertex/1"
 ```
 
 The response will have the same format as the example response above
