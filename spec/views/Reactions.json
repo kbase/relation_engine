@@ -1,0 +1,38 @@
+{
+  "writebufferIdle": 64,
+  "writebufferActive": 0,
+  "type": "arangosearch",
+  "primarySort": [],
+  "writebufferSizeMax": 33554432,
+  "commitIntervalMsec": 1000,
+  "consolidationPolicy": {
+    "type": "bytes_accum",
+    "threshold": 0.10000000149011612
+  },
+  "globallyUniqueId": "h5455DEB9D2A1/9853332",
+  "cleanupIntervalStep": 10,
+  "id": "9853332",
+  "links": {
+    "rxn_reaction": {
+      "analyzers": [
+        "identity"
+      ],
+      "fields": {
+        "name": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "aliases": {
+          "analyzers": [
+            "text_en"
+          ]
+        }
+      },
+      "includeAllFields": true,
+      "storeValues": "none",
+      "trackListPositions": false
+    }
+  },
+  "consolidationIntervalMsec": 60000
+}
