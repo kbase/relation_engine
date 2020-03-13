@@ -1,0 +1,64 @@
+# Search for a taxon with a scientific name
+# Offset is limited to 10k
+name: taxonomy_search_sci_name
+params:
+  type: object
+  required: [search_text, ts, "@taxon_coll", sciname_field]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    search_text:
+      type: string
+      title: Search text
+      description: Text to search on for the scientific name
+    ranks:
+      description: Filter the query to include only these ranks. An empty array is ignored.
+      type: array
+      default: []
+      items:
+        type: string
+    include_strains:
+      description: true to include strains in the result, regardless of the ranks field. false
+        to perform no special filtering on strains.
+      type: boolean
+      default: false
+    offset:
+      type: integer
+      default: 0
+      maximum: 100000
+    limit:
+      type: integer
+      default: 20
+      maximum: 1000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+query: |
+  // Search using the fulltext index on scientific_name
+  // Don't limit the results yet so we can get the total_count below
+  LET results = (
+    FOR doc IN FULLTEXT(@@taxon_coll, @sciname_field, @search_text)
+      // Filter non-expired docs
+      FILTER doc.created <= @ts AND doc.expired >= @ts
+      FILTER LENGTH(@ranks) > 0 ?
+          (@include_strains ? (doc.rank in @ranks OR doc.strain) : doc.rank in @ranks) : true
+      RETURN doc
+  )
+  // Limit the results
+  LET limited = (
+    FOR r IN results
+      LIMIT @offset, @limit
+      RETURN @select ? KEEP(r, @select) : r
+  )
+  RETURN {results: limited, total_count: COUNT(results)}

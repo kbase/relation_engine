@@ -1,0 +1,26 @@
+# Fetch a taxon document from a workspace object reference
+name: taxonomy_get_taxon_from_ws_obj
+params:
+  type: object
+  required: [obj_ref, ts, "@taxon_coll"]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    obj_ref:
+      type: string
+      title: Workspace versioned object reference
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: with @@taxon_coll
+query: |
+  for obj in ws_object_version
+    filter obj._key == @obj_ref
+    filter obj.is_public or obj.workspace_id IN ws_ids
+    for tax in 1 outbound obj ws_obj_version_has_taxon
+      filter tax.created <= @ts AND tax.expired >= @ts
+      limit 1
+      return tax
+

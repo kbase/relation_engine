@@ -1,0 +1,74 @@
+# Get the workspace objects associated with a taxon
+
+name: taxonomy_get_associated_ws_objects
+
+params:
+  type: object
+  required: [taxon_id, ts, "@taxon_coll"]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    taxon_id:
+      type: string
+      title: NCBI Taxon ID
+      description: ID of the taxon vertex to find associated taxa
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select_obj:
+      type: [array, "null"]
+      items: {type: string}
+      title: WS obj fields to keep in the results
+      default: null
+    select_edge:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon edge fields to keep in the results
+      default: null
+query_prefix: WITH ws_object_version, ws_type_version, ws_workspace
+query: |
+  LET count = COUNT(
+    FOR tax IN @@taxon_coll
+      FILTER tax.id == @taxon_id
+      FILTER tax.created <= @ts AND tax.expired >= @ts
+      LIMIT 1
+      FOR obj IN 1..1 INBOUND tax ws_obj_version_has_taxon
+        RETURN 1
+  )
+  LET results = (
+    FOR tax IN @@taxon_coll
+      FILTER tax.id == @taxon_id
+      FILTER tax.created <= @ts AND tax.expired >= @ts
+      LIMIT 1
+      FOR obj, e IN 1 INBOUND tax ws_obj_version_has_taxon
+        FILTER obj.is_public OR obj.workspace_id IN ws_ids
+        LIMIT @offset, @limit
+        LET type = first(
+          FOR type IN 1 OUTBOUND obj ws_obj_instance_of_type
+            RETURN KEEP(type, ['_key', 'module_name', 'type_name', 'maj_ver', 'min_ver'])
+        )
+        LET unver_id = CONCAT("ws_object/", TO_STRING(obj.workspace_id), ':', TO_STRING(obj.object_id))
+        LET ws_info = FIRST(
+          FOR ws IN 1 INBOUND unver_id ws_workspace_contains_obj
+            FILTER !ws.is_deleted
+            RETURN KEEP(ws, ['owner', 'metadata', 'is_public', 'mod_epoch'])
+        )
+        LET o = MERGE(obj, {type, ws_info})
+        RETURN {
+          ws_obj: @select_obj ? KEEP(o, @select_obj) : o,
+          edge: @select_edge ? KEEP(e, @select_edge) : e
+        }
+  )
+  RETURN {results, total_count: count}

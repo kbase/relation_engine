@@ -1,0 +1,33 @@
+# Get all children for a taxon, using a cursor
+name: taxonomy_get_children_cursor
+params:
+  type: object
+  required: [id, ts, "@taxon_coll"]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon vertex collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    "@taxon_child_of":
+      type: string
+      title: Taxon edge collection name for parent-to-child relationship
+      examples: [ncbi_child_of_taxon, gtdb_child_of_taxon]
+    id:
+      type: string
+      title: Document ID
+      description: ID of the taxon vertex for which you want to find descendants
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  for tax in @@taxon_coll
+    filter tax.id == @id
+    filter tax.created <= @ts AND tax.expired >= @ts
+    limit 1
+    for child in 1..1 inbound tax @@taxon_child_of
+      return @select ? KEEP(tax, @select) : tax

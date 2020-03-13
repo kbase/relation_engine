@@ -1,0 +1,41 @@
+# Get the lineage array for a taxon
+# Returns an array where the top-most (closest to the root) taxon is at the beginning
+name: taxonomy_get_lineage
+params:
+  type: object
+  required: [id, ts, "@taxon_coll", "@taxon_child_of"]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    "@taxon_child_of":
+      type: string
+      title: Taxon edge collection name for parent-to-child relationship
+      examples: [ncbi_child_of_taxon, gtdb_child_of_taxon]
+    id:
+      type: string
+      title: Document id
+      description: ID of the taxon vertex for which you want to find ancestors
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  let ps = (
+    for t in @@taxon_coll
+      filter t.id == @id
+      filter t.created <= @ts AND t.expired >= @ts
+      limit 1
+      for ancestor, e, path in 1..100 outbound t @@taxon_child_of
+        options {bfs: true}
+        filter path.edges[*].created ALL <= @ts AND path.edges[*].expired ALL >= @ts
+        return (@select ? KEEP(ancestor, @select) : ancestor)
+  )
+  // doing return reverse(ps) returns an array of an array for some reason,
+  // which we don't want
+  for d in reverse(ps) return d
