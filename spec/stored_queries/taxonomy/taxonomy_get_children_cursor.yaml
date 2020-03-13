@@ -2,7 +2,7 @@
 name: taxonomy_get_children_cursor
 params:
   type: object
-  required: [id, ts, "@taxon_coll"]
+  required: [id, ts, "@taxon_coll", "@taxon_child_of"]
   properties:
     "@taxon_coll":
       type: string
