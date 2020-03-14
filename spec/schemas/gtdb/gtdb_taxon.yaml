@@ -3,6 +3,8 @@ type: vertex
 delta: true
 
 indexes:
+  - type: fulltext
+    fields: [name]
   - type: persistent
     fields: [id, expired, created]
   - type: persistent
