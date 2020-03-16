@@ -28,6 +28,9 @@ class TestTaxonomy(unittest.TestCase):
             {'_key': '7', 'scientific_name': 'Deltaproteobacteria', 'rank': 'Class', 'strain': False},
             {'_key': '8', 'scientific_name': 'Bacillus subtilis 168', 'rank': 'no rank', 'strain': True},
         ]
+        gtdb_taxon_docs = [
+            {'_key': '1', 'name': 'Bacteria', 'rank': 'Domain'},
+        ]
         child_docs = [
             {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
             {'_from': 'ncbi_taxon/4', '_to': 'ncbi_taxon/1', 'from': '4', 'to': '1', 'id': '4'},
@@ -70,6 +73,7 @@ class TestTaxonomy(unittest.TestCase):
             {'_from': 'ws_object_version/1:1:2', '_to': 'ws_type_version/KBaseGenomes.Genome-99.77'}
         ]
         _create_delta_test_docs('ncbi_taxon', taxon_docs)
+        _create_delta_test_docs('gtdb_taxon', gtdb_taxon_docs)
         _create_delta_test_docs('ncbi_child_of_taxon', child_docs, edge=True)
         create_test_docs('ws_obj_version_has_taxon', obj_to_taxa_docs)
         create_test_docs('ws_object', obj_docs)
@@ -202,6 +206,23 @@ class TestTaxonomy(unittest.TestCase):
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 1)
         self.assertEqual(result['results'][0]['scientific_name'], 'Bacteria')
+
+    def test_search_sciname_gtdb(self):
+        """Test a search on scientific name against the gtdb taxonomy."""
+        resp = requests.post(
+            _CONF['re_api_url'] + '/api/v1/query_results',
+            params={'stored_query': 'taxonomy_search_sci_name'},
+            data=json.dumps({
+                'ts': _NOW,
+                'search_text': 'prefix:bact',
+                'select': ['name'],
+                'sciname_field': 'name',
+                '@taxon_coll': 'gtdb_taxon',
+            }),
+        ).json()
+        result = resp['results'][0]
+        self.assertEqual(result['total_count'], 1)
+        self.assertEqual(result['results'][0]['name'], 'Bacteria')
 
     def test_search_sciname_nonexistent(self):
         """Test a query to search sciname for empty results."""
