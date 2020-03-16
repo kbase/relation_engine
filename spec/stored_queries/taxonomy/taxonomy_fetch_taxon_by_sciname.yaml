@@ -1,0 +1,26 @@
+# Fetch a taxon document by exact match on sciname
+name: taxonomy_fetch_taxon_by_sciname
+params:
+  type: object
+  required: [sciname, sciname_field, ts, "@taxon_coll"]
+  properties:
+    sciname:
+      type: string
+      title: NCBI scientific name
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+    ts:
+      type: integer
+      title: Versioning timestamp
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+query: |
+  for t in @@taxon_coll
+      filter t.@sciname_field == @sciname
+      filter t.created <= @ts AND t.expired >= @ts
+      limit 1
+      return t

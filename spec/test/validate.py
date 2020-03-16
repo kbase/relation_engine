@@ -120,7 +120,7 @@ def validate_stored_queries():
             # Params must be of type 'object'
             if data['params'].get('type') != 'object':
                 _fatal("Params schema must have type 'object'")
-        query = data['query']
+        query = data.get('query_prefix', '') + ' ' + data['query']
         # Parse the AQL query on arangodb
         url = _CONF['db_url'] + '/_api/query'
         resp = requests.post(url, data=json.dumps({'query': query}), auth=_CONF['db_auth'])

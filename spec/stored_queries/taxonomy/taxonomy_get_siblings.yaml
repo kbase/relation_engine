@@ -1,0 +1,67 @@
+# Get the array of siblings for a taxon
+# Results are limited to 10k
+name: taxonomy_get_siblings
+params:
+  type: object
+  required: [id, ts, sciname_field, "@taxon_coll", "@taxon_child_of"]
+  properties:
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+    "@taxon_coll":
+      type: string
+      title: Taxon vertex collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    "@taxon_child_of":
+      type: string
+      title: Taxon edge collection name for parent-to-child relationship
+      examples: [ncbi_child_of_taxon, gtdb_child_of_taxon]
+    id:
+      type: string
+      title: Document id
+      description: ID of the taxon vertex for which you want to find siblings
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  // Fetch the siblings
+  let parent_id = first(
+    for e in @@taxon_child_of
+      filter e.from == @id
+      filter e.created <= @ts and e.expired >= @ts
+      limit 1
+      return e.to
+  )
+  let sibling_ids = (
+    for e in @@taxon_child_of
+      filter e.to == parent_id
+      filter e.created <= @ts and e.expired >= @ts
+      filter e.from != @id
+      return e.from
+  )
+  // Apply sort and limits to the results
+  let siblings = (
+    for tax in @@taxon_coll
+      filter tax.id in sibling_ids
+      filter tax.created <= @ts AND tax.expired >= @ts
+      sort tax.@sciname_field asc
+      limit @offset, @limit
+      return (@select ? KEEP(tax, @select) : tax)
+  )
+  return {total_count: COUNT(sibling_ids), results: siblings}
