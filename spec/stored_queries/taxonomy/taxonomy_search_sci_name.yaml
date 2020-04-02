@@ -9,6 +9,10 @@ params:
       type: string
       title: Taxon collection name
       examples: [ncbi_taxon, gtdb_taxon]
+    no_count:
+      type: boolean
+      default: false
+      description: Skip the calculation of a total count of search results
     search_text:
       type: string
       title: Search text
@@ -61,4 +65,4 @@ query: |
       LIMIT @offset, @limit
       RETURN @select ? KEEP(r, @select) : r
   )
-  RETURN {results: limited, total_count: COUNT(results)}
+  RETURN @no_count ? {results: limited} : {results: limited, total_count: COUNT(results)}

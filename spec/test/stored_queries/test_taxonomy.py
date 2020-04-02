@@ -190,21 +190,26 @@ class TestTaxonomy(unittest.TestCase):
         ).json()
         self.assertEqual(resp['results'][0]['total_count'], 0)
 
-    def test_search_species_valid(self):
-        """Test a valid query to search species/strains."""
+    def test_search_sci_name_no_count(self):
+        """Test a valid query to search sciname without a count."""
+        start = time.time()
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
-            params={'stored_query': 'taxonomy_search_species'},
+            params={'stored_query': 'taxonomy_search_sci_name'},
             data=json.dumps({
                 'ts': _NOW,
-                'search_text': 'subtilis',
-                'select': ['_key'],
+                'no_count': True,
+                'search_text': 'prefix:bact',
+                'select': ['scientific_name'],
                 'sciname_field': 'scientific_name',
+                'ranks': ['Domain'],
                 '@taxon_coll': 'ncbi_taxon',
             }),
         ).json()
-        self.assertEqual(len(resp['results']), 1)
-        self.assertEqual(resp['results'][0]['_key'], '8')
+        print('Total time was', time.time() - start)
+        result = resp['results'][0]
+        self.assertTrue('total_count' not in result)
+        self.assertEqual(result['results'][0]['scientific_name'], 'Bacteria')
 
     def test_search_sciname_prefix(self):
         """Test a query to search sciname."""
