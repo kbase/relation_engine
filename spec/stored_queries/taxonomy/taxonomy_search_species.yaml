@@ -1,0 +1,39 @@
+# Search for a species/strain. Similar to search_sci_name, but simpler and quicker
+name: taxonomy_search_species
+params:
+  type: object
+  required: [search_text, ts, "@taxon_coll", sciname_field]
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    search_text:
+      type: string
+      title: Search text
+      description: Text to search on for the scientific name
+    offset:
+      type: integer
+      default: 0
+      maximum: 100000
+    limit:
+      type: integer
+      default: 20
+      maximum: 1000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+query: |
+  FOR doc IN FULLTEXT(@@taxon_coll, @sciname_field, @search_text)
+    FILTER doc.created <= @ts AND doc.expired >= @ts AND (doc.rank == "species" OR doc.strain)
+    LIMIT @offset, @limit
+    RETURN @select ? KEEP(doc, @select) : doc
