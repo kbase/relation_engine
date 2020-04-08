@@ -29,7 +29,7 @@ class TestTaxonomy(unittest.TestCase):
             {'_key': '8', 'scientific_name': 'Bacillus subtilis 168', 'rank': 'no rank', 'strain': True},
         ]
         gtdb_taxon_docs = [
-            {'_key': '1', 'name': 'Bacteria', 'rank': 'Domain'},
+            {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain'},
         ]
         child_docs = [
             {'_from': 'ncbi_taxon/2', '_to': 'ncbi_taxon/1', 'from': '2', 'to': '1', 'id': '2'},
@@ -236,14 +236,14 @@ class TestTaxonomy(unittest.TestCase):
             data=json.dumps({
                 'ts': _NOW,
                 'search_text': 'prefix:bact',
-                'select': ['name'],
-                'sciname_field': 'name',
+                'select': ['scientific_name'],
+                'sciname_field': 'scientific_name',
                 '@taxon_coll': 'gtdb_taxon',
             }),
         ).json()
         result = resp['results'][0]
         self.assertEqual(result['total_count'], 1)
-        self.assertEqual(result['results'][0]['name'], 'Bacteria')
+        self.assertEqual(result['results'][0]['scientific_name'], 'Bacteria')
 
     def test_search_sciname_nonexistent(self):
         """Test a query to search sciname for empty results."""

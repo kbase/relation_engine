@@ -4,7 +4,7 @@ delta: true
 
 indexes:
   - type: fulltext
-    fields: [name]
+    fields: [scientific_name]
   - type: persistent
     fields: [id, expired, created]
   - type: persistent
@@ -14,7 +14,7 @@ schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
   description: Template for a vertex entry in the GTDB taxonomy tree.
-  required: [id, name, rank]
+  required: [id, scientific_name, rank]
   properties:
     id:
       type: string
@@ -22,9 +22,9 @@ schema:
         with ':' and the taxon name with spaces replaced by underscores. For an organism node,
         it is the accession ID.
       examples: ['p:Firmicutes', 's:Sediminibacterium_sp002786355', 'RS_GCF_000169355.1']
-    name:
+    scientific_name:
       type: string
-      description: The name of the taxon. For organisms this is the species name.
+      description: The name of the taxon
       examples: ['Firmicutes', 'Sediminibacterium sp002786355']
     rank:
       type: string
