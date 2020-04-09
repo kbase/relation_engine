@@ -50,7 +50,7 @@ query: |
   LET results = (
     FOR tax IN @@taxon_coll
       FILTER tax.id == @taxon_id
-      FILTER tax.created <= @ts AND tax.expired >= @ts
+      FILTER tax.created <= @ts
       LIMIT 1
       FOR obj, e IN 1 INBOUND tax ws_obj_version_has_taxon
         FILTER obj.is_public OR obj.workspace_id IN ws_ids
