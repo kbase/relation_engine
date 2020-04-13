@@ -3,7 +3,7 @@
 name: generic_ontology_get_ancestors
 params:
   type: object
-  required: [id, ts, onto_terms, onto_edges]
+  required: [id, ts, "@onto_terms", "@onto_edges"]
   properties:
     id:
       type: string
@@ -22,12 +22,12 @@ params:
     ts:
       type: integer
       title: Versioning timestamp
-    onto_terms:
+    "@onto_terms":
       type: string
-      title: Ontology terms collection
-    onto_edges:
+      title: Ontology terms collection name
+    "@onto_edges":
       type: string
-      title: Ontology edges collection
+      title: Ontology edges collection name
 query_prefix: WITH @@onto_terms
 query: |
   FOR t in @@onto_terms
