@@ -1,6 +1,6 @@
-# Get all siblings of this term
+# Get all descendents of this term 
 
-name: generic_ontology_get_siblings
+name: ontology_get_descendants
 params:
   type: object
   required: [id, ts, "@onto_terms", "@onto_edges"]
@@ -8,11 +8,11 @@ params:
     id:
       type: string
       title: Document ID
-      description: Ontology id of the term you want to get all the siblings of
+      description: Ontology id of the term you want to get all the descendants of 
     limit:
         type: integer
         default: 20
-        description: Maximum result limit
+        description: Maximum result limit 
         maximum: 1000
     offset:
         type: integer
@@ -34,13 +34,10 @@ query: |
     FILTER t.id == @id
     FILTER t.created <= @ts AND t.expired >= @ts
     limit 1
-    FOR v_parent, e_parent IN 1..1 OUTBOUND t @@onto_edges
-      FILTER e_parent.created <= @ts AND e_parent.expired >= @ts
-      FILTER e_parent.type == "is_a"
-      FOR v_child, e_child in 1..1 INBOUND v_parent @@onto_edges
-        FILTER e_child.created <= @ts AND e_child.expired >= @ts
-        FILTER e_child.type == "is_a"
-        FILTER v_child != t
-        SORT v_child.id ASC
-        LIMIT @offset, @limit
-        RETURN v_child
+    FOR v, e, p IN 1..100 INBOUND t @@onto_edges
+      FILTER p.edges[*].created ALL <= @ts 
+        AND p.edges[*].expired ALL >= @ts 
+        AND p.edges[*].type ALL == "is_a"
+      SORT v._key ASC
+      LIMIT @offset, @limit
+      RETURN {term: v, edge: e}

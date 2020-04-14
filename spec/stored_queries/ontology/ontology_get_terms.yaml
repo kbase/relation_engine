@@ -1,6 +1,6 @@
 # Get a set of terms by the term ID and a timestamp, maximum 10000
 
-name: generic_ontology_get_terms
+name: ontology_get_terms
 params:
   type: object
   required: [ids, ts]

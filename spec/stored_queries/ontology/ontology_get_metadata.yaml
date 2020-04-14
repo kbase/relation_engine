@@ -1,6 +1,6 @@
 # Get information/metadata of a particular ontology term (see spec for available fields)
 
-name: generic_ontology_get_metadata
+name: ontology_get_metadata
 params:
   type: object
   required: [id, ts, "@onto_terms"]
