@@ -3,8 +3,7 @@
 name: ontology_get_terms
 params:
   type: object
-  required: [ids, ts]
-  required: [id, ts, "@onto_terms",]
+  required: [ids, ts, "@onto_terms"]
   properties:
     ids:
       type: array
