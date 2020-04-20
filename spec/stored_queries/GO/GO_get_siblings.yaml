@@ -36,4 +36,4 @@ query: |
         FILTER v_child != t
         SORT v_child.id ASC
         LIMIT @offset, @limit
-        RETURN v_child.id
+        RETURN v_child
