@@ -206,7 +206,6 @@ class TestTaxonomy(unittest.TestCase):
                 '@taxon_coll': 'ncbi_taxon',
             }),
         ).json()
-        print('Total time was', time.time() - start)
         result = resp['results'][0]
         self.assertTrue('total_count' not in result)
         self.assertEqual(result['results'][0]['scientific_name'], 'Bacteria')
