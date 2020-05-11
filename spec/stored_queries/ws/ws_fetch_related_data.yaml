@@ -1,0 +1,69 @@
+name: ws_fetch_related_data
+params:
+  type: object
+  required: [obj_key]
+  properties:
+    obj_key:
+      type: string
+      description: Key of the wsprov_object to search on
+    show_private:
+      type: boolean
+      description: limit to objects in workspaces that a user has access to
+      default: true
+    show_public:
+      type: boolean
+      description: limit to objects in public workspaces
+      default: true
+query_prefix: WITH ws_type_version
+query: |
+  LET obj_id = concat('ws_object_version/', @obj_key)
+  FOR obj IN ws_object_version
+      FILTER obj._id == obj_id
+      LET prov = (
+          FOR v, e, p IN 1..10 ANY obj ws_prov_descendant_of
+              OPTIONS {bfs: true, uniqueVertices: 'global'}
+              LIMIT 1000
+              FILTER v && !v.deleted
+              FILTER (@show_private && @show_public)
+                  ? (v.is_public || v.workspace_id IN ws_ids)
+                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              let t = FIRST(
+                  FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+                      return t
+              )
+              RETURN {data: v, type: t, hops: COUNT(p.edges)}
+      )
+      let refs = (
+          FOR v, e, p IN 1..10 ANY obj ws_refers_to
+              OPTIONS {bfs: true, uniqueVertices: 'global'}
+              LIMIT 1000
+              FILTER v && !v.deleted
+              FILTER (@show_private && @show_public)
+                  ? (v.is_public || v.workspace_id IN ws_ids)
+                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              let t = FIRST(
+                  FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+                      return t
+              )
+              RETURN {data: v, type: t, hops: COUNT(p.edges)}
+      )
+      let copies = (
+          FOR v, e, p IN 1..10 ANY obj ws_copied_from
+              OPTIONS {bfs: true, uniqueVertices: 'global'}
+              LIMIT 1000
+              FILTER v && !v.deleted
+              FILTER (@show_private && @show_public)
+                  ? (v.is_public || v.workspace_id IN ws_ids)
+                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              let t = FIRST(
+                  FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+                      LIMIT 1
+                      return t
+              )
+              RETURN {data: v, type: t, hops: COUNT(p.edges)}
+      )
+      RETURN {
+          copies: {data: copies, count: COUNT(copies)},
+          prov: {data: prov, count: COUNT(prov)},
+          refs: {data: refs, count: COUNT(refs)}
+      }
