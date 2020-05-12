@@ -6,14 +6,6 @@ params:
     obj_key:
       type: string
       description: Key of the wsprov_object to search on
-    show_private:
-      type: boolean
-      description: limit to objects in workspaces that a user has access to
-      default: true
-    show_public:
-      type: boolean
-      description: limit to objects in public workspaces
-      default: true
 query_prefix: WITH ws_type_version
 query: |
   LET obj_id = concat('ws_object_version/', @obj_key)
@@ -24,9 +16,7 @@ query: |
               OPTIONS {bfs: true, uniqueVertices: 'global'}
               LIMIT 1000
               FILTER v && !v.deleted
-              FILTER (@show_private && @show_public)
-                  ? (v.is_public || v.workspace_id IN ws_ids)
-                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              FILTER v.is_public || v.workspace_id IN ws_ids
               let t = FIRST(
                   FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
                       return t
@@ -38,9 +28,7 @@ query: |
               OPTIONS {bfs: true, uniqueVertices: 'global'}
               LIMIT 1000
               FILTER v && !v.deleted
-              FILTER (@show_private && @show_public)
-                  ? (v.is_public || v.workspace_id IN ws_ids)
-                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              FILTER v.is_public || v.workspace_id IN ws_ids
               let t = FIRST(
                   FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
                       return t
@@ -52,9 +40,7 @@ query: |
               OPTIONS {bfs: true, uniqueVertices: 'global'}
               LIMIT 1000
               FILTER v && !v.deleted
-              FILTER (@show_private && @show_public)
-                  ? (v.is_public || v.workspace_id IN ws_ids)
-                  : (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+              FILTER v.is_public || v.workspace IN ws_ids
               let t = FIRST(
                   FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
                       LIMIT 1
@@ -62,7 +48,14 @@ query: |
               )
               RETURN {data: v, type: t, hops: COUNT(p.edges)}
       )
+      let type = FIRST(
+        FOR t IN 1 OUTBOUND obj ws_obj_instance_of_type
+          LIMIT 1
+          return t
+      )
       RETURN {
+          obj: obj,
+          obj_type: type,
           copies: {data: copies, count: COUNT(copies)},
           prov: {data: prov, count: COUNT(prov)},
           refs: {data: refs, count: COUNT(refs)}

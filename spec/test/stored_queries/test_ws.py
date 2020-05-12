@@ -47,6 +47,7 @@ class TestWs(unittest.TestCase):
         ws_type_version = [{'_key': 'Module.Type1-1.0'}]
         create_test_docs('ws_type_version', ws_type_version)
         ws_obj_instance_of_type = [
+            {'_from': 'ws_object_version/1:1:1', '_to': 'ws_type_version/Module.Type1-1.0'},
             {'_from': 'ws_object_version/1:2:1', '_to': 'ws_type_version/Module.Type1-1.0'},
             {'_from': 'ws_object_version/1:3:1', '_to': 'ws_type_version/Module.Type1-1.0'},
             {'_from': 'ws_object_version/1:4:1', '_to': 'ws_type_version/Module.Type1-1.0'},
@@ -81,6 +82,9 @@ class TestWs(unittest.TestCase):
         self.assertEqual(resp['count'], 1)
         self.assertEqual(resp['has_more'], False)
         res = resp['results'][0]
+        # Check the root object results
+        self.assertEqual(res['obj']['_key'], '1:1:1')
+        self.assertEqual(res['obj_type']['_key'], 'Module.Type1-1.0')
         # Check the copy results
         self.assertEqual(res['copies']['count'], 1)
         self.assertEqual(len(res['copies']['data']), 1)
