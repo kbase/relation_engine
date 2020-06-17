@@ -1,0 +1,26 @@
+name: djornl_domain_co_occur
+type: edge
+delta: false
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: Gene Domain Co-occurrence Edge
+  description: |
+    A layer of protein domain co-occurrence values from the Arabidopsis
+    AraNetv2 database. The LLS scores that serve as edge values were
+    calculated from weighted mutual information scores to normalize the data
+    for comparison across studies and different types of data layers (Lee et
+    al, 2015).
+  type: object
+  required: [lls, _from, _to]
+  properties:
+    lls:
+      title: Least Likelhood Score
+      # (float)
+      type: number
+    _from:
+      type: string
+      title: Gene ID
+    _to:
+      type: string
+      title: Gene ID

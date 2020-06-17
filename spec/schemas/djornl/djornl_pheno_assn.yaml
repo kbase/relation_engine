@@ -1,0 +1,24 @@
+name: djornl_pheno_assn
+type: edge
+delta: false
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: Phenotype Association Edge
+  description: |
+    GWAS associations produced by analyzing a subset of phenotypes and SNPs
+    in the Arabidopsis 1001 Genomes database. Edge values are significant
+    association scores after FDR correction.
+  type: object
+  required: [assn_score, _from, _to]
+  properties:
+    assn_score:
+      title: Association Score
+      # (float)
+      type: number
+    _from:
+      type: string
+      title: Gene ID
+    _to:
+      type: string
+      title: Phenotype ID
