@@ -15,7 +15,7 @@ schema:
   required: [lls, _from, _to]
   properties:
     lls:
-      title: Least Likelhood Score
+      title: Least Likelihood Score
       # (float)
       type: number
     _from:
