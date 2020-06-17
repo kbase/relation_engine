@@ -1,0 +1,15 @@
+# Fetch a gene document by list of keys
+name: djornl_fetch_genes
+params:
+  type: object
+  required: [keys]
+  properties:
+    keys:
+      type: array
+      items: {type: string}
+      title: Gene Keys
+      examples: [[AT1G01010]]
+query: |
+  FOR g IN djornl_gene
+    FILTER g._key IN @keys
+    RETURN g

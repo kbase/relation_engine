@@ -1,0 +1,15 @@
+# Fetch a phenotype document by list of keys
+name: djornl_fetch_phenotypes
+params:
+  type: object
+  required: [keys]
+  properties:
+    keys:
+      type: array
+      items: {type: string}
+      title: Phenotype Keys
+      examples: [[As2]]
+query: |
+  FOR p IN djornl_phenotype
+    FILTER p._key IN @keys
+    RETURN p
