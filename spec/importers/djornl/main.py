@@ -16,9 +16,9 @@ CONF = config.load_from_env(extra_required=['ROOT_DATA_PATH'])
 _ROOT = CONF['ROOT_DATA_PATH']
 _VERT_PATH = os.path.join(_ROOT, 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv')
 _CLUSTER_PATHS = [
-    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'),
-    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'),
-    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'),
 ]
 _PHENO_ASSN_PATH = os.path.join(_ROOT, 'aragwas_subnet_phenoassociations_AMW_083019.tsv')
 _DOMAIN_CO_OCCUR_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-DC_anno_AF_082919.tsv')
