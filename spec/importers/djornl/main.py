@@ -31,6 +31,12 @@ _PHENO_VERT_NAME = 'djornl_phenotype'
 _GENE_VERT_NAME = 'djornl_gene'
 _EDGE_NAME = 'djornl_edge'
 
+# Edge score type names
+_COEXPR_TYPE = 'gene_coexpr'
+_CO_OCCUR_TYPE = 'domain_co_occur'
+_HITHRU_TYPE = 'ppi_hithru'
+_LIT_TYPE = 'ppi_liter'
+
 
 def load_edges(path, score_type):
     # Headers and sample row:
@@ -143,10 +149,10 @@ def main():
     load_vert_metadata()
     load_pheno_assns()
     edge_paths = [
-        (_GENE_COEXPR_PATH, 'gene_coexpr'),
-        (_DOMAIN_CO_OCCUR_PATH, 'domain_co_occur'),
-        (_PPI_HITHRU_PATH, 'ppi_hithru'),
-        (_PPI_LIT_PATH, 'ppi_liter'),
+        (_GENE_COEXPR_PATH, _COEXPR_TYPE),
+        (_DOMAIN_CO_OCCUR_PATH, _CO_OCCUR_TYPE),
+        (_PPI_HITHRU_PATH, _HITHRU_TYPE),
+        (_PPI_LIT_PATH, _LIT_TYPE),
     ]
     for (path, score_type) in edge_paths:
         load_edges(path, score_type)
