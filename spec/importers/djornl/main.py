@@ -10,21 +10,21 @@ import os
 import csv
 
 import importers.utils.config as config
-CONF = config.load_from_env()
+CONF = config.load_from_env(extra_required=['ROOT_DATA_PATH'])
 
 # Path config
-_BASE_PATH = os.environ['RES_base_path']
-_VERT_PATH = os.path.join(_BASE_PATH, 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv')
+_ROOT = CONF['ROOT_DATA_PATH']
+_VERT_PATH = os.path.join(_ROOT, 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv')
 _CLUSTER_PATHS = [
-    os.path.join(_BASE_PATH, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'),
-    os.path.join(_BASE_PATH, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'),
-    os.path.join(_BASE_PATH, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'),
+    os.path.join(_ROOT, 'cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'),
 ]
-_PHENO_ASSN_PATH = os.path.join(_BASE_PATH, 'aragwas_subnet_phenoassociations_AMW_083019.tsv')
-_DOMAIN_CO_OCCUR_PATH = os.path.join(_BASE_PATH, 'aranetv2_subnet_AT-DC_anno_AF_082919.tsv')
-_GENE_COEXPR_PATH = os.path.join(_BASE_PATH, 'aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.tsv')
-_PPI_HITHRU_PATH = os.path.join(_BASE_PATH, 'aranetv2_subnet_AT-HT_anno_AF_082919.tsv')
-_PPI_LIT_PATH = os.path.join(_BASE_PATH, 'aranetv2_subnet_AT-LC_anno_AF_082919.tsv')
+_PHENO_ASSN_PATH = os.path.join(_ROOT, 'aragwas_subnet_phenoassociations_AMW_083019.tsv')
+_DOMAIN_CO_OCCUR_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-DC_anno_AF_082919.tsv')
+_GENE_COEXPR_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.tsv')
+_PPI_HITHRU_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-HT_anno_AF_082919.tsv')
+_PPI_LIT_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-LC_anno_AF_082919.tsv')
 
 # Collection name config
 _PHENO_VERT_NAME = 'djornl_phenotype'
@@ -155,9 +155,9 @@ def main():
 
 def save_docs(coll_name, docs, on_dupe='update'):
     resp = requests.put(
-        CONF.api_url + '/api/v1/documents',
+        CONF['API_URL'] + '/api/v1/documents',
         params={'collection': coll_name, 'on_duplicate': on_dupe},
-        headers={'Authorization': CONF.auth_token},
+        headers={'Authorization': CONF['AUTH_TOKEN']},
         data='\n'.join(json.dumps(d) for d in docs)
     )
     if not resp.ok:
