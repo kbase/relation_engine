@@ -1,3 +1,7 @@
+"""
+Loads and initializes configuration data for importers using environment
+variables and a set of default values.
+"""
 import os
 
 
