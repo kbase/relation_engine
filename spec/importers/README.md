@@ -13,7 +13,7 @@ Global env vars:
 
 ### djornl
 
-```py
+```sh
 RES_auth_token=admin_token \
 RES_base_path=/path/to/djornl_data \
 python -m importers.djornl.main
