@@ -13,6 +13,21 @@ schema:
       type: string
       title: Gene Key
       examples: ["AT1G01010"]
+    cluster_I2:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
+    cluster_I4:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
+    cluster_I6:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
     node_type:
       type: string
       examples: ["gene"]
