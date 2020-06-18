@@ -18,11 +18,11 @@ params:
 query: |
   FOR g IN djornl_gene
     FILTER g._key == @gene_key
-    FOR n, e, p IN @distance ANY g djornl_domain_co_occur, djornl_gene_coexpr, djornl_pheno_assn, djornl_ppi_hithru, djornl_ppi_liter
+    FOR n, e, p IN @distance ANY g djornl_edge
       OPTIONS {bfs: true, uniqueVertices: "global"}
       LET edges = (
         FOR entry IN p.edges
-            RETURN KEEP(entry, "_id", "_from", "_to")
+            RETURN KEEP(entry, "_id", "_from", "_to", "score", "score_type")
       )
       LET verts = (
         FOR entry IN SLICE(p.vertices, 1)
