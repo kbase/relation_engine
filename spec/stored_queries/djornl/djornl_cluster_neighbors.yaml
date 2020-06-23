@@ -1,5 +1,5 @@
 # Fetch the neighbors of all vertices in a certain cluster
-name: djornl_gene_neighbors
+name: djornl_cluster_neighbors
 params:
   type: object
   required: [cluster_name, cluster_id]
@@ -21,7 +21,7 @@ query: |
   FOR gene IN djornl_gene
     FILTER gene[@cluster_name] = @cluster_id
     LET neighbors = (
-      FOR neighbor IN @distance ANY gene djornl_edge
+      FOR neighbor IN 1..@distance ANY gene djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
         RETURN neighbor
     )
