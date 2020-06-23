@@ -19,7 +19,7 @@ params:
       maximum: 100
 query: |
   FOR gene IN djornl_gene
-    FILTER gene[@cluster_name] = @cluster_id
+    FILTER gene[@cluster_name] == @cluster_id
     LET neighbors = (
       FOR neighbor IN 1..@distance ANY gene djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
