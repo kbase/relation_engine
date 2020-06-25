@@ -1,0 +1,37 @@
+# Fetch the neighbors of all vertices in a certain cluster
+name: djornl_cluster_neighbors
+params:
+  type: object
+  required: [cluster_name, cluster_id]
+  properties:
+    cluster_name:
+      type: string
+      enum: [cluster_I2, cluster_I4, cluster_I6]
+    cluster_id:
+      type: string
+      examples: [Cluster1, Cluster2]
+    distance:
+      type: integer
+      title: Traversal Distance
+      description: How many hops to find neighbors and neighbors-of-neighbors
+      default: 1
+      minimum: 1
+      maximum: 100
+# phenotype nodes can be returned
+query_prefix: WITH djornl_phenotype
+query: |
+  LET cluster = (
+    FOR gene IN djornl_gene
+      FILTER gene[@cluster_name] == @cluster_id
+      RETURN gene
+  )
+  // Returns empty list if @distance is 0
+  LET neighbors = (
+    FOR gene IN cluster
+      FOR node, edge IN 0..@distance ANY gene djornl_edge
+        OPTIONS {bfs: true, uniqueVertices: "global"}
+        FILTER edge
+        RETURN DISTINCT {node, edge}
+  )
+  // Return nested results to get around any limit (by default limited to 1k results)
+  return {cluster, neighbors}
