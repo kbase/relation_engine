@@ -1,0 +1,87 @@
+name: djornl_gene
+type: vertex
+delta: false
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: Gene Vertices
+  description: Arabidopsis gene nodes from the Dan Jacobson Lab
+  type: object
+  required: [_key]
+  properties:
+    _key:
+      type: string
+      title: Gene Key
+      examples: ["AT1G01010"]
+    cluster_I2:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
+    cluster_I4:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
+    cluster_I6:
+      type: string
+      title: Cluster ID
+      description: Iterative random forest cluster group ID
+      examples: ["Cluster1"]
+    node_type:
+      type: string
+      examples: ["gene"]
+    transcript:
+      type: string
+      examples: ["AT1G01010.1"]
+    gene_symbol:
+      type: string
+      examples: ["NTL10"]
+    gene_full_name:
+      type: string
+      examples: ["NAC domain containing protein 1"]
+    gene_model_type:
+      type: string
+      examples: ["protein_coding"]
+    tair_computational_desc:
+      type: string
+      examples: ["NAC domain containing protein 1;(source:Araport11)"]
+    tair_curator_summary:
+      type: string
+    tair_short_desc:
+      type: string
+      examples: ["NAC domain containing protein 1"]
+    go_descr:
+      type: string
+      examples: ["DNA-binding transcription factor activity"]
+    go_terms:
+      type: array
+      items: {type: string}
+      examples: [["DNA binding"]]
+    mapman_bin:
+      type: string
+      examples: ["GO:0003700"]
+    mapman_name:
+      type: string
+      examples: ["GO:0003677"]
+    mapman_desc:
+      type: string
+      examples: ["15.5.17"]
+    pheno_aragwas_id:
+      type: string
+      examples: [".RNA biosynthesis.transcriptional regulation.transcription factor (NAC)"]
+    pheno_desc1:
+      type: string
+      examples: ["transcription factor (NAC) (original description: pep chromosome:TAIR10:1:3631:5899:1 gene:AT1G01010 transcript:AT1G01010.1 gene_biotype:protein_coding transcript_biotype:protein_coding gene_symbol:NAC001 description:NAC domain-containing protein 1 [Source:UniProtKB/Swiss-Prot;Acc:Q0WV96])"]
+    pheno_desc2:
+      type: string
+      examples: []
+    pheno_desc3:
+      type: string
+      examples: []
+    pheno_ref:
+      type: string
+      examples: []
+    user_notes:
+      type: string
+      examples: []
