@@ -20,12 +20,18 @@ params:
 # phenotype nodes can be returned
 query_prefix: WITH djornl_phenotype
 query: |
-  LET results = (
+  LET cluster = (
     FOR gene IN djornl_gene
       FILTER gene[@cluster_name] == @cluster_id
-      FOR node IN 0..@distance ANY gene djornl_edge
+      RETURN gene
+  )
+  // Returns empty list if @distance is 0
+  LET neighbors = (
+    FOR gene IN cluster
+      FOR node, edge IN 0..@distance ANY gene djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
-        RETURN DISTINCT node
+        FILTER edge
+        RETURN DISTINCT {node, edge}
   )
   // Return nested results to get around any limit (by default limited to 1k results)
-  return {results}
+  return {cluster, neighbors}
