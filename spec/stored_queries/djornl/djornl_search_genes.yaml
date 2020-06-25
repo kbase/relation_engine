@@ -1,0 +1,28 @@
+# Simple fuzzy search genes using the djornl_gene_view ArangoSearch view
+name: djornl_search_genes
+params:
+  type: object
+  required: [query]
+  properties:
+    query:
+      type: string
+      title: Query Text
+      minLength: 3
+query: |
+  FOR g IN djornl_gene_view
+      SEARCH ANALYZER(
+            PHRASE(g.tair_computational_desc, @query) OR
+            PHRASE(g.tair_short_desc, @query) OR
+            PHRASE(g.mapman_desc, @query) OR
+            PHRASE(g.go_desc, @query) OR
+            PHRASE(g.mapman_name, @query) OR
+            PHRASE(g.mapman_desc, @query) OR
+            PHRASE(g.pheno_desc1, @query) OR
+            PHRASE(g.pheno_desc2, @query) OR
+            PHRASE(g.pheno_desc3, @query) OR
+            PHRASE(g.user_notes, @query),
+            'text_en'
+        )
+        OR PHRASE(g.go_terms, @query)
+        OR PHRASE(g.transcript, @query)
+      RETURN g

@@ -15,11 +15,21 @@ CONF = config.load_from_env(extra_required=['ROOT_DATA_PATH'])
 # Path config
 _ROOT = CONF['ROOT_DATA_PATH']
 _VERT_PATH = os.path.join(_ROOT, 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv')
-_CLUSTER_PATHS = [
-    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'),
-    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'),
-    os.path.join(_ROOT, 'cluster_data', 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'),
-]
+_CLUSTER_BASE = os.path.join(_ROOT, 'cluster_data')
+_CLUSTER_PATHS = {
+    'cluster_I2': os.path.join(
+        _CLUSTER_BASE,
+        'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'
+    ),
+    'cluster_I4': os.path.join(
+        _CLUSTER_BASE,
+        'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'
+    ),
+    'cluster_I6': os.path.join(
+        _CLUSTER_BASE,
+        'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'
+    ),
+}
 _PHENO_ASSN_PATH = os.path.join(_ROOT, 'aragwas_subnet_phenoassociations_AMW_083019.tsv')
 _DOMAIN_CO_OCCUR_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-DC_anno_AF_082919.tsv')
 _GENE_COEXPR_PATH = os.path.join(_ROOT, 'aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.tsv')
@@ -132,14 +142,14 @@ def load_vert_metadata():
 def load_cluster_data():
     """Annotate genes with cluster ID fields."""
     docs = []
-    for path in _CLUSTER_PATHS:
+    for (cluster_label, path) in _CLUSTER_PATHS.items():
         with open(path) as fd:
             csv_reader = csv.reader(fd, delimiter='\t')
             for row in csv_reader:
-                cluster_label = row[0]
+                cluster_id = row[0]
                 gene_keys = row[1:]
                 docs += [
-                    {'_key': key, 'cluster': cluster_label}
+                    {'_key': key, cluster_label: cluster_id}
                     for key in gene_keys
                 ]
     save_docs(_GENE_VERT_NAME, docs)
