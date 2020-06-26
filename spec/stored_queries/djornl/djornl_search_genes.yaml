@@ -2,7 +2,7 @@
 name: djornl_search_genes
 params:
   type: object
-  required: [query]
+  required: [search_text]
   properties:
     search_text:
       type: string
