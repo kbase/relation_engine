@@ -1,5 +1,5 @@
 # Fetch all vertices in the djornl subgraph
-name: djornl_fetch_all_vertices
+name: djornl_fetch_all
 params:
   type: object
 query: |
@@ -11,4 +11,8 @@ query: |
     FOR v IN djornl_phenotype
       RETURN v
   )
-  RETURN {genes, phenotypes}
+  LET edges = (
+    FOR e IN djornl_edge
+      RETURN e
+  )
+  RETURN {genes, phenotypes, edges}
