@@ -3,64 +3,45 @@ type: edge
 delta: false
 
 indexes:
-  - type: hash
-    fields: [score_type]
-  - type: persistent
-    fields: [score]
-
-# A guide to the edge score types:
-
-# domain_co_occur:
-#   A layer of protein domain co-occurrence values from the Arabidopsis
-#   AraNetv2 database. The LLS scores that serve as edge values were calculated
-#   from weighted mutual information scores to normalize the data for
-#   comparison across studies and different types of data layers (Lee et al,
-#   2015).
-
-# gene_coexpr:
-#   A subset of pairwise gene coexpression values from the Arabidopsis
-#   AraNetv2 database. The LLS scores that serve as edge values were
-#   calculated from Pearson correlation coefficients to normalize the data
-#   for comparison across studies and different types of data layers (Lee et
-#   al, 2015).
-
-# pheno_assn:
-#   GWAS associations produced by analyzing a subset of phenotypes and SNPs
-#   in the Arabidopsis 1001 Genomes database. Edge values are significant
-#   association scores after FDR correction.
-
-# ppi_hithru:
-#   Log likelihood score. A layer of protein-protein interaction values
-#   derived from four high-throughput PPI screening experiments; from the
-#   Arabidopsis AraNetv2 database. The LLS scores that serve as edge values
-#   were calculated to normalize the data for comparison across studies and
-#   different types of data layers (Lee et al, 2015).
-
-# ppi_liter:
-#   A layer of protein-protein interaction values from literature-curated
-#   small- to medium-scale experimental data; from the Arabidopsis AraNetv2
-#   database. The LLS scores that serve as edge values were calculated to
-#   normalize the data for comparison across studies and different types of
-#   data layers (Lee et al, 2015).
+ - type: hash
+   fields: [edge_type]
+ - type: persistent
+   fields: [score]
 
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   title: Arabidopsis gene-gene or gene-phenotype edge
   description: Generic gene-to-gene or gene-to-phenotype edge for Dan Jacobson Arabidopsis data
   type: object
-  required: [score, score_type, _from, _to]
+  required: [score, edge_type, _from, _to, _key]
   properties:
-    score:
-      title: Edge Score (Weight)
-      # (float)
-      type: number
-    score_type:
-      title: Least Likelihood Score
+    _key:
       type: string
-      enum: [domain_co_occur, gene_coexpr, pheno_assn, ppi_hithru, ppi_liter]
+      title: Key
     _from:
       type: string
       title: Gene ID
     _to:
       type: string
       title: Gene or Phenotype ID
+    score:
+      title: Edge Score (Weight)
+      # (float)
+      type: number
+    edge_type:
+      title: Edge Type
+      type: string
+      oneOf:
+        - const: domain_co_occur
+          description: A layer of protein domain co-occurrence values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from weighted mutual information scores to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+        - const: gene_coexpr
+          description: A subset of pairwise gene coexpression values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were
+            calculated from Pearson correlation coefficients to normalize the data
+            for comparison across studies and different types of data layers (Lee et
+            al, 2015).
+        - const: pheno_assn
+          description: GWAS associations produced by analyzing a subset of phenotypes and SNPs in the Arabidopsis 1001 Genomes database. Edge values are significant association scores after FDR correction.
+        - const: ppi_hithru
+          description: Log likelihood score. A layer of protein-protein interaction values derived from four high-throughput PPI screening experiments; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+        - const: ppi_liter
+          description: A layer of protein-protein interaction values from literature-curated small- to medium-scale experimental data; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).

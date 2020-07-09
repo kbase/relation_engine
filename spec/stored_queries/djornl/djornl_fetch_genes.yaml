@@ -1,15 +1,37 @@
-# Fetch a gene document by list of keys
 name: djornl_fetch_genes
+description: Fetch a gene or list of genes by key, and the edges and nodes within the specified distance (number of hops) of those genes.
 params:
   type: object
   required: [keys]
   properties:
+    distance:
+      type: integer
+      title: Traversal Distance
+      description: How many hops to find neighbors and neighbors-of-neighbors
+      default: 1
+      minimum: 0
+      maximum: 100
     keys:
       type: array
       items: {type: string}
       title: Gene Keys
-      examples: [[AT1G01010]]
+      examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
 query: |
-  FOR g IN djornl_gene
-    FILTER g._key IN @keys
-    RETURN g
+  LET node_ids = (
+    FOR n IN djornl_node
+      FILTER n._key IN @keys AND n.node_type == 'gene'
+      FOR node IN 0..@distance ANY n djornl_edge
+        OPTIONS {bfs: true, uniqueVertices: "global"}
+        RETURN DISTINCT node._id
+  )
+  LET edges = (
+    FOR edge IN djornl_edge
+      FILTER edge._from IN node_ids AND edge._to IN node_ids
+      RETURN edge
+  )
+  LET nodes = (
+    FOR node IN djornl_node
+        FILTER node._id IN node_ids
+        RETURN node
+  )
+  RETURN {nodes, edges}

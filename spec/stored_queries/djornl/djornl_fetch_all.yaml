@@ -1,18 +1,15 @@
-# Fetch all vertices in the djornl subgraph
 name: djornl_fetch_all
+description: Fetch all node and edge data from the djornl subgraph
 params:
   type: object
+#  additionalProperties: false
 query: |
-  LET genes = (
-    FOR v IN djornl_gene
-      RETURN v
-  )
-  LET phenotypes = (
-    FOR v IN djornl_phenotype
+  LET nodes = (
+    FOR v IN djornl_node
       RETURN v
   )
   LET edges = (
     FOR e IN djornl_edge
       RETURN e
   )
-  RETURN {genes, phenotypes, edges}
+  RETURN {nodes, edges}
