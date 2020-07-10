@@ -15,6 +15,7 @@ def get_config():
     spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
     spec_schemas_path = os.path.join(spec_repo_path, 'schemas')  # /spec/repo/schemas
     stored_queries_path = os.path.join(spec_repo_path, 'stored_queries')  # /spec/repo/stored_queries
+    spec_views_path = os.path.join(spec_repo_path, 'views')  # /spec/repo/views
     spec_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
     kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
     auth_url = os.environ.get('KBASE_AUTH_URL', urljoin(kbase_endpoint + '/', 'auth'))
@@ -46,6 +47,7 @@ def get_config():
             'repo': spec_repo_path,
             'schemas': spec_schemas_path,
             'stored_queries': stored_queries_path,
+            'views': spec_views_path,
             'vertices': os.path.join(spec_schemas_path, 'vertices'),
             'data_sources': os.path.join(spec_repo_path, 'data_sources'),
         }

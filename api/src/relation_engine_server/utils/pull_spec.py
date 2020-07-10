@@ -41,6 +41,7 @@ def download_specs(init_collections=True, release_url=None, reset=False):
     # Initialize all the collections
     if init_collections:
         arango_client.init_collections()
+        arango_client.init_views()
 
 
 def _fetch_github_release_url():

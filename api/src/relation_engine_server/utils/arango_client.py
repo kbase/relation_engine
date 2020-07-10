@@ -78,6 +78,16 @@ def init_collections():
         create_collection(coll_name, config)
 
 
+def init_views():
+    """Initialize any uninitialized views in the database from a set of schemas."""
+    pattern = os.path.join(_CONF['spec_paths']['views'], '**', '*.json')
+    for path in glob.iglob(pattern):
+        view_name = os.path.basename(os.path.splitext(path)[0])
+        with open(path) as fd:
+            config = json.load(fd)
+        create_view(view_name, config)
+
+
 def create_collection(name, config):
     """
     Create a single collection by name using some basic defaults.
@@ -165,6 +175,28 @@ def import_from_file(file_path, query):
         if details:
             sys.stderr.write(f"Error details:\n{details[0]}\n")
     return resp_json
+
+
+def create_view(name, config):
+    """
+    Create a view by name, ignoring duplicates.
+    For any other server error, an exception is thrown.
+    """
+
+    url = _CONF['api_url'] + '/view#arangosearch'
+
+    if 'name' not in config:
+        config['name'] = name
+    if 'type' not in config:
+        config['type'] = 'arangosearch'
+    print(f"Creating view {name}")
+    data = json.dumps(config)
+    resp = requests.post(url, data, auth=(_CONF['db_user'], _CONF['db_pass']))
+    resp_json = resp.json()
+    if not resp.ok:
+        if 'duplicate' not in resp_json['errorMessage']:
+            # Unable to create the view
+            raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):
