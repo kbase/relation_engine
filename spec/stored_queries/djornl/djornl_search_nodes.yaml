@@ -1,0 +1,50 @@
+name: djornl_search_nodes
+description: Search for nodes using a simple fuzzy search on node metadata; return the matching nodes, and the edges and nodes within the specified distance (number of hops) of those nodes.
+params:
+  type: object
+  required: [search_text]
+  properties:
+    distance:
+      type: integer
+      title: Traversal Distance
+      description: How many hops to find neighbors and neighbors-of-neighbors
+      default: 1
+      minimum: 0
+      maximum: 100
+    search_text:
+      type: string
+      title: Search text
+      examples: ['GO:0005515', 'organelle machinery']
+query: |
+  LET node_ids = (
+    FOR g IN djornl_node_view
+        SEARCH ANALYZER(
+            PHRASE(g.tair_computational_desc, @search_text) OR
+            PHRASE(g.tair_short_desc, @search_text) OR
+            PHRASE(g.mapman_desc, @search_text) OR
+            PHRASE(g.go_desc, @search_text) OR
+            PHRASE(g.mapman_name, @search_text) OR
+            PHRASE(g.mapman_desc, @search_text) OR
+            PHRASE(g.pheno_desc1, @search_text) OR
+            PHRASE(g.pheno_desc2, @search_text) OR
+            PHRASE(g.pheno_desc3, @search_text) OR
+            PHRASE(g.user_notes, @search_text),
+            'text_en'
+        )
+        OR PHRASE(g.go_terms, @search_text)
+        OR PHRASE(g.transcript, @search_text)
+      FOR node IN 0..@distance ANY g djornl_edge
+        OPTIONS {bfs: true, uniqueVertices: "global"}
+        RETURN DISTINCT node._id
+  )
+  LET edges = (
+    FOR edge IN djornl_edge
+      FILTER edge._from IN node_ids AND edge._to IN node_ids
+      RETURN edge
+  )
+  LET nodes = (
+    FOR node IN djornl_node
+        FILTER node._id IN node_ids
+        RETURN node
+  )
+  RETURN {nodes, edges}

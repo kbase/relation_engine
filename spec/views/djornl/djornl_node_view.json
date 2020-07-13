@@ -1,19 +1,19 @@
 {
-  "writebufferIdle": 64,
-  "writebufferActive": 0,
+  "name": "djornl_node_view",
   "type": "arangosearch",
   "primarySort": [],
-  "writebufferSizeMax": 33554432,
+  "cleanupIntervalStep": 2,
   "commitIntervalMsec": 1000,
   "consolidationPolicy": {
     "type": "bytes_accum",
     "threshold": 0.1
   },
-  "globallyUniqueId": "c98232107/",
-  "cleanupIntervalStep": 2,
-  "id": "98232107",
+  "writebufferIdle": 64,
+  "writebufferActive": 0,
+  "consolidationIntervalMsec": 60000,
+  "writebufferSizeMax": 33554432,
   "links": {
-    "djornl_gene": {
+    "djornl_node": {
       "analyzers": [
         "identity"
       ],
@@ -30,11 +30,6 @@
           ]
         },
         "gene_model_type": {},
-        "mapman_desc": {
-          "analyzers": [
-            "text_en"
-          ]
-        },
         "go_terms": {},
         "go_desc": {
           "analyzers": [
@@ -77,6 +72,5 @@
       "storeValues": "none",
       "trackListPositions": false
     }
-  },
-  "consolidationIntervalMsec": 60000
+  }
 }

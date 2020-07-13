@@ -137,6 +137,46 @@ def validate_stored_queries():
     print('..all valid.')
 
 
+# JSON schema for arangosearch views found in /views
+view_schema = {
+    "type": "object",
+    "required": ["name", "type"],
+    "properties": {
+        "name": {
+            'title': 'View name',
+            "type": "string",
+            "format": r'^[a-z_]+$'
+        },
+        'type': {
+            'type': 'string',
+            'enum': ['arangosearch']
+        }
+    }
+}
+
+
+def validate_views():
+    """Validate the structure and syntax of arangosearch views"""
+    print('Validating views..')
+    names = set()  # type: set
+    for path in glob.iglob('views/**/*.json', recursive=True):
+        print(f'  validating {path}..')
+        with open(path) as fd:
+            data = json.load(fd)
+        jsonschema.validate(data, view_schema)
+        name = data['name']
+        filename = os.path.splitext(os.path.basename(path))[0]
+        if name != filename:
+            _fatal(f'Name key should match filename: {name} vs {filename}')
+        if name in names:
+            _fatal(f'Duplicate queries named {name}')
+        else:
+            names.add(name)
+
+        print(f'✓ {name} is valid.')
+    print('..all valid.')
+
+
 def _fatal(msg):
     """Fatal error."""
     sys.stderr.write(str(msg) + '\n')
@@ -147,3 +187,4 @@ if __name__ == '__main__':
     wait_for_arangodb()
     validate_json_schemas()
     validate_stored_queries()
+    validate_views()
