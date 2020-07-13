@@ -27,7 +27,7 @@ params:
       title: Versioning timestamp
 query_prefix: WITH ws_genome_features, ws_object_version
 query: |
-  LET flag=IS_NULL(@obj_ref) OR LENGTH(@obj_ref) == 0 ? 1 : 0
+  LET obj_ref_null=IS_NULL(@obj_ref) OR LENGTH(@obj_ref) == 0
   LET raw=(
     FOR t in GO_terms
       FILTER t.id == @id
@@ -36,7 +36,7 @@ query: |
       FOR v, e, p IN 2 INBOUND t ws_feature_has_GO_annotation, ws_genome_has_feature
         FILTER p.edges[0].created <= @ts AND p.edges[0].expired >= @ts
         FILTER v.is_public OR v.workspace_id IN ws_ids
-        FILTER v._key == @obj_ref OR 1 == flag
+        FILTER obj_ref_null OR v._key == @obj_ref
         SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
         LIMIT @offset, @limit
         RETURN DISTINCT {
