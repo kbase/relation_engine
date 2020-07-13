@@ -143,7 +143,7 @@ view_schema = {
     "required": ["name", "type"],
     "properties": {
         "name": {
-            'title': 'Collection name',
+            'title': 'View name',
             "type": "string",
             "format": r'^[a-z_]+$'
         },

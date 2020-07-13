@@ -72,6 +72,7 @@ class DJORNL_Parser(object):
           'AraNetv2-LC_lit-curated-ppi':            'ppi_liter',
         }
 
+        # dict of nodes, indexed by node ID (node1 and node2 from the file)
         node_ix = {}
         edges = []
         node_name = self.config()['_NODE_NAME']
@@ -92,7 +93,7 @@ class DJORNL_Parser(object):
                 node_ix[cols[0]] = 1
                 node_ix[cols[1]] = 1
                 edge_type = cols[4]
-                if not edge_type in edge_remap:
+                if edge_type not in edge_remap:
                     raise RuntimeError(f"line {line_no}: invalid edge type: {edge_type}")
 
                 edges.append({
