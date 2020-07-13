@@ -5,8 +5,6 @@ import sys
 import os
 import requests
 import json
-import glob
-import yaml
 
 from .config import get_config
 
@@ -66,16 +64,6 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=10000,
         'cursor_id': resp_json.get('id'),
         'stats': resp_json['extra']['stats']
     }
-
-
-def init_collections():
-    """Initialize any uninitialized collections in the database from a set of schemas."""
-    pattern = os.path.join(_CONF['spec_paths']['schemas'], '**', '*.yaml')
-    for path in glob.iglob(pattern):
-        coll_name = os.path.basename(os.path.splitext(path)[0])
-        with open(path) as fd:
-            config = yaml.safe_load(fd)
-        create_collection(coll_name, config)
 
 
 def create_collection(name, config):
@@ -165,6 +153,28 @@ def import_from_file(file_path, query):
         if details:
             sys.stderr.write(f"Error details:\n{details[0]}\n")
     return resp_json
+
+
+def create_view(name, config):
+    """
+    Create a view by name, ignoring duplicates.
+    For any other server error, an exception is thrown.
+    """
+
+    url = _CONF['api_url'] + '/view#arangosearch'
+
+    if 'name' not in config:
+        config['name'] = name
+    if 'type' not in config:
+        config['type'] = 'arangosearch'
+    print(f"Creating view {name}")
+    data = json.dumps(config)
+    resp = requests.post(url, data, auth=(_CONF['db_user'], _CONF['db_pass']))
+    resp_json = resp.json()
+    if not resp.ok:
+        if 'duplicate' not in resp_json['errorMessage']:
+            # Unable to create the view
+            raise ArangoServerError(resp.text)
 
 
 class ArangoServerError(Exception):

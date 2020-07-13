@@ -4,6 +4,10 @@ import requests
 import tarfile
 import tempfile
 import shutil
+import json
+import glob
+import yaml
+
 
 from . import arango_client
 from .config import get_config
@@ -40,7 +44,28 @@ def download_specs(init_collections=True, release_url=None, reset=False):
         _rename_directories(_CONF['spec_paths']['root'], _CONF['spec_paths']['repo'])
     # Initialize all the collections
     if init_collections:
-        arango_client.init_collections()
+        do_init_collections()
+        do_init_views()
+
+
+def do_init_collections():
+    """Initialize any uninitialized collections in the database from a set of schemas."""
+    pattern = os.path.join(_CONF['spec_paths']['schemas'], '**', '*.yaml')
+    for path in glob.iglob(pattern):
+        coll_name = os.path.basename(os.path.splitext(path)[0])
+        with open(path) as fd:
+            config = yaml.safe_load(fd)
+        arango_client.create_collection(coll_name, config)
+
+
+def do_init_views():
+    """Initialize any uninitialized views in the database from a set of schemas."""
+    pattern = os.path.join(_CONF['spec_paths']['views'], '**', '*.json')
+    for path in glob.iglob(pattern):
+        view_name = os.path.basename(os.path.splitext(path)[0])
+        with open(path) as fd:
+            config = json.load(fd)
+        arango_client.create_view(view_name, config)
 
 
 def _fetch_github_release_url():
