@@ -5,8 +5,6 @@ import sys
 import os
 import requests
 import json
-import glob
-import yaml
 
 from .config import get_config
 
@@ -66,26 +64,6 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=10000,
         'cursor_id': resp_json.get('id'),
         'stats': resp_json['extra']['stats']
     }
-
-
-def init_collections():
-    """Initialize any uninitialized collections in the database from a set of schemas."""
-    pattern = os.path.join(_CONF['spec_paths']['schemas'], '**', '*.yaml')
-    for path in glob.iglob(pattern):
-        coll_name = os.path.basename(os.path.splitext(path)[0])
-        with open(path) as fd:
-            config = yaml.safe_load(fd)
-        create_collection(coll_name, config)
-
-
-def init_views():
-    """Initialize any uninitialized views in the database from a set of schemas."""
-    pattern = os.path.join(_CONF['spec_paths']['views'], '**', '*.json')
-    for path in glob.iglob(pattern):
-        view_name = os.path.basename(os.path.splitext(path)[0])
-        with open(path) as fd:
-            config = json.load(fd)
-        create_view(view_name, config)
 
 
 def create_collection(name, config):
