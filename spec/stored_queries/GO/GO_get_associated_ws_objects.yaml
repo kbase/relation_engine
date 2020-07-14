@@ -24,21 +24,17 @@ params:
       title: Versioning timestamp
 query_prefix: WITH ws_genome_features, ws_object_version
 query: |
-  LET raw=(
-    FOR t in GO_terms
-      FILTER t.id == @id
-      FILTER t.created <= @ts AND t.expired >= @ts
-      limit 1
-      FOR v, e, p IN 2 INBOUND t ws_feature_has_GO_annotation, ws_genome_has_feature
-        FILTER p.edges[0].created <= @ts AND p.edges[0].expired >= @ts
-        FILTER v.is_public OR v.workspace_id IN ws_ids
-        SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
-        RETURN DISTINCT {
-          ws_obj: KEEP(v, ['workspace_id', 'object_id', 'version', 'name']),
-          feature: KEEP(p.vertices[1], ['feature_id', 'updated_at'])
-        }
-  )
-  FOR r IN raw
-    COLLECT ws_obj=r.ws_obj WITH COUNT INTO feature_count
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    LIMIT 1
+    FOR v, e, p IN 2 INBOUND t ws_feature_has_GO_annotation, ws_genome_has_feature
+      FILTER p.edges[0].created <= @ts AND p.edges[0].expired >= @ts
+      FILTER v.is_public OR v.workspace_id IN ws_ids
+      SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
+      COLLECT ws_obj = v WITH COUNT INTO feature_count
       LIMIT @offset, @limit
-      RETURN {ws_obj, feature_count}
+      RETURN DISTINCT {
+        ws_obj: KEEP(ws_obj, ['workspace_id', 'object_id', 'version', 'name']),
+        feature_count
+      }
