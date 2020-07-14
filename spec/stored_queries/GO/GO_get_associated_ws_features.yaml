@@ -1,0 +1,49 @@
+# Get the associated ws features of this term
+
+name: GO_get_associated_ws_features
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: GO id of the term you want to get the ws object of
+    obj_ref:
+      type: string
+      title: Workspace versioned object reference
+    limit:
+      type: integer
+      title: Maximum result limit
+      default: 20
+      maximum: 1000
+    offset:
+      type: integer
+      title: Result offset for pagination
+      default: 0
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH ws_genome_features, ws_object_version
+query: |
+  LET obj_ref_null=IS_NULL(@obj_ref) OR LENGTH(@obj_ref) == 0
+  LET raw=(
+    FOR t in GO_terms
+      FILTER t.id == @id
+      FILTER t.created <= @ts AND t.expired >= @ts
+      limit 1
+      FOR v, e, p IN 2 INBOUND t ws_feature_has_GO_annotation, ws_genome_has_feature
+        FILTER p.edges[0].created <= @ts AND p.edges[0].expired >= @ts
+        FILTER v.is_public OR v.workspace_id IN ws_ids
+        FILTER obj_ref_null OR v._key == @obj_ref
+        SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
+        LIMIT @offset, @limit
+        RETURN DISTINCT {
+          ws_obj: KEEP(v, ['workspace_id', 'object_id', 'version', 'name']),
+          feature: KEEP(p.vertices[1], ['feature_id', 'updated_at'])
+        }
+  )
+  FOR r IN raw
+    COLLECT ws_obj=r.ws_obj INTO features=r.feature
+      RETURN {ws_obj, features}
