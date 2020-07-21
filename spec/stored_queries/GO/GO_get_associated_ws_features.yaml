@@ -28,7 +28,7 @@ params:
 query_prefix: WITH ws_genome_features, ws_object_version
 query: |
   LET obj_ref_null=IS_NULL(@obj_ref) OR LENGTH(@obj_ref) == 0
-  LET raw=(
+  LET results=(
     FOR t in GO_terms
       FILTER t.id == @id
       FILTER t.created <= @ts AND t.expired >= @ts
@@ -38,12 +38,16 @@ query: |
         FILTER v.is_public OR v.workspace_id IN ws_ids
         FILTER obj_ref_null OR v._key == @obj_ref
         SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
-        LIMIT @offset, @limit
         RETURN DISTINCT {
           ws_obj: KEEP(v, ['workspace_id', 'object_id', 'version', 'name']),
           feature: KEEP(p.vertices[1], ['feature_id', 'updated_at'])
         }
   )
-  FOR r IN raw
-    COLLECT ws_obj=r.ws_obj INTO features=r.feature
-      RETURN {ws_obj, features}
+  LET total_count=COUNT(results)
+  LET limited=(
+    FOR r in results
+      LIMIT @offset, @limit
+      COLLECT ws_obj=r.ws_obj INTO features=r.feature
+        RETURN {ws_obj, features}
+  )
+  RETURN {results: limited, total_count}
