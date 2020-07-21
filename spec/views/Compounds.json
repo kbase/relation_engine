@@ -1,17 +1,16 @@
 {
+  "name": "Compounds",
+  "type": "arangosearch",
   "writebufferIdle": 64,
   "writebufferActive": 0,
-  "type": "arangosearch",
   "primarySort": [],
   "writebufferSizeMax": 33554432,
   "commitIntervalMsec": 1000,
   "consolidationPolicy": {
     "type": "bytes_accum",
-    "threshold": 0.10000000149011612
+    "threshold": 0.1
   },
-  "globallyUniqueId": "h5455DEB9D2A1/9852581",
   "cleanupIntervalStep": 10,
-  "id": "9852581",
   "links": {
     "rxn_compound": {
       "analyzers": [

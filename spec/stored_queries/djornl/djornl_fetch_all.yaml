@@ -1,0 +1,15 @@
+name: djornl_fetch_all
+description: Fetch all node and edge data from the djornl subgraph
+params:
+  type: object
+#  additionalProperties: false
+query: |
+  LET nodes = (
+    FOR v IN djornl_node
+      RETURN v
+  )
+  LET edges = (
+    FOR e IN djornl_edge
+      RETURN e
+  )
+  RETURN {nodes, edges}

@@ -1,0 +1,8 @@
+node1	node2	edge	edge_descrip	layer_descrip
+As2	AT1G01040	5.422046084731258	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
+As75	AT1G01020	39.98573324312915	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
+AT1G01010	AT1G01020	2.39322646755088	AraNetv2_log-likelihood-score	AraNetv2-HT_high-throughput-ppi
+AT1G01010	AT1G01030	2.39322646755088	AraNetv2_log-likelihood-score	AraNetv2-HT_high-throughput-ppi
+AT1G01010	AT1G01040	2.39322646755088
+AT1G01030	AT1G01050	2.5494618241936697	AraNetv2_log-likelihood-score	AraNetv2-CX_pairwise-gene-coexpression
+AT1G01050	AT1G01060	4.34242054808616	AraNetv2_log-likelihood-score	AraNetv2-LC_lit-curated-ppi
