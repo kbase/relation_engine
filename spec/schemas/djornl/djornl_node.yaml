@@ -1,0 +1,107 @@
+name: djornl_node
+type: vertex
+delta: false
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: Gene and Phenotype Vertices
+  description: Arabidopsis gene and phenotype nodes from the Dan Jacobson Lab
+  type: object
+  required: [_key]
+  properties:
+    _key:
+      type: string
+      title: Key
+      examples: ["AT1G01010"]
+    cluster_I2:
+      type: integer
+      title: Cluster 2 ID
+      description: Iterative random forest cluster group ID
+      examples: [1]
+    cluster_I4:
+      type: integer
+      title: Cluster 4 ID
+      description: Iterative random forest cluster group ID
+      examples: [13]
+    cluster_I6:
+      type: integer
+      title: Cluster 6 ID
+      description: Iterative random forest cluster group ID
+      examples: [27]
+    node_type:
+      type: string
+      title: Node type
+      examples: ["gene", "phenotype"]
+    transcript:
+      type: string
+      title: Transcript
+      examples: ["AT1G01010.1"]
+    gene_symbol:
+      type: string
+      title: Gene symbol
+      examples: ["NTL10"]
+    gene_full_name:
+      type: string
+      title: Gene full name
+      examples: ["NAC domain containing protein 1"]
+    gene_model_type:
+      type: string
+      title: Gene model type
+      examples: ["protein_coding"]
+    tair_computational_desc:
+      type: string
+      title: TAIR computational description
+      examples: ["NAC domain containing protein 1;(source:Araport11)"]
+    tair_curator_summary:
+      type: string
+      title: TAIR curator summary
+      examples: ["Encodes a plasma membrane-localized amino acid transporter likely involved in amino acid export in the developing seed."]
+    tair_short_desc:
+      type: string
+      title: TAIR short description
+      examples: ["NAC domain containing protein 1"]
+    go_descr:
+      type: string
+      title: GO descriptions
+      examples: ["DNA-binding transcription factor activity"]
+    go_terms:
+      type: array
+      title: GO term IDs
+      items: {type: string}
+      examples: [["GO:0003700", "GO:0005515"]]
+    mapman_bin:
+      type: string
+      title: Mapman bin
+      examples: ["15.5.17"]
+    mapman_name:
+      type: string
+      title: Mapman name
+      examples: [".RNA biosynthesis.transcriptional regulation.transcription factor (NAC)"]
+    mapman_desc:
+      type: string
+      title: Mapman description
+      examples: ["transcription factor (NAC) (original description: pep chromosome:TAIR10:1:3631:5899:1 gene:AT1G01010 transcript:AT1G01010.1 gene_biotype:protein_coding transcript_biotype:protein_coding gene_symbol:NAC001 description:NAC domain-containing protein 1 [Source:UniProtKB/Swiss-Prot;Acc:Q0WV96])"]
+    pheno_aragwas_id:
+      type: string
+      title: AraGWAS ID
+      examples: ["10.21958/phenotype:67"]
+    pheno_desc1:
+      type: string
+      title: Phenotype description 1
+      examples: ["Arsenic concentrations in leaves, grown in soil. Elemental analysis was performed with an ICP-MS (PerkinElmer). Sample normalized to calculated weights as described in Baxter et al., 2008"]
+    pheno_desc2:
+      type: string
+      title: PTO name
+      examples: ["arsenic concentration"]
+    pheno_desc3:
+      type: string
+      title: PTO description
+      examples: ["A mineral and ion content related trait (TO:0000465) which is the concentration of arsenic (CHEBI:22632) in some plant structure (PO:0009011). [GR:Karthik]"]
+    pheno_ref:
+      type: string
+      title: Phenotype reference
+      examples: ["Atwell et. al, Nature 2010"]
+    user_notes:
+      type: string
+      title: User Notes
+      examples: ["flowering time related"]

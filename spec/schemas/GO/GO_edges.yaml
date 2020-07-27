@@ -1,0 +1,43 @@
+name: GO_edges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: GO_edges
+    type: object
+    description: A entry for edges in the Gene Ontology (GO) hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+        examples:
+          - GO:0000136::GO:0031501::is_a
+          - GO:0000022::GO:0051231::is_a
+      type:
+        type: string
+        description: GO edge type
+        examples:
+          - is_a
+          - part_of
+      from:
+        type: string
+        description: GO id
+        examples:
+          - GO:0023052
+      to:
+        type: string
+        title: GO id
+        examples:
+          - GO:0008150
+    required:
+      - id
+      - type
+      - from
+      - to

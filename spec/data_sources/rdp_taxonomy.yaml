@@ -1,0 +1,6 @@
+name: rdp_taxonomy
+category: taxonomy
+title: Ribosomal Database Project
+home_url: http://rdp.cme.msu.edu/taxomatic/main.spr
+data_url: http://rdp.cme.msu.edu/misc/resources.jsp
+logo_path: /images/third-party-data-sources/ncbi/logo-51-64.png

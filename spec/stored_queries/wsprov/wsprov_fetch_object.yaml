@@ -1,0 +1,14 @@
+# Fetch a wsprov_object
+name: wsprov_fetch_object
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      description: key of the object to fetch
+query: |
+  for o in wsprov_object
+    filter o._key == @key
+    filter o.is_public || (o.workspace_id IN ws_ids)
+    return o

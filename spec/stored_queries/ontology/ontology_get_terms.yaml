@@ -1,0 +1,26 @@
+# Get a set of terms by the term ID and a timestamp, maximum 10000
+
+name: ontology_get_terms
+params:
+  type: object
+  required: [ids, ts, "@onto_terms"]
+  properties:
+    ids:
+      type: array
+      items:
+        type: string
+      title: Ontology term IDs
+      description: The list of ontology term IDs to be fetched
+      maxItems: 10000
+    ts:
+      type: integer
+      title: Versioning timestamp in milliseconds since the Unix epoch
+    "@onto_terms":
+      type: string
+      title: Ontology terms collection name
+query_prefix: WITH @@onto_terms
+query: |
+  FOR t in @@onto_terms
+    FILTER t.id IN @ids
+    FILTER t.expired >= @ts AND t.created <= @ts
+    RETURN t

@@ -1,0 +1,52 @@
+name: rdp_taxon
+type: vertex
+delta: true
+
+indexes:
+  - type: fulltext
+    fields: [name]
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: Template for a vertex entry in the RDP taxonomy tree.
+  required: [id, name, rank, molecule, unclassified, incertae_sedis]
+  properties:
+    id:
+      type: string
+      description: RDP Taxon id. For a non-sequence node, this is the rank joined
+        with ':' and the taxon name with spaces and slashes replaced by underscores.
+        If the node is an incertae sedis insertion, ':is' is appended. For a sequence (e.g. leaf)
+        node, it is the locus ID.
+      examples: ['phylum:Actinobacteria', 'S000494589']
+    name:
+      type: string
+      description: The name of the taxon. For sequences this is the strain name. Some sequences
+        in RDP have no name, in which case the name will be an empty string. 
+        If '[ _][Ii]ncertae[ _][Ss]edis' exists in the name for internal nodes, that
+        text is removed and the node is marked as an incertae sedis node (see below).
+      examples: ['Acidimicrobium', 'uncultured bacterium; YRM60L1D06060904']
+    rank:
+      type: string
+      title: Taxonomic rank. Sequence node rank is always 'sequence_example'. 
+      examples: [domain, sequence_example]
+    molecule:
+      type: ['string', 'null']
+      description: The type of molecule for the RDP sequence. Either 16S or 28S. Null
+        for non-leaf nodes.
+      examples: [16S, 28S]
+    unclassified:
+      type: boolean
+      description: Denotes an sequence that does not have a full lineage. In the RDP files,
+        these sequence are denoted via a truncated linage string where the last entry starts
+        with the string 'unclassified_'. The lineage string is a list of tuples of rank and name
+        all separated by semicolons, so if there are an odd number of entries in the lineage
+        string an unclassified organism is expected. Always false for internal nodes.
+    incertae_sedis:
+      type: ['boolean', 'null']
+      description: Denotes a taxa node that is an inceratae sedis insertion. Always null for
+        sequence (e.g. leaf) nodes.

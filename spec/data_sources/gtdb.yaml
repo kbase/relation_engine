@@ -1,0 +1,6 @@
+name: gtdb
+category: taxonomy
+title: GTDB Taxonomy
+home_url: https://gtdb.ecogenomic.org
+data_url: https://data.ace.uq.edu.au/public/gtdb/data/releases/
+logo_path: /images/third-party-data-sources/gtdb/logo-128-64.png

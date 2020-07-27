@@ -1,0 +1,69 @@
+# Get the array of direct descendants for any taxon
+name: taxonomy_get_children
+params:
+  type: object
+  required: [id, ts, sciname_field, "@taxon_coll", "@taxon_child_of"]
+  properties:
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+    "@taxon_coll":
+      type: string
+      title: Taxon vertex collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    "@taxon_child_of":
+      type: string
+      title: Taxon edge collection name for parent-to-child relationship
+      examples: [ncbi_child_of_taxon, gtdb_child_of_taxon]
+    id:
+      type: string
+      title: Document ID
+      description: ID of the taxon vertex for which you want to find descendants
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+    search_text:
+      type: string
+      description: Search scientific name
+      default: ''
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  // Fetch the child IDs using the edge attributes
+  let child_ids = (
+    for e in @@taxon_child_of
+      filter e.to == @id
+      filter e.created <= @ts AND e.expired >= @ts
+      return e.from
+  )
+  // Sort and filter the children
+  // Should only get evaluated if search_text is truthy
+  let searched = (
+    for tax in FULLTEXT(@@taxon_coll, @sciname_field, @search_text)
+      filter tax.id in child_ids
+      return tax.id
+  )
+  let filtered = @search_text ? searched : child_ids
+  let results = (
+    for tax in @@taxon_coll
+      filter tax.id in filtered
+      filter tax.created <= @ts AND tax.expired >= @ts
+      sort tax.@sciname_field asc
+      limit @offset, @limit
+      return (@select ? KEEP(tax, @select) : tax)
+  )
+  return {total_count: COUNT(filtered), results: results}

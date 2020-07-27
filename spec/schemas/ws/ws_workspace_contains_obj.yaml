@@ -1,0 +1,14 @@
+name: ws_workspace_contains_obj
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: A workspace contains an object
+  required: [_from, _to]
+  properties:
+    _from:
+      type: string
+      description: The ID of the workspace
+    _to:
+      type: string
+      description: The ID of the object

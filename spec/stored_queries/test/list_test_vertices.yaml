@@ -1,0 +1,7 @@
+# Test query - List all test vertices
+# Has some simple auth against ws_ids
+name: list_test_vertices
+query: |
+  FOR o IN test_vertex
+    FILTER o.is_public || o.ws_id IN ws_ids
+    RETURN o

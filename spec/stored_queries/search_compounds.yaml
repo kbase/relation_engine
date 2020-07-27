@@ -1,0 +1,35 @@
+# Use ArangoSearch to search documents in the compounds index. Returns documents by ascending id.
+name: search_compounds
+params:
+  type: object
+  properties:
+    search_text:
+      default: ''
+      type: string
+      description: text to match to document fields
+    all_documents:
+      default: false
+      type: boolean
+      description: Ignore search text and return all documents
+    include_obsolete:
+      default: false
+      type: boolean
+      description: should obsolete documents be included?
+    offset:
+      default: 0
+      type: integer
+      description: how many documents to skip
+    result_limit:
+      default: 10
+      type: integer
+      description: maximum documents to return
+query: |
+  FOR doc IN Compounds
+    SEARCH ANALYZER(PHRASE(doc.id, @search_text)
+                 OR PHRASE(doc.name, @search_text)
+                 OR PHRASE(doc.abbreviation, @search_text)
+                 OR PHRASE(doc.aliases, @search_text), 'text_en') OR @all_documents
+    FILTER @include_obsolete || doc.is_obsolete == 0
+    SORT doc.id
+    LIMIT @offset, @result_limit
+    RETURN doc

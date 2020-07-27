@@ -1,0 +1,35 @@
+name: ncbi_taxon_merges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: ncbi_taxon_merges
+    type: object
+    description: A entry for merge edges in the NCBI hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of the ID of the child node
+        examples:
+          - '51633'
+      from:
+        type: string
+        description: NCBI id
+        examples:
+          - '51633'
+      to:
+        type: string
+        title: NCBI id
+        examples:
+          - '5467'
+    required:
+      - id
+      - from
+      - to

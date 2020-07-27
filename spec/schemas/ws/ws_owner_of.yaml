@@ -1,0 +1,19 @@
+name: ws_owner_of
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  additionalProperties: false
+  description: The user is an owner of a workspace or type module.
+  required: [_from, _to]
+  properties:
+    _from:
+      type: string
+      examples: ["ws_user/jjeffryes"]
+      description: A username
+    _to:
+      type: string
+      examples:
+      - ws_type_module/KBaseGenomes
+      - ws_workspace/35414
+      description: A Workspace or Type Module

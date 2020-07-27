@@ -1,0 +1,147 @@
+name: ENVO_terms
+type: vertex
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  title: ENVO_terms
+  type: object
+  description: A entry for vertices in the Environment Ontology (ENVO) hierarchy
+  properties:
+    id:
+      type: string
+      description: The unique id of the current term.
+      examples:
+        - ENVO:0022609
+        - ENVO:0044848
+    type:
+      type: string
+      description: The type of the node.
+      examples:
+        - CLASS
+        - INDIVIDUAL
+    name:
+      type: ["null", "string"]   # some OBO classes have no label
+      description: The term name.
+      examples:
+        - ice cap dome
+        - horse manure
+    namespace:
+      type: ["null", "string"]   # some OBO classes have no namespace
+      description: The namespace of the term.
+      examples:
+        - ENVO
+    alt_ids:
+      type: array
+      items:
+        type: string
+      description: Defines an alternate id for this term. A term may have any number
+        of alternate ids.
+      examples:
+        - ["ENVO:0019952"]
+        - ["ENVO:0050876"]
+        - ["ENVO:0044848"]
+    def:
+      type: ["null", "object"]    # some OBO classes have no definition
+      description: The definition of the current term.
+      required:
+        - val
+      properties:
+        pred:
+          type: string
+          description: The definition predicate
+        val:
+          type: string
+          description: The definition value
+          examples:
+            - A natural/cultural feature of outstanding or unique value because of its inherent
+              rarity, representative of aesthetic qualities or cultural significance.
+        xrefs:
+          type: array
+          description: A dbxref that describes an analagous term in another vocabulary
+          items:
+            type: string
+          examples:
+            - ["Geonames:feature"]
+            - ["https://en.wikipedia.org/wiki/Natural_Monument"]
+    comments:
+      type: array
+      items:
+        type: string
+      description: Comments for this term.
+      examples:
+        - ["This class refers to strictly sealed enclosures such as Biosphere 2 (https://en.wikipedia.org/wiki/Biosphere_2), rather than vivaria which allow matter exchange with external environmental systems."]
+    subsets:
+      type: array
+      items:
+        type: string
+      description: This tag indicates a term subset to which this term belongs.
+      examples:
+        - ["wwfBiome"]
+        - ["environmental_hazards"]
+    synonyms:
+      description: This tag gives a synonym for this term, some xrefs to describe the
+        origins of the synonym, and may indicate a synonym category or scope information.
+      type: array
+      items:
+        type: object
+        required:
+          - val
+        properties:
+          pred:
+            type: string
+            description: The synonym predicate
+            examples:
+              - hasBroadSynonym
+              - hasNarrowSynonym
+          val:
+            type: string
+            description: The synonym value
+            examples:
+              - HydrothermalVents
+          xrefs:
+            type: array
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+            examples:
+              - ["NASA:earthrealm"]
+    xrefs:
+      description:  DBxrefs that describes an analagous term in another vocabulary
+      type: array
+      items:
+        type: object
+        required:
+          - val
+        properties:
+          pred:
+            type: string
+            description: The xref predicate
+          val:
+            type: string
+            description: The xref value
+            examples:
+              - SPIRE:Soil
+              - https://en.wikipedia.org/wiki/Soil
+          xrefs:
+            type: array
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+  required:
+  - id
+  - type
+  - name
+  - namespace
+  - alt_ids
+  - def
+  - comments
+  - subsets
+  - synonyms
+  - xrefs

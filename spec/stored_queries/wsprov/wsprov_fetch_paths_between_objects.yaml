@@ -1,0 +1,34 @@
+# Fetch the counts of a ws_objects in the RE that is linked to a wsprov_object
+# *** if both show_private and show_private are true this will be treated as an OR ***
+name: wsprov_fetch_paths_between_objects
+params:
+  type: object
+  required: [start_key, end_key]
+  properties:
+    start_key: 
+      type: string
+      description: key of the object to start from
+    end_key: 
+      type: string
+      description: key of the object to terminate with
+    show_private: 
+      type: boolean
+      description: if present, limit to objects in workspaces that a user has access to
+      default: true
+    show_public: 
+      type: boolean
+      description: if present, limit to objects in public workspaces
+      default: true
+    max_depth: 
+      default: 10
+      type: integer
+      description: longest path to explore
+query: |
+  WITH wsprov_object
+  FOR v, e, path IN 1..@max_depth
+      ANY CONCAT('wsprov_object/', @start_key) wsprov_links
+      OPTIONS {'uniqueVertices': 'path', 'uniqueEdges': 'path'}
+      FILTER (@show_private && @show_public) ? (v.is_public || v.workspace_id IN ws_ids) :
+          (!@show_private || v.workspace_id IN ws_ids) && (!@show_public || v.is_public)
+      filter v._key == @end_key
+      RETURN path

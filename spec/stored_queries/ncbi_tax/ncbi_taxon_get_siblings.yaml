@@ -1,0 +1,55 @@
+# Get the array of siblings for a taxon
+# Results are limited to 10k
+name: ncbi_taxon_get_siblings
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document id
+      description: ID of the taxon vertex for which you want to find siblings
+    limit:
+      type: integer
+      default: 20
+      description: Maximum result limit
+      maximum: 1000
+    offset:
+      type: integer
+      default: 0
+      description: Result offset for pagination
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  // Fetch the siblings
+  let parent_id = first(
+    for e in ncbi_child_of_taxon
+      filter e.from == @id
+      filter e.created <= @ts and e.expired >= @ts
+      limit 1
+      return e.to
+  )
+  let sibling_ids = (
+    for e in ncbi_child_of_taxon
+      filter e.to == parent_id
+      filter e.created <= @ts and e.expired >= @ts
+      filter e.from != @id
+      return e.from
+  )
+  // Apply sort and limits to the results
+  let siblings = (
+    for tax in ncbi_taxon
+      filter tax.id in sibling_ids
+      filter tax.created <= @ts AND tax.expired >= @ts
+      sort tax.scientific_name asc
+      limit @offset, @limit
+      return (@select ? KEEP(tax, @select) : tax)
+  )
+  return {total_count: COUNT(sibling_ids), results: siblings}

@@ -1,0 +1,13 @@
+# Test query - fetch a single test vertex by ID
+name: fetch_test_vertex
+params:
+  type: object
+  required: [key]
+  properties:
+    key:
+      type: string
+      title: _key to match on
+query: |
+  FOR o IN test_vertex
+    FILTER o._key == @key
+    RETURN o

@@ -1,0 +1,33 @@
+name: ws_workspace
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [_key, owner, max_obj_id, lock_status, name, mod_epoch, is_public, is_deleted, metadata]
+  properties:
+    _key:
+      type: string
+      description: The workspace ID for this workspace
+      examples: ['35414']
+      pattern: "^\\d+$"
+    owner:
+      type: string
+      title: Username of workspace owner
+    max_obj_id:
+      type: integer
+      title: Maximum object ID in this workspace
+    lock_status:
+      type: string
+      title: Status of the workspace lock
+    name:
+      type: string
+      description: The workspace name for this workspace
+      examples: ["jjeffryes:narrative_1534187093329"]
+    mod_epoch:
+      type: integer
+      title: Modified date epoch
+      description: Timestamp of when the workspace was last modified
+      minimum: 0
+    is_public: {type: boolean}
+    is_deleted: {type: boolean}
+    metadata: {type: object}

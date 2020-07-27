@@ -1,0 +1,42 @@
+{
+  "name": "Compounds",
+  "type": "arangosearch",
+  "writebufferIdle": 64,
+  "writebufferActive": 0,
+  "primarySort": [],
+  "writebufferSizeMax": 33554432,
+  "commitIntervalMsec": 1000,
+  "consolidationPolicy": {
+    "type": "bytes_accum",
+    "threshold": 0.1
+  },
+  "cleanupIntervalStep": 10,
+  "links": {
+    "rxn_compound": {
+      "analyzers": [
+        "identity"
+      ],
+      "fields": {
+        "id": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "abbreviation": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "aliases": {
+          "analyzers": [
+            "text_en"
+          ]
+        }
+      },
+      "includeAllFields": true,
+      "storeValues": "none",
+      "trackListPositions": false
+    }
+  },
+  "consolidationIntervalMsec": 60000
+}

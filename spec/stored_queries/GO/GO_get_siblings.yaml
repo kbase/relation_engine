@@ -1,0 +1,39 @@
+# Get all siblings of this term
+name: GO_get_siblings
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: Get all siblings of this term
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
+query: |
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v_parent, e_parent IN 1..1 OUTBOUND t GO_edges
+      FILTER e_parent.created <= @ts AND e_parent.expired >= @ts
+      FILTER e_parent.type == "is_a"
+      FOR v_child, e_child in 1..1 INBOUND v_parent GO_edges
+        FILTER e_child.created <= @ts AND e_child.expired >= @ts
+        FILTER e_child.type == "is_a"
+        FILTER v_child != t
+        SORT v_child.id ASC
+        LIMIT @offset, @limit
+        RETURN v_child
