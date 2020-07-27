@@ -1,0 +1,6 @@
+mypy==0.630
+bandit==1.5.1
+mccabe==0.6.1
+flake8==3.5.0
+grequests==0.3.0
+coverage==4.5.1
