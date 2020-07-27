@@ -1,7 +1,0 @@
-/CODEOWNERS export-ignore
-/.gitattributes export-ignore
-/.gitignore export-ignore
-/.travis.yaml export-ignore
-README.md export-ignore
-/Makefile export-ignore
-/test export-ignore
