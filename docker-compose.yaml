@@ -8,12 +8,14 @@ services:
   web:
     build:
       context: .
+      dockerfile: Dockerfile-api
       args:
         DEVELOPMENT: 1
     ports:
       - "127.0.0.1:5000:5000"
-    volumes:
-      - ${PWD}:/app
+#    volumes:
+#      - ${PWD}:/app
+#      - ${PWD}/scripts:/app/scripts
     depends_on:
       - auth
       - workspace
@@ -34,13 +36,13 @@ services:
   auth:
     image: mockservices/mock_json_service
     volumes:
-      - ${PWD}/src/test/mock_auth:/config
+      - ${PWD}/api/src/test/mock_auth:/config
 
   # Mock workspace server (see src/test/mock_workspace/endpoints.json)
   workspace:
     image: mockservices/mock_json_service
     volumes:
-      - ${PWD}/src/test/mock_workspace:/config
+      - ${PWD}/api/src/test/mock_workspace:/config
 
   # Arangodb server in cluster mode
   arangodb:

@@ -24,7 +24,9 @@ RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies
 
-COPY . /app
+COPY api/ /app
+COPY scripts /app/scripts
+COPY spec/test test
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/kbase/relation_engine_api" \

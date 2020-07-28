@@ -13,11 +13,8 @@ import contextlib
 
 from importers.djornl.parser import DJORNL_Parser
 
-from test.helpers import get_config, assert_subset, modified_environ
-from test.stored_queries.helpers import create_test_docs
+from test.helpers import modified_environ, create_test_docs
 
-_CONF = get_config()
-_NOW = int(time.time() * 1000)
 _TEST_DIR = '/app/test'
 
 

@@ -6,9 +6,11 @@ services:
 
   # General python container for executing tests
   spec:
-    build: .
-    volumes:
-      - ${PWD}:/app
+    build:
+      context: .
+      dockerfile: Dockerfile-spec
+#    volumes:
+#      - ${PWD}:/app
     depends_on:
       - re_api
     environment:

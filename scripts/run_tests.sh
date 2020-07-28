@@ -8,4 +8,5 @@ bandit -r src
 sh scripts/start_server.sh &
 python -m src.test.wait_for_api &&
 python -m unittest discover src/test/ &&
-PYTHONPATH=client_src python -m unittest discover client_src/test/
+PYTHONPATH=client_src python -m unittest discover client_src/test/ &&
+PYTHONPATH=importers python -m unittest discover importers/test

@@ -9,8 +9,7 @@ import os
 import glob
 import yaml
 
-from test.helpers import get_config, assert_subset, modified_environ
-from test.stored_queries.helpers import create_test_docs
+from test.helpers import get_config, modified_environ, create_test_docs
 from importers.djornl.parser import DJORNL_Parser
 
 _CONF = get_config()
