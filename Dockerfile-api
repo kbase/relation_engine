@@ -24,9 +24,9 @@ RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies
 
-COPY api/ /app
+COPY src /app/src
 COPY scripts /app/scripts
-COPY spec/test test
+COPY test /app/test
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/kbase/relation_engine_api" \
@@ -37,4 +37,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 EXPOSE 5000
 ENTRYPOINT ["/usr/local/bin/dockerize"]
-CMD ["sh", "-x", "scripts/start_server.sh"]
+CMD ["sh", "-x", "/app/scripts/start_server.sh"]

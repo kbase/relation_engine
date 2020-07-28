@@ -13,7 +13,6 @@ from test.helpers import get_config, modified_environ, create_test_docs
 from importers.djornl.parser import DJORNL_Parser
 
 _CONF = get_config()
-_NOW = int(time.time() * 1000)
 _TEST_DIR = '/app/test'
 _VERBOSE = 0
 
@@ -194,7 +193,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     self.json_data['fetch_clusters'][fetch_args][distance]
                 )
 
-    @unittest.skip('This test is disabled until automated view loading is possible')
     def test_search_nodes_no_results(self):
 
         resp = self.submit_query('djornl_search_nodes', {
@@ -202,8 +200,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
         })
         self.assertEqual(resp['results'][0], self.no_results)
 
-
-    @unittest.skip('This test is disabled until automated view loading is possible')
     def test_search_nodes(self):
 
         for search_text in self.json_data['search_nodes'].keys():

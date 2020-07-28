@@ -5,15 +5,12 @@ At the present time, this just ensures that the files are parsed correctly;
 it does not check data loading into the db.
 """
 import json
-import time
 import unittest
-import requests
 import os
-import contextlib
 
 from importers.djornl.parser import DJORNL_Parser
 
-from test.helpers import modified_environ, create_test_docs
+from test.helpers import modified_environ
 
 _TEST_DIR = '/app/test'
 
@@ -27,7 +24,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with open(results_file) as fh:
             cls.json_data = json.load(fh)
 
-
     def init_parser_with_path(self, root_path):
 
         with modified_environ(RES_ROOT_DATA_PATH=root_path):
@@ -35,7 +31,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
             # ensure that the configuration has been set
             parser.config()
             return parser
-
 
     def test_load_empty_files(self):
         """ test loading files containing no data """
@@ -47,7 +42,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.assertEqual(parser.load_edges(), {"nodes": [], "edges": []})
         self.assertEqual(parser.load_node_metadata(), {"nodes": []})
         self.assertEqual(parser.load_cluster_data(), {"nodes": []})
-
 
     def test_load_missing_files(self):
         """ test loading when files cannot be found """
@@ -67,7 +61,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with self.assertRaisesRegex(FileNotFoundError, err_str):
             parser.load_cluster_data()
 
-
     def test_load_invalid_types(self):
         """ test file format errors """
 
@@ -85,7 +78,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, node_err_msg):
             parser.load_node_metadata()
 
-
     def test_load_col_count_errors(self):
         """ test files with invalid numbers of columns """
 
@@ -102,7 +94,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
         node_err_msg = 'line 3: expected 20 cols, found 22'
         with self.assertRaisesRegex(RuntimeError, node_err_msg):
             parser.load_node_metadata()
-
 
     def test_load_valid_edge_data(self):
 
@@ -139,4 +130,3 @@ class Test_DJORNL_Parser(unittest.TestCase):
             cluster_data,
             self.json_data["load_cluster_data"]
         )
-

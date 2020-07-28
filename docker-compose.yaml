@@ -36,13 +36,13 @@ services:
   auth:
     image: mockservices/mock_json_service
     volumes:
-      - ${PWD}/api/src/test/mock_auth:/config
+      - ${PWD}/src/test/mock_auth:/config
 
   # Mock workspace server (see src/test/mock_workspace/endpoints.json)
   workspace:
     image: mockservices/mock_json_service
     volumes:
-      - ${PWD}/api/src/test/mock_workspace:/config
+      - ${PWD}/src/test/mock_workspace:/config
 
   # Arangodb server in cluster mode
   arangodb:

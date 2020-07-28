@@ -59,17 +59,16 @@ class DJORNL_Parser(object):
         self._config = configuration
         return self._config
 
-
     def load_edges(self):
         # Headers and sample row:
         # node1	node2	edge	edge_descrip	layer_descrip
         # AT1G01370	AT1G57820	4.40001558779779	AraNetv2_log-likelihood-score	AraNetv2-LC_lit-curated-ppi
         edge_remap = {
-          'AraGWAS-Phenotype_Associations':         'pheno_assn',
-          'AraNetv2-CX_pairwise-gene-coexpression': 'gene_coexpr',
-          'AraNetv2-DC_domain-co-occurrence':       'domain_co_occur',
-          'AraNetv2-HT_high-throughput-ppi':        'ppi_hithru',
-          'AraNetv2-LC_lit-curated-ppi':            'ppi_liter',
+            'AraGWAS-Phenotype_Associations': 'pheno_assn',
+            'AraNetv2-CX_pairwise-gene-coexpression': 'gene_coexpr',
+            'AraNetv2-DC_domain-co-occurrence': 'domain_co_occur',
+            'AraNetv2-HT_high-throughput-ppi': 'ppi_hithru',
+            'AraNetv2-LC_lit-curated-ppi': 'ppi_liter',
         }
 
         # dict of nodes, indexed by node ID (node1 and node2 from the file)
@@ -103,12 +102,10 @@ class DJORNL_Parser(object):
                     'score': float(cols[2]),
                     'edge_type': edge_remap[edge_type],
                 })
-
         return {
             'nodes': [{'_key': n} for n in node_ix.keys()],
             'edges': edges,
         }
-
 
     def load_node_metadata(self):
         """Load node metadata"""
@@ -157,9 +154,7 @@ class DJORNL_Parser(object):
                     'user_notes': cols[19],
                 }
                 nodes.append(doc)
-
         return {'nodes': nodes}
-
 
     def load_cluster_data(self):
         """Annotate genes with cluster ID fields."""
@@ -171,15 +166,13 @@ class DJORNL_Parser(object):
                 for row in csv_reader:
                     if len(row) > 1:
                         # remove the 'Cluster' text
-                        cluster_id = row[0].replace('Cluster','')
+                        cluster_id = row[0].replace('Cluster', '')
                         gene_keys = row[1:]
                         nodes += [
                             {'_key': key, cluster_label: int(cluster_id)}
                             for key in gene_keys
                         ]
-
         return {'nodes': nodes}
-
 
     def save_dataset(self, dataset):
 
@@ -188,7 +181,6 @@ class DJORNL_Parser(object):
 
         if 'edges' in dataset and len(dataset['edges']) > 0:
             self.save_docs(self.config()['_EDGE_NAME'], dataset['edges'])
-
 
     def save_docs(self, coll_name, docs, on_dupe='update'):
 
@@ -206,9 +198,7 @@ class DJORNL_Parser(object):
         print('=' * 80)
         return resp
 
-
     def load_data(self):
         self.save_dataset(self.load_edges())
         self.save_dataset(self.load_node_metadata())
         self.save_dataset(self.load_cluster_data())
-

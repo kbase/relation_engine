@@ -20,13 +20,18 @@ services:
 
   # Relation Engine API
   re_api:
-    image: kbase/relation_engine_api:develop
+#    image: kbase/relation_engine_api:develop
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+      args:
+        DEVELOPMENT: 1
     ports:
       - "127.0.0.1:5000:5000"
     depends_on:
-      - arangodb
       - auth
       - workspace
+      - arangodb
     environment:
       - WORKERS=2
       - DEVELOPMENT=1
@@ -37,8 +42,9 @@ services:
       - PYTHONUNBUFFERED=true
       - DB_URL=http://arangodb:8529
       - DB_USER=root
+#      - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
     volumes:
-      - ".:/spec/repo"
+      - "./spec:/spec/repo"
 
   # Arangodb server in cluster mode
   arangodb:

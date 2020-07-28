@@ -2,7 +2,4 @@ sudo: required
 services:
 - docker
 script:
-- cd api
-- make test
-- cd ../spec
 - make test
