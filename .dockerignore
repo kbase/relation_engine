@@ -16,6 +16,9 @@ coverage.xml
 .git
 .git*
 CODEOWNERS
+LICENSE.md
+Makefile
+hooks
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

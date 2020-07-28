@@ -9,6 +9,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-spec
+#    uncomment to mount local dir
 #    volumes:
 #      - ${PWD}:/app
     depends_on:
@@ -20,7 +21,8 @@ services:
 
   # Relation Engine API
   re_api:
-#    image: kbase/relation_engine_api:develop
+    # uncomment to use the RE API docker image
+    # image: kbase/relation_engine_api:develop
     build:
       context: .
       dockerfile: Dockerfile-api
@@ -42,7 +44,6 @@ services:
       - PYTHONUNBUFFERED=true
       - DB_URL=http://arangodb:8529
       - DB_USER=root
-#      - SPEC_RELEASE_PATH=/app/src/test/spec_release/spec.tar.gz
     volumes:
       - "./spec:/spec/repo"
 
@@ -53,13 +54,13 @@ services:
       - "127.0.0.1:8529:8529"
     command: sh -c "arangodb --starter.local"
 
-  # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
+  # A mock kbase auth server (see test/mock_auth/endpoints.json)
   auth:
     image: mockservices/mock_json_service
     volumes:
       - ${PWD}/test/mock_services/mock_auth:/config
 
-  # Mock workspace server (see src/test/mock_workspace/endpoints.json)
+  # Mock workspace server (see test/mock_workspace/endpoints.json)
   workspace:
     image: mockservices/mock_json_service
     volumes:

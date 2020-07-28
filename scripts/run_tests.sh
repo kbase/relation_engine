@@ -9,4 +9,4 @@ sh /app/scripts/start_server.sh &
 python -m src.test.wait_for_api &&
 python -m unittest discover src/test/ &&
 PYTHONPATH=src/client_src python -m unittest discover src/client_src/test/ &&
-PYTHONPATH=src python -m unittest discover src/importers/test
+PYTHONPATH=src:/app python -m unittest discover src/importers/test

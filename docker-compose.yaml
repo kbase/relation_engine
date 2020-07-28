@@ -13,9 +13,9 @@ services:
         DEVELOPMENT: 1
     ports:
       - "127.0.0.1:5000:5000"
+#    uncomment to mount local dir
 #    volumes:
 #      - ${PWD}:/app
-#      - ${PWD}/scripts:/app/scripts
     depends_on:
       - auth
       - workspace
