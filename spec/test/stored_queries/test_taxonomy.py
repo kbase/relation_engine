@@ -6,8 +6,7 @@ import time
 import unittest
 import requests
 
-from test.helpers import get_config, assert_subset
-from test.stored_queries.helpers import create_test_docs
+from spec.test.helpers import get_config, assert_subset, create_test_docs
 
 _CONF = get_config()
 _NOW = int(time.time() * 1000)
@@ -192,7 +191,6 @@ class TestTaxonomy(unittest.TestCase):
 
     def test_search_sci_name_no_count(self):
         """Test a valid query to search sciname without a count."""
-        start = time.time()
         resp = requests.post(
             _CONF['re_api_url'] + '/api/v1/query_results',
             params={'stored_query': 'taxonomy_search_sci_name'},

@@ -1,0 +1,54 @@
+version: '3'
+
+# This docker-compose is for developer convenience, not for running in production.
+
+services:
+
+  # For running the Flask server and tests
+  re_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DEVELOPMENT: 1
+    ports:
+      - "127.0.0.1:5000:5000"
+#    uncomment to mount local directories
+#    volumes:
+#      - ${PWD}:/app
+#      - "./spec:/spec/repo"
+    depends_on:
+      - auth
+      - workspace
+      - arangodb
+    environment:
+      - WORKERS=2
+      - DEVELOPMENT=1
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - KBASE_AUTH_URL=http://auth:5000
+      - KBASE_WORKSPACE_URL=http://workspace:5000
+      - PYTHONUNBUFFERED=true
+      - SPEC_RELEASE_PATH=/app/relation_engine_server/test/spec_release/spec.tar.gz
+      - DB_URL=http://arangodb:8529
+      - DB_USER=root
+      - RE_API_URL=http://127.0.0.1:5000
+
+  # A mock kbase auth server (see src/test/mock_auth/endpoints.json)
+  auth:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/relation_engine_server/test/mock_auth:/config
+
+  # Mock workspace server (see src/test/mock_workspace/endpoints.json)
+  workspace:
+    image: mockservices/mock_json_service
+    volumes:
+      - ${PWD}/relation_engine_server/test/mock_workspace:/config
+
+  # Arangodb server in cluster mode
+  arangodb:
+    image: arangodb:3.5
+    ports:
+      - "127.0.0.1:8529:8529"
+    command: sh -c "arangodb --starter.local"

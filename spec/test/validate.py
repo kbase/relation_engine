@@ -10,9 +10,10 @@ import requests
 import json
 from jsonschema.exceptions import ValidationError
 
-from test.helpers import get_config, wait_for_arangodb
+from spec.test.helpers import get_config, wait_for_arangodb
 
 _CONF = get_config()
+_BASE_DIR = '/app/spec'
 
 # JSON schema for vertex and edge collection schemas found in /schema
 schema_schema = {
@@ -37,7 +38,9 @@ def validate_json_schemas():
     """Validate the syntax of all the JSON schemas."""
     print('Validating JSON schemas..')
     names = set()  # type: set
-    for path in glob.iglob('schemas/**/*.yaml', recursive=True):
+    for path in glob.iglob(
+      os.path.join(_BASE_DIR, 'schemas', '**', '*.yaml'),
+      recursive=True):
         name = os.path.basename(path)
         print(f'  validating {path}..')
         with open(path) as fd:
@@ -95,7 +98,9 @@ def validate_stored_queries():
     """Validate the structure and syntax of all the queries."""
     print('Validating AQL queries..')
     names = set()  # type: set
-    for path in glob.iglob('stored_queries/**/*.yaml', recursive=True):
+    for path in glob.iglob(
+      os.path.join(_BASE_DIR, 'stored_queries', '**', '*.yaml'),
+      recursive=True):
         print(f'  validating {path}..')
         with open(path) as fd:
             data = yaml.safe_load(fd)
@@ -159,7 +164,9 @@ def validate_views():
     """Validate the structure and syntax of arangosearch views"""
     print('Validating views..')
     names = set()  # type: set
-    for path in glob.iglob('views/**/*.json', recursive=True):
+    for path in glob.iglob(
+      os.path.join(_BASE_DIR, 'views', '**', '*.json'),
+      recursive=True):
         print(f'  validating {path}..')
         with open(path) as fd:
             data = json.load(fd)
@@ -173,7 +180,7 @@ def validate_views():
         else:
             names.add(name)
 
-        print(f'✓ {name} is valid.')
+        print(f'✓ {path} is valid.')
     print('..all valid.')
 
 
