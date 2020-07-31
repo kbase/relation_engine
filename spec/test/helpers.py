@@ -89,15 +89,3 @@ def modified_environ(*remove, **update):
     finally:
         env.update(update_after)
         [env.pop(k) for k in remove_after]
-
-
-# def update_specs():
-#     """Test the endpoint that triggers an update on the specs."""
-#     resp = requests.put(
-#         conf['re_api_url'] + '/api/v1/specs',
-#         headers={'Authorization': 'admin_token'},
-#         params={'reset': '1', 'init_collections': '1'}
-#     )
-#     resp_json = resp.json()
-#     self.assertEqual(resp.status_code, 200)
-#     self.assertTrue(len(resp_json['status']))
