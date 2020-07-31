@@ -1,4 +1,3 @@
-import sys
 import os
 import requests
 import tarfile
@@ -26,8 +25,6 @@ def download_specs(init_collections=True, release_url=None, reset=False):
         if _CONF['spec_release_path']:
             _extract_tarball(_CONF['spec_release_path'], _CONF['spec_paths']['root'])
         else:
-            if release_url:
-                tarball_url = release_url
             if _CONF['spec_release_url']:
                 tarball_url = _CONF['spec_release_url']
             else:
@@ -125,7 +122,4 @@ def _save_release_id(info):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'init':
-            download_specs(init_collections=True)
     download_specs()

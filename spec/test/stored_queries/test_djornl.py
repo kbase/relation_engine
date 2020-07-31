@@ -2,18 +2,15 @@
 Tests for the Dan Jacobson ORNL Arabidopsis stored queries.
 """
 import json
-import time
 import unittest
 import requests
 import os
-import glob
-import yaml
 
-from test.helpers import get_config, modified_environ, create_test_docs
+from spec.test.helpers import get_config, modified_environ, create_test_docs
 from importers.djornl.parser import DJORNL_Parser
 
 _CONF = get_config()
-_TEST_DIR = '/app/test'
+_TEST_DIR = '/app/spec/test'
 _VERBOSE = 0
 
 
@@ -57,7 +54,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             r = create_test_docs(config['_NODE_NAME'], cluster_data['nodes'], True)
             print_db_update(r, config['_NODE_NAME'])
 
-
     def submit_query(self, query_name, query_data={}):
         """submit a database query"""
 
@@ -69,9 +65,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             params={'stored_query': query_name},
             data=q_data_str
         ).json()
-
         return response
-
 
     def check_expected_results(self, description, response, expected):
 
@@ -88,26 +82,13 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             set(expected['edges'])
         )
 
-
     def test_fetch_all(self):
-
-        # expect all the nodes from load_node_metadata and all the edges from load_edges
-        expected = {
-            "nodes": [n["_key"] for n in self.json_data['load_node_metadata']['nodes']],
-            "edges": [ {
-              "_to":        e["_to"],
-              "_from":      e["_from"],
-              "score":      e["score"],
-              "edge_type":  e["edge_type"] } for e in self.json_data['load_edges']['edges']
-            ]
-        }
 
         self.check_expected_results(
             "djornl_fetch_all",
             self.submit_query('djornl_fetch_all'),
             self.json_data['fetch_all']
         )
-
 
     # indexing schema in results.json
     # self.json_data[query][primary_param][distance_param]
@@ -124,7 +105,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
         })
         self.assertEqual(resp['results'][0], self.no_results)
 
-
     def test_fetch_phenotypes(self):
 
         for fetch_args in self.json_data['fetch_phenotypes'].keys():
@@ -139,14 +119,12 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     self.json_data['fetch_phenotypes'][fetch_args][distance]
                 )
 
-
     def test_fetch_genes_no_results(self):
         resp = self.submit_query('djornl_fetch_genes', {
             # phenotype node
             "keys": ["As2"],
         })
         self.assertEqual(resp['results'][0], self.no_results)
-
 
     def test_fetch_genes(self):
 
@@ -162,7 +140,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     self.json_data['fetch_genes'][fetch_args][distance]
                 )
 
-
     def test_fetch_clusters_no_results(self):
 
         resp = self.submit_query('djornl_fetch_clusters', {
@@ -171,7 +148,6 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             'cluster_i6_ids': [666],
         })
         self.assertEqual(resp['results'][0], self.no_results)
-
 
     def test_fetch_clusters(self):
 

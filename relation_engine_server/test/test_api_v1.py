@@ -8,7 +8,7 @@ import requests
 import json
 import os
 
-from src.relation_engine_server.utils.config import get_config
+from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
 

@@ -7,8 +7,8 @@ calc_workers="$(($(nproc) * 2 + 1))"
 # Use the WORKERS environment variable, if present
 workers=${WORKERS:-$calc_workers}
 
-python -m src.relation_engine_server.wait_for_services
-python -m src.relation_engine_server.utils.pull_spec
+python -m relation_engine_server.wait_for_services
+python -m relation_engine_server.utils.pull_spec
 
 gunicorn \
   --worker-class gevent \
@@ -16,4 +16,4 @@ gunicorn \
   --workers $workers \
   --bind :5000 \
   ${DEVELOPMENT:+"--reload"} \
-  src.relation_engine_server.main:app
+  relation_engine_server.main:app

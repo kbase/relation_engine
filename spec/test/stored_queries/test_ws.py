@@ -4,7 +4,7 @@ Tests for workspace workspace stored queries under the ws* namespace
 import unittest
 import json
 import requests
-from test.helpers import get_config, create_test_docs
+from spec.test.helpers import get_config, create_test_docs
 
 _CONF = get_config()
 

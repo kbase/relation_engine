@@ -2,11 +2,22 @@
 
 set -e
 
-flake8 --max-complexity 10 --ignore=E501 src
-mypy --ignore-missing-imports src
-bandit -r src
+flake8 --max-complexity 15 /app
+mypy --ignore-missing-imports /app
+bandit -r /app
+mkdir /spec
+mkdir /spec/repo
+cp -r /app/spec/* /spec/repo/
+# start server, using the specs in /spec/repo
 sh /app/scripts/start_server.sh &
-python -m src.test.wait_for_api &&
-python -m unittest discover src/test/ &&
-PYTHONPATH=src/client_src python -m unittest discover src/client_src/test/ &&
-PYTHONPATH=src:/app python -m unittest discover src/importers/test
+python -m spec.test.helpers wait_for_api &&
+# spec validation
+python -m spec.test.validate &&
+# spec stored query tests
+python -m unittest discover spec/test &&
+# importer tests
+python -m unittest discover importers/test &&
+# RE API tests
+python -m unittest discover relation_engine_server/test &&
+# RE client tests
+PYTHONPATH=client_src python -m unittest discover client_src/test

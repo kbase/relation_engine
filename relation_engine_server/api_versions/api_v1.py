@@ -1,5 +1,5 @@
 import flask
-from src.relation_engine_server.utils import (
+from relation_engine_server.utils import (
     json_validation,
     arango_client,
     spec_loader,
@@ -10,7 +10,7 @@ from src.relation_engine_server.utils import (
     config,
     parse_json
 )
-from src.relation_engine_server.exceptions import InvalidParameters
+from relation_engine_server.exceptions import InvalidParameters
 
 api_v1 = flask.Blueprint('api_v1', __name__)
 

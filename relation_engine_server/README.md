@@ -166,7 +166,7 @@ _Response JSON schema_
 
 #### JSON Schema error responses
 
-If you try to update a collection and it fails validation against a JSON schema found in the [relation_engine_spec](https://github.com/kbase/relation_engine_spec/), then you will get a JSON error response with the following fields:
+If you try to update a collection and it fails validation against a JSON schema found in the [relation engine spec](spec/), then you will get a JSON error response with the following fields:
 
 * `"error"` - Human readable message explaining the error
 * `"failed_validator"` - The name of the validator that failed (eg. "required")
@@ -352,6 +352,5 @@ Alternatively, set the image name in `scripts/local-build.sh` and run it to buil
 
 ## Project anatomy
 
-* Source code is in `./src`
-* Tests are in  `./src/test`
-* The main server code is in `./src/relation_engine_server`.
+* The main server code is in `./relation_engine_server`.
+* Tests are in  `./relation_engine_server/test`

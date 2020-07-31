@@ -1,18 +1,17 @@
 # Relation Engine Spec
 
-This repo holds the [stored queries](stored_queries), [schemas](schemas), and [migrations](migrations) for the relation engine graph database service.
+This repo holds the [stored queries](spec/stored_queries), [schemas](spec/schemas), and [migrations](migrations) for the relation engine graph database service.
 
-These specifications are used by the [Relation Engine API](https://github.com/kbase/relation_engine_api).
+These specifications are used by the [Relation Engine API](relation_engine_server).
 
-* **Stored queries** are stored [AQL queries](https://docs.arangodb.com/3.5/AQL/index.html) that can be used
+* **[Stored queries](spec/stored_queries)** are stored [AQL queries](https://docs.arangodb.com/3.5/AQL/index.html) that can be used
 by KBase apps to fetch data from the database.
-* **Schemas** are [JSON schemas](https://json-schema.org/) that define what form of data can be stored in
-the database's collections.
-* **Data sources** (in `data_sources/`) contains some general information about where some of our imported data comes from.
-* **Views** (in `views/`) are raw ArangoSearch view configuration files
+* **[Collections, or document schemas,](spec/schemas)** are [JSON schemas](https://json-schema.org/) that define what form of data can be stored in the database's collections.
+* **[Data sources](spec/data_sources)** contain general information about where some of our imported data comes from.
+* **[Views](spec/views)** are raw ArangoSearch view configuration files
 
 ## Development
 
 ### Running tests
 
-Run tests with `make test`.
+Tests are located in the [spec/tests](spec/tests) directory, and are run as part of the test suite triggered by `scripts/run_tests.sh`.

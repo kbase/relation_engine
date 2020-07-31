@@ -5,7 +5,7 @@ import flask
 import json
 import hashlib
 
-from src.relation_engine_server.utils import json_validation
+from relation_engine_server.utils import json_validation
 from . import spec_loader
 from .arango_client import import_from_file
 

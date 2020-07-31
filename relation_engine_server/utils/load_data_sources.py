@@ -9,8 +9,8 @@ import yaml
 import os
 import glob
 
-from src.relation_engine_server.utils.config import get_config
-from src.relation_engine_server.exceptions import NotFound
+from relation_engine_server.utils.config import get_config
+from relation_engine_server.exceptions import NotFound
 
 _CONF = get_config()
 _PATH = _CONF['spec_paths']['data_sources']

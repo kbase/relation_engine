@@ -1,9 +1,8 @@
-import json
 import unittest
 import requests
 import time
 
-from test.helpers import create_test_docs, get_config
+from spec.test.helpers import create_test_docs, get_config
 
 _CONF = get_config()
 _QUERY_URL = _CONF['re_api_url'] + '/api/v1/query_results?view=list_test_vertices'
@@ -18,7 +17,7 @@ class TestListTestVertices(unittest.TestCase):
         api_up = False
         while not api_up:
             try:
-                requests.get('http://re_api:5000').raise_for_status()
+                requests.get('http://127.0.0.1:5000').raise_for_status()
                 requests.get('http://auth:5000')
                 requests.get('http://workspace:5000')
                 api_up = True

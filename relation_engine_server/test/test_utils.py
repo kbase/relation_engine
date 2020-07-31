@@ -1,7 +1,7 @@
 """
 Test utility functions
 """
-from src.relation_engine_server.utils import json_validation
+from relation_engine_server.utils import json_validation
 
 import unittest
 

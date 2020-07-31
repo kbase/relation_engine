@@ -6,7 +6,7 @@ import time
 import unittest
 import requests
 
-from test.helpers import get_config, assert_subset, create_test_docs
+from spec.test.helpers import get_config, assert_subset, create_test_docs
 
 _CONF = get_config()
 _NOW = int(time.time() * 1000)

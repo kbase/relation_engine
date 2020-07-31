@@ -10,7 +10,7 @@ import requests
 import json
 from jsonschema.exceptions import ValidationError
 
-from test.helpers import get_config, wait_for_arangodb
+from spec.test.helpers import get_config, wait_for_arangodb
 
 _CONF = get_config()
 _BASE_DIR = '/app/spec'

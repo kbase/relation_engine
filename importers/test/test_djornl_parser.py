@@ -10,9 +10,9 @@ import os
 
 from importers.djornl.parser import DJORNL_Parser
 
-from test.helpers import modified_environ
+from spec.test.helpers import modified_environ
 
-_TEST_DIR = '/app/test'
+_TEST_DIR = '/app/spec/test'
 
 
 class Test_DJORNL_Parser(unittest.TestCase):
