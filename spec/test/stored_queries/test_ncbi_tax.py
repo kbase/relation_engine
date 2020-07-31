@@ -7,6 +7,7 @@ import unittest
 import requests
 
 from spec.test.helpers import get_config, assert_subset, create_test_docs
+from relation_engine_server.utils.wait_for import wait_for_api
 
 _CONF = get_config()
 _NOW = int(time.time() * 1000)
@@ -17,6 +18,9 @@ class TestNcbiTax(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create test documents"""
+
+        wait_for_api()
+
         taxon_docs = [
             {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain', 'strain': False},
             {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum', 'strain': False},

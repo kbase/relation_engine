@@ -1,0 +1,13 @@
+name: collection_schema
+type: object
+required: ['name', 'type', 'schema']
+properties:
+  name:
+    type: string
+    title: Collection name
+    format: ^\w+$
+  type:
+    type: string
+    enum: ['vertex', 'edge']
+  schema:
+    type: object

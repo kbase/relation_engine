@@ -1,9 +1,7 @@
 """
 Test helpers
 """
-import sys
 import os
-import time
 import requests
 import functools
 import contextlib
@@ -15,53 +13,22 @@ def get_config():
     """Return configuration data for tests."""
     return {
         're_api_url': os.environ['RE_API_URL'],
+        're_query_results_url': os.environ['RE_API_URL'] + '/api/v1/query_results',
         'db_url': os.environ['DB_URL'],
         'db_auth': (os.environ['DB_USER'], os.environ.get('DB_PASS', ''))
     }
 
 
-def wait_for_arangodb():
-    """Wait for arangodb to go live."""
-    conf = get_config()
-    db_url = conf['db_url']
-    auth = ('root', '')
-    timeout = time.time() + 60
-    while True:
-        try:
-            resp = requests.get(db_url + '/_admin/cluster/health', auth=auth)
-            resp.raise_for_status()
-            break
-        except Exception as err:
-            print('Waiting for arangodb to come online')
-            if time.time() > timeout:
-                sys.stderr.write(str(err) + '\n')
-                raise RuntimeError('Timed out waiting for arangodb')
-            time.sleep(3)
+def run_query(query_name, query_data={}):
+    """submit a database query"""
 
+    query_results_url = os.environ['RE_API_URL'] + '/api/v1/query_results'
 
-def wait_for_api():
-    wait_for_arangodb()
-    # Wait for other dependent services to come online
-    conf = get_config()
-    timeout = int(time.time()) + 60
-    auth_url = 'http://auth:5000'
-    ws_url = 'http://workspace:5000'
-    while True:
-        try:
-            # Reassign the `url` variable so we can print which service errored
-            url = conf['re_api_url']
-            requests.get(url).raise_for_status()
-            url = auth_url
-            requests.get(url)
-            url = ws_url
-            requests.get(url)
-            break
-        except Exception as err:
-            print(f"Waiting for dependent service to come online: {url}")
-            if int(time.time()) > timeout:
-                sys.stderr.write(str(err) + "\n")
-                raise RuntimeError(f"Timed out waiting for {url}")
-            time.sleep(2)
+    return requests.post(
+        query_results_url,
+        params={'stored_query': query_name},
+        data=json.dumps(query_data)
+    ).json()
 
 
 def assert_subset(testCls, subset, _dict):
@@ -124,6 +91,13 @@ def modified_environ(*remove, **update):
         [env.pop(k) for k in remove_after]
 
 
-if __name__ == '__main__':
-    if sys.argv[1] == 'wait_for_api':
-        wait_for_api()
+# def update_specs():
+#     """Test the endpoint that triggers an update on the specs."""
+#     resp = requests.put(
+#         conf['re_api_url'] + '/api/v1/specs',
+#         headers={'Authorization': 'admin_token'},
+#         params={'reset': '1', 'init_collections': '1'}
+#     )
+#     resp_json = resp.json()
+#     self.assertEqual(resp.status_code, 200)
+#     self.assertTrue(len(resp_json['status']))

@@ -1,8 +1,8 @@
 import unittest
 import requests
-import time
 
 from spec.test.helpers import create_test_docs, get_config
+from relation_engine_server.utils.wait_for import wait_for_api
 
 _CONF = get_config()
 _QUERY_URL = _CONF['re_api_url'] + '/api/v1/query_results?view=list_test_vertices'
@@ -13,20 +13,7 @@ class TestListTestVertices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Wait for the API to come online
-        timeout = int(time.time()) + 60
-        api_up = False
-        while not api_up:
-            try:
-                requests.get('http://127.0.0.1:5000').raise_for_status()
-                requests.get('http://auth:5000')
-                requests.get('http://workspace:5000')
-                api_up = True
-            except Exception as err:
-                print(err)
-                print('Waiting for RE API to come online..')
-                if int(time.time()) > timeout:
-                    raise RuntimeError("Timed out waiting for RE API.")
-                time.sleep(2)
+        wait_for_api()
 
     def test_valid(self):
         """Test a valid query."""

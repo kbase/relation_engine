@@ -7,7 +7,7 @@ calc_workers="$(($(nproc) * 2 + 1))"
 # Use the WORKERS environment variable, if present
 workers=${WORKERS:-$calc_workers}
 
-python -m relation_engine_server.wait_for_services
+python -m relation_engine_server.utils.wait_for services
 python -m relation_engine_server.utils.pull_spec
 
 gunicorn \
