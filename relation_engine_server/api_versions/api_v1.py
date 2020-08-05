@@ -1,6 +1,5 @@
 import flask
 from relation_engine_server.utils import (
-    json_validation,
     arango_client,
     spec_loader,
     load_data_sources,
@@ -10,6 +9,7 @@ from relation_engine_server.utils import (
     config,
     parse_json
 )
+from relation_engine_server.utils.json_validation import run_validator
 from relation_engine_server.exceptions import InvalidParameters
 
 api_v1 = flask.Blueprint('api_v1', __name__)
@@ -78,7 +78,7 @@ def run_query():
                                             batch_size=batch_size,
                                             full_count=full_count)
         return flask.jsonify(resp_body)
-    if ('stored_query' in flask.request.args) or ('view' in flask.request.args):
+    if 'stored_query' in flask.request.args or 'view' in flask.request.args:
         # Run a query from a query name
         # Note: we are maintaining backwards compatibility here with the "view" arg.
         # "stored_query" is the more accurate name
@@ -87,7 +87,8 @@ def run_query():
         stored_query_source = _preprocess_stored_query(stored_query['query'], stored_query)
         if 'params' in stored_query:
             # Validate the user params for the query
-            json_validation.Validator(stored_query['params']).validate(json_body)
+            run_validator(schema=stored_query['params'], data=json_body)
+#            json_validation.Validator(stored_query['params']).validate(json_body)
         json_body['ws_ids'] = ws_ids
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,

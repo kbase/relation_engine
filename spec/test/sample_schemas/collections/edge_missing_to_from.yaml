@@ -1,0 +1,12 @@
+# Edge schemas must require "_from" and "_to" attributes
+name: edge_missing_to_from
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [_key, _from]
+  description: Example edge schema for testing.
+  properties:
+    _key: {type: string}
+    _from: {type: string}
+    _to: {type: string}

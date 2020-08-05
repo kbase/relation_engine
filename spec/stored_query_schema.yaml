@@ -4,9 +4,14 @@ required: ['query', 'name']
 properties:
   name:
     type: string
+  title:
+    type: string
+  description:
+    type: string
   params:
     type: object
   query_prefix:
     type: string
   query:
     type: string
+additionalProperties: false

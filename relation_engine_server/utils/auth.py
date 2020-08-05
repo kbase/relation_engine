@@ -5,8 +5,8 @@ import json
 import flask
 import requests
 
-from .config import get_config
-from ..exceptions import MissingHeader, UnauthorizedAccess
+from relation_engine_server.utils.config import get_config
+from relation_engine_server.exceptions import MissingHeader, UnauthorizedAccess
 
 
 def require_auth_token(roles=[]):

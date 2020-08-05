@@ -1,11 +1,13 @@
 """
 Test helpers
 """
+import contextlib
+import functools
+import io
+import json
 import os
 import requests
-import functools
-import contextlib
-import json
+import sys
 
 
 @functools.lru_cache(maxsize=1)
@@ -22,7 +24,7 @@ def get_config():
 def run_query(query_name, query_data={}):
     """submit a database query"""
 
-    query_results_url = os.environ['RE_API_URL'] + '/api/v1/query_results'
+    query_results_url = get_config()['re_query_results_url']
 
     return requests.post(
         query_results_url,
@@ -58,6 +60,15 @@ def create_test_docs(coll_name, docs, update_on_dupe=False):
         raise RuntimeError(resp.text)
 
     return resp
+
+
+def capture_stdout(function, *args, **kwargs):
+    """capture and return the standard output from a function"""
+    io_stdout = io.StringIO()
+    sys.stdout = io_stdout
+    function(*args, **kwargs)
+    sys.stdout = sys.__stdout__
+    return io_stdout.getvalue()
 
 
 @contextlib.contextmanager

@@ -1,0 +1,6 @@
+{
+  "name": "invalid_additional_property",
+  "type": "invalid",
+  "category": "something boring",
+  "title": "An invalid additional property"
+}

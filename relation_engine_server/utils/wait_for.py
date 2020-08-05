@@ -4,7 +4,7 @@ Block until all dependent services come online.
 import requests
 import time
 import sys
-from .config import get_config
+from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
 
@@ -23,6 +23,7 @@ def wait_for_service(service_list):
                 if service['auth'] is not None:
                     requests.get(service['url'], auth=service['auth']).raise_for_status()
                 else:
+                    # auth and workspace both return 500, so don't raise_for_status
                     requests.get(service['url'])
             break
         except Exception:

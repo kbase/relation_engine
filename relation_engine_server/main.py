@@ -6,9 +6,9 @@ from uuid import uuid4
 import traceback
 from jsonschema.exceptions import ValidationError
 
-from .api_versions.api_v1 import api_v1
-from .exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters, NotFound
-from .utils import arango_client, spec_loader
+from relation_engine_server.api_versions.api_v1 import api_v1
+from relation_engine_server.exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters, NotFound
+from relation_engine_server.utils import arango_client, spec_loader
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)

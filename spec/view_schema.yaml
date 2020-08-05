@@ -5,7 +5,8 @@ properties:
   name:
     type: string
     title: View name
-    format: ^\\w+$
+    format: regex
+    pattern: ^\w+$
   type:
     type: string
     enum: ['arangosearch']

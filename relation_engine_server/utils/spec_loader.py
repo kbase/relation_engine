@@ -5,7 +5,7 @@ import glob
 import os
 import yaml
 
-from .config import get_config
+from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
 

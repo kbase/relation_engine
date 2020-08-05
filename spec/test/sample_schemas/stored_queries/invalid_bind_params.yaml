@@ -1,0 +1,32 @@
+name: invalid_bind_params
+params:
+  type: object
+  required: [keys]
+  properties:
+    distance_to_nearest_star:
+      type: integer
+      default: 1
+      minimum: 0
+      maximum: 100
+    keys:
+      type: array
+      items: {type: string}
+query: |
+  LET node_ids = (
+    FOR n IN djornl_node
+      FILTER n._key IN @door_keys AND n.node_type == 'gene'
+      FOR node IN 0..@distance ANY n djornl_edge
+        OPTIONS {bfs: true, uniqueVertices: "global"}
+        RETURN DISTINCT node._id
+  )
+  LET edges = (
+    FOR edge IN djornl_edge
+      FILTER edge._from IN node_ids AND edge._to IN node_ids
+      RETURN edge
+  )
+  LET nodes = (
+    FOR node IN djornl_node
+        FILTER node._id IN node_ids
+        RETURN node
+  )
+  RETURN {nodes, edges}

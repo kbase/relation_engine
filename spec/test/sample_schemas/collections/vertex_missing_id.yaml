@@ -1,0 +1,13 @@
+# Time-travel vertex schemas must require the "id" attribute
+name: vertex_missing_id
+type: vertex
+delta: true
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [_key]
+  description: An example vertex schema for testing
+  properties:
+    _key: {type: string}
+    is_public: {type: boolean}
+    ws_id: {type: integer}

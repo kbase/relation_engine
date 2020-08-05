@@ -1,13 +1,45 @@
 name: collection_schema
 type: object
 required: ['name', 'type', 'schema']
+additionalProperties: false
 properties:
+  delta:
+    type: boolean
+    default: false
+  indexes:
+    type: array
+    items:
+      type: object
+      required: ['fields', 'type']
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+          enum: ['fulltext', 'geo', 'hash', 'persistent']
   name:
     type: string
     title: Collection name
-    format: ^\w+$
+    format: regex
+    pattern: ^\w+$
+  schema:
+    type: object
+    required: ['properties', 'required']
+    properties:
+      description:
+        type: string
+      properties:
+        type: object
+      required:
+        type: array
+        items:
+          type: string
+      title:
+        type: string
+      type:
+        type: string
   type:
     type: string
     enum: ['vertex', 'edge']
-  schema:
-    type: object
