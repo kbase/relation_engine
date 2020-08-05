@@ -26,7 +26,7 @@ _VALID_SCHEMA_TYPES = {
     },
     'collection': {
         'file': os.path.join(_BASE_DIR, 'collection_schema.yaml'),
-        'plural': 'schemas',
+        'plural': 'collections',
     },
     'view': {
         'file': os.path.join(_BASE_DIR, 'view_schema.yaml'),

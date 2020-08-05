@@ -4,9 +4,9 @@ This repo holds the code associated with the KBase relation engine, previously h
 
 ## Relation Engine Spec
 
-This repo holds the [stored queries](spec/stored_queries), [schemas](spec/schemas), and [migrations](spec/migrations) for the relation engine graph database service.
+This repo holds the schemas for [stored queries](spec/stored_queries), [collections](spec/collections), [views](spec/views) and [migrations](spec/migrations) for the relation engine graph database service.
 
-These specifications are used by the [Relation Engine API](https://github.com/kbase/relation_engine_api).
+These specifications are used by the [Relation Engine API](relation_engine_server).
 
 ## Relation Engine API
 

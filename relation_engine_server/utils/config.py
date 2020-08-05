@@ -13,9 +13,9 @@ def get_config():
     spec_release_url = os.environ.get('SPEC_RELEASE_URL')
     spec_release_path = os.environ.get('SPEC_RELEASE_PATH')
     spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
-    spec_schemas_path = os.path.join(spec_repo_path, 'schemas')  # /spec/repo/schemas
+    collections_path = os.path.join(spec_repo_path, 'collections')  # /spec/repo/collections
     stored_queries_path = os.path.join(spec_repo_path, 'stored_queries')  # /spec/repo/stored_queries
-    spec_views_path = os.path.join(spec_repo_path, 'views')  # /spec/repo/views
+    views_path = os.path.join(spec_repo_path, 'views')  # /spec/repo/views
     spec_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
     kbase_endpoint = os.environ.get('KBASE_ENDPOINT', 'https://ci.kbase.us/services')
     auth_url = os.environ.get('KBASE_AUTH_URL', urljoin(kbase_endpoint + '/', 'auth'))
@@ -45,10 +45,10 @@ def get_config():
             'release_id': os.path.join(spec_path, '.release_id'),
             'root': spec_path,
             'repo': spec_repo_path,
-            'schemas': spec_schemas_path,
+            'collections': collections_path,
             'stored_queries': stored_queries_path,
-            'views': spec_views_path,
-            'vertices': os.path.join(spec_schemas_path, 'vertices'),
+            'views': views_path,
+            'vertices': os.path.join(collections_path, 'vertices'),  # unused
             'data_sources': os.path.join(spec_repo_path, 'data_sources'),
         }
     }

@@ -7,11 +7,11 @@ from relation_engine_client.exceptions import RERequestError, RENotFound
 
 _API_URL = os.environ.get('RE_API_URL', 'http://localhost:5000')
 # See the test schemas here:
-# https://github.com/kbase/relation_engine_spec/tree/develop/schemas/test
+# https://github.com/kbase/relation_engine/tree/develop/spec/collections/test
 _VERT_COLL = 'test_vertex'
 _EDGE_COLL = 'test_edge'
 # See the docker-compose.yaml file in the root of this repo
-# See the mock auth endpoints in src/test/mock_auth/*.json
+# See the mock auth endpoints in relation_engine_server/test/mock_auth/*.json
 _TOK_ADMIN = 'admin_token'
 _TOK_USER = 'non_admin_token'
 _TOK_INVALID = 'invalid_token'
