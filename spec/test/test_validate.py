@@ -32,7 +32,7 @@ class TestValidate(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, err_msg):
             validate_schema('/path/to/file', 'made-up_schema')
 
-    def test_validate_collection(self):
+    def test_validate_collection_errors(self):
         """Testing collection-specific schema errors"""
 
         base_dir = os_path.join(_TEST_DIR, 'collections')
@@ -80,6 +80,20 @@ class TestValidate(unittest.TestCase):
 
         # TODO: add an example of a schema that validates but where data['schema'] is
         # not a valid json schema.
+
+    def test_validate_collection(self):
+        """Testing collection-specific schema errors"""
+
+        base_dir = os_path.join(_TEST_DIR, 'collections')
+
+        # valid schemas -- check delta is set appropriately
+        for type in ['edge', 'vertex']:
+            data = validate_collection(os_path.join(base_dir, 'test_' + type + '.yaml'))
+            self.assertEqual(data['delta'], False)
+
+            # delta is true:
+            data = validate_collection(os_path.join(base_dir, 'test_delta_' + type + '.yaml'))
+            self.assertEqual(data['delta'], True)
 
     def test_validate_data_source(self):
 

@@ -11,7 +11,6 @@ Example usage:
     assert obj == {'foo': 'bar'}
 """
 from jsonschema import validators, Draft7Validator, FormatChecker
-# from jsonschema.exceptions import ValidationError
 from jsonpointer import resolve_pointer
 import yaml
 import json
@@ -61,8 +60,6 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
     # get the appropriate location in the schema
     validation_schema = resolve_pointer(schema, validate_at)
 
-    # resolver = RefResolver("file://{}/".format(schema_dir), None)
-
     return Validator(validation_schema, format_checker=FormatChecker())
 
 
@@ -102,15 +99,8 @@ def run_validator(schema=None, schema_file=None, validate_at="", data=None, data
     if validator.is_valid(data):
         return data
 
+    # this will throw a ValidationError
     validator.validate(data)
-
-#     err_arr = [e.message + '\n' for e in sorted(validator.iter_errors(data), key=str)]
-#     raise ValidationError(err_arr)
-
-#     err_arr = [e.message + '\n' for e in sorted(validator.iter_errors(data), key=str)]
-#     raise ValidationError(
-#         'Validation failed with the following errors:\n' + '\n'.join(err_arr)
-#     )
 
 
 def _load_json_schema(file):
