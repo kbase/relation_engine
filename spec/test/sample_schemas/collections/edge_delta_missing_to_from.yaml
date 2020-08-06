@@ -1,0 +1,14 @@
+# Time-travel edge schemas must require "from" and "to" attributes
+name: edge_delta_missing_to_from
+delta: true
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required:
+    - name
+  description: Example edge schema for testing.
+  properties:
+    name: {type: string}
+    _from: {type: string}
+    _to: {type: string}

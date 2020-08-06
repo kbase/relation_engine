@@ -1,0 +1,27 @@
+# Return genes associated with reactions similar to a query reaction
+name: invalid_aql
+params:
+  type: object
+  required: [sf_sim, df_sim, rid]
+  properties:
+    rid:
+      type: string
+      title: Reaction id (rxn_reaction vertex id)
+    sf_sim:
+      type: number
+      title: Minimum structural fingerprint similarity score
+    df_sim:
+      type: number
+      title: Minimum difference fingerprint similarity score
+    exclude_self:
+      type: boolean
+      description: If true, don't include the query reactions genes
+      default: false
+
+query_prefix: WITH rxn_reaction
+query: |
+  LET start = @exclude_self ? 1 : 0
+  LET us pray
+  FOR a
+  RETURN to
+  NORMALITY

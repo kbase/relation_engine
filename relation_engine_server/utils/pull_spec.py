@@ -8,8 +8,8 @@ import glob
 import yaml
 
 
-from . import arango_client
-from .config import get_config
+from relation_engine_server.utils import arango_client
+from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
 

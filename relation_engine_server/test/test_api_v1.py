@@ -9,6 +9,7 @@ import json
 import os
 
 from relation_engine_server.utils.config import get_config
+from relation_engine_server.utils.wait_for import wait_for_api
 
 _CONF = get_config()
 
@@ -56,6 +57,10 @@ def save_test_docs(count, edges=False):
 
 
 class TestApi(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        wait_for_api()
 
     def test_root(self):
         """Test root path for api."""

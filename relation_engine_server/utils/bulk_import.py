@@ -5,9 +5,9 @@ import flask
 import json
 import hashlib
 
-from relation_engine_server.utils import json_validation
-from . import spec_loader
-from .arango_client import import_from_file
+from relation_engine_server.utils.json_validation import get_schema_validator
+from relation_engine_server.utils import spec_loader
+from relation_engine_server.utils.arango_client import import_from_file
 
 
 def bulk_import(query_params):
@@ -17,6 +17,7 @@ def bulk_import(query_params):
     arango client.
     """
     schema = spec_loader.get_schema(query_params['collection'])
+    validator = get_schema_validator(schema=schema['schema'])
     # We can't use a context manager here
     # We need to close the file to have the file contents readable
     #  and we need to prevent deletion of the temp file on close (default behavior of tempfiles)
@@ -26,7 +27,7 @@ def bulk_import(query_params):
         # Parse each line to json, validate the schema, and write to a file
         for line in flask.request.stream:
             json_line = json.loads(line)
-            json_validation.Validator(schema['schema']).validate(json_line)
+            validator.validate(json_line)
             json_line = _write_edge_key(json_line)
             json_line['updated_at'] = int(time.time() * 1000)
             temp_fd.write(json.dumps(json_line) + '\n')

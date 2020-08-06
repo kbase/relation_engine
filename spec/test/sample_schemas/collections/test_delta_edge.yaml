@@ -1,0 +1,11 @@
+name: test_delta_edge
+type: edge
+delta: true
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [from, to]
+  description: Example edge schema for testing.
+  properties:
+    from: {type: string}
+    to: {type: string}

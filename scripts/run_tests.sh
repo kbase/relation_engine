@@ -10,9 +10,8 @@ mkdir /spec/repo
 cp -r /app/spec/* /spec/repo/
 # start server, using the specs in /spec/repo
 sh /app/scripts/start_server.sh &
-python -m spec.test.helpers wait_for_api &&
 # spec validation
-python -m spec.test.validate &&
+python -m spec.validate &&
 # spec stored query tests
 python -m unittest discover spec/test &&
 # importer tests

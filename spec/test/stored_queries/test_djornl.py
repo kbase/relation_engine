@@ -3,11 +3,11 @@ Tests for the Dan Jacobson ORNL Arabidopsis stored queries.
 """
 import json
 import unittest
-import requests
 import os
 
-from spec.test.helpers import get_config, modified_environ, create_test_docs
+from spec.test.helpers import get_config, modified_environ, create_test_docs, run_query
 from importers.djornl.parser import DJORNL_Parser
+from relation_engine_server.utils.wait_for import wait_for_api
 
 _CONF = get_config()
 _TEST_DIR = '/app/spec/test'
@@ -27,6 +27,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
+        wait_for_api()
         # import the results file
         results_file = os.path.join(_TEST_DIR, 'djornl', 'results.json')
         with open(results_file) as fh:
@@ -57,15 +58,11 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
     def submit_query(self, query_name, query_data={}):
         """submit a database query"""
 
-        q_data_str = json.dumps(query_data)
         if _VERBOSE:
+            q_data_str = json.dumps(query_data)
             print('query data string: ' + q_data_str)
-        response = requests.post(
-            _CONF['re_api_url'] + '/api/v1/query_results',
-            params={'stored_query': query_name},
-            data=q_data_str
-        ).json()
-        return response
+
+        return run_query(query_name, query_data)
 
     def check_expected_results(self, description, response, expected):
 

@@ -1,0 +1,27 @@
+name: data_source_schema
+type: object
+required: ['name', 'title', 'category']
+properties:
+  name:
+    type: string
+    title: Abbreviated data source name
+    format: regex
+    pattern: ^\w+$
+  category:
+    type: string
+    title: Data source category
+  title:
+    type: string
+    title: Full data source name
+  home_url:
+    type: string
+    title: Data source home page
+    format: uri
+  data_url:
+    type: string
+    title: URL where data can be downloaded
+    format: uri
+  logo_path:
+    type: string
+    title: Path to logo
+additionalProperties: false
