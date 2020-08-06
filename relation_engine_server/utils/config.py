@@ -48,7 +48,6 @@ def get_config():
             'collections': collections_path,
             'stored_queries': stored_queries_path,
             'views': views_path,
-            'vertices': os.path.join(collections_path, 'vertices'),  # unused
             'data_sources': os.path.join(spec_repo_path, 'data_sources'),
         }
     }

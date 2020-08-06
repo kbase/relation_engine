@@ -87,13 +87,3 @@ class StoredQueryNonexistent(Exception):
 
     def __str__(self):
         return 'Stored query does not exist.'
-
-
-class SchemaNonexistent(Exception):
-    """Requested schema is not in the spec."""
-
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return 'Schema does not exist.'

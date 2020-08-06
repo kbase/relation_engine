@@ -264,9 +264,7 @@ _Query params_
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
 
-### GET /api/v1/specs/collections or /api/v1/specs/schemas
-
-Both `collections` and `schemas` return the same data.
+### GET /api/v1/specs/collections
 
 Get all collection names (returns an array of strings):
 
@@ -335,6 +333,13 @@ To update specs while the server is running, use this curl command with an RE_AD
 curl -X PUT -H "Authorization: <mytoken>" \
   "https://ci.kbase.us/services/relation_engine_api/api/v1/specs?init_collections=1
 ```
+
+## Deprecated Endpoints
+
+#### GET `/api/v1/specs/schemas` (replaced by `/api/v1/specs/schemas`)
+
+This endpoint has been deprecated; queries should use `/api/v1/specs/schemas` instead.
+
 
 ## Development
 
