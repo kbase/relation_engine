@@ -64,7 +64,7 @@ def invalid_params(err):
     return (flask.jsonify(resp), 400)
 
 
-@app.errorhandler(spec_loader.SchemaNonexistent)
+@app.errorhandler(spec_loader.CollectionNonexistent)
 @app.errorhandler(spec_loader.StoredQueryNonexistent)
 def view_does_not_exist(err):
     """General error cases."""

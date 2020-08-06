@@ -107,22 +107,54 @@ class TestApi(unittest.TestCase):
     def test_list_stored_queries(self):
         """Test the listing out of saved AQL stored queries."""
         resp = requests.get(API_URL + '/specs/stored_queries').json()
-        self.assertTrue('list_test_vertices' in resp)
+        for sq in ['fetch_test_vertex', 'list_test_vertices', 'ncbi_fetch_taxon']:
+            self.assertIn(sq, resp)
 
-    def test_list_schemas(self):
-        """Test the listing out of registered JSON schemas for vertices and edges."""
-        resp = requests.get(API_URL + '/specs/schemas').json()
-        self.assertTrue('test_vertex' in resp)
-        self.assertTrue('test_edge' in resp)
-        self.assertFalse('error' in resp)
-        self.assertTrue(len(resp))
+    def test_list_collections(self):
+        """Test the listing out of registered collection schemas for vertices and edges."""
+        for variant in ['schemas', 'collections']:
+            resp = requests.get(API_URL + '/specs/' + variant).json()
+            self.assertTrue(len(resp))
+            for coll in ['test_edge', 'test_vertex', 'ncbi_taxon']:
+                self.assertIn(coll, resp)
 
     def test_fetch_schema_for_doc(self):
         """Given a document ID, fetch its schema."""
-        resp = requests.get(API_URL + '/specs/schemas', params={'doc_id': 'test_vertex/123'}).json()
-        self.assertEqual(resp['name'], 'test_vertex')
-        self.assertEqual(resp['type'], 'vertex')
-        self.assertTrue(resp['schema'])
+
+        for variant in ['schemas', 'collections']:
+            resp = requests.get(
+                API_URL + '/specs/' + variant,
+                params={'doc_id': 'test_vertex/123'}
+            ).json()
+            self.assertEqual(resp['name'], 'test_vertex')
+            self.assertEqual(resp['type'], 'vertex')
+            self.assertTrue(resp['schema'])
+
+    def test_fetch_invalid_collections(self):
+        """Test the case where the collection/schema does not exist."""
+        for variant in ['schemas', 'collections']:
+            resp = requests.get(
+                API_URL + '/specs/' + variant,
+                params={'name': 'xyzabc'},
+            ).json()
+            self.assertEqual(resp['error'], 'Collection does not exist.')
+
+    def test_fetch_invalid_documents(self):
+        """Test the case where the collection/schema does not exist."""
+        for variant in ['schemas', 'collections']:
+            resp = requests.get(
+                API_URL + '/specs/' + variant,
+                params={'doc_id': 'fake_collection/123'},
+            ).json()
+            self.assertEqual(resp['error'], 'Collection does not exist.')
+
+    def test_fetch_invalid_queries(self):
+        """Test the case where the stored query does not exist."""
+        resp = requests.get(
+            API_URL + '/specs/stored_queries',
+            params={'name': 'xyzabc'},
+        ).json()
+        self.assertEqual(resp['error'], 'Stored query does not exist.')
 
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
@@ -170,7 +202,7 @@ class TestApi(unittest.TestCase):
             data='',
             headers=HEADERS_ADMIN
         ).json()
-        self.assertTrue('Schema does not exist' in resp['error'])
+        self.assertTrue('Collection does not exist' in resp['error'])
 
     def test_save_documents_invalid_json(self):
         """Test an attempt to save documents with an invalid JSON body."""

@@ -16,7 +16,7 @@ def bulk_import(query_params):
     schema, then write them into a temporary file that can be passed into the
     arango client.
     """
-    schema = spec_loader.get_schema(query_params['collection'])
+    schema = spec_loader.get_collection(query_params['collection'])
     validator = get_schema_validator(schema=schema['schema'])
     # We can't use a context manager here
     # We need to close the file to have the file contents readable

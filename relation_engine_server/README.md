@@ -264,12 +264,12 @@ _Query params_
 
 Every call to update specs will reset the spec data (do a clean download and overwrite).
 
-### GET /api/v1/specs/schemas
+### GET /api/v1/specs/collections
 
-Get all schema names (returns an array of strings):
+Get all collection names (returns an array of strings):
 
 ```sh
-GET {root_url}/api/v1/specs/schemas
+GET {root_url}/api/v1/specs/collections
 ```
 
 Example response:
@@ -278,10 +278,10 @@ Example response:
 ["test_vertex", "test_edge"]
 ```
 
-Get the contents of a specific schema
+Get the schema for a specific collection
 
 ```sh
-GET "{root_url}/api/v1/specs/schemas?name=test_vertex"
+GET "{root_url}/api/v1/specs/collections?name=test_vertex"
 ```
 
 Example response:
@@ -307,7 +307,7 @@ Example response:
 Get the schema for a particular document by its full ID
 
 ```sh
-GET "{root_url}/api/v1/specs/schemas?doc_id=test_vertex/1"
+GET "{root_url}/api/v1/specs/collections?doc_id=test_vertex/1"
 ```
 
 The response will have the same format as the example response above
@@ -333,6 +333,13 @@ To update specs while the server is running, use this curl command with an RE_AD
 curl -X PUT -H "Authorization: <mytoken>" \
   "https://ci.kbase.us/services/relation_engine_api/api/v1/specs?init_collections=1
 ```
+
+## Deprecated Endpoints
+
+#### GET `/api/v1/specs/schemas` (replaced by `/api/v1/specs/schemas`)
+
+This endpoint has been deprecated; queries should use `/api/v1/specs/schemas` instead.
+
 
 ## Development
 

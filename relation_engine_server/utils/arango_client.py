@@ -45,8 +45,6 @@ def run_query(query_text=None, cursor_id=None, bind_vars=None, batch_size=10000,
             req_json['options'] = {'fullCount': True}
         if bind_vars:
             req_json['bindVars'] = bind_vars
-    # Initialize the readonly user
-    # _init_readonly_user()
     # Run the query as the readonly user
     resp = requests.request(
         method,

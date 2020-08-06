@@ -36,17 +36,18 @@ def show_stored_queries():
     return flask.jsonify(spec_loader.get_stored_query_names())
 
 
+@api_v1.route('/specs/collections', methods=['GET'])
 @api_v1.route('/specs/schemas', methods=['GET'])
-def show_schemas():
-    """Show the current schema names (edges and vertices) loaded from the spec."""
+def show_collections():
+    """Show the names of the (document) collections (edges and vertices) loaded from the spec."""
     name = flask.request.args.get('name')
     doc_id = flask.request.args.get('doc_id')
     if name:
-        return flask.jsonify(spec_loader.get_schema(name))
+        return flask.jsonify(spec_loader.get_collection(name))
     elif doc_id:
         return flask.jsonify(spec_loader.get_schema_for_doc(doc_id))
     else:
-        return flask.jsonify(spec_loader.get_schema_names())
+        return flask.jsonify(spec_loader.get_collection_names())
 
 
 @api_v1.route('/query_results', methods=['POST'])
