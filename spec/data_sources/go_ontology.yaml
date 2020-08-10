@@ -1,6 +1,6 @@
 name: go_ontology
 category: ontology
 title: Gene Ontology
-home_url: http://geneontology.org/
-data_url: http://release.geneontology.org/
-logo_path: /images/third-party-data-sources/go/logo-248-64.png
+home_url: "http://geneontology.org/"
+data_url: "http://release.geneontology.org/"
+logo_path: "/images/third-party-data-sources/go/logo-248-64.png"

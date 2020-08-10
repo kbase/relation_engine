@@ -5,7 +5,7 @@ schema:
   "$schema": http://json-schema.org/draft-07/schema#
   title: delta_load_registry
   type: object
-  description: Don't touch this. It's for the exlusive use of delta loaders.
+  description: Don't touch this. It's for the exclusive use of delta loaders.
   properties:
     _key:
       type: string

@@ -10,10 +10,17 @@ Example usage:
     Validator(schema).validate(obj)
     assert obj == {'foo': 'bar'}
 """
-from jsonschema import validators, Draft7Validator, FormatChecker
+from jsonschema import validators, Draft7Validator, FormatChecker, RefResolver
+
+from jsonschema.compat import (
+    urlopen,
+    urlsplit,
+)
+from jsonschema.exceptions import ValidationError
 from jsonpointer import resolve_pointer
 import yaml
 import json
+import requests
 
 
 def extend_with_default(validator_class):
@@ -50,7 +57,7 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
 
     """
 
-    if schema is None and schema_file is None or schema is not None and schema_file is not None:
+    if schema == schema_file and schema is None or schema is not None and schema_file is not None:
         raise ValueError("Please supply either a schema or a schema file path")
 
     # schema to validate against
@@ -60,10 +67,19 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
     # get the appropriate location in the schema
     validation_schema = resolve_pointer(schema, validate_at)
 
-    return Validator(validation_schema, format_checker=FormatChecker())
+    if schema_file:
+        resolver = ExtendedRefResolver(schema_file, schema)
+    else:
+        resolver = ExtendedRefResolver.from_schema(schema)
+
+    return Validator(
+        validation_schema,
+        format_checker=FormatChecker(),
+        resolver=resolver
+    )
 
 
-def run_validator(schema=None, schema_file=None, validate_at="", data=None, data_file=None):
+def run_validator(schema=None, schema_file=None, validate_at="", data=None, data_file=None, nicer_errors=False):
     """
     Validate data against a schema, filling in defaults if appropriate
 
@@ -99,8 +115,13 @@ def run_validator(schema=None, schema_file=None, validate_at="", data=None, data
     if validator.is_valid(data):
         return data
 
-    # this will throw a ValidationError
-    validator.validate(data)
+    if not nicer_errors:
+        # this will throw a ValidationError
+        validator.validate(data)
+
+    err_msg = "".join(e.message + "\n" for e in sorted(validator.iter_errors(data), key=str))
+
+    raise ValidationError(err_msg)
 
 
 def _load_json_schema(file):
@@ -114,3 +135,32 @@ def _load_json_schema(file):
             return json.load(fd)
 
         raise TypeError('Unknown file type encountered: ' + file)
+
+
+class ExtendedRefResolver(RefResolver):
+
+    def resolve_remote(self, uri):
+
+        scheme = urlsplit(uri).scheme
+        # if there's no scheme, it's a local file, so prefix it with "file://"
+        if scheme == '':
+            uri = 'file://' + uri
+
+        if scheme in self.handlers:
+            result = self.handlers[scheme](uri)
+        elif scheme in [u"http", u"https"]:
+            # Requests has support for detecting the correct encoding of
+            # json over http
+            result = requests.get(uri).json()
+        else:
+            # Otherwise, pass off to urllib and assume utf-8
+            with urlopen(uri) as url:
+                content = url.read().decode("utf-8")
+                if uri.endswith('.yaml') or uri.endswith('.yml'):
+                    result = yaml.safe_load(content)
+                else:
+                    result = json.loads(content)
+
+        if self.cache_remote:
+            self.store[uri] = result
+        return result

@@ -1,6 +1,6 @@
 name: ncbi_taxonomy
 category: taxonomy
 title: NCBI Taxonomy
-home_url: https://www.ncbi.nlm.nih.gov/taxonomy
-data_url: ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/
-logo_path: /images/third-party-data-sources/ncbi/logo-51-64.png
+home_url: "https://www.ncbi.nlm.nih.gov/taxonomy"
+data_url: "ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/"
+logo_path: "/images/third-party-data-sources/ncbi/logo-51-64.png"
