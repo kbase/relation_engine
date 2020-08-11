@@ -10,4 +10,3 @@ schema:
     _key:
       type: string
       title: Key
-

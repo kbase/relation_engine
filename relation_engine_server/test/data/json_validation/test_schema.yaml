@@ -1,0 +1,26 @@
+name: test_schema
+$schema: 'http://json-schema.org/draft-07/schema#'
+properties:
+  params:
+    type: object
+    properties:
+      name:
+        type: string
+        format: regex
+        pattern: ^\w+$
+        default: blank
+      title:
+        type: string
+      distance:
+        type: integer
+        minimum: 0
+        maximum: 10
+        default: 1
+      home_page:
+        type: string
+        format: uri
+      date:
+        title: date
+        description: A type of dried fruit
+        type: string
+        format: date
