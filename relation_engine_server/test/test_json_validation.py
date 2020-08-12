@@ -3,8 +3,11 @@ Test JSON validation functions
 """
 import unittest
 import os.path as os_path
+import json
+import yaml
 from relation_engine_server.utils.json_validation import run_validator
 from jsonschema.exceptions import ValidationError
+from jsonschema.exceptions import RefResolutionError
 from jsonpointer import JsonPointerException
 
 
@@ -41,13 +44,31 @@ test_schema = {
 }
 
 valid_json_loc = '/properties/params'
-test_data_dir = os_path.join('/app', 'relation_engine_server', 'test', 'data', 'json_validation')
+test_data_dirs = ['/app', 'relation_engine_server', 'test', 'data']
+json_validation_dir = os_path.join(*(test_data_dirs + ['json_validation']))
+schema_refs_dir = os_path.join(*(test_data_dirs + ['schema_refs']))
 
 test_schema_list = [
     ['schema', test_schema],
-    ['schema_file', os_path.join(test_data_dir, 'test_schema.json')],
-    ['schema_file', os_path.join(test_data_dir, 'test_schema.yaml')],
+    ['schema_file', os_path.join(json_validation_dir, 'test_schema.json')],
+    ['schema_file', os_path.join(json_validation_dir, 'test_schema.yaml')],
 ]
+
+valid_edge_data = {
+    "_from": "here",
+    "_to": "eternity",
+    "score": 1.23456,
+    "_key": "abcdefg",
+    "edge_type": "domain_co_occur",
+}
+
+invalid_edge_data = {
+    "_from": "here",
+    "_to": "eternity",
+    "score": 1.23456,
+    "_key": "abcdefg",
+    "edge_type": "whatever",
+}
 
 
 class TestJsonValidation(unittest.TestCase):
@@ -126,7 +147,7 @@ class TestJsonValidation(unittest.TestCase):
         self.assertEqual(test_data, {'name': 'blank', 'distance': 1})
 
         for file_ext in ['json', 'yaml']:
-            file_path = os_path.join(test_data_dir, 'defaults.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'defaults.' + file_ext)
             self.assertEqual(
                 run_validator(
                     schema=schema_arg,
@@ -160,7 +181,7 @@ class TestJsonValidation(unittest.TestCase):
         for file_ext in ['json', 'yaml']:
             # validation error - string does not match regex
             err_str = '"what\'s-the-problem with-this-string\?" does not match .*?'
-            file_path = os_path.join(test_data_dir, 'invalid_pattern.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'invalid_pattern.' + file_ext)
             with self.assertRaisesRegex(ValidationError, err_str):
                 run_validator(
                     schema=schema_arg,
@@ -168,7 +189,7 @@ class TestJsonValidation(unittest.TestCase):
                     data_file=file_path,
                     validate_at=valid_json_loc)
 
-            file_path = os_path.join(test_data_dir, 'valid_pattern.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'valid_pattern.' + file_ext)
             self.assertEqual(
                 run_validator(
                     schema=schema_arg,
@@ -200,7 +221,7 @@ class TestJsonValidation(unittest.TestCase):
 
         # data files
         for file_ext in ['json', 'yaml']:
-            file_path = os_path.join(test_data_dir, 'invalid_uri.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'invalid_uri.' + file_ext)
             err_str = "'where is it\?' is not a 'uri'"
             with self.assertRaisesRegex(ValidationError, err_str):
                 run_validator(
@@ -209,7 +230,7 @@ class TestJsonValidation(unittest.TestCase):
                     data_file=file_path,
                     validate_at=valid_json_loc)
 
-            file_path = os_path.join(test_data_dir, 'valid_uri.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'valid_uri.' + file_ext)
             self.assertEqual(
                 run_validator(
                     schema=schema_arg,
@@ -246,7 +267,7 @@ class TestJsonValidation(unittest.TestCase):
         # data files
         for file_ext in ['json', 'yaml']:
             # invalid type (number instead of string)
-            file_path = os_path.join(test_data_dir, 'invalid_date_type.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'invalid_date_type.' + file_ext)
             err_str = "20200606 is not of type 'string'"
             with self.assertRaisesRegex(ValidationError, err_str):
                 run_validator(
@@ -256,7 +277,7 @@ class TestJsonValidation(unittest.TestCase):
                     validate_at=valid_json_loc)
 
             # quoted string but not in the correct format
-            file_path = os_path.join(test_data_dir, 'invalid_date.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'invalid_date.' + file_ext)
             err_str = "'20200606' is not a 'date'"
             with self.assertRaisesRegex(ValidationError, err_str):
                 run_validator(
@@ -265,7 +286,7 @@ class TestJsonValidation(unittest.TestCase):
                     data_file=file_path,
                     validate_at=valid_json_loc)
 
-            file_path = os_path.join(test_data_dir, 'valid_date.' + file_ext)
+            file_path = os_path.join(json_validation_dir, 'valid_date.' + file_ext)
             self.assertEqual(
                 run_validator(
                     schema=schema_arg,
@@ -280,7 +301,7 @@ class TestJsonValidation(unittest.TestCase):
             )
 
         # pyyaml-specific issue: dates get automatically parsed into datetime objects (doh!)
-        file_path = os_path.join(test_data_dir, 'unquoted_date.yaml')
+        file_path = os_path.join(json_validation_dir, 'unquoted_date.yaml')
         err_str = "datetime.date\(2020, 6, 6\) is not of type 'string'"
         with self.assertRaisesRegex(ValidationError, err_str):
             run_validator(
@@ -291,24 +312,6 @@ class TestJsonValidation(unittest.TestCase):
 
     def test_schema_references(self):
         """Ensure referenced schemas, including those written in yaml, can be accessed."""
-
-        valid_edge_data = {
-            "_from": "here",
-            "_to": "eternity",
-            "score": 1.23456,
-            "_key": "abcdefg",
-            "edge_type": "domain_co_occur",
-        }
-
-        invalid_edge_data = {
-            "_from": "here",
-            "_to": "eternity",
-            "score": 1.23456,
-            "_key": "abcdefg",
-            "edge_type": "whatever",
-        }
-
-        schema_ref_dir = ['/app', 'relation_engine_server', 'test', 'data', 'schema_refs']
 
         # same schema in different places
         path_list = [
@@ -321,13 +324,16 @@ class TestJsonValidation(unittest.TestCase):
         for path in path_list:
 
             for file_ext in ['json', 'yaml']:
-                file_path = os_path.join(*(schema_ref_dir + path), 'edge.' + file_ext)
+                file_path = os_path.join(*(test_data_dirs + ['schema_refs'] + path), 'edge.' + file_ext)
+
+                # fails due to invalid data
                 with self.assertRaisesRegex(ValidationError, err_msg):
                     run_validator(
                         schema_file=file_path,
                         data=invalid_edge_data,
                     )
 
+                # valid data
                 self.assertEqual(
                     run_validator(
                         schema_file=file_path,
@@ -335,3 +341,68 @@ class TestJsonValidation(unittest.TestCase):
                     ),
                     valid_edge_data
                 )
+
+                # validate using the schema instead of the schema_file
+                with open(file_path) as fd:
+                    contents = yaml.safe_load(fd) if file_ext == 'yaml' else json.load(fd)
+
+                # if there is no $id in the schema, the ref resolver won't know
+                # where the schema file is located and will not resolve relative references
+                with self.assertRaisesRegex(RefResolutionError, 'No such file or directory'):
+                    run_validator(
+                        schema=contents,
+                        data=valid_edge_data
+                    )
+
+                # inject an $id with the current file path
+                contents['$id'] = file_path
+                self.assertEqual(
+                    run_validator(
+                        schema=contents,
+                        data=valid_edge_data,
+                    ),
+                    valid_edge_data
+                )
+
+    def test_complex_schema_references(self):
+        """test validation with complex references that reference other references"""
+
+        valid_data = {
+          'node': {
+            'id': 'TAIR:19830',
+            'type': 'gene',
+          },
+          'edge': valid_edge_data,
+          'marks_out_of_ten': 5
+        }
+
+        invalid_data = {
+          'node': {
+            'id': 'TAIR:19830',
+            'type': 'gene',
+          },
+          'edge': invalid_edge_data,
+          'marks_out_of_ten': 5
+        }
+
+        err_msg = "'whatever' is not valid under any of the given schemas"
+        for file_ext in ['json', 'yaml']:
+            file_path = os_path.join(
+                *(test_data_dirs + ['schema_refs', 'level_1']),
+                'test_object.' + file_ext
+            )
+
+            # data fails validation
+            with self.assertRaisesRegex(ValidationError, err_msg):
+                run_validator(
+                    schema_file=file_path,
+                    data=invalid_data,
+                )
+
+            self.assertEqual(
+                run_validator(
+                    schema_file=file_path,
+                    data=valid_data,
+                ),
+                valid_data
+            )

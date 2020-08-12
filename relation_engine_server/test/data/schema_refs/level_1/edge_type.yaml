@@ -1,8 +1,4 @@
 $schema: "http://json-schema.org/draft-07/schema#"
-#type: object
-#required: [edge_type]
-#properties:
-#  edge_type:
 name: edge_type
 title: Edge Type
 description: Edge types in Dan Jacobson Exascale dataset
