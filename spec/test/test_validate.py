@@ -115,6 +115,11 @@ class TestValidate(unittest.TestCase):
                 'msg': "Additional properties are not allowed \('type' was unexpected\)",
                 'file': 'invalid_additional_property.json',
             },
+            {
+                'msg': "'this is not a valid URI' is not a 'uri'",
+                'file': 'uri_validation.json',
+
+            }
         ]
 
         for entry in error_list:
@@ -127,9 +132,6 @@ class TestValidate(unittest.TestCase):
             # same thing as above via specific method
             with self.assertRaisesRegex(err_type, entry['msg']):
                 validate_data_source(os_path.join(base_dir, entry['file']))
-
-        # TODO: add in a test for URL validation (once URL validation is working)
-        # see uri_validation.json for example
 
     def test_validate_stored_query(self):
 
