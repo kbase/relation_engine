@@ -173,81 +173,6 @@ If you try to update a collection and it fails validation against a JSON schema 
 * `"value"` - The (possibly nested) value in your data that failed validation
 * `"path"` - The path into your data where you can find the value that failed validation
 
-### GET /api/v1/data_sources
-
-Fetch a list of data source names. Will return an array of strings.
-
-Example response body:
-
-```json
-{"data_sources": ["x", "y", "z"]}
-```
-
-Response JSON schema:
-
-```json
-{ "type": "object",
-  "properties": {
-    "data_sources": {
-      "type": "array",
-      "items": { "type": "string" }
-    }
-  }
-}
-```
-
-### GET /api/v1/data_sources/{name}
-
-Fetch the details for a data source by name. Will return an object of key/value details.
-
-Example response body:
-
-```json
-{
-  "data_source": {
-    "name": "envo_ontology",
-    "category": "ontology",
-    "title": "Environment Ontology",
-    "home_url": "http://www.obofoundry.org/ontology/envo.html",
-    "data_url": "https://github.com/EnvironmentOntology/envo/releases",
-    "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/envo/logo-119-64.png"
-  }
-}
-```
-
-Response JSON schema:
-
-```json
-{ "type": "object",
-  "properties": {
-    "name": {
-      "type": "string",
-      "description": "canonical identifier for this data source"
-    },
-    "category": {
-      "type": "string",
-      "description": "parent category, such as taxonomy or ontology"
-    },
-    "title": {
-      "type": "string",
-      "description": "human readable name for the data source"
-    },
-    "home_url": {
-      "type": "string",
-      "description": "full URL of the home page for the data source"
-    },
-    "data_url": {
-      "type": "string",
-      "description": "full URL from where the data can be downloaded"
-    },
-    "logo_url": {
-      "type": "string",
-      "description": "the URL of a logo image representing this data source"
-    },
-  }
-}
-```
-
 ### PUT /api/v1/specs/
 
 Manually check and pull spec updates. Requires sysadmin auth.
@@ -311,6 +236,173 @@ GET "{root_url}/api/v1/specs/collections?doc_id=test_vertex/1"
 ```
 
 The response will have the same format as the example response above
+
+### GET /api/v1/specs/data_sources
+
+See also `GET /api/v1/data_sources` for a similar API that returns results in a slightly different format.
+
+Get all data source names (returns an array of strings):
+
+```sh
+GET {root_url}/api/v1/specs/data_sources
+```
+
+Example response:
+
+```json
+["envo_ontology", "go_ontology", "gtdb"]
+```
+
+Get the schema for a specific data source
+
+```sh
+GET "{root_url}/api/v1/specs/data_source?name=ncbi_taxonomy"
+```
+
+Example response:
+
+```json
+{
+  "name": "ncbi_taxonomy",
+  "category": "taxonomy",
+  "title": "NCBI Taxonomy",
+  "home_url": "https://www.ncbi.nlm.nih.gov/taxonomy",
+  "data_url": "ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/",
+  "logo_url": "https://kbase.us/ui-assets/images/third-party-data-sources/ncbi/logo-51-64.png"
+}
+```
+
+Response JSON schema:
+
+```json
+{ "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "canonical identifier for this data source"
+    },
+    "category": {
+      "type": "string",
+      "description": "parent category, such as taxonomy or ontology"
+    },
+    "title": {
+      "type": "string",
+      "description": "human readable name for the data source"
+    },
+    "home_url": {
+      "type": "string",
+      "description": "full URL of the home page for the data source"
+    },
+    "data_url": {
+      "type": "string",
+      "description": "full URL from where the data can be downloaded"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "the URL of a logo image representing this data source"
+    },
+  }
+}
+```
+
+
+### GET /api/v1/specs/stored_queries
+
+Get all stored query names (returns an array of strings):
+
+```sh
+GET {root_url}/api/v1/specs/stored_queries
+```
+
+Example response:
+
+```json
+["fetch_test_vertices", "fetch_test_edges", "ncbi_fetch_taxon"]
+```
+
+Get the schema for a specific stored query
+
+```sh
+GET "{root_url}/api/v1/specs/stored_query?name=ncbi_fetch_taxon"
+```
+
+Example response:
+
+```json
+{
+  "stored_query": {
+    "name": "ncbi_fetch_taxon",
+    "params": {
+      "type": "object",
+      "required": [
+        "id",
+        "ts"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "NCBI Taxonomy ID"
+        },
+        "ts": {
+          "type": "integer",
+          "title": "Versioning timestamp"
+        }
+      }
+    },
+    "query": "for t in ncbi_taxon\n    filter t.id == @id\n    filter t.created <= @ts AND t.expired >= @ts\n    limit 1\n    return t\n"
+  }
+}
+```
+
+
+### GET /api/v1/data_sources
+
+See also `GET /api/v1/spec/data_sources` for the standard `/specs` API endpoint access to this data.
+
+Fetch a list of data source names. Will return an array of strings.
+
+Example response body:
+
+```json
+{"data_sources": ["x", "y", "z"]}
+```
+The response is nearly identical to that for `GET /api/v1/specs/data_sources`, but this data is held in an object under the key `data_sources`.
+
+
+Response JSON schema:
+
+```json
+{ "type": "object",
+  "properties": {
+    "data_sources": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
+```
+
+### GET /api/v1/data_sources/{name}
+
+Fetch the details for a data source by name. Will return an object of key/value details.
+
+Example response body:
+
+```json
+{
+  "data_source": {
+    "name": "envo_ontology",
+    "category": "ontology",
+    "title": "Environment Ontology",
+    "home_url": "http://www.obofoundry.org/ontology/envo.html",
+    "data_url": "https://github.com/EnvironmentOntology/envo/releases",
+    "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/envo/logo-119-64.png"
+  }
+}
+```
+
+Response JSON schema is the same as for `GET /api/v1/specs/data_sources?name=data_source_name`, but the data is held in an object under the key `data_source`.
+
 
 ## Administration
 
