@@ -169,7 +169,18 @@ class TestREClientIntegration(unittest.TestCase):
     def test_save_docs_unknown_coll(self):
         with self.assertRaises(RERequestError) as ctx:
             self.client.save_docs('xyz123', [{'_key': 0}])
-        self.assertEqual(ctx.exception.resp.status_code, 400)
+        self.assertEqual(ctx.exception.resp.status_code, 404)
+        self.assertEqual(
+            ctx.exception.resp.json(),
+            {
+                'error': {
+                    'message': 'Not found',
+                    'status': 404,
+                    'details': "Collection 'xyz123' does not exist.",
+                    'name': 'xyz123',
+                }
+            }
+        )
         # Mostly make sure that the __str__ method does not throw any errs
         self.assertTrue('Response:' in str(ctx.exception))
 
