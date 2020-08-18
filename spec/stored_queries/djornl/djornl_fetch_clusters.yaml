@@ -2,25 +2,13 @@ name: djornl_fetch_clusters
 description: Fetch all nodes that are members of the specified cluster(s), and the edges and nodes within the specified distance (number of hops) of those nodes.
 params:
   type: object
+  required: [cluster_ids]
   properties:
-    cluster_i2_ids:
-      title: Cluster I2 IDs
-      description: Cluster I2 IDs to locate
-      items: {type: integer}
-      default: []
-      examples: [[1], [3, 5]]
-    cluster_i4_ids:
-      title: Cluster I4 IDs
-      description: Cluster I4 IDs to locate
-      items: {type: integer}
-      examples: [[2], [4, 6]]
-      default: []
-    cluster_i6_ids:
-      title: Cluster I6 IDs
-      description: Cluster I6 IDs to locate
-      items: {type: integer}
-      examples: [[666], [999, 333]]
-      default: []
+    cluster_ids:
+      title: Cluster IDs
+      description: Cluster IDs, in the form "clustering_system_name:cluster_id"
+      items: {type: string}
+      examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
     distance:
       type: integer
       title: Traversal Distance
@@ -31,7 +19,7 @@ params:
 query: |
   LET node_ids = (
     FOR n IN djornl_node
-      FILTER n.cluster_I2 IN @cluster_i2_ids OR n.cluster_I4 IN @cluster_i4_ids OR n.cluster_I6 IN @cluster_i6_ids
+      FILTER n.clusters ANY IN @cluster_ids
       FOR node IN 0..@distance ANY n djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
         RETURN DISTINCT node._id

@@ -14,11 +14,14 @@ import importers.utils.config as config
 
 class DJORNL_Parser(object):
 
-    def config(self):
+    def config(self, value):
         if not hasattr(self, '_config'):
-            return self._configure()
+            self._configure()
 
-        return self._config
+        if value not in self._config:
+            raise KeyError(f'No such config value: {value}')
+
+        return self._config[value]
 
     def _configure(self):
 
@@ -43,15 +46,15 @@ class DJORNL_Parser(object):
 
         _CLUSTER_BASE = os.path.join(configuration['ROOT_DATA_PATH'], 'cluster_data')
         configuration['_CLUSTER_PATHS'] = {
-            'cluster_I2': os.path.join(
+            'markov_i2': os.path.join(
                 _CLUSTER_BASE,
                 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv'
             ),
-            'cluster_I4': os.path.join(
+            'markov_i4': os.path.join(
                 _CLUSTER_BASE,
                 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv'
             ),
-            'cluster_I6': os.path.join(
+            'markov_i6': os.path.join(
                 _CLUSTER_BASE,
                 'out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv'
             ),
@@ -74,10 +77,10 @@ class DJORNL_Parser(object):
         # dict of nodes, indexed by node ID (node1 and node2 from the file)
         node_ix = {}
         edges = []
-        node_name = self.config()['_NODE_NAME']
-        expected_col_count = self.config()['_EDGE_FILE_COL_COUNT']
+        node_name = self.config('_NODE_NAME')
+        expected_col_count = self.config('_EDGE_FILE_COL_COUNT')
 
-        with open(self.config()['_EDGE_PATH']) as fd:
+        with open(self.config('_EDGE_PATH')) as fd:
             csv_reader = csv.reader(fd, delimiter='\t')
             next(csv_reader, None)  # skip headers
             line_no = 1
@@ -102,6 +105,7 @@ class DJORNL_Parser(object):
                     'score': float(cols[2]),
                     'edge_type': edge_remap[edge_type],
                 })
+
         return {
             'nodes': [{'_key': n} for n in node_ix.keys()],
             'edges': edges,
@@ -111,8 +115,9 @@ class DJORNL_Parser(object):
         """Load node metadata"""
 
         nodes = []
-        expected_col_count = self.config()['_NODE_FILE_COL_COUNT']
-        with open(self.config()['_NODE_PATH']) as fd:
+        valid_node_types = ['gene', 'pheno']
+        expected_col_count = self.config('_NODE_FILE_COL_COUNT')
+        with open(self.config('_NODE_PATH')) as fd:
             csv_reader = csv.reader(fd, delimiter=',')
             next(csv_reader, None)  # skip headers
             line_no = 1
@@ -126,7 +131,7 @@ class DJORNL_Parser(object):
 
                 _key = cols[0]
                 node_type = cols[1]
-                if node_type != 'gene' and node_type != 'pheno':
+                if node_type not in valid_node_types:
                     raise RuntimeError(f"line {line_no}: invalid node type: {node_type}")
 
                 go_terms = [c.strip() for c in cols[10].split(',')] if len(cols[10]) else []
@@ -154,40 +159,53 @@ class DJORNL_Parser(object):
                     'user_notes': cols[19],
                 }
                 nodes.append(doc)
+
         return {'nodes': nodes}
 
     def load_cluster_data(self):
         """Annotate genes with cluster ID fields."""
-        nodes = []
-        cluster_paths = self.config()['_CLUSTER_PATHS']
+
+        # index of nodes
+        node_ix = {}
+
+        cluster_paths = self.config('_CLUSTER_PATHS')
         for (cluster_label, path) in cluster_paths.items():
             with open(path) as fd:
                 csv_reader = csv.reader(fd, delimiter='\t')
                 for row in csv_reader:
                     if len(row) > 1:
-                        # remove the 'Cluster' text
-                        cluster_id = row[0].replace('Cluster', '')
-                        gene_keys = row[1:]
-                        nodes += [
-                            {'_key': key, cluster_label: int(cluster_id)}
-                            for key in gene_keys
-                        ]
+                        # remove the 'Cluster' text and replace it with cluster_label
+                        cluster_id = cluster_label + ':' + row[0].replace('Cluster', '')
+
+                        node_keys = row[1:]
+                        for key in node_keys:
+                            if key not in node_ix:
+                                node_ix[key] = [cluster_id]
+                            elif cluster_id not in node_ix[key]:
+                                node_ix[key].append(cluster_id)
+
+        # gather a list of cluster IDs for each node
+        nodes = [{
+            '_key': key,
+            'clusters': cluster_data
+        } for (key, cluster_data) in node_ix.items()]
+
         return {'nodes': nodes}
 
     def save_dataset(self, dataset):
 
         if 'nodes' in dataset and len(dataset['nodes']) > 0:
-            self.save_docs(self.config()['_NODE_NAME'], dataset['nodes'])
+            self.save_docs(self.config('_NODE_NAME'), dataset['nodes'])
 
         if 'edges' in dataset and len(dataset['edges']) > 0:
-            self.save_docs(self.config()['_EDGE_NAME'], dataset['edges'])
+            self.save_docs(self.config('_EDGE_NAME'), dataset['edges'])
 
     def save_docs(self, coll_name, docs, on_dupe='update'):
 
         resp = requests.put(
-            self.config()['API_URL'] + '/api/v1/documents',
+            self.config('API_URL') + '/api/v1/documents',
             params={'collection': coll_name, 'on_duplicate': on_dupe},
-            headers={'Authorization': self.config()['AUTH_TOKEN']},
+            headers={'Authorization': self.config('AUTH_TOKEN')},
             data='\n'.join(json.dumps(d) for d in docs)
         )
         if not resp.ok:
@@ -202,3 +220,32 @@ class DJORNL_Parser(object):
         self.save_dataset(self.load_edges())
         self.save_dataset(self.load_node_metadata())
         self.save_dataset(self.load_cluster_data())
+
+    def check_data_delta(self):
+        edge_data = self.load_edges()
+        node_metadata = self.load_node_metadata()
+        clusters = self.load_cluster_data()
+
+        self.check_deltas(edge_data=edge_data, node_metadata=node_metadata, cluster_data=clusters)
+
+    def check_deltas(self, edge_data={}, node_metadata={}, cluster_data={}):
+
+        edge_nodes = set([e['_key'] for e in edge_data['nodes']])
+        node_metadata_nodes = set([e['_key'] for e in node_metadata['nodes']])
+        cluster_nodes = set([e['_key'] for e in cluster_data['nodes']])
+        all_nodes = edge_nodes.union(node_metadata_nodes).union(cluster_nodes)
+
+        # check all nodes in cluster_data have node_metadata
+        clstr_no_node_md_set = cluster_nodes.difference(node_metadata_nodes)
+        if clstr_no_node_md_set:
+            print({'clusters with no node metadata': clstr_no_node_md_set})
+
+        # check all nodes in the edge_data have node_metadata
+        edge_no_node_md_set = edge_nodes.difference(node_metadata_nodes)
+        if edge_no_node_md_set:
+            print({'edges with no node metadata': edge_no_node_md_set})
+
+        # count all edges
+        print("Dataset contains " + str(len(edge_data['edges'])) + " edges")
+        # count all nodes
+        print("Dataset contains " + str(len(all_nodes)) + " nodes")
