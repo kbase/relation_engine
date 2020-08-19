@@ -8,7 +8,8 @@ from jsonschema.exceptions import ValidationError
 
 from relation_engine_server.api_versions.api_v1 import api_v1
 from relation_engine_server.exceptions import MissingHeader, UnauthorizedAccess, InvalidParameters, NotFound
-from relation_engine_server.utils import arango_client, spec_loader
+from relation_engine_server.utils.spec_loader import SchemaNonexistent
+from relation_engine_server.utils import arango_client
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
@@ -64,14 +65,6 @@ def invalid_params(err):
     return (flask.jsonify(resp), 400)
 
 
-@app.errorhandler(spec_loader.CollectionNonexistent)
-@app.errorhandler(spec_loader.StoredQueryNonexistent)
-def view_does_not_exist(err):
-    """General error cases."""
-    resp = {'error': str(err), 'name': err.name}
-    return (flask.jsonify(resp), 400)
-
-
 @app.errorhandler(ValidationError)
 def validation_error(err):
     """Json Schema validation error."""
@@ -97,6 +90,20 @@ def unauthorized_access(err):
         },
     }
     return (flask.jsonify(resp), 403)
+
+
+@app.errorhandler(SchemaNonexistent)
+def schema_does_not_exist(err):
+    """General error cases."""
+    resp = {
+        'error': {
+            'message': 'Not found',
+            'status': 404,
+            'details': str(err),
+            'name': err.name,
+        }
+    }
+    return (flask.jsonify(resp), 404)
 
 
 @app.errorhandler(NotFound)

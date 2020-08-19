@@ -7,7 +7,6 @@ import unittest
 import requests
 import json
 import os
-
 from relation_engine_server.utils.config import get_config
 from relation_engine_server.utils.wait_for import wait_for_api
 
@@ -62,6 +61,39 @@ class TestApi(unittest.TestCase):
     def setUpClass(cls):
         wait_for_api()
 
+    def test_request(self, url=None, params=None, data=None, headers=None, method='get',
+                     status_code=200, resp_json=None, resp_test=None):
+        '''test a get request to the server
+
+        arguments:
+            url             url to be appended to API_URL (i.e. request will be made to API_URL + url)
+            params          request parameters
+            method          HTTP method; defaults to 'get'
+            status_code     expected response status; defaults to 200
+            resp_json       expected response content (JSON)
+            resp_test       a function to perform on the response to test it is as expected
+        '''
+
+        if url is None:
+            self.skipTest('No arguments provided')
+
+        resp = requests.request(
+            method,
+            API_URL + url,
+            params=params,
+            data=data,
+            headers=headers,
+        )
+        self.assertEqual(resp.status_code, status_code)
+        if resp_json:
+            self.assertEqual(
+                resp_json,
+                resp.json()
+            )
+
+        if resp_test:
+            resp_test(self, resp)
+
     def test_root(self):
         """Test root path for api."""
         resp = requests.get(URL + '/').json()
@@ -104,57 +136,248 @@ class TestApi(unittest.TestCase):
             ('expired', 'created', 'last_version')
         })
 
-    def test_list_stored_queries(self):
-        """Test the listing out of saved AQL stored queries."""
-        resp = requests.get(API_URL + '/specs/stored_queries').json()
-        for sq in ['fetch_test_vertex', 'list_test_vertices', 'ncbi_fetch_taxon']:
-            self.assertIn(sq, resp)
+    def check_list_contains(self, the_list, must_contain):
+        '''ensure the_list contains the items in must_contain'''
+        for item in must_contain:
+            self.assertIn(item, the_list)
 
     def test_list_collections(self):
         """Test the listing out of registered collection schemas for vertices and edges."""
         for variant in ['schemas', 'collections']:
-            resp = requests.get(API_URL + '/specs/' + variant).json()
-            self.assertTrue(len(resp))
-            for coll in ['test_edge', 'test_vertex', 'ncbi_taxon']:
-                self.assertIn(coll, resp)
 
-    def test_fetch_schema_for_doc(self):
-        """Given a document ID, fetch its schema."""
+            def check_resp_json_contains(self, resp):
+                resp_json = resp.json()
+                self.check_list_contains(resp_json, ['test_edge', 'test_vertex', 'ncbi_taxon'])
+
+            self.test_request(
+                '/specs/' + variant,
+                resp_test=check_resp_json_contains
+            )
+
+    def test_list_data_sources(self):
+        """test the data source listing endpoints"""
+
+        # there are two different data_sources endpoints that return very similar results
+        # /data_sources is used by the UI and requires slightly different response formatting
+        # /specs/data_sources is in the standard /specs format used by collections and stored_queries
+
+        data_sources = ['djornl', 'envo_ontology', 'go_ontology', 'gtdb', 'ncbi_taxonomy', 'rdp_taxonomy']
+
+        # /spec/data_sources endpoint
+        def check_resp_json_spec_endpoint(self, resp):
+            resp_json = resp.json()
+            self.check_list_contains(
+                resp_json,
+                data_sources,
+            )
+
+        self.test_request(
+            '/specs/data_sources',
+            resp_test=check_resp_json_spec_endpoint
+        )
+
+    def test_list_stored_queries(self):
+        """Test the listing out of saved AQL stored queries."""
+
+        def check_resp_json_contains(self, resp):
+            resp_json = resp.json()
+            self.check_list_contains(
+                resp_json,
+                ['fetch_test_vertex', 'list_test_vertices', 'ncbi_fetch_taxon']
+            )
+
+        self.test_request(
+            '/specs/stored_queries',
+            resp_test=check_resp_json_contains,
+        )
+
+    def test_fetch_collection_and_fetch_schema_for_doc(self):
+        """Given a collection name or a document ID, fetch its schema."""
+
+        name = 'test_vertex'
+        collection_params = {'name': name}  # valid collection
+        document_params = {'doc_id': name + '/123'}  # valid document
+
+        def check_resp_json(self, resp):
+            resp_json = resp.json()
+            self.assertEqual(resp_json['name'], name)
+            self.assertEqual(resp_json['type'], 'vertex')
+            self.assertTrue(resp_json['schema'])
 
         for variant in ['schemas', 'collections']:
-            resp = requests.get(
-                API_URL + '/specs/' + variant,
-                params={'doc_id': 'test_vertex/123'}
-            ).json()
-            self.assertEqual(resp['name'], 'test_vertex')
-            self.assertEqual(resp['type'], 'vertex')
-            self.assertTrue(resp['schema'])
+            for params in [document_params, collection_params]:
+                self.test_request(
+                    '/specs/' + variant,
+                    params=params,
+                    resp_test=check_resp_json,
+                )
 
-    def test_fetch_invalid_collections(self):
-        """Test the case where the collection/schema does not exist."""
+    def test_fetch_data_source(self):
+        '''fetch a data source by name'''
+
+        name = 'ncbi_taxonomy'
+
+        def check_resp_json(self, resp):
+            resp_json = resp.json()
+            self.assertEqual(type(resp_json), dict)
+            self.assertEqual(set(resp_json.keys()), {
+                'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
+            })
+            self.assertTrue(
+                '/ui-assets/images/third-party-data-sources/ncbi' in resp_json['logo_url']
+            )
+
+        self.test_request(
+            '/specs/data_sources',
+            {'name': name},
+            resp_test=check_resp_json
+        )
+
+    def test_fetch_stored_query(self):
+        '''fetch a stored query by name'''
+
+        name = 'fetch_test_vertex'
+
+        # note that the stored_queries endpoint returns the query data in a dict
+        # under the key 'stored_query'
+        def check_resp_json(self, resp):
+            resp_json = resp.json()
+            self.assertEqual(type(resp_json['stored_query']), dict)
+            self.assertEqual(resp_json['stored_query']['name'], name)
+            self.assertEqual(set(resp_json['stored_query'].keys()), {
+                'name', 'query', 'params'
+            })
+
+        self.test_request(
+            '/specs/stored_queries',
+            {'name': name},
+            resp_test=check_resp_json
+        )
+
+    def test_fetch_invalid_data_source(self):
+        """Unknown data source name should yield 404 status."""
+
+        name = 'invalid_data_source'
+        self.test_request(
+            '/specs/data_sources',
+            {'name': name},
+            status_code=404,
+            resp_json={
+                'error': {
+                    'status': 404,
+                    'message': 'Not found',
+                    'details': f"Data source '{name}' does not exist.",
+                    'name': name,
+                }
+            }
+        )
+
+    def test_fetch_invalid_collections_and_documents(self):
+        """Test the case where the collection or document does not exist."""
+
+        name = 'fake_collection'
+        collection_params = {'name': name}  # fetch an invalid collection
+        document_params = {'doc_id': name + '/123'}  # fetch an invalid document
         for variant in ['schemas', 'collections']:
-            resp = requests.get(
-                API_URL + '/specs/' + variant,
-                params={'name': 'xyzabc'},
-            ).json()
-            self.assertEqual(resp['error'], 'Collection does not exist.')
+            for params in [document_params, collection_params]:
 
-    def test_fetch_invalid_documents(self):
-        """Test the case where the collection/schema does not exist."""
-        for variant in ['schemas', 'collections']:
-            resp = requests.get(
-                API_URL + '/specs/' + variant,
-                params={'doc_id': 'fake_collection/123'},
-            ).json()
-            self.assertEqual(resp['error'], 'Collection does not exist.')
+                self.test_request(
+                    '/specs/' + variant,
+                    params=params,
+                    status_code=404,
+                    resp_json={
+                        'error': {
+                            'status': 404,
+                            'message': 'Not found',
+                            'details': f"Collection '{name}' does not exist.",
+                            'name': name,
+                        }
+                    }
+                )
 
-    def test_fetch_invalid_queries(self):
+    def test_fetch_invalid_stored_queries(self):
         """Test the case where the stored query does not exist."""
-        resp = requests.get(
-            API_URL + '/specs/stored_queries',
-            params={'name': 'xyzabc'},
-        ).json()
-        self.assertEqual(resp['error'], 'Stored query does not exist.')
+
+        name = 'made_up_stored_query'
+        self.test_request(
+            '/specs/stored_queries',
+            params={'name': name},
+            status_code=404,
+            resp_json={
+                'error': {
+                    'status': 404,
+                    'message': 'Not found',
+                    'details': f"Stored query '{name}' does not exist.",
+                    'name': name,
+                }
+            }
+        )
+
+    def test_show_data_sources(self):
+        resp = requests.get(API_URL + '/data_sources')
+        self.assertTrue(resp.ok)
+        resp_json = resp.json()
+        self.assertTrue(len(resp_json['data_sources']) > 0)
+        self.assertEqual(set(type(x) for x in resp_json['data_sources']), {str})
+
+    def test_show_data_source(self):
+
+        name = 'ncbi_taxonomy'
+
+        def check_resp_json(self, resp):
+            resp_json = resp.json()
+            self.assertEqual(type(resp_json['data_source']), dict)
+            self.assertEqual(set(resp_json['data_source'].keys()), {
+                'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
+            })
+            self.assertTrue(
+                '/ui-assets/images/third-party-data-sources/ncbi' in resp_json['data_source']['logo_url']
+            )
+
+        self.test_request(
+            '/data_sources/' + name,
+            resp_test=check_resp_json
+        )
+
+        resp = requests.get(API_URL + '/data_sources/ncbi_taxonomy')
+        self.assertTrue(resp.ok)
+        resp_json = resp.json()
+        self.assertEqual(type(resp_json['data_source']), dict)
+        self.assertEqual(set(resp_json['data_source'].keys()), {
+            'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
+        })
+        self.assertTrue(
+            '/ui-assets/images/third-party-data-sources/ncbi' in resp_json['data_source']['logo_url']
+        )
+
+    def test_show_data_source_unknown(self):
+        """Unknown data source name should yield 404 status."""
+        name = 'xyzyxz'
+
+        self.test_request(
+            f"/data_sources/{name}",
+            status_code=404,
+            resp_json={
+                'error': {
+                    'status': 404,
+                    'message': 'Not found',
+                    'details': f"Data source '{name}' does not exist.",
+                    'name': name,
+                }
+            }
+        )
+
+        resp = requests.get(f"{API_URL}/data_sources/{name}")
+        self.assertEqual(resp.status_code, 404)
+        resp_json = resp.json()
+        self.assertEqual(resp_json, {
+            'error': {
+                'message': 'Not found',
+                'status': 404,
+                'name': name,
+                'details': f"Data source '{name}' does not exist.",
+            }
+        })
 
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
@@ -196,13 +419,24 @@ class TestApi(unittest.TestCase):
 
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
-        resp = requests.put(
-            API_URL + '/documents',
-            params={'collection': 'xyzabc'},
+
+        name = 'fake_collection'
+        self.test_request(
+            '/documents',
+            method='put',
+            params={'collection': name},
             data='',
-            headers=HEADERS_ADMIN
-        ).json()
-        self.assertTrue('Collection does not exist' in resp['error'])
+            headers=HEADERS_ADMIN,
+            status_code=404,
+            resp_json={
+                'error': {
+                    'status': 404,
+                    'message': 'Not found',
+                    'details': f"Collection '{name}' does not exist.",
+                    'name': name,
+                }
+            }
+        )
 
     def test_save_documents_invalid_json(self):
         """Test an attempt to save documents with an invalid JSON body."""
@@ -362,12 +596,22 @@ class TestApi(unittest.TestCase):
 
     def test_query_no_name(self):
         """Test a query error with a stored query name that does not exist."""
-        resp = requests.post(
-            API_URL + '/query_results',
-            params={'stored_query': 'nonexistent'}
-        ).json()
-        self.assertEqual(resp['error'], 'Stored query does not exist.')
-        self.assertEqual(resp['name'], 'nonexistent')
+
+        name = 'nonexistent'
+        self.test_request(
+            '/query_results',
+            method='post',
+            params={'stored_query': name},
+            status_code=404,
+            resp_json={
+                'error': {
+                    'status': 404,
+                    'message': 'Not found',
+                    'details': f"Stored query '{name}' does not exist.",
+                    'name': name,
+                }
+            }
+        )
 
     def test_query_missing_bind_var(self):
         """Test a query error with a missing bind variable."""
@@ -442,6 +686,7 @@ class TestApi(unittest.TestCase):
             data='{"name": "requires_auth", "_key": "1", "ws_id": 99}',
             headers=HEADERS_ADMIN
         )
+
         resp = requests.post(
             API_URL + '/query_results',
             params={'view': 'list_test_vertices'},
@@ -480,37 +725,3 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         resp_json = resp.json()
         self.assertEqual(resp_json['errors'], 1)
-
-    def test_list_data_sources(self):
-        resp = requests.get(API_URL + '/data_sources')
-        self.assertTrue(resp.ok)
-        resp_json = resp.json()
-        self.assertTrue(len(resp_json['data_sources']) > 0)
-        self.assertEqual(set(type(x) for x in resp_json['data_sources']), {str})
-
-    def test_show_data_source(self):
-        resp = requests.get(API_URL + '/data_sources/ncbi_taxonomy')
-        self.assertTrue(resp.ok)
-        resp_json = resp.json()
-        self.assertEqual(type(resp_json['data_source']), dict)
-        self.assertEqual(set(resp_json['data_source'].keys()), {
-            'name', 'category', 'title', 'home_url', 'data_url', 'logo_url'
-        })
-        self.assertTrue(
-            '/ui-assets/images/third-party-data-sources/ncbi' in resp_json['data_source']['logo_url']
-        )
-
-    def test_show_data_source_unknown(self):
-        """Unknown data source name should yield 404 status."""
-        name = 'xyzyxz'
-        resp = requests.get(f"{API_URL}/data_sources/{name}")
-        self.assertEqual(resp.status_code, 404)
-        resp_json = resp.json()
-        # Just assert that it returns any json in the body
-        self.assertEqual(resp_json, {
-            'error': {
-                'message': 'Not found',
-                'status': 404,
-                'details': f"The data source with name '{name}' does not exist.",
-            }
-        })

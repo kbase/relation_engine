@@ -6,8 +6,7 @@ import os.path as os_path
 import json
 import yaml
 from relation_engine_server.utils.json_validation import run_validator
-from jsonschema.exceptions import ValidationError
-from jsonschema.exceptions import RefResolutionError
+from jsonschema.exceptions import ValidationError, RefResolutionError
 from jsonpointer import JsonPointerException
 
 

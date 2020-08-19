@@ -2,7 +2,6 @@ import flask
 from relation_engine_server.utils import (
     arango_client,
     spec_loader,
-    load_data_sources,
     auth,
     bulk_import,
     pull_spec,
@@ -15,16 +14,29 @@ from relation_engine_server.exceptions import InvalidParameters
 api_v1 = flask.Blueprint('api_v1', __name__)
 
 
-@api_v1.route("/data_sources", methods=["GET"])
+@api_v1.route("/data_sources", methods=['GET'])
 def list_data_sources():
-    data_sources = load_data_sources.list_all()
+    # note the custom response format is used by the frontend, so this endpoint is provided
+    # in addition to the /specs/data_sources endpoint
+
+    data_sources = spec_loader.get_names('data_sources')
     return flask.jsonify({'data_sources': data_sources})
 
 
-@api_v1.route("/data_sources/<name>", methods=["GET"])
-def show_data_source(name):
-    data_source = load_data_sources.fetch_one(name)
+@api_v1.route("/data_sources/<name>", methods=['GET'])
+def fetch_data_source(name):
+
+    data_source = spec_loader.get_schema('data_source', name)
     return flask.jsonify({'data_source': data_source})
+
+
+@api_v1.route('/specs/data_sources', methods=['GET'])
+def show_data_sources():
+    """Show the current data sources loaded from the spec."""
+    name = flask.request.args.get('name')
+    if name:
+        return flask.jsonify(spec_loader.get_schema('data_source', name))
+    return flask.jsonify(spec_loader.get_names('data_sources'))
 
 
 @api_v1.route('/specs/stored_queries', methods=['GET'])
@@ -32,8 +44,8 @@ def show_stored_queries():
     """Show the current stored query names loaded from the spec."""
     name = flask.request.args.get('name')
     if name:
-        return {'stored_query': spec_loader.get_stored_query(name)}
-    return flask.jsonify(spec_loader.get_stored_query_names())
+        return flask.jsonify({'stored_query': spec_loader.get_schema('stored_query', name)})
+    return flask.jsonify(spec_loader.get_names('stored_query'))
 
 
 @api_v1.route('/specs/collections', methods=['GET'])
@@ -43,11 +55,11 @@ def show_collections():
     name = flask.request.args.get('name')
     doc_id = flask.request.args.get('doc_id')
     if name:
-        return flask.jsonify(spec_loader.get_collection(name))
+        return flask.jsonify(spec_loader.get_schema('collection', name))
     elif doc_id:
         return flask.jsonify(spec_loader.get_schema_for_doc(doc_id))
     else:
-        return flask.jsonify(spec_loader.get_collection_names())
+        return flask.jsonify(spec_loader.get_names('collection'))
 
 
 @api_v1.route('/query_results', methods=['POST'])
@@ -70,7 +82,6 @@ def run_query():
     if 'query' in json_body:
         # Run an adhoc query for a sysadmin
         auth.require_auth_token(roles=['RE_ADMIN'])
-        query_text = json_body['query']
         query_text = _preprocess_stored_query(json_body['query'], json_body)
         del json_body['query']
         json_body['ws_ids'] = ws_ids
