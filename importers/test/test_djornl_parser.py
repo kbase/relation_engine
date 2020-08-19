@@ -9,7 +9,6 @@ import unittest
 import os
 
 from importers.djornl.parser import DJORNL_Parser
-
 from spec.test.helpers import modified_environ
 
 _TEST_DIR = '/app/spec/test'
@@ -24,13 +23,28 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with open(results_file) as fh:
             cls.json_data = json.load(fh)
 
+        cls.maxDiff = None
+
     def init_parser_with_path(self, root_path):
 
         with modified_environ(RES_ROOT_DATA_PATH=root_path):
             parser = DJORNL_Parser()
             # ensure that the configuration has been set
-            parser.config()
+            parser._configure()
             return parser
+
+    def test_load_invalid_file(self):
+        """ test loading when what is supposed to be a file is actually a directory """
+
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'invalid_file')
+
+        # edges: directory, not a file
+        edges_file_path = os.path.join(RES_ROOT_DATA_PATH, "merged_edges-AMW-060820_AF.tsv")
+        err_str = f"Is a directory: '{edges_file_path}'"
+        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
+        with self.assertRaisesRegex(IsADirectoryError, err_str):
+            parser.load_edges()
 
     def test_load_empty_files(self):
         """ test loading files containing no data """
@@ -100,33 +114,38 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        self.maxDiff = None
-
         edge_data = parser.load_edges()
-        self.assertEqual(
-            edge_data,
-            self.json_data["load_edges"]
-        )
+        expected = self.json_data["load_edges"]
+
+        for data_structure in [edge_data, expected]:
+            for k in data_structure.keys():
+                data_structure[k] = sorted(data_structure[k], key=lambda n: n['_key'])
+
+        self.assertEqual(edge_data, expected)
 
     def test_load_valid_node_metadata(self):
 
-        self.maxDiff = None
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
         node_metadata = parser.load_node_metadata()
-        self.assertEqual(
-            node_metadata,
-            self.json_data["load_node_metadata"]
-        )
+        expected = self.json_data["load_node_metadata"]
+
+        for data_structure in [node_metadata, expected]:
+            for k in data_structure.keys():
+                data_structure[k] = sorted(data_structure[k], key=lambda n: n['_key'])
+                data_structure[k] = [n['_key'] for n in data_structure[k]]
+
+        self.assertEqual(node_metadata, expected)
 
     def test_load_valid_cluster_data(self):
 
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
-
         cluster_data = parser.load_cluster_data()
         self.assertEqual(
             cluster_data,
             self.json_data["load_cluster_data"]
         )
+
+        parser.check_data_delta()

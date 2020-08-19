@@ -2,6 +2,10 @@ name: djornl_node
 type: vertex
 delta: false
 
+indexes:
+ - type: hash
+   fields: ["clusters[*]"]
+
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   title: Gene and Phenotype Vertices
@@ -13,21 +17,15 @@ schema:
       type: string
       title: Key
       examples: ["AT1G01010"]
-    cluster_I2:
-      type: integer
-      title: Cluster 2 ID
-      description: Iterative random forest cluster group ID
-      examples: [1]
-    cluster_I4:
-      type: integer
-      title: Cluster 4 ID
-      description: Iterative random forest cluster group ID
-      examples: [13]
-    cluster_I6:
-      type: integer
-      title: Cluster 6 ID
-      description: Iterative random forest cluster group ID
-      examples: [27]
+    clusters:
+      type: array
+      title: Clusters
+      description: Clusters to which the node has been assigned
+      items:
+        type: string
+        format: regex
+        pattern: ^\w+:\d+$
+      examples: [["markov_i2:1", "markov_i4:5"], ["markov_i6:3"]]
     node_type:
       type: string
       title: Node type
