@@ -33,15 +33,20 @@ schema:
       type: string
       oneOf:
         - const: domain_co_occur
+          title: AraNetv2-DC_domain-co-occurrence
           description: A layer of protein domain co-occurrence values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from weighted mutual information scores to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
         - const: gene_coexpr
+          title: AraNetv2-CX_pairwise-gene-coexpression
           description: A subset of pairwise gene coexpression values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were
             calculated from Pearson correlation coefficients to normalize the data
             for comparison across studies and different types of data layers (Lee et
             al, 2015).
         - const: pheno_assn
+          title: AraGWAS-Phenotype_Associations
           description: GWAS associations produced by analyzing a subset of phenotypes and SNPs in the Arabidopsis 1001 Genomes database. Edge values are significant association scores after FDR correction.
         - const: ppi_hithru
+          title: AraNetv2-HT_high-throughput-ppi
           description: Log likelihood score. A layer of protein-protein interaction values derived from four high-throughput PPI screening experiments; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
         - const: ppi_liter
+          title: AraNetv2-LC_lit-curated-ppi
           description: A layer of protein-protein interaction values from literature-curated small- to medium-scale experimental data; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).

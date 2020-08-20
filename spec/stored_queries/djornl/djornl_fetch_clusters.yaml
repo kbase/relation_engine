@@ -5,6 +5,7 @@ params:
   required: [cluster_ids]
   properties:
     cluster_ids:
+      type: array
       title: Cluster IDs
       description: Cluster IDs, in the form "clustering_system_name:cluster_id"
       items: {type: string}

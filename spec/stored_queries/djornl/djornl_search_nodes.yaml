@@ -19,15 +19,15 @@ query: |
   LET node_ids = (
     FOR g IN djornl_node_view
         SEARCH ANALYZER(
-            PHRASE(g.tair_computational_desc, @search_text) OR
-            PHRASE(g.tair_short_desc, @search_text) OR
-            PHRASE(g.mapman_desc, @search_text) OR
-            PHRASE(g.go_desc, @search_text) OR
+            PHRASE(g.tair_computational_description, @search_text) OR
+            PHRASE(g.tair_short_description, @search_text) OR
+            PHRASE(g.mapman_description, @search_text) OR
+            PHRASE(g.go_description, @search_text) OR
             PHRASE(g.mapman_name, @search_text) OR
-            PHRASE(g.mapman_desc, @search_text) OR
-            PHRASE(g.pheno_desc1, @search_text) OR
-            PHRASE(g.pheno_desc2, @search_text) OR
-            PHRASE(g.pheno_desc3, @search_text) OR
+            PHRASE(g.mapman_description, @search_text) OR
+            PHRASE(g.pheno_description, @search_text) OR
+            PHRASE(g.pheno_pto_name, @search_text) OR
+            PHRASE(g.pheno_pto_description, @search_text) OR
             PHRASE(g.user_notes, @search_text),
             'text_en'
         )

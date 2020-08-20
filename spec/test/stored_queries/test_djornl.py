@@ -40,8 +40,8 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
         root_path = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         with modified_environ(RES_ROOT_DATA_PATH=root_path):
             parser = DJORNL_Parser()
-            node_name = parser.config('_NODE_NAME')
-            edge_name = parser.config('_EDGE_NAME')
+            node_name = parser.config('node_name')
+            edge_name = parser.config('edge_name')
 
             edge_data = parser.load_edges()
             r = create_test_docs(node_name, edge_data['nodes'])

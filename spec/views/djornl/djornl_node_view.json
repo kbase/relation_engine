@@ -19,19 +19,19 @@
       ],
       "fields": {
         "transcript": {},
-        "tair_computational_desc": {
+        "tair_computational_description": {
           "analyzers": [
             "text_en"
           ]
         },
-        "tair_short_desc": {
+        "tair_short_description": {
           "analyzers": [
             "text_en"
           ]
         },
         "gene_model_type": {},
         "go_terms": {},
-        "go_desc": {
+        "go_description": {
           "analyzers": [
             "text_en"
           ]
@@ -41,22 +41,22 @@
             "text_en"
           ]
         },
-        "mapman_desc": {
+        "mapman_description": {
           "analyzers": [
             "text_en"
           ]
         },
-        "pheno_desc1": {
+        "pheno_description": {
           "analyzers": [
             "text_en"
           ]
         },
-        "pheno_desc2": {
+        "pheno_pto_name": {
           "analyzers": [
             "text_en"
           ]
         },
-        "pheno_desc3": {
+        "pheno_pto_description": {
           "analyzers": [
             "text_en"
           ]

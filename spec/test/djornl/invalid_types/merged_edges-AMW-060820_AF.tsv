@@ -1,3 +1,4 @@
+# data_type: edge
 node1	node2	edge	edge_descrip	layer_descrip
 As2	AT1G01020	8.422046084731258	AraGWAS-Association_score	AraGWAS-Some-Old-Rubbish-I-Made-Up
 As2	AT1G01040	5.422046084731258	AraGWAS-Association_score	AraGWAS-Phenotype_Associations

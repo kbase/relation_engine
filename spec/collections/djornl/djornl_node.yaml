@@ -46,7 +46,7 @@ schema:
       type: string
       title: Gene model type
       examples: ["protein_coding"]
-    tair_computational_desc:
+    tair_computational_description:
       type: string
       title: TAIR computational description
       examples: ["NAC domain containing protein 1;(source:Araport11)"]
@@ -54,11 +54,11 @@ schema:
       type: string
       title: TAIR curator summary
       examples: ["Encodes a plasma membrane-localized amino acid transporter likely involved in amino acid export in the developing seed."]
-    tair_short_desc:
+    tair_short_description:
       type: string
       title: TAIR short description
       examples: ["NAC domain containing protein 1"]
-    go_descr:
+    go_description:
       type: string
       title: GO descriptions
       examples: ["DNA-binding transcription factor activity"]
@@ -75,7 +75,7 @@ schema:
       type: string
       title: Mapman name
       examples: [".RNA biosynthesis.transcriptional regulation.transcription factor (NAC)"]
-    mapman_desc:
+    mapman_description:
       type: string
       title: Mapman description
       examples: ["transcription factor (NAC) (original description: pep chromosome:TAIR10:1:3631:5899:1 gene:AT1G01010 transcript:AT1G01010.1 gene_biotype:protein_coding transcript_biotype:protein_coding gene_symbol:NAC001 description:NAC domain-containing protein 1 [Source:UniProtKB/Swiss-Prot;Acc:Q0WV96])"]
@@ -83,17 +83,19 @@ schema:
       type: string
       title: AraGWAS ID
       examples: ["10.21958/phenotype:67"]
-    pheno_desc1:
+    pheno_description:
       type: string
-      title: Phenotype description 1
+      title: Phenotype description
       examples: ["Arsenic concentrations in leaves, grown in soil. Elemental analysis was performed with an ICP-MS (PerkinElmer). Sample normalized to calculated weights as described in Baxter et al., 2008"]
-    pheno_desc2:
+    pheno_pto_name:
       type: string
       title: PTO name
+      description: Plant Trait Ontology name
       examples: ["arsenic concentration"]
-    pheno_desc3:
+    pheno_pto_description:
       type: string
       title: PTO description
+      description: Plant Trait Ontology description
       examples: ["A mineral and ion content related trait (TO:0000465) which is the concentration of arsenic (CHEBI:22632) in some plant structure (PO:0009011). [GR:Karthik]"]
     pheno_ref:
       type: string

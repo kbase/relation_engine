@@ -1,0 +1,39 @@
+# node file has no format specified, so the path must be parsed
+name: Dan Jacobson Exascale data
+release_date: "2020-08-06"
+description: Preliminary Jacobson dataset
+file_list:
+  - data_type: edge
+    path: merged_edges-AMW-060820_AF.tsv
+    file_format: tsv
+    description: Merged edge data. AraGWAS phenotype-GWAS layer has an FDR filter was applied, removing some of the edges. The Aranetv2 coexpression layer network contains the top (highest log-likelihood scores) 15% coexpression edges to compensate for the decreased network size of the phenotype-GWAS layer.
+    date_created: "2020-06-08"
+
+  - data_type: node
+    path: nodes.csv
+    description: Merged AraNet AraGWAS gene and phenotype data
+    date_created: "2019-09-13"
+
+  - data_type: cluster
+    cluster_prefix: markov_i2
+    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv
+    file_format: tsv
+    title: Markov clustering, inflation 2
+    description: Iterative random forest Markov clustering, inflation set to 2
+    date_created: "2019-08-19"
+
+  - data_type: cluster
+    cluster_prefix: markov_i4
+    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv
+    file_format: tsv
+    title: Markov clustering, inflation 4
+    description: Iterative random forest Markov clustering, inflation set to 4
+    date_created: "2019-08-19"
+
+  - data_type: cluster
+    cluster_prefix: markov_i6
+    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv
+    file_format: tsv
+    title: Markov clustering, inflation 6
+    description: Iterative random forest Markov clustering, inflation set to 6
+    date_created: "2019-08-19"

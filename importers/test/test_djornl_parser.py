@@ -33,18 +33,29 @@ class Test_DJORNL_Parser(unittest.TestCase):
             parser._configure()
             return parser
 
+    def test_load_no_manifest(self):
+        """ test loading when the manifest does not exist """
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'no_manifest')
+        err_str = 'No manifest file found at ' + os.path.join(RES_ROOT_DATA_PATH, 'manifest.yaml')
+        with self.assertRaisesRegex(RuntimeError, err_str):
+            self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
+    def test_load_invalid_manifest(self):
+        """ test an invalid manifest file """
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'invalid_manifest')
+        err_str = "The manifest file failed validation"
+        with self.assertRaisesRegex(RuntimeError, err_str):
+            self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
     def test_load_invalid_file(self):
         """ test loading when what is supposed to be a file is actually a directory """
 
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'invalid_file')
 
         # edges: directory, not a file
-        edges_file_path = os.path.join(RES_ROOT_DATA_PATH, "merged_edges-AMW-060820_AF.tsv")
-        err_str = f"Is a directory: '{edges_file_path}'"
-        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
-
-        with self.assertRaisesRegex(IsADirectoryError, err_str):
-            parser.load_edges()
+        err_str = os.path.join(RES_ROOT_DATA_PATH, "edges.tsv") + ": not a file"
+        with self.assertRaisesRegex(RuntimeError, err_str):
+            self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_empty_files(self):
         """ test loading files containing no data """
@@ -60,20 +71,11 @@ class Test_DJORNL_Parser(unittest.TestCase):
     def test_load_missing_files(self):
         """ test loading when files cannot be found """
 
-        # this dir does not contain the correct file structure
-        # path: test/djornl/empty_files/cluster_data
-        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'empty_files', 'cluster_data')
-        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
-
-        err_str = "No such file or directory: '" + RES_ROOT_DATA_PATH
-        with self.assertRaisesRegex(FileNotFoundError, err_str):
-            parser.load_edges()
-
-        with self.assertRaisesRegex(FileNotFoundError, err_str):
-            parser.load_node_metadata()
-
-        with self.assertRaisesRegex(FileNotFoundError, err_str):
-            parser.load_cluster_data()
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_files')
+        # not found
+        err_str = os.path.join(RES_ROOT_DATA_PATH, "edges.tsv") + ': file does not exist'
+        with self.assertRaisesRegex(RuntimeError, err_str):
+            self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_invalid_types(self):
         """ test file format errors """
@@ -83,12 +85,12 @@ class Test_DJORNL_Parser(unittest.TestCase):
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
         # invalid edge type
-        edge_err_msg = 'line 2: invalid edge type: AraGWAS-Some-Old-Rubbish-I-Made-Up'
+        edge_err_msg = 'merged_edges-AMW-060820_AF.tsv line 3: invalid edge type: AraGWAS-Some-Old-Rubbish-I-Made-Up'
         with self.assertRaisesRegex(RuntimeError, edge_err_msg):
             parser.load_edges()
 
         # invalid node type
-        node_err_msg = 'line 4: invalid node type: Monkey'
+        node_err_msg = 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv line 5: invalid node type: Monkey'
         with self.assertRaisesRegex(RuntimeError, node_err_msg):
             parser.load_node_metadata()
 
