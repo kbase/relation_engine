@@ -13,3 +13,7 @@ These specifications are used by the [Relation Engine API](relation_engine_serve
 ### `relation_engine_server/`
 
 The relation engine server (`relation_engine_server/`) is a simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
+
+## Relation Engine builds
+
+The Relation Engine is available on dockerhub as `kbase/relation_engine_api`. Automated builds are performed whenever there is a new push to `master` or `develop`.
