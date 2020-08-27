@@ -11,7 +11,7 @@ import csv
 import yaml
 
 import importers.utils.config as config
-from relation_engine_server.utils.json_validation import run_validator
+from relation_engine_server.utils.json_validation import run_validator, get_schema_validator
 
 
 class DJORNL_Parser(object):
@@ -62,7 +62,15 @@ class DJORNL_Parser(object):
 
     def _get_manifest_schema_file(self):
 
-        return os.path.join('/app', 'spec', 'datasets', 'djornl', 'manifest.schema.json')
+        return os.path.join(self._get_dataset_schema_dir(), 'manifest.schema.json')
+
+    def _get_dataset_schema_dir(self):
+
+        if not hasattr(self, '_dataset_schema_dir'):
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            self._dataset_schema_dir = os.path.join(dir_path, '../', '../', 'spec', 'datasets', 'djornl')
+
+        return self._dataset_schema_dir
 
     def _get_manifest(self, configuration):
         """
@@ -81,8 +89,8 @@ class DJORNL_Parser(object):
         except FileNotFoundError:
             raise RuntimeError(
                 f"No manifest file found at {manifest_file}.\n"
-                + "Please ensure that you have created a manifest that lists the files "
-                + "in the release"
+                "Please ensure that you have created a manifest that lists the files "
+                "in the release"
             )
 
         try:
@@ -109,205 +117,282 @@ class DJORNL_Parser(object):
     def parser_gen(self, file):
         """generator function to parse a file"""
         expected_col_count = 0
-        with open(file['file_path']) as fd:
+        with open(file['file_path'], newline='') as fd:
             csv_reader = self._get_file_reader(fd, file)
             line_no = 0
             for row in csv_reader:
                 line_no += 1
-                if len(row) <= 1 or row[0][0] == '#':
+                if not len(row) or row[0][0] == '#':
                     # comment / metadata
                     continue
 
                 cols = [c.strip() for c in row]
 
                 if len(cols) == expected_col_count:
-                    yield (line_no, cols)
+                    yield (line_no, cols, None)
                     continue
 
                 # if we didn't get the expected number of cols:
                 if expected_col_count == 0:
                     # this is the header row; set up the expected column count
                     expected_col_count = len(cols)
-                    yield (line_no, [c.lower() for c in cols])
+                    yield (line_no, [c.lower() for c in cols], None)
                     continue
 
                 # otherwise, this row does not have the correct number of columns
-                n_cols = len(cols)
-                raise RuntimeError(
-                    f"{file['path']} line {line_no}: "
-                    + f"expected {expected_col_count} cols, found {n_cols}"
-                )
+                col_count = len(cols)
+                msg = f"expected {expected_col_count} cols, found {col_count}"
+                yield(line_no, None, f"{file['path']} line {line_no}: {msg}")
+
+    def remap_object(self, raw_data, remap_functions):
+        """ Given a dict, raw_data, create a new dict, remapped_data, using the functions in the
+        dictionary `remap_functions`. """
+        remapped_data = {}
+        for (key, function) in remap_functions.items():
+            # these keys get copied over unchanged to the new object if they exist in the input obj
+            if function is None:
+                if key in raw_data:
+                    remapped_data[key] = raw_data[key]
+            else:
+                remapped_data[key] = function(raw_data)
+
+        return remapped_data
+
+    def process_file(self, file, remap_fn, store_fn, err_list, validator=None):
+        """ process an input file to generate a dataset and possibly an error list
+
+        Each valid line in the file is turned into a dictionary using the header row, and then
+        validated against the csv validation schema in spec/datasets/djornl/csv_<file_type>.
+        If that completes successfully, it is transformed using the functions in the dictionary
+        `remap_fn`, checked for uniqueness against existing data, and saved to a dictionary. Once
+        all files of a certain type have been processed, results can be saved to Arango.
+
+        Any errors that occur during parsing and processing are accumulated in `err_list`.
+
+        :param file: (dict)             file data
+        :param remap_fn: (dict)         mapping of output param names to functions
+                                        each function should take the row data object as input and
+                                        return the value for the output parameter
+
+        :param store_fn: (func)         function to store the results of the remapping
+
+        :param err_list: (list)         error list
+
+        :param validator: (Validator)   jsonschema validator object
+
+        """
+        file_parser = self.parser_gen(file)
+        try:
+            (line_no, cols, err_str) = next(file_parser)
+        except StopIteration:
+            # no valid lines found in the file
+            err_list.append(f"{file['path']}: no header line found")
+            return
+
+        headers = cols
+        n_stored = 0
+        for (line_no, cols, err_str) in file_parser:
+            # mismatch in number of cols
+            if cols is None:
+                err_list.append(err_str)
+                continue
+
+            # merge headers with cols to create an object
+            row_object = dict(zip(headers, cols))
+
+            if validator is not None:
+                # validate the object
+                if not validator.is_valid(row_object):
+                    err_msg = "".join(
+                        f"{file['path']} line {line_no}: " + e.message
+                        for e in sorted(validator.iter_errors(row_object), key=str)
+                    )
+                    err_list.append(err_msg)
+                    continue
+
+            # transform it using the remap_functions
+            datum = self.remap_object(row_object, remap_fn)
+
+            # and store it
+            storage_error = store_fn(datum)
+            if storage_error is None:
+                n_stored += 1
+            else:
+                err_list.append(f"{file['path']} line {line_no}: " + storage_error)
+
+        if not n_stored:
+            err_list.append(f"{file['path']}: no valid data found")
 
     def load_edges(self):
-        # Headers and sample row:
-        # node1	node2	edge	edge_descrip	layer_descrip
-        # AT1G01370	AT1G57820	4.40001558779779	AraNetv2_log-likelihood-score	AraNetv2-LC_lit-curated-ppi
-        edge_type_remap = {
-            'AraGWAS-Phenotype_Associations': 'pheno_assn',
-            'AraNetv2-CX_pairwise-gene-coexpression': 'gene_coexpr',
-            'AraNetv2-DC_domain-co-occurrence': 'domain_co_occur',
-            'AraNetv2-HT_high-throughput-ppi': 'ppi_hithru',
-            'AraNetv2-LC_lit-curated-ppi': 'ppi_liter',
-        }
+        """Load edge data from the set of edge files"""
 
         # dict of nodes, indexed by node ID (node1 and node2 from the file)
         node_ix = {}
-        edges = []
+        # dict of edges, indexed by node1__node2__edge_type
+        edge_ix = {}
+        # error accumulator
+        err_list = []
+
+        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_edge.yaml')
+        validator = get_schema_validator(schema_file=schema_file)
+
         node_name = self.config('node_name')
-
-        def edge_type(row):
-            if row['layer_descrip'] not in edge_type_remap:
-                raise RuntimeError(
-                    f"{file['path']} line {line_no}: invalid edge type: {row['layer_descrip']}"
-                )
-            return edge_type_remap[row['layer_descrip']]
-
-        def _key(row):
-            return '__'.join([
-                row['node1'],
-                row['node2'],
-                edge_type(row),
-                row['edge'],
-            ])
-
         # these functions remap the values in the columns of the input file to
         # appropriate values to go into Arango
         remap_functions = {
+            # create a unique key for each record
+            '_key': lambda row: '__'.join([row[_] for _ in ['node1', 'node2', 'layer_descrip', 'edge']]),
+            'node1': None,  # this will be deleted in the 'store' step
+            'node2': None,  # as will this
             '_from': lambda row: node_name + '/' + row['node1'],
             '_to': lambda row: node_name + '/' + row['node2'],
             'score': lambda row: float(row['edge']),
-            'edge_type': edge_type,
-            '_key': _key,
+            'edge_type': lambda row: row['layer_descrip'],
         }
 
+        # store edge data, checking for potential duplicates
+        def store_edges(datum):
+            # there should only be one value for each node<->node edge of a given type
+            edge_key = "__".join([datum['node1'], datum['node2'], datum['edge_type']])
+
+            if edge_key in edge_ix:
+                # ignore duplicate lines; report non-matching data
+                if datum['score'] != edge_ix[edge_key]['score']:
+                    return f"duplicate data for edge {edge_key}"
+                return None
+
+            # keep track of the nodes mentioned in this edge set
+            for node_n in ["1", "2"]:
+                node_ix[datum[f"node{node_n}"]] = 1
+                del datum[f"node{node_n}"]
+
+            edge_ix[edge_key] = datum
+            return None
+
         for file in self.config('edge_files'):
-            file_parser = self.parser_gen(file)
-            headers = []
+            self.process_file(
+                file=file,
+                remap_fn=remap_functions,
+                store_fn=store_edges,
+                err_list=err_list,
+                validator=validator,
+            )
 
-            while True:
-                try:
-                    (line_no, cols) = next(file_parser)
-                except StopIteration:
-                    break
-
-                if len(headers) == 0:
-                    headers = cols
-                    continue
-
-                # merge headers with cols to create an object
-                row_object = dict(zip(headers, cols))
-                # transform it using the remap_functions
-                datum = {key: func(row_object) for (key, func) in remap_functions.items()}
-                edges.append(datum)
-
-                # keep track of the nodes mentioned in this edge set
-                for node in ["1", "2"]:
-                    node_ix[row_object[f"node{node}"]] = 1
+        if len(err_list):
+            raise RuntimeError('\n'.join(err_list))
 
         return {
             'nodes': [{'_key': n} for n in node_ix.keys()],
-            'edges': edges,
+            'edges': edge_ix.values(),
         }
 
     def load_node_metadata(self):
         """Load node metadata"""
 
-        nodes = []
-        valid_node_types = ['gene', 'pheno']
+        node_ix = {}
+        err_list = []
+
+        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_node.yaml')
+        validator = get_schema_validator(schema_file=schema_file)
 
         def go_terms(row):
-            if len(row['go_terms']):
-                return [c.strip() for c in row_object['go_terms'].split(',')]
+            if 'go_terms' in row and len(row['go_terms']):
+                return [c.strip() for c in row['go_terms'].split(',')]
             return []
-
-        def node_type(row):
-            if row['node_type'] not in valid_node_types:
-                raise RuntimeError(
-                    f"{file['path']} line {line_no}: invalid node type: {row['node_type']}"
-                )
-            return row['node_type']
 
         remap_functions = {
             # these pass straight through
-            'transcript': None,
-            'gene_symbol': None,
             'gene_full_name': None,
             'gene_model_type': None,
-            'tair_computational_description': None,
-            'tair_short_description': None,
-            'tair_curator_summary': None,
+            'gene_symbol': None,
+            'go_description': None,
             'mapman_bin': None,
+            'mapman_description': None,
             'mapman_name': None,
+            'node_type': None,
             'pheno_aragwas_id': None,
+            'pheno_description': None,
+            'pheno_pto_description': None,
+            'pheno_pto_name': None,
             'pheno_ref': None,
+            'tair_computational_description': None,
+            'tair_curator_summary': None,
+            'tair_short_description': None,
+            'transcript': None,
             'user_notes': None,
             # rename
             '_key': lambda row: row['node_id'],
-            'go_description': lambda row: row['go_descr'],
-            'mapman_description': lambda row: row['mapman_descr'],
-            'pheno_description': lambda row: row['pheno_descrip1'],
-            'pheno_pto_name': lambda row: row['pheno_descrip2'],
-            'pheno_pto_description': lambda row: row['pheno_descrip3'],
             # see functions above
-            'node_type': node_type,
             'go_terms': go_terms,
         }
 
+        # store nodes in a dict indexed by _key
+        def store_nodes(datum):
+            # check whether we have this node already
+            if datum['_key'] in node_ix:
+                # report non-matching data
+                if datum != node_ix[datum['_key']]:
+                    return f"duplicate data for node {datum['_key']}"
+                # otherwise, it's duplicated line: ignore
+                return None
+
+            node_ix[datum['_key']] = datum
+            return None
+
         for file in self.config('node_files'):
-            file_parser = self.parser_gen(file)
-            headers = []
+            self.process_file(
+                file=file,
+                remap_fn=remap_functions,
+                store_fn=store_nodes,
+                err_list=err_list,
+                validator=validator,
+            )
 
-            while True:
-                try:
-                    (line_no, cols) = next(file_parser)
-                except StopIteration:
-                    break
-
-                if len(headers) == 0:
-                    headers = cols
-                    continue
-
-                # merge with headers to form an object, then remap to create Arango-ready data
-                row_object = dict(zip(headers, cols))
-
-                datum = {}
-                for (key, func) in remap_functions.items():
-                    if func is None:
-                        datum[key] = row_object[key]
-                    else:
-                        datum[key] = func(row_object)
-                nodes.append(datum)
-
-        return {'nodes': nodes}
+        if len(err_list):
+            raise RuntimeError('\n'.join(err_list))
+        return {'nodes': node_ix.values()}
 
     def load_cluster_data(self):
         """Annotate genes with cluster ID fields."""
 
         # index of nodes
         node_ix = {}
+        err_list = []
+
+        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_cluster.yaml')
+        validator = get_schema_validator(schema_file=schema_file)
+
+        # these functions remap the values in the columns of the input file to
+        # appropriate values to go into Arango
+        remap_functions = {
+            'node_ids': lambda row: [n.strip() for n in row['node_ids'].split(',')]
+        }
+
+        # store clusters in a dictionary with key node_id and value list of cluster IDs to which
+        # the node is assigned
+        def store_clusters(datum):
+            cluster_id = datum['cluster_id']
+            for node_id in datum['node_ids']:
+                if node_id not in node_ix:
+                    node_ix[node_id] = [cluster_id]
+                elif cluster_id not in node_ix[node_id]:
+                    node_ix[node_id].append(cluster_id)
+            return None
+
         for file in self.config('cluster_files'):
-            cluster_label = file['cluster_prefix']
-            headers = []
-            file_parser = self.parser_gen(file)
+            prefix = file['cluster_prefix']
+            remap_functions['cluster_id'] = lambda row: prefix + ':' + row['cluster_id'].replace('Cluster', '')
 
-            while True:
-                try:
-                    (line_no, cols) = next(file_parser)
-                except StopIteration:
-                    break
+            self.process_file(
+                file=file,
+                remap_fn=remap_functions,
+                store_fn=store_clusters,
+                err_list=err_list,
+                validator=validator,
+            )
 
-                if len(headers) == 0:
-                    headers = cols
-                    continue
-
-                # remove the 'Cluster' text and replace it with cluster_label
-                cluster_id = cluster_label + ':' + cols[0].replace('Cluster', '')
-                node_keys = [n.strip() for n in cols[1].split(',')]
-                for key in node_keys:
-                    if key not in node_ix:
-                        node_ix[key] = [cluster_id]
-                    elif cluster_id not in node_ix[key]:
-                        node_ix[key].append(cluster_id)
+        if len(err_list):
+            raise RuntimeError('\n'.join(err_list))
 
         # gather a list of cluster IDs for each node
         nodes = [{
@@ -345,6 +430,7 @@ class DJORNL_Parser(object):
         self.save_dataset(self.load_edges())
         self.save_dataset(self.load_node_metadata())
         self.save_dataset(self.load_cluster_data())
+        return True
 
     def check_data_delta(self):
         edge_data = self.load_edges()
@@ -374,3 +460,8 @@ class DJORNL_Parser(object):
         print("Dataset contains " + str(len(edge_data['edges'])) + " edges")
         # count all nodes
         print("Dataset contains " + str(len(all_nodes)) + " nodes")
+
+
+if __name__ == '__main__':
+    parser = DJORNL_Parser()
+    parser.load_data()

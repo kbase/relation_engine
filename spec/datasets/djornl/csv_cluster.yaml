@@ -1,0 +1,15 @@
+"$schema": http://json-schema.org/draft-07/schema#
+name: csv_cluster
+title: Cluster data
+description: Cluster ID to node ID mappings
+type: object
+required: [cluster_id, node_ids]
+additionalProperties: false
+properties:
+  cluster_id:
+    type: string
+    format: regex
+    pattern: "^Cluster\\d+"
+  # pre-transform node_ids
+  node_ids:
+    type: string

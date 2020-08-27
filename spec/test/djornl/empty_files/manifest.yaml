@@ -9,12 +9,12 @@ file_list:
 
   - data_type: cluster
     cluster_prefix: markov_i2
-    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I2_named.tsv
+    path: cluster_data/headers_only.tsv
 
   - data_type: cluster
     cluster_prefix: markov_i4
-    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I4_named.tsv
+    path: cluster_data/no_content.tsv
 
   - data_type: cluster
     cluster_prefix: markov_i6
-    path: cluster_data/out.aranetv2_subnet_AT-CX_top10percent_anno_AF_082919.abc.I6_named.tsv
+    path: cluster_data/comment_only.tsv

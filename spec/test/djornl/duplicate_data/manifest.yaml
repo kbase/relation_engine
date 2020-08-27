@@ -1,0 +1,39 @@
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+home_url: "https://github.com/kbase/exascale_data"
+file_list:
+  - data_type: edge
+    path: edges.tsv
+    date: "2020-12-25"
+
+  - data_type: edge
+    path: hithruput-edges.csv
+    date: "2020-12-25"
+
+  - data_type: node
+    path: nodes.csv
+    date: "2019-01-01"
+
+  - data_type: cluster
+    cluster_prefix: markov_i2
+    path: I2_named.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i4
+    path: I4_named.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i6
+    path: I6_named.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i6
+    path: I6_copy.csv
+
+  - data_type: node
+    path: pheno_nodes.csv
+    date: "2019-01-01"
+
+  - data_type: node
+    path: extra_node.tsv
+    date: "2019-01-01"

@@ -4,5 +4,6 @@ cluster_id	node_ids
 # title: Markov clustering, inflation = 2
 Cluster1	AT1G01010,AT1G01030,AT1G01040
 Cluster2	AT1G01050,AT1G01060,AT1G01070
-Cluster3	AT1G01090
+HoneyNutCluster3	AT1G01080,AT1G01090
+Cluster4
 Cluster5	AT1G01020
