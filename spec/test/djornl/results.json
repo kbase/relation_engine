@@ -25,7 +25,7 @@
       {"_key": "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8", "_from": "djornl_node/AT1G01080", "_to": "djornl_node/AT1G01090", "edge_type": "AraNetv2-LC_lit-curated-ppi", "score": 2.8}
     ]
   },
-  "load_cluster_data": {
+  "load_clusters": {
     "nodes": [
       {"_key": "AT1G01010", "clusters": ["markov_i2:1", "markov_i6:3"]},
       {"_key": "AT1G01030", "clusters": ["markov_i2:1", "markov_i6:3"]},
@@ -38,7 +38,7 @@
       {"_key": "AT1G01080", "clusters": ["markov_i4:3"]}
     ]
   },
-  "load_node_metadata": {
+  "load_nodes": {
     "nodes": [
       {"_key": "As2", "node_type": "pheno", "transcript": "", "gene_symbol": "", "gene_full_name": "", "gene_model_type": "", "tair_computational_description": "", "tair_curator_summary": "", "tair_short_description": "", "go_description": "", "go_terms": [], "mapman_bin": "", "mapman_name": "", "mapman_description": "", "pheno_aragwas_id": "10.21958/phenotype:103", "pheno_description": "", "pheno_pto_name": "bacterial disease resistance", "pheno_pto_description": "The resistance exhibited by a plant or a group of plants (population) in response to the disease caused by a bacterial pathogen infection as compared to the susceptible and/or the reference plants of the same species. [GR:pj]", "pheno_ref": "Atwell et. al, Nature 2010", "user_notes": ""},
       {"_key": "As75", "node_type": "pheno", "transcript": "", "gene_symbol": "", "gene_full_name": "", "gene_model_type": "", "tair_computational_description": "", "tair_curator_summary": "", "tair_short_description": "", "go_description": "", "go_terms": [], "mapman_bin": "", "mapman_name": "", "mapman_description": "", "pheno_aragwas_id": "10.21958/phenotype:67", "pheno_description": "Arsenic concentrations in leaves, grown in soil. Elemental analysis was performed with an ICP-MS (PerkinElmer). Sample normalized to calculated weights as described in Baxter et al., 2008", "pheno_pto_name": "arsenic concentration", "pheno_pto_description": "A mineral and ion content related trait (TO:0000465) which is the concentration of arsenic (CHEBI:22632) in some plant structure (PO:0009011). [GR:Karthik]", "pheno_ref": "Atwell et. al, Nature 2010", "user_notes": ""},

@@ -252,14 +252,16 @@ class DJORNL_Parser(object):
 
         # store edge data, checking for potential duplicates
         def store_edges(datum):
-            # there should only be one value for each node<->node edge of a given type
+            # there should only be one value for each node<->node edge of a given type,
+            # so use these values as an index key
             edge_key = "__".join([datum['node1'], datum['node2'], datum['edge_type']])
 
             if edge_key in edge_ix:
-                # ignore duplicate lines; report non-matching data
-                if datum['score'] != edge_ix[edge_key]['score']:
-                    return f"duplicate data for edge {edge_key}"
-                return None
+                # duplicate lines can be ignored
+                if datum['score'] == edge_ix[edge_key]['score']:
+                    return None
+                # report non-matching data
+                return f"duplicate data for edge {edge_key}"
 
             # keep track of the nodes mentioned in this edge set
             for node_n in ["1", "2"]:
@@ -286,7 +288,7 @@ class DJORNL_Parser(object):
             'edges': edge_ix.values(),
         }
 
-    def load_node_metadata(self):
+    def load_nodes(self):
         """Load node metadata"""
 
         node_ix = {}
@@ -352,7 +354,7 @@ class DJORNL_Parser(object):
             raise RuntimeError('\n'.join(err_list))
         return {'nodes': node_ix.values()}
 
-    def load_cluster_data(self):
+    def load_clusters(self):
         """Annotate genes with cluster ID fields."""
 
         # index of nodes
@@ -428,33 +430,38 @@ class DJORNL_Parser(object):
 
     def load_data(self):
         self.save_dataset(self.load_edges())
-        self.save_dataset(self.load_node_metadata())
-        self.save_dataset(self.load_cluster_data())
+        self.save_dataset(self.load_nodes())
+        self.save_dataset(self.load_clusters())
         return True
 
     def check_data_delta(self):
         edge_data = self.load_edges()
-        node_metadata = self.load_node_metadata()
-        clusters = self.load_cluster_data()
+        node_data = self.load_nodes()
+        clusters = self.load_clusters()
 
-        self.check_deltas(edge_data=edge_data, node_metadata=node_metadata, cluster_data=clusters)
+        self.check_deltas(edge_data=edge_data, node_data=node_data, cluster_data=clusters)
 
-    def check_deltas(self, edge_data={}, node_metadata={}, cluster_data={}):
+    def check_deltas(self, edge_data={}, node_data={}, cluster_data={}):
 
-        edge_nodes = set([e['_key'] for e in edge_data['nodes']])
-        node_metadata_nodes = set([e['_key'] for e in node_metadata['nodes']])
-        cluster_nodes = set([e['_key'] for e in cluster_data['nodes']])
-        all_nodes = edge_nodes.union(node_metadata_nodes).union(cluster_nodes)
+        edges_nodelist = set([e['_key'] for e in edge_data['nodes']])
+        nodes_nodelist = set([e['_key'] for e in node_data['nodes']])
+        clusters_nodelist = set([e['_key'] for e in cluster_data['nodes']])
+        all_nodes = edges_nodelist.union(nodes_nodelist).union(clusters_nodelist)
 
-        # check all nodes in cluster_data have node_metadata
-        clstr_no_node_md_set = cluster_nodes.difference(node_metadata_nodes)
-        if clstr_no_node_md_set:
-            print({'clusters with no node metadata': clstr_no_node_md_set})
+        # check all nodes in cluster_data have node data
+        cluster_no_node_set = clusters_nodelist.difference(nodes_nodelist)
+        if cluster_no_node_set:
+            print({'clusters with no node metadata': cluster_no_node_set})
 
-        # check all nodes in the edge_data have node_metadata
-        edge_no_node_md_set = edge_nodes.difference(node_metadata_nodes)
-        if edge_no_node_md_set:
-            print({'edges with no node metadata': edge_no_node_md_set})
+        # check all nodes in the edge_data have node data
+        edge_no_node_set = edges_nodelist.difference(nodes_nodelist)
+        if edge_no_node_set:
+            print({'edges with no node metadata': edge_no_node_set})
+
+        # check all nodes are in the edge_data set
+        node_no_edge_set = nodes_nodelist.difference(edges_nodelist)
+        if node_no_edge_set:
+            print({'nodes not in an edge': node_no_edge_set})
 
         # count all edges
         print("Dataset contains " + str(len(edge_data['edges'])) + " edges")
@@ -464,4 +471,8 @@ class DJORNL_Parser(object):
 
 if __name__ == '__main__':
     parser = DJORNL_Parser()
-    parser.load_data()
+    try:
+        parser.load_data()
+    except Exception as err:
+        print(err)
+        exit(1)

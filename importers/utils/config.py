@@ -20,8 +20,7 @@ def load_from_env(extra_required=None, extra_optional=None, prefix='RES_'):
     optional = list(OPTIONAL) + (extra_optional or [])
     for field in required:
         if (prefix + field) not in os.environ:
-            print(f"Missing required env var: {prefix + field}")
-            exit(1)
+            raise RuntimeError(f"Missing required env var: {prefix + field}")
     for field in required + optional:
         if (prefix + field) in os.environ:
             conf[field] = os.environ[prefix + field]

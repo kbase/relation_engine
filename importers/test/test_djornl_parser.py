@@ -33,6 +33,19 @@ class Test_DJORNL_Parser(unittest.TestCase):
             parser._configure()
             return parser
 
+    def test_missing_required_env_var(self):
+        '''test that the parser exits with code 1 if the RES_ROOT_DATA_PATH env var is not set'''
+        with self.assertRaisesRegex(RuntimeError, 'Missing required env var: RES_ROOT_DATA_PATH'):
+            parser = DJORNL_Parser()
+            parser.load_edges()
+
+    def test_config(self):
+        '''test that the parser raises an error if a config value cannot be found'''
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
+        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
+        with self.assertRaisesRegex(KeyError, 'No such config value: bananas'):
+            parser.config('bananas')
+
     def test_load_no_manifest(self):
         """ test loading when the manifest does not exist """
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'no_manifest')
@@ -67,7 +80,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         # header only, no content
         err_str = 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv: no valid data found'
         with self.assertRaisesRegex(RuntimeError, err_str):
-            parser.load_node_metadata()
+            parser.load_nodes()
 
         # comments only
         err_str = 'merged_edges-AMW-060820_AF.tsv: no header line found'
@@ -81,7 +94,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             'cluster_data/comment_only.tsv: no header line found',
         ])
         with self.assertRaisesRegex(RuntimeError, err_str):
-            parser.load_cluster_data()
+            parser.load_clusters()
 
     def test_load_missing_files(self):
         """ test loading when files cannot be found """
@@ -119,7 +132,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         # invalid node type
         node_err_msg = "nodes.csv line 5: 'Monkey' is not valid under any of the given schemas"
         with self.assertRaisesRegex(RuntimeError, node_err_msg):
-            parser.load_node_metadata()
+            parser.load_nodes()
 
     def test_load_invalid_clusters(self):
         """ test file format errors """
@@ -131,7 +144,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         # invalid node type
         cluster_err_msg = "markov2_named.tsv line 7: 'HoneyNutCluster3' does not match"
         with self.assertRaisesRegex(RuntimeError, cluster_err_msg):
-            parser.load_cluster_data()
+            parser.load_clusters()
 
     def test_load_col_count_errors(self):
         """ test files with invalid numbers of columns """
@@ -148,7 +161,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         # too many cols
         node_err_msg = 'aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv line 3: expected 20 cols, found 22'
         with self.assertRaisesRegex(RuntimeError, node_err_msg):
-            parser.load_node_metadata()
+            parser.load_nodes()
 
     def test_load_valid_edge_data(self):
 
@@ -169,8 +182,8 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        node_metadata = parser.load_node_metadata()
-        expected = self.json_data["load_node_metadata"]
+        node_metadata = parser.load_nodes()
+        expected = self.json_data["load_nodes"]
 
         for data_structure in [node_metadata, expected]:
             for k in data_structure.keys():
@@ -184,10 +197,10 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        cluster_data = parser.load_cluster_data()
+        cluster_data = parser.load_clusters()
         self.assertEqual(
             cluster_data,
-            self.json_data["load_cluster_data"]
+            self.json_data["load_clusters"]
         )
 
     def test_duplicate_edge_data(self):
@@ -211,7 +224,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         err_msg = "extra_node.tsv line 5: duplicate data for node AT1G01080"
         with self.assertRaisesRegex(RuntimeError, err_msg):
-            parser.load_node_metadata()
+            parser.load_nodes()
 
     def test_duplicate_cluster_data(self):
         """ test files with duplicate cluster data, which should be seamlessly merged """
@@ -220,10 +233,10 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'duplicate_data')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        cluster_data = parser.load_cluster_data()
+        cluster_data = parser.load_clusters()
         self.assertEqual(
             cluster_data,
-            self.json_data["load_cluster_data"]
+            self.json_data["load_clusters"]
         )
 
     def test_the_full_shebang(self):
