@@ -4,8 +4,7 @@ Tests for workspace workspace stored queries under the ws* namespace
 import unittest
 import json
 import requests
-from spec.test.helpers import get_config, create_test_docs
-from relation_engine_server.utils.wait_for import wait_for_api
+from spec.test.helpers import get_config, create_test_docs, check_spec_test_env
 
 _CONF = get_config()
 
@@ -34,7 +33,7 @@ class TestWs(unittest.TestCase):
         Create all test data.
         """
 
-        wait_for_api()
+        check_spec_test_env()
 
         ws_object_version = [
             _ws_obj(1, 1, 1),  # root/origin object

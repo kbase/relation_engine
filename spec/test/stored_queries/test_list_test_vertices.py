@@ -1,8 +1,7 @@
 import unittest
 import requests
 
-from spec.test.helpers import create_test_docs, get_config
-from relation_engine_server.utils.wait_for import wait_for_api
+from spec.test.helpers import create_test_docs, get_config, check_spec_test_env
 
 _CONF = get_config()
 _QUERY_URL = _CONF['re_api_url'] + '/api/v1/query_results?view=list_test_vertices'
@@ -12,8 +11,7 @@ class TestListTestVertices(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Wait for the API to come online
-        wait_for_api()
+        check_spec_test_env()
 
     def test_valid(self):
         """Test a valid query."""

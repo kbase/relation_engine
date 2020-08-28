@@ -121,6 +121,10 @@ class TestApi(unittest.TestCase):
         resp_json = resp.json()
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(len(resp_json['status']))
+
+        # delete the SPEC_TEST_READY env var as it is no longer true
+        os.environ.pop('SPEC_TEST_READY', None)
+
         # Test that the indexes get created and not duplicated
         url = _CONF['db_url'] + '/_api/index'
         auth = (_CONF['db_user'], _CONF['db_pass'])
@@ -161,7 +165,7 @@ class TestApi(unittest.TestCase):
         # /data_sources is used by the UI and requires slightly different response formatting
         # /specs/data_sources is in the standard /specs format used by collections and stored_queries
 
-        data_sources = ['djornl', 'envo_ontology', 'go_ontology', 'gtdb', 'ncbi_taxonomy', 'rdp_taxonomy']
+        data_sources = ['ncbi_taxonomy']
 
         # /spec/data_sources endpoint
         def check_resp_json_spec_endpoint(self, resp):

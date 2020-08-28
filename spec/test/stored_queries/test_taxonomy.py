@@ -6,8 +6,7 @@ import time
 import unittest
 import requests
 
-from spec.test.helpers import get_config, assert_subset, create_test_docs
-from relation_engine_server.utils.wait_for import wait_for_api
+from spec.test.helpers import get_config, assert_subset, create_test_docs, check_spec_test_env
 
 _CONF = get_config()
 _NOW = int(time.time() * 1000)
@@ -19,7 +18,7 @@ class TestTaxonomy(unittest.TestCase):
     def setUpClass(cls):
         """Create test documents"""
 
-        wait_for_api()
+        check_spec_test_env()
         taxon_docs = [
             {'_key': '1', 'scientific_name': 'Bacteria', 'rank': 'Domain', 'strain': False},
             {'_key': '2', 'scientific_name': 'Firmicutes', 'rank': 'Phylum', 'strain': False},

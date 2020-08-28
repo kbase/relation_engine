@@ -8,6 +8,10 @@ import json
 import os
 import requests
 import sys
+import shutil
+from relation_engine_server.utils.wait_for import wait_for_api
+from relation_engine_server.utils.pull_spec import download_specs
+from relation_engine_server.utils.config import get_config as get_re_config
 
 
 @functools.lru_cache(maxsize=1)
@@ -60,6 +64,21 @@ def create_test_docs(coll_name, docs, update_on_dupe=False):
         raise RuntimeError(resp.text)
 
     return resp
+
+
+def check_spec_test_env():
+    """ ensure that the environment is prepared for running the spec tests """
+    if os.environ.get('SPEC_TEST_READY', None) is None:
+        wait_for_api()
+        _CONF = get_re_config()
+        # Remove the spec directory, ignoring if it is already missing
+        shutil.rmtree(_CONF['spec_paths']['root'], ignore_errors=True)
+        # Recreate the spec directory so we have a clean slate, avoiding name conflicts
+        os.makedirs(_CONF['spec_paths']['root'])
+        # copy the contents of /app/spec into /spec/repo
+        shutil.copytree('/app/spec', _CONF['spec_paths']['repo'])
+        download_specs()
+        os.environ.update({'SPEC_TEST_READY': "Done"})
 
 
 def capture_stdout(function, *args, **kwargs):
