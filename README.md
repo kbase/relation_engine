@@ -1,3 +1,6 @@
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/kbase/relation_engine.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbase/relation_engine/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kbase/relation_engine.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbase/relation_engine/context:python)
+![RE test and deploy](https://github.com/kbase/relation_engine/workflows/Relation%20Engine%20test%20and%20deploy/badge.svg)
+
 # KBase Relation Engine
 
 This repo holds the code associated with the KBase relation engine, previously held in https://github.com/kbase/relation_engine_api and https://github.com/kbase/relation_engine_spec.
