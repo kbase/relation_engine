@@ -1,0 +1,14 @@
+# multiple errors
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    path: edges.tsv
+
+  - data_type: node
+
+  - data_type: cluster
+    path: clusters.tsv
+
+  - data_type: ping-pong balls
+    path: where?

@@ -1,0 +1,20 @@
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    path: merged_edges-AMW-060820_AF.tsv
+
+  - data_type: node
+    path: aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv
+
+  - data_type: cluster
+    cluster_prefix: markov_i2
+    path: cluster_data/headers_only.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i4
+    path: cluster_data/no_content.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i6
+    path: cluster_data/comment_only.tsv

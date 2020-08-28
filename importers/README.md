@@ -15,5 +15,5 @@ Global env vars:
 
 ```sh
 RES_ROOT_DATA_PATH=/path/to/djornl_data \
-python -m importers.djornl.main
+python -m importers.djornl.parser
 ```

@@ -1,19 +1,37 @@
-name: djornl_node
-type: vertex
-delta: false
-
-indexes:
-  - type: hash
-    fields: ["clusters[*]"]
-
-schema:
-  "$schema": http://json-schema.org/draft-07/schema#
-  title: Gene and Phenotype Vertices
-  description: Arabidopsis gene and phenotype nodes from the Dan Jacobson Lab
-  type: object
-  required: [_key]
-  additionalProperties: false
-  properties:
+"$schema": "http://json-schema.org/draft-07/schema#"
+name: definitions
+title: DJORNL schema definitions
+description: Node and edge metadata definitions for the Dan Jacobson Exascale dataset
+definitions:
+  cluster_id:
+    type: string
+    format: regex
+    pattern: ^\w+:\d+$
+    examples: ["markov_i2:1", "markov_i4:5", "markov_i6:3"]
+  go_term:
+    type: string
+    format: regex
+    pattern: ^GO:\d{7}$
+    examples: ["GO:0003700", "GO:0005515"]
+  djornl_edge:
+    _key:
+      type: string
+      title: Key
+      format: regex
+      pattern: ^(\S+__){3}(\S+)$
+    _from:
+      type: string
+      title: Gene ID
+    _to:
+      type: string
+      title: Gene or Phenotype ID
+    score:
+      title: Edge Score (Weight)
+      # (float)
+      type: number
+    edge_type:
+      $ref: edge_type.yaml
+  djornl_node:
     _key:
       type: string
       title: Key
@@ -23,14 +41,17 @@ schema:
       title: Clusters
       description: Clusters to which the node has been assigned
       items:
-        type: string
-        format: regex
-        pattern: ^\w+:\d+$
+        $ref: #definitions/cluster_id
       examples: [["markov_i2:1", "markov_i4:5"], ["markov_i6:3"]]
     node_type:
       type: string
       title: Node type
-      examples: ["gene", "phenotype"]
+      oneOf:
+        - const: gene
+          title: Gene
+        - const: pheno
+          title: Phenotype
+      examples: ["gene", "pheno"]
     transcript:
       type: string
       title: Transcript
@@ -66,8 +87,8 @@ schema:
     go_terms:
       type: array
       title: GO term IDs
-      items: {type: string}
-      examples: [["GO:0003700", "GO:0005515"]]
+      items:
+        $ref: #definitions/go_term
     mapman_bin:
       type: string
       title: Mapman bin

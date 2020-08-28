@@ -40,8 +40,8 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
         root_path = os.path.join(_TEST_DIR, 'djornl', 'test_data')
         with modified_environ(RES_ROOT_DATA_PATH=root_path):
             parser = DJORNL_Parser()
-            node_name = parser.config('_NODE_NAME')
-            edge_name = parser.config('_EDGE_NAME')
+            node_name = parser.config('node_name')
+            edge_name = parser.config('edge_name')
 
             edge_data = parser.load_edges()
             r = create_test_docs(node_name, edge_data['nodes'])
@@ -49,11 +49,11 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             r = create_test_docs(edge_name, edge_data['edges'])
             print_db_update(r, edge_name)
 
-            node_metadata = parser.load_node_metadata()
+            node_metadata = parser.load_nodes()
             r = create_test_docs(node_name, node_metadata['nodes'], True)
             print_db_update(r, node_name)
 
-            cluster_data = parser.load_cluster_data()
+            cluster_data = parser.load_clusters()
             r = create_test_docs(node_name, cluster_data['nodes'], True)
             print_db_update(r, node_name)
 
@@ -93,7 +93,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
 
         # ensure that all the cluster data is returned OK
         node_data = response['results'][0]['nodes']
-        expected_node_data = self.json_data['load_cluster_data']['nodes']
+        expected_node_data = self.json_data['load_clusters']['nodes']
         self.assertEqual(
             {n['_key']: n['clusters'] for n in node_data if 'clusters' in n},
             {n['_key']: n['clusters'] for n in expected_node_data if 'clusters' in n},

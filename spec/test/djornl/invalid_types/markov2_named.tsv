@@ -1,0 +1,9 @@
+cluster_id	node_ids
+# data_type: cluster
+# cluster_prefix: markov_i2
+# title: Markov clustering, inflation = 2
+Cluster1	AT1G01010,AT1G01030,AT1G01040
+Cluster2	AT1G01050,AT1G01060,AT1G01070
+HoneyNutCluster3	AT1G01080,AT1G01090
+Cluster4
+Cluster5	AT1G01020

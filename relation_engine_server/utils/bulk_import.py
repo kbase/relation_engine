@@ -6,7 +6,7 @@ import json
 import hashlib
 
 from relation_engine_server.utils.json_validation import get_schema_validator
-from relation_engine_server.utils import spec_loader
+from relation_engine_server.utils.spec_loader import get_collection
 from relation_engine_server.utils.arango_client import import_from_file
 
 
@@ -16,8 +16,8 @@ def bulk_import(query_params):
     schema, then write them into a temporary file that can be passed into the
     arango client.
     """
-    schema = spec_loader.get_collection(query_params['collection'])
-    validator = get_schema_validator(schema=schema['schema'])
+    schema_file = get_collection(query_params['collection'], path_only=True)
+    validator = get_schema_validator(schema_file=schema_file, validate_at='/schema')
     # We can't use a context manager here
     # We need to close the file to have the file contents readable
     #  and we need to prevent deletion of the temp file on close (default behavior of tempfiles)
