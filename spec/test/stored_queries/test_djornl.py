@@ -5,9 +5,8 @@ import json
 import unittest
 import os
 
-from spec.test.helpers import get_config, modified_environ, create_test_docs, run_query
+from spec.test.helpers import get_config, modified_environ, create_test_docs, run_query, check_spec_test_env
 from importers.djornl.parser import DJORNL_Parser
-from relation_engine_server.utils.wait_for import wait_for_api
 
 _CONF = get_config()
 _TEST_DIR = '/app/spec/test'
@@ -27,7 +26,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        wait_for_api()
+        check_spec_test_env()
         # import the results file
         results_file = os.path.join(_TEST_DIR, 'djornl', 'results.json')
         with open(results_file) as fh:

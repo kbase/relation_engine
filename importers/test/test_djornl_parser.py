@@ -238,11 +238,3 @@ class Test_DJORNL_Parser(unittest.TestCase):
             cluster_data,
             self.json_data["load_clusters"]
         )
-
-    def test_the_full_shebang(self):
-
-        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
-        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
-
-        parser.load_data()
-        self.assertEqual(True, parser.load_data())
