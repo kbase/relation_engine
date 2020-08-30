@@ -60,15 +60,21 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
         """submit a database query"""
 
         if _VERBOSE:
-            q_data_str = json.dumps(query_data)
-            print('query data string: ' + q_data_str)
+            print('query data string: ' + json.dumps(query_data))
 
         return run_query(query_name, query_data)
 
-    def check_expected_results(self, description, response, expected):
+    def test_expected_results(self, description=None, response=None, expected=None):
+
+        # don't run the tests if they're being called automatically
+        if response is None:
+            self.assertTrue(True)
+            return
 
         if _VERBOSE:
             print("Running test " + description)
+            if 'results' not in response:
+                print({'response': response})
 
         results = response['results'][0]
         self.assertEqual(
@@ -81,13 +87,113 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             set(expected['edges'])
         )
 
+    def test_error_response(self, description=None, response=None, expected=None):
+
+        # don't run the tests if they're being called automatically
+        if response is None:
+            self.assertTrue(True)
+            return
+
+        self.assertIn('error', response)
+        self.assertEqual(response['error'], expected)
+
+    def test_errors(self):
+
+        # query not found
+        self.test_error_response(
+            'stored query not found',
+            self.submit_query('djornl_fetch_phenotype', {
+                'keys': ['A', 'B', 'C'],
+            }),
+            {
+                'details': "Stored query 'djornl_fetch_phenotype' does not exist.",
+                'message': 'Not found',
+                'name': 'djornl_fetch_phenotype',
+                'status': 404
+            }
+        )
+
+        # extra param not in query
+        self.test_error_response(
+            'parameter not allowed in query',
+            self.submit_query('djornl_fetch_all', {
+                'musical': 'Mary Poppins',
+            }),
+            {
+                'failed_validator': 'additionalProperties',
+                'message': "Additional properties are not allowed ('musical' was unexpected)",
+                'path': [],
+                'status': 400,
+                'value': {'musical': 'Mary Poppins'},
+            }
+        )
+
+        # missing required param
+        self.test_error_response(
+            'missing required parameter',
+            self.submit_query('djornl_fetch_phenotypes', {}),
+            {
+                'failed_validator': 'required',
+                'message': "'keys' is a required property",
+                'path': [],
+                'status': 400,
+                'value': {},
+            }
+        )
+
+        # param not in correct format (should be array, not str)
+        self.test_error_response(
+            'parameter should be array, not string',
+            self.submit_query('djornl_fetch_clusters', {
+                'cluster_ids': 'Mary Poppins',
+            }),
+            {
+                'failed_validator': 'type',
+                'message': "'Mary Poppins' is not of type 'array'",
+                'path': ['cluster_ids'],
+                'status': 400,
+                'value': 'Mary Poppins'
+            }
+        )
+
+        # invalid param (fails validation)
+        self.test_error_response(
+            'invalid parameter fails validation',
+            self.submit_query('djornl_fetch_clusters', {
+                'cluster_ids': ['Mary Poppins'],
+            }),
+            {
+                'failed_validator': 'pattern',
+                'message': "'Mary Poppins' does not match '^\\\\w+:\\\\d+$'",
+                'path': ['cluster_ids', 0],
+                'status': 400,
+                'value': 'Mary Poppins'
+            }
+        )
+
+        # not enough array items
+        self.test_error_response(
+            'minItems parameter fails validation',
+            self.submit_query('djornl_fetch_clusters', {
+                'cluster_ids': [],
+            }),
+            {
+                'failed_validator': 'minItems',
+                'message': "[] is too short",
+                'path': ['cluster_ids'],
+                'status': 400,
+                'value': []
+            }
+        )
+
     def test_fetch_all(self):
 
+        all_results = self.json_data['fetch_all']['-']
         response = self.submit_query('djornl_fetch_all')
-        self.check_expected_results(
+        self.test_expected_results(
             "djornl_fetch_all",
             response,
-            self.json_data['fetch_all']
+            all_results
         )
 
         # ensure that all the cluster data is returned OK
@@ -126,7 +232,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     "keys": fetch_args.split('__'),
                     "distance": int(distance),
                 })
-                self.check_expected_results(
+                self.test_expected_results(
                     "fetch phenotypes with args " + fetch_args + " and distance " + distance,
                     resp,
                     distance_data
@@ -140,7 +246,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     "keys": fetch_args.split('__'),
                     "distance": int(distance),
                 })
-                self.check_expected_results(
+                self.test_expected_results(
                     "fetch genes with args " + fetch_args + " and distance " + distance,
                     resp,
                     distance_data
@@ -154,7 +260,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     "cluster_ids": fetch_args.split('__'),
                     "distance": int(distance),
                 })
-                self.check_expected_results(
+                self.test_expected_results(
                     "fetch clusters with args " + fetch_args + " and distance " + distance,
                     resp,
                     distance_data
@@ -168,7 +274,7 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
                     "search_text": search_text,
                     "distance": int(distance),
                 })
-                self.check_expected_results(
+                self.test_expected_results(
                     "search nodes with args " + search_text + " and distance " + distance,
                     resp,
                     distance_data

@@ -36,12 +36,20 @@ _VALID_SCHEMA_TYPES = {
 
 
 def validate_all(schema_type, directory=None):
-    """Validate the syntax of all schemas of a certain type."""
+    """
+    Validate the syntax of all schemas of type schema_type in a specified directory
+
+    :param schema_type: (string)  the schema type to validate
+    :param directory:   (string)  the directory to look in.
+                                  If not specified, the default directory for the schema_type
+                                  will be used.
+    """
+    if schema_type not in _VALID_SCHEMA_TYPES.keys():
+        raise ValueError(f"No validation schema found for '{schema_type}'")
+
     print(f'Validating {schema_type} schemas...')
 
-    if schema_type not in _VALID_SCHEMA_TYPES.keys():
-        raise ValueError('No validation schema found for ' + schema_type)
-
+    err_count = 0
     names = set()  # type: set
     if directory is None:
         type_dir_name = _VALID_SCHEMA_TYPES[schema_type]['plural']
@@ -49,23 +57,71 @@ def validate_all(schema_type, directory=None):
 
     for path in glob.iglob(os.path.join(directory, '**', '*.*'), recursive=True):
         if path.endswith('.yaml') or path.endswith('.json'):
-            data = validate_schema(path, schema_type)
+            try:
+                data = validate_schema(path, schema_type)
+                # Check for any duplicate schema names
+                name = data['name']
+                if name in names:
+                    raise ValueError(f"Duplicate queries named '{name}'")
+                else:
+                    names.add(name)
 
-            # Check for any duplicate schema names
-            name = data['name']
-            if name in names:
-                raise ValueError(f'Duplicate queries named {name}')
-            else:
-                names.add(name)
+            except Exception as err:
+                print(f"✕ {path} failed validation")
+                print(err)
+                err_count += 1
 
+    if err_count:
+        raise ValidationError(f'{directory} failed validation')
+
+    # all's well
     print('...all valid.')
+    return
+
+
+def validate_all_by_type(validation_base_dir=None):
+    """
+    Validate the syntax of all schemas of all types in validation_base_dir
+
+    Assumes that the schemas will be set up in parent directories named with the plural form
+    of the schema type name, i.e. all collection schemas in the 'collections' dir, all views
+    in the 'views' dir, etc.
+
+    :param validation_base_dir:   (string) the directory to look in.
+                                  If not specified, the default directory from the config
+                                  will be used
+
+    :return n_errors:             (int) the number of errors encountered
+
+    """
+
+    n_errors = 0
+    for schema_type in sorted(_VALID_SCHEMA_TYPES.keys()):
+        try:
+            if validation_base_dir is None:
+                validate_all(schema_type)
+            else:
+                directory = os.path.join(
+                    validation_base_dir,
+                    _VALID_SCHEMA_TYPES[schema_type]['plural']
+                )
+                validate_all(schema_type, directory)
+        except Exception as err:
+            print(err)
+            n_errors += 1
+        print("\n")
+
+    if n_errors > 0:
+        print('Validation failed!\n')
+
+    return n_errors
 
 
 def validate_schema(path, schema_type):
     """Validate a single file against its schema"""
 
     if schema_type not in _VALID_SCHEMA_TYPES.keys():
-        raise ValueError('No validation schema found for ' + schema_type)
+        raise ValueError(f"No validation schema found for '{schema_type}'")
 
     return globals()["validate_" + schema_type](path)
 
@@ -184,16 +240,12 @@ def validate_aql_on_arango(data):
             + f"  Extra params in schema: {params - query_bind_vars}")
 
 
-def _fatal(msg):
-    """Fatal error."""
-    sys.stderr.write(str(msg) + '\n')
-    sys.exit(1)
-
-
 if __name__ == '__main__':
+
+    validation_base_dir = None
+    if len(sys.argv) > 1:
+        validation_base_dir = sys.argv[1]
+
     wait_for_arangodb()
-    try:
-        for s in ['data_source', 'stored_query', 'view', 'collection']:
-            validate_all(s)
-    except Exception as err:
-        _fatal(err)
+    n_errors = validate_all_by_type(validation_base_dir)
+    sys.exit(n_errors)

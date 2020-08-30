@@ -13,6 +13,22 @@ The API is a small, rest-ish service where all data is in JSON format. Replace t
  * Staging: `https://ci.kbase.us/services/relation_engine_api`
  * App-dev: `https://appdev.kbase.us/services/relation_engine_api`
 
+### Error responses
+
+The majority of errors returned from the server have explanatory information in the response content in the following format:
+
+```json
+
+{
+  "error": {
+    "message": "A brief message explaining the error",
+    "status": 400, # or the appropriate HTTP error status code
+  }
+}
+```
+
+Specific errors may have other fields giving more details, e.g. JSON parsing errors have `source_json`, `pos`, `lineno`, and `colno` describing the error; ArangoDB errors have an `arango_message` field.
+
 ### GET /
 
 Returns server status info
@@ -168,7 +184,7 @@ _Response JSON schema_
 
 If you try to update a collection and it fails validation against a JSON schema found in the [relation engine spec](spec/), then you will get a JSON error response with the following fields:
 
-* `"error"` - Human readable message explaining the error
+* `"message"` - Human readable message explaining the error
 * `"failed_validator"` - The name of the validator that failed (eg. "required")
 * `"value"` - The (possibly nested) value in your data that failed validation
 * `"path"` - The path into your data where you can find the value that failed validation
@@ -428,9 +444,9 @@ curl -X PUT -H "Authorization: <mytoken>" \
 
 ## Deprecated Endpoints
 
-#### GET `/api/v1/specs/schemas` (replaced by `/api/v1/specs/schemas`)
+#### GET `/api/v1/specs/schemas` (replaced by `/api/v1/specs/collections`)
 
-This endpoint has been deprecated; queries should use `/api/v1/specs/schemas` instead.
+This endpoint has been deprecated; queries should use `/api/v1/specs/collections` instead.
 
 
 ## Development

@@ -63,19 +63,22 @@ class TestApi(unittest.TestCase):
 
     def test_request(self, url=None, params=None, data=None, headers=None, method='get',
                      status_code=200, resp_json=None, resp_test=None):
-        '''test a get request to the server
+        '''test a request to the server
 
         arguments:
             url             url to be appended to API_URL (i.e. request will be made to API_URL + url)
             params          request parameters
+            data            query data, encoded as JSON
             method          HTTP method; defaults to 'get'
             status_code     expected response status; defaults to 200
             resp_json       expected response content (JSON)
-            resp_test       a function to perform on the response to test it is as expected
+            resp_test       a function to perform on the response to test that it is as expected
         '''
 
+        # this method should only be run from another test method
         if url is None:
-            self.skipTest('No arguments provided')
+            self.assertTrue(True)
+            return
 
         resp = requests.request(
             method,
@@ -416,10 +419,10 @@ class TestApi(unittest.TestCase):
             data='{"name": "x"}\n{"name": "y"}',
             headers=HEADERS_ADMIN
         ).json()
-        self.assertEqual(resp['error'], "'_key' is a required property")
-        self.assertEqual(resp['value'], {'name': 'x'})
-        self.assertEqual(resp['path'], [])
-        self.assertEqual(resp['failed_validator'], 'required')
+        self.assertEqual(resp['error']['message'], "'_key' is a required property")
+        self.assertEqual(resp['error']['value'], {'name': 'x'})
+        self.assertEqual(resp['error']['path'], [])
+        self.assertEqual(resp['error']['failed_validator'], 'required')
 
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
@@ -450,9 +453,9 @@ class TestApi(unittest.TestCase):
             data='\n',
             headers=HEADERS_ADMIN
         ).json()
-        self.assertTrue('Unable to parse' in resp['error'])
-        self.assertEqual(resp['pos'], 1)
-        self.assertEqual(resp['source_json'], '\n')
+        self.assertTrue('Unable to parse' in resp['error']['message'])
+        self.assertEqual(resp['error']['pos'], 1)
+        self.assertEqual(resp['error']['source_json'], '\n')
 
     def test_create_documents(self):
         """Test all valid cases for saving documents."""
@@ -580,6 +583,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['count'], 20)
         self.assertEqual(resp['stats']['fullCount'], 20)
         self.assertTrue(len(resp['results']), 10)
+
         cursor_id = resp['cursor_id']
         resp = requests.post(
             API_URL + '/query_results',
@@ -590,13 +594,21 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp['has_more'], False)
         self.assertEqual(resp['cursor_id'], None)
         self.assertTrue(len(resp['results']), 10)
+
         # Try to get the same cursor again
-        resp = requests.post(
-            API_URL + '/query_results',
-            params={'cursor_id': cursor_id}
-        ).json()
-        self.assertTrue(resp['error'])
-        self.assertEqual(resp['arango_message'], 'cursor not found')
+        self.test_request(
+            '/query_results',
+            method='post',
+            params={'cursor_id': cursor_id},
+            status_code=400,
+            resp_json={
+                'error': {
+                    'status': 400,
+                    'message': 'ArangoDB server error.',
+                    'arango_message': 'cursor not found',
+                }
+            }
+        )
 
     def test_query_no_name(self):
         """Test a query error with a stored query name that does not exist."""
@@ -619,13 +631,22 @@ class TestApi(unittest.TestCase):
 
     def test_query_missing_bind_var(self):
         """Test a query error with a missing bind variable."""
-        resp = requests.post(
-            API_URL + '/query_results',
+
+        arango_msg = "AQL: bind parameter 'xyz' was not declared in the query (while parsing)"
+        self.test_request(
+            '/query_results',
+            method='post',
             params={'stored_query': 'list_test_vertices'},
-            data=json.dumps({'xyz': 'test_vertex'})
-        ).json()
-        self.assertEqual(resp['error'], 'ArangoDB server error.')
-        self.assertTrue(resp['arango_message'])
+            data=json.dumps({'xyz': 'test_vertex'}),
+            status_code=400,
+            resp_json={
+                'error': {
+                    'status': 400,
+                    'message': 'ArangoDB server error.',
+                    'arango_message': arango_msg,
+                }
+            }
+        )
 
     def test_auth_query_with_access(self):
         """Test the case where we query a collection with specific workspace access."""

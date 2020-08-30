@@ -57,34 +57,36 @@
     ]
   },
   "fetch_all": {
-    "nodes": [
-      "As2",
-      "As75",
-      "AT1G01010",
-      "AT1G01020",
-      "AT1G01030",
-      "AT1G01040",
-      "AT1G01050",
-      "AT1G01060",
-      "AT1G01070",
-      "AT1G01080",
-      "AT1G01090",
-      "AT1G01100",
-      "Na23",
-      "SDV"
-    ],
-    "edges": [
-      "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-      "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-      "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-      "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-      "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-      "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-      "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-      "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-      "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
-      "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
-    ]
+    "-": {
+      "nodes": [
+        "As2",
+        "As75",
+        "AT1G01010",
+        "AT1G01020",
+        "AT1G01030",
+        "AT1G01040",
+        "AT1G01050",
+        "AT1G01060",
+        "AT1G01070",
+        "AT1G01080",
+        "AT1G01090",
+        "AT1G01100",
+        "Na23",
+        "SDV"
+      ],
+      "edges": [
+        "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+        "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+        "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+        "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+        "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+        "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+        "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+        "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+        "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
+        "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+      ]
+    }
   },
   "fetch_genes": {
     "keys": {
@@ -278,7 +280,7 @@
 
   "fetch_clusters": {
     "cluster_ids": {
-      "Mary Poppins": {
+      "MaryPoppins:1": {
         "distance": {
           "0": {"nodes": [], "edges": []},
           "1": {"nodes": [], "edges": []},
