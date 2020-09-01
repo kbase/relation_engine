@@ -8,8 +8,12 @@ params:
       type: array
       title: Cluster IDs
       description: Cluster IDs, in the form "clustering_system_name:cluster_id"
-      items: {type: string}
+      items:
+        type: string
+        format: regex
+        pattern: ^\w+:\d+$
       examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
+      minItems: 1
     distance:
       type: integer
       title: Traversal Distance

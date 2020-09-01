@@ -22,7 +22,6 @@ The majority of errors returned from the server have explanatory information in 
 {
   "error": {
     "message": "A brief message explaining the error",
-    "status": 400, # or the appropriate HTTP error status code
   }
 }
 ```

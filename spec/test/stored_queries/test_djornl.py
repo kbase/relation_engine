@@ -56,144 +56,72 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             r = create_test_docs(node_name, cluster_data['nodes'], True)
             print_db_update(r, node_name)
 
-    def submit_query(self, query_name, query_data={}):
-        """submit a database query"""
-
-        if _VERBOSE:
-            print('query data string: ' + json.dumps(query_data))
-
-        return run_query(query_name, query_data)
-
-    def test_expected_results(self, description=None, response=None, expected=None):
+    def test_expected_results(self, query_name=None, test_data=None):
 
         # don't run the tests if they're being called automatically
-        if response is None:
+        if query_name is None:
             self.assertTrue(True)
             return
 
+        # ensure we have either 'results' or 'error' in the test data
+        self.assertTrue('results' in test_data or 'error' in test_data)
+
+        params = {}
+        if 'params' in test_data:
+            params = test_data['params']
+
+        response = run_query(query_name, params)
+
         if _VERBOSE:
-            print("Running test " + description)
-            if 'results' not in response:
+            print("Running query " + query_name)
+            if 'params' in test_data:
+                print({'params': params})
+
+        # expecting an error response
+        if 'error' in test_data:
+            if 'error' not in response:
                 print({'response': response})
 
+            self.assertIn('error', response)
+            self.assertEqual(response['error'], test_data['error'])
+            return response
+
+        # expecting a valid response
+        if 'results' not in response:
+            print({'response': response})
+
+        self.assertIn('results', response)
         results = response['results'][0]
+
         self.assertEqual(
             set([n["_key"] for n in results['nodes']]),
-            set(expected['nodes'])
+            set(test_data['results']['nodes'])
         )
 
         self.assertEqual(
             set([e["_key"] for e in results['edges']]),
-            set(expected['edges'])
+            set(test_data['results']['edges'])
         )
+        return response
 
-    def test_error_response(self, description=None, response=None, expected=None):
-
-        # don't run the tests if they're being called automatically
-        if response is None:
-            self.assertTrue(True)
-            return
-
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], expected)
-
-    def test_errors(self):
-
-        # query not found
-        self.test_error_response(
-            'stored query not found',
-            self.submit_query('djornl_fetch_phenotype', {
-                'keys': ['A', 'B', 'C'],
-            }),
-            {
-                'details': "Stored query 'djornl_fetch_phenotype' does not exist.",
-                'message': 'Not found',
-                'name': 'djornl_fetch_phenotype',
-                'status': 404
-            }
-        )
-
-        # extra param not in query
-        self.test_error_response(
-            'parameter not allowed in query',
-            self.submit_query('djornl_fetch_all', {
-                'musical': 'Mary Poppins',
-            }),
-            {
-                'failed_validator': 'additionalProperties',
-                'message': "Additional properties are not allowed ('musical' was unexpected)",
-                'path': [],
-                'status': 400,
-                'value': {'musical': 'Mary Poppins'},
-            }
-        )
-
-        # missing required param
-        self.test_error_response(
-            'missing required parameter',
-            self.submit_query('djornl_fetch_phenotypes', {}),
-            {
-                'failed_validator': 'required',
-                'message': "'keys' is a required property",
-                'path': [],
-                'status': 400,
-                'value': {},
-            }
-        )
-
-        # param not in correct format (should be array, not str)
-        self.test_error_response(
-            'parameter should be array, not string',
-            self.submit_query('djornl_fetch_clusters', {
-                'cluster_ids': 'Mary Poppins',
-            }),
-            {
-                'failed_validator': 'type',
-                'message': "'Mary Poppins' is not of type 'array'",
-                'path': ['cluster_ids'],
-                'status': 400,
-                'value': 'Mary Poppins'
-            }
-        )
-
-        # invalid param (fails validation)
-        self.test_error_response(
-            'invalid parameter fails validation',
-            self.submit_query('djornl_fetch_clusters', {
-                'cluster_ids': ['Mary Poppins'],
-            }),
-            {
-                'failed_validator': 'pattern',
-                'message': "'Mary Poppins' does not match '^\\\\w+:\\\\d+$'",
-                'path': ['cluster_ids', 0],
-                'status': 400,
-                'value': 'Mary Poppins'
-            }
-        )
-
-        # not enough array items
-        self.test_error_response(
-            'minItems parameter fails validation',
-            self.submit_query('djornl_fetch_clusters', {
-                'cluster_ids': [],
-            }),
-            {
-                'failed_validator': 'minItems',
-                'message': "[] is too short",
-                'path': ['cluster_ids'],
-                'status': 400,
-                'value': []
-            }
-        )
+    # indexing schema in results.json
+    # self.json_data['queries'][query_name]
+    # e.g. for fetch_clusters data:
+    # "djornl_fetch_clusters": {
+    #   "params": { "cluster_ids": ["markov_i2:6", "markov_i4:3"], "distance": "1"},
+    #   "results": {
+    #     "nodes": [ node IDs ],
+    #     "edges": [ edge data ]
+    #   }
+    # }
+    # nodes are represented as a list of node[_key]
+    # edges are objects with keys _to, _from, edge_type and score
 
     def test_fetch_all(self):
-
-        all_results = self.json_data['fetch_all']['-']
-        response = self.submit_query('djornl_fetch_all')
-        self.test_expected_results(
+        '''Ensure that data returned by the fetch all query has all the information that we expect'''
+        response = self.test_expected_results(
             "djornl_fetch_all",
-            response,
-            all_results
+            self.json_data['queries']['djornl_fetch_all'][0]
         )
 
         # ensure that all the cluster data is returned OK
@@ -204,78 +132,10 @@ class Test_DJORNL_Stored_Queries(unittest.TestCase):
             {n['_key']: n['clusters'] for n in expected_node_data if 'clusters' in n},
         )
 
-    # indexing schema in results.json
-    # self.json_data[query_name][param_name][param_value]["distance"][distance_param]
-    # e.g. for fetch_clusters data:
-    # "fetch_clusters": {
-    #   "cluster_ids": {
-    #     "markov_i2:6__markov_i4:3": {
-    #       "distance": {
-    #         1: {
-    #           "nodes": [ node IDs ],
-    #           "edges": [ edge data ],
-    #         }
-    #       }
-    #     }
-    #   }
-    # }
-    # if param_value is an array, join the array entities with "__"
-    # results are in the form {"nodes": [...], "edges": [...]}
-    # nodes are represented as a list of node[_key]
-    # edges are objects with keys _to, _from, edge_type and score
+    def test_queries(self):
+        '''Run parameterised queries and check for results or error messages'''
 
-    def test_fetch_phenotypes(self):
-
-        for (fetch_args, key_data) in self.json_data['fetch_phenotypes']['keys'].items():
-            for (distance, distance_data) in key_data['distance'].items():
-                resp = self.submit_query('djornl_fetch_phenotypes', {
-                    "keys": fetch_args.split('__'),
-                    "distance": int(distance),
-                })
-                self.test_expected_results(
-                    "fetch phenotypes with args " + fetch_args + " and distance " + distance,
-                    resp,
-                    distance_data
-                )
-
-    def test_fetch_genes(self):
-
-        for (fetch_args, key_data) in self.json_data['fetch_genes']['keys'].items():
-            for (distance, distance_data) in key_data['distance'].items():
-                resp = self.submit_query('djornl_fetch_genes', {
-                    "keys": fetch_args.split('__'),
-                    "distance": int(distance),
-                })
-                self.test_expected_results(
-                    "fetch genes with args " + fetch_args + " and distance " + distance,
-                    resp,
-                    distance_data
-                )
-
-    def test_fetch_clusters(self):
-
-        for (fetch_args, cluster_data) in self.json_data['fetch_clusters']['cluster_ids'].items():
-            for (distance, distance_data) in cluster_data['distance'].items():
-                resp = self.submit_query('djornl_fetch_clusters', {
-                    "cluster_ids": fetch_args.split('__'),
-                    "distance": int(distance),
-                })
-                self.test_expected_results(
-                    "fetch clusters with args " + fetch_args + " and distance " + distance,
-                    resp,
-                    distance_data
-                )
-
-    def test_search_nodes(self):
-
-        for (search_text, search_data) in self.json_data['search_nodes']['search_text'].items():
-            for (distance, distance_data) in search_data['distance'].items():
-                resp = self.submit_query('djornl_search_nodes', {
-                    "search_text": search_text,
-                    "distance": int(distance),
-                })
-                self.test_expected_results(
-                    "search nodes with args " + search_text + " and distance " + distance,
-                    resp,
-                    distance_data
-                )
+        for query in self.json_data['queries'].keys():
+            for test in self.json_data['queries'][query]:
+                with self.subTest(query=query, params=test['params']):
+                    self.test_expected_results(query, test)

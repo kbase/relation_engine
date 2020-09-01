@@ -248,4 +248,5 @@ if __name__ == '__main__':
 
     wait_for_arangodb()
     n_errors = validate_all_by_type(validation_base_dir)
-    sys.exit(n_errors)
+    exit_code = 0 if not n_errors else 1
+    sys.exit(exit_code)

@@ -99,20 +99,20 @@ class TestApi(unittest.TestCase):
 
     def test_root(self):
         """Test root path for api."""
-        resp = requests.get(URL + '/').json()
-        self.assertEqual(resp['arangodb_status'], 'connected_authorized')
-        self.assertTrue(resp['commit_hash'])
-        self.assertTrue(resp['repo_url'])
+        resp_json = requests.get(URL + '/').json()
+        self.assertEqual(resp_json['arangodb_status'], 'connected_authorized')
+        self.assertTrue(resp_json['commit_hash'])
+        self.assertTrue(resp_json['repo_url'])
 
     def test_config(self):
         """Test config fetch."""
-        resp = requests.get(API_URL + '/config').json()
-        self.assertTrue(len(resp['auth_url']))
-        self.assertTrue(len(resp['workspace_url']))
-        self.assertTrue(len(resp['kbase_endpoint']))
-        self.assertTrue(len(resp['db_url']))
-        self.assertTrue(len(resp['db_name']))
-        self.assertTrue(len(resp['spec_url']))
+        resp_json = requests.get(API_URL + '/config').json()
+        self.assertTrue(len(resp_json['auth_url']))
+        self.assertTrue(len(resp_json['workspace_url']))
+        self.assertTrue(len(resp_json['kbase_endpoint']))
+        self.assertTrue(len(resp_json['db_url']))
+        self.assertTrue(len(resp_json['db_name']))
+        self.assertTrue(len(resp_json['spec_url']))
 
     def test_update_specs(self):
         """Test the endpoint that triggers an update on the specs."""
@@ -271,7 +271,6 @@ class TestApi(unittest.TestCase):
             status_code=404,
             resp_json={
                 'error': {
-                    'status': 404,
                     'message': 'Not found',
                     'details': f"Data source '{name}' does not exist.",
                     'name': name,
@@ -294,7 +293,6 @@ class TestApi(unittest.TestCase):
                     status_code=404,
                     resp_json={
                         'error': {
-                            'status': 404,
                             'message': 'Not found',
                             'details': f"Collection '{name}' does not exist.",
                             'name': name,
@@ -312,7 +310,6 @@ class TestApi(unittest.TestCase):
             status_code=404,
             resp_json={
                 'error': {
-                    'status': 404,
                     'message': 'Not found',
                     'details': f"Stored query '{name}' does not exist.",
                     'name': name,
@@ -366,7 +363,6 @@ class TestApi(unittest.TestCase):
             status_code=404,
             resp_json={
                 'error': {
-                    'status': 404,
                     'message': 'Not found',
                     'details': f"Data source '{name}' does not exist.",
                     'name': name,
@@ -374,55 +370,76 @@ class TestApi(unittest.TestCase):
             }
         )
 
-        resp = requests.get(f"{API_URL}/data_sources/{name}")
-        self.assertEqual(resp.status_code, 404)
-        resp_json = resp.json()
-        self.assertEqual(resp_json, {
-            'error': {
-                'message': 'Not found',
-                'status': 404,
-                'name': name,
-                'details': f"Data source '{name}' does not exist.",
-            }
-        })
-
     def test_save_documents_missing_auth(self):
         """Test an invalid attempt to save a doc with a missing auth token."""
-        resp = requests.put(
-            API_URL + '/documents?on_duplicate=error&overwrite=true&collection'
-        ).json()
-        self.assertEqual(resp['error'], {'message': 'Missing header: Authorization', 'status': 400})
+        self.test_request(
+            '/documents?on_duplicate=error&overwrite=true&collection',
+            method='put',
+            status_code=400,
+            resp_json={'error': {'message': 'Missing header: Authorization'}},
+        )
 
     def test_save_documents_invalid_auth(self):
         """Test an invalid attempt to save a doc with a bad auth token."""
-        resp = requests.put(
-            API_URL + '/documents?on_duplicate=error&overwrite=true&collection',
-            headers={'Authorization': 'Bearer ' + INVALID_TOKEN}
-        ).json()
-        self.assertEqual(resp['error']['message'], 'Unauthorized')
-        self.assertEqual(resp['error']['status'], 403)
+
+        # see ./mock_auth/auth_invalid.json for the response
+        auth_response = {
+            "error": {
+                "httpcode": 401,
+                "httpstatus": "Unauthorized",
+                "appcode": 10020,
+                "apperror": "Invalid token",
+                "message": "10020 Invalid token",
+                "callid": "1757210147564211",
+                "time": 1542737889450
+            }
+        }
+
+        self.test_request(
+            '/documents?on_duplicate=error&overwrite=true&collection',
+            headers={'Authorization': 'Bearer ' + INVALID_TOKEN},
+            method='put',
+            status_code=403,
+            resp_json={'error': {
+                'message': 'Unauthorized',
+                'auth_url': 'http://auth:5000',
+                'auth_response': json.dumps(auth_response)
+            }},
+        )
 
     def test_save_documents_non_admin(self):
         """Test an invalid attempt to save a doc as a non-admin."""
-        resp = requests.put(
-            API_URL + '/documents?on_duplicate=error&overwrite=true&collection',
-            headers=HEADERS_NON_ADMIN
-        ).json()
-        self.assertEqual(resp['error']['message'], 'Unauthorized')
-        self.assertEqual(resp['error']['status'], 403)
+        self.test_request(
+            '/documents?on_duplicate=error&overwrite=true&collection',
+            headers=HEADERS_NON_ADMIN,
+            method='put',
+            status_code=403,
+            resp_json={
+                'error': {
+                    'auth_response': 'Missing role',
+                    'auth_url': 'http://auth:5000',
+                    'message': 'Unauthorized'
+                }
+            },
+        )
 
     def test_save_documents_invalid_schema(self):
         """Test the case where some documents fail against their schema."""
-        resp = requests.put(
-            API_URL + '/documents',
+
+        self.test_request(
+            '/documents',
             params={'on_duplicate': 'ignore', 'collection': 'test_vertex'},
             data='{"name": "x"}\n{"name": "y"}',
-            headers=HEADERS_ADMIN
-        ).json()
-        self.assertEqual(resp['error']['message'], "'_key' is a required property")
-        self.assertEqual(resp['error']['value'], {'name': 'x'})
-        self.assertEqual(resp['error']['path'], [])
-        self.assertEqual(resp['error']['failed_validator'], 'required')
+            headers=HEADERS_ADMIN,
+            method='put',
+            status_code=400,
+            resp_json={'error': {
+                'message': "'_key' is a required property",
+                'value': {'name': 'x'},
+                'path': [],
+                'failed_validator': 'required',
+            }},
+        )
 
     def test_save_documents_missing_schema(self):
         """Test the case where the collection/schema does not exist."""
@@ -437,7 +454,6 @@ class TestApi(unittest.TestCase):
             status_code=404,
             resp_json={
                 'error': {
-                    'status': 404,
                     'message': 'Not found',
                     'details': f"Collection '{name}' does not exist.",
                     'name': name,
@@ -447,15 +463,15 @@ class TestApi(unittest.TestCase):
 
     def test_save_documents_invalid_json(self):
         """Test an attempt to save documents with an invalid JSON body."""
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'collection': 'test_vertex'},
             data='\n',
             headers=HEADERS_ADMIN
         ).json()
-        self.assertTrue('Unable to parse' in resp['error']['message'])
-        self.assertEqual(resp['error']['pos'], 1)
-        self.assertEqual(resp['error']['source_json'], '\n')
+        self.assertTrue('Unable to parse' in resp_json['error']['message'])
+        self.assertEqual(resp_json['error']['pos'], 1)
+        self.assertEqual(resp_json['error']['source_json'], '\n')
 
     def test_create_documents(self):
         """Test all valid cases for saving documents."""
@@ -471,14 +487,14 @@ class TestApi(unittest.TestCase):
 
     def test_update_documents(self):
         """Test updating existing documents."""
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'update', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=HEADERS_ADMIN
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
-        self.assertEqual(resp, expected)
+        self.assertEqual(resp_json, expected)
 
     def test_update_edge(self):
         """Test updating existing edge."""
@@ -490,110 +506,133 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN
         )
         self.assertTrue(resp.ok)
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'update', 'collection': 'test_edge'},
             data=edges,
             headers=HEADERS_ADMIN
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
-        self.assertEqual(resp, expected)
+        self.assertEqual(resp_json, expected)
 
     def test_replace_documents(self):
         """Test replacing of existing documents."""
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'replace', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=HEADERS_ADMIN
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 3, 'ignored': 0, 'error': False}
-        self.assertEqual(resp, expected)
+        self.assertEqual(resp_json, expected)
 
     def test_save_documents_dupe_errors(self):
         """Test where we want to raise errors on duplicate documents."""
         save_test_docs(3)
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'error', 'collection': 'test_vertex', 'display_errors': '1'},
             data=create_test_docs(3),
             headers=HEADERS_ADMIN
         ).json()
-        self.assertEqual(resp['created'], 0)
-        self.assertEqual(resp['errors'], 3)
-        self.assertTrue(resp['details'])
+        self.assertEqual(resp_json['created'], 0)
+        self.assertEqual(resp_json['errors'], 3)
+        self.assertTrue(resp_json['details'])
 
     def test_save_documents_ignore_dupes(self):
         """Test ignoring duplicate, existing documents when saving."""
-        resp = requests.put(
+        resp_json = requests.put(
             API_URL + '/documents',
             params={'on_duplicate': 'ignore', 'collection': 'test_vertex'},
             data=create_test_docs(3),
             headers=HEADERS_ADMIN
         ).json()
         expected = {'created': 0, 'errors': 0, 'empty': 0, 'updated': 0, 'ignored': 3, 'error': False}
-        self.assertEqual(resp, expected)
+        self.assertEqual(resp_json, expected)
 
     def test_admin_query(self):
         """Test an ad-hoc query made by an admin."""
         save_test_docs(1)
         query = 'for v in test_vertex sort rand() limit @count return v._id'
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={},
             headers=HEADERS_ADMIN,
             data=json.dumps({'query': query, 'count': 1})
         ).json()
-        self.assertEqual(resp['count'], 1)
-        self.assertEqual(len(resp['results']), 1)
+        self.assertEqual(resp_json['count'], 1)
+        self.assertEqual(len(resp_json['results']), 1)
 
     def test_admin_query_non_admin(self):
         """Test an ad-hoc query error as a non-admin."""
         query = 'for v in test_vertex sort rand() limit @count return v._id'
-        resp = requests.post(
-            API_URL + '/query_results',
+        auth_response = '{"class":"Exception","error":"Unable to match endpoint: POST /"}\n'
+        self.test_request(
+            '/query_results',
+            method='post',
             params={},
             headers=HEADERS_NON_ADMIN,
-            data=json.dumps({'query': query, 'count': 1})
-        ).json()
-        self.assertEqual(resp['error']['message'], 'Unauthorized')
-        self.assertEqual(resp['error']['status'], 403)
+            data=json.dumps({'query': query, 'count': 1}),
+            status_code=403,
+            resp_json={'error': {
+                'message': 'Unauthorized',
+                'auth_url': 'http://workspace:5000',
+                'auth_response': auth_response
+            }},
+        )
 
     def test_admin_query_invalid_auth(self):
         """Test the error response for an ad-hoc admin query without auth."""
+
+        # see ./mock_workspace/list_workspace_ids_invalid.json for response
         query = 'for v in test_vertex sort rand() limit @count return v._id'
-        resp = requests.post(
-            API_URL + '/query_results',
+        self.test_request(
+            '/query_results',
+            method='post',
             params={},
             headers={'Authorization': INVALID_TOKEN},
-            data=json.dumps({'query': query, 'count': 1})
-        ).json()
-        self.assertEqual(resp['error']['message'], 'Unauthorized')
-        self.assertEqual(resp['error']['status'], 403)
+            data=json.dumps({'query': query, 'count': 1}),
+            status_code=403,
+            resp_json={
+                'error': {
+                    'message': 'Unauthorized',
+                    'auth_url': 'http://workspace:5000',
+                    'auth_response': json.dumps({
+                        "version": "1.1",
+                        "error": {
+                            "name": "JSONRPCError",
+                            "code": -32400,
+                            "message": "Token validation failed!",
+                            "error": "..."
+                        }
+                    })
+                }
+            }
+        )
 
     def test_query_with_cursor(self):
         """Test getting more data via a query cursor and setting batch size."""
         save_test_docs(count=20)
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={'stored_query': 'list_test_vertices', 'batch_size': 10, 'full_count': True}
         ).json()
-        self.assertTrue(resp['cursor_id'])
-        self.assertEqual(resp['has_more'], True)
-        self.assertEqual(resp['count'], 20)
-        self.assertEqual(resp['stats']['fullCount'], 20)
-        self.assertTrue(len(resp['results']), 10)
+        self.assertTrue(resp_json['cursor_id'])
+        self.assertEqual(resp_json['has_more'], True)
+        self.assertEqual(resp_json['count'], 20)
+        self.assertEqual(resp_json['stats']['fullCount'], 20)
+        self.assertTrue(len(resp_json['results']), 10)
 
-        cursor_id = resp['cursor_id']
-        resp = requests.post(
+        cursor_id = resp_json['cursor_id']
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={'cursor_id': cursor_id}
         ).json()
-        self.assertEqual(resp['count'], 20)
-        self.assertEqual(resp['stats']['fullCount'], 20)
-        self.assertEqual(resp['has_more'], False)
-        self.assertEqual(resp['cursor_id'], None)
-        self.assertTrue(len(resp['results']), 10)
+        self.assertEqual(resp_json['count'], 20)
+        self.assertEqual(resp_json['stats']['fullCount'], 20)
+        self.assertEqual(resp_json['has_more'], False)
+        self.assertEqual(resp_json['cursor_id'], None)
+        self.assertTrue(len(resp_json['results']), 10)
 
         # Try to get the same cursor again
         self.test_request(
@@ -603,7 +642,6 @@ class TestApi(unittest.TestCase):
             status_code=400,
             resp_json={
                 'error': {
-                    'status': 400,
                     'message': 'ArangoDB server error.',
                     'arango_message': 'cursor not found',
                 }
@@ -621,7 +659,6 @@ class TestApi(unittest.TestCase):
             status_code=404,
             resp_json={
                 'error': {
-                    'status': 404,
                     'message': 'Not found',
                     'details': f"Stored query '{name}' does not exist.",
                     'name': name,
@@ -641,7 +678,6 @@ class TestApi(unittest.TestCase):
             status_code=400,
             resp_json={
                 'error': {
-                    'status': 400,
                     'message': 'ArangoDB server error.',
                     'arango_message': arango_msg,
                 }
@@ -662,13 +698,13 @@ class TestApi(unittest.TestCase):
             }),
             headers=HEADERS_ADMIN
         )
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={'stored_query': 'list_test_vertices'},
             headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
-        self.assertEqual(resp['count'], 1)
-        self.assertEqual(resp['results'][0]['ws_id'], ws_id)
+        self.assertEqual(resp_json['count'], 1)
+        self.assertEqual(resp_json['results'][0]['ws_id'], ws_id)
 
     def test_auth_query_no_access(self):
         """Test the case where we try to query a collection without the right workspace access."""
@@ -679,12 +715,12 @@ class TestApi(unittest.TestCase):
             data='{"name": "requires_auth", "_key": "1", "ws_id": 9999}',
             headers=HEADERS_ADMIN
         )
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={'stored_query': 'list_test_vertices'},
             headers={'Authorization': 'valid_token'}  # see ./mock_workspace/endpoints.json
         ).json()
-        self.assertEqual(resp['count'], 0)
+        self.assertEqual(resp_json['count'], 0)
 
     def test_query_cannot_pass_ws_ids(self):
         """Test that users cannot set the ws_ids param."""
@@ -695,13 +731,13 @@ class TestApi(unittest.TestCase):
             data='{"name": "requires_auth", "_key": "1", "ws_id": 99}',
             headers=HEADERS_ADMIN
         )
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             params={'view': 'list_test_vertices'},
             data=json.dumps({'ws_ids': [ws_id]}),
             headers={'Authorization': 'valid_token'}
         ).json()
-        self.assertEqual(resp['count'], 0)
+        self.assertEqual(resp_json['count'], 0)
 
     def test_auth_query_invalid_token(self):
         """Test the case where we try to authorize a query using an invalid auth token."""
@@ -712,13 +748,30 @@ class TestApi(unittest.TestCase):
             headers=HEADERS_ADMIN
         )
 
-        resp = requests.post(
-            API_URL + '/query_results',
+        # see ./mock_workspace/list_workspace_ids_invalid.json for response
+        self.test_request(
+            '/query_results',
             params={'view': 'list_test_vertices'},
             data=json.dumps({'ws_ids': [1]}),
-            headers={'Authorization': INVALID_TOKEN}
+            headers={'Authorization': INVALID_TOKEN},
+            method='post',
+            status_code=403,
+            resp_json={
+                'error': {
+                    'message': 'Unauthorized',
+                    'auth_url': 'http://workspace:5000',
+                    'auth_response': json.dumps({
+                        "version": "1.1",
+                        "error": {
+                            "name": "JSONRPCError",
+                            "code": -32400,
+                            "message": "Token validation failed!",
+                            "error": "..."
+                        }
+                    })
+                }
+            }
         )
-        self.assertEqual(resp.status_code, 403)
 
     def test_auth_adhoc_query(self):
         """Test that the 'ws_ids' bind-var is set for RE_ADMINs."""
@@ -731,12 +784,12 @@ class TestApi(unittest.TestCase):
         )
         # This is the same query as list_test_vertices.aql in the spec
         query = 'for o in test_vertex filter o.is_public || o.ws_id IN ws_ids return o'
-        resp = requests.post(
+        resp_json = requests.post(
             API_URL + '/query_results',
             data=json.dumps({'query': query}),
             headers={'Authorization': ADMIN_TOKEN}  # see ./mock_workspace/endpoints.json
         ).json()
-        self.assertEqual(resp['count'], 1)
+        self.assertEqual(resp_json['count'], 1)
 
     def test_save_docs_invalid(self):
         """Test that an invalid bulk save returns a 400 response"""

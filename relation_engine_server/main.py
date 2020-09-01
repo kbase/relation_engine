@@ -25,16 +25,13 @@ def return_error(error_dict, code):
 
     'error': {
         'message': <text explanation of error>,
-        'status': <HTTP error code>,
     }
 
     The 'error' dictionary may have extra keys if there is additional information.
 
-    This helper adds the 'status' key and value to the input, and wraps the whole structure
-    in an extra dict under the key 'error'.
+    This helper wraps the whole structure in an extra dict under the key 'error'.
 
     """
-    error_dict['status'] = code
     return (flask.jsonify({'error': error_dict}), code)
 
 
