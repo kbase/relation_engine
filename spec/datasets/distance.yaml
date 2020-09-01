@@ -1,0 +1,7 @@
+name: distance
+type: integer
+title: Traversal Distance
+description: How many hops to find neighbors and neighbors-of-neighbors
+default: 1
+minimum: 0
+maximum: 100
