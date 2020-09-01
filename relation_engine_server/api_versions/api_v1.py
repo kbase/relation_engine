@@ -71,10 +71,8 @@ def run_query():
      - public stored queries (these have access controls within them based on params)
     """
     json_body = parse_json.get_json_body() or {}
-    # Don't allow the user to set the special 'ws_ids' field
-    json_body['ws_ids'] = []
-    auth_token = auth.get_auth_header()
     # Fetch any authorized workspace IDs using a KBase auth token, if present
+    auth_token = auth.get_auth_header()
     ws_ids = auth.get_workspace_ids(auth_token)
     # fetch number of documents to return
     batch_size = int(flask.request.args.get('batch_size', 10000))
@@ -99,21 +97,13 @@ def run_query():
         query_name = flask.request.args.get('stored_query') or flask.request.args.get('view')
         stored_query = spec_loader.get_stored_query(query_name)
 
-        has_ws_ids = False
-        if 'ws_ids' in stored_query['query']:
-            json_body['ws_ids'] = ws_ids
-            has_ws_ids = True
-        else:
-            del json_body['ws_ids']
-
-        stored_query_source = _preprocess_stored_query(
-            stored_query['query'], stored_query, has_ws_ids
-        )
-
         if 'params' in stored_query:
             # Validate the user params for the query
             stored_query_path = spec_loader.get_stored_query(query_name, path_only=True)
             run_validator(schema_file=stored_query_path, data=json_body, validate_at='/params')
+
+        stored_query_source = _preprocess_stored_query(stored_query['query'], stored_query)
+        json_body['ws_ids'] = ws_ids
 
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,
@@ -180,11 +170,10 @@ def show_config():
     })
 
 
-def _preprocess_stored_query(query_text, config, has_ws_ids=True):
+def _preprocess_stored_query(query_text, config):
     """Inject some default code into each stored query."""
-    ws_id_text = " LET ws_ids = @ws_ids " if has_ws_ids else ""
     return (
         config.get('query_prefix', '') +
-        ws_id_text +
+        " LET ws_ids = @ws_ids " +
         query_text
     )
