@@ -71,9 +71,6 @@ def run_query():
      - public stored queries (these have access controls within them based on params)
     """
     json_body = parse_json.get_json_body() or {}
-    # Fetch any authorized workspace IDs using a KBase auth token, if present
-    auth_token = auth.get_auth_header()
-    ws_ids = auth.get_workspace_ids(auth_token)
     # fetch number of documents to return
     batch_size = int(flask.request.args.get('batch_size', 10000))
     full_count = flask.request.args.get('full_count', False)
@@ -83,7 +80,11 @@ def run_query():
         auth.require_auth_token(roles=['RE_ADMIN'])
         query_text = _preprocess_stored_query(json_body['query'], json_body)
         del json_body['query']
-        json_body['ws_ids'] = ws_ids
+        if 'ws_ids' in query_text:
+            # Fetch any authorized workspace IDs using a KBase auth token, if present
+            auth_token = auth.get_auth_header()
+            json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
+
         resp_body = arango_client.run_query(query_text=query_text,
                                             bind_vars=json_body,
                                             batch_size=batch_size,
@@ -103,7 +104,10 @@ def run_query():
             run_validator(schema_file=stored_query_path, data=json_body, validate_at='/params')
 
         stored_query_source = _preprocess_stored_query(stored_query['query'], stored_query)
-        json_body['ws_ids'] = ws_ids
+        if 'ws_ids' in stored_query_source:
+            # Fetch any authorized workspace IDs using a KBase auth token, if present
+            auth_token = auth.get_auth_header()
+            json_body['ws_ids'] = auth.get_workspace_ids(auth_token)
 
         resp_body = arango_client.run_query(query_text=stored_query_source,
                                             bind_vars=json_body,
@@ -172,8 +176,9 @@ def show_config():
 
 def _preprocess_stored_query(query_text, config):
     """Inject some default code into each stored query."""
+    ws_id_text = " LET ws_ids = @ws_ids " if 'ws_ids' in query_text else ""
     return (
         config.get('query_prefix', '') +
-        " LET ws_ids = @ws_ids " +
+        ws_id_text +
         query_text
     )
