@@ -2,7 +2,16 @@ name: djornl_fetch_all
 description: Fetch all node and edge data from the djornl subgraph
 params:
   type: object
-#  additionalProperties: false
+  additionalProperties: false
+  properties:
+    edge_types:
+      type: array
+      title: Edge types
+      description: Permitted edge types
+      items:
+        $ref: "../../datasets/djornl/edge_type.yaml"
+      default: []
+      examples: [['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi'],['AraGWAS-Phenotype_Associations']]
 query: |
   LET nodes = (
     FOR v IN djornl_node
@@ -10,6 +19,7 @@ query: |
   )
   LET edges = (
     FOR e IN djornl_edge
+      FILTER length(@edge_types) > 0 && e.edge_type IN @edge_types || length(@edge_types) == 0
       RETURN e
   )
   RETURN {nodes, edges}

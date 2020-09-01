@@ -2,22 +2,18 @@ name: djornl_fetch_genes
 description: Fetch a gene or list of genes by key, and the edges and nodes within the specified distance (number of hops) of those genes.
 params:
   type: object
+  additionalProperties: false
   required: [keys]
   properties:
-    distance:
-      type: integer
-      title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
-      default: 1
-      minimum: 0
-      maximum: 100
     keys:
       type: array
-      items:
-        type: string
       title: Gene Keys
+      items:
+        $ref: "../../datasets/djornl/definitions.yaml#definitions/djornl_node/_key"
       minItems: 1
       examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
+    distance:
+      $ref: "../../datasets/distance.yaml"
 query: |
   LET node_ids = (
     FOR n IN djornl_node

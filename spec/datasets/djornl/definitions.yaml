@@ -35,7 +35,7 @@ definitions:
     _key:
       type: string
       title: Key
-      examples: ["AT1G01010"]
+      examples: ["AT1G01010", "As2"]
     clusters:
       type: array
       title: Clusters

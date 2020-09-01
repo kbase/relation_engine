@@ -2,6 +2,7 @@ name: djornl_fetch_clusters
 description: Fetch all nodes that are members of the specified cluster(s), and the edges and nodes within the specified distance (number of hops) of those nodes.
 params:
   type: object
+  additionalProperties: false
   required: [cluster_ids]
   properties:
     cluster_ids:
@@ -9,18 +10,11 @@ params:
       title: Cluster IDs
       description: Cluster IDs, in the form "clustering_system_name:cluster_id"
       items:
-        type: string
-        format: regex
-        pattern: ^\w+:\d+$
-      examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
+        $ref: "../../datasets/djornl/definitions.yaml#definitions/cluster_id"
       minItems: 1
+      examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
     distance:
-      type: integer
-      title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
-      default: 1
-      minimum: 0
-      maximum: 100
+      $ref: "../../datasets/distance.yaml"
 query: |
   LET node_ids = (
     FOR n IN djornl_node

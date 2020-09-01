@@ -2,19 +2,15 @@ name: djornl_search_nodes
 description: Search for nodes using a simple fuzzy search on node metadata; return the matching nodes, and the edges and nodes within the specified distance (number of hops) of those nodes.
 params:
   type: object
+  additionalProperties: false
   required: [search_text]
   properties:
-    distance:
-      type: integer
-      title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
-      default: 1
-      minimum: 0
-      maximum: 100
     search_text:
       type: string
       title: Search text
       examples: ['GO:0005515', 'organelle machinery']
+    distance:
+      $ref: "../../datasets/distance.yaml"
 query: |
   LET node_ids = (
     FOR g IN djornl_node_view
