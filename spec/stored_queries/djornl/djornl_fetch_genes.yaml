@@ -13,8 +13,10 @@ params:
       maximum: 100
     keys:
       type: array
-      items: {type: string}
+      items:
+        type: string
       title: Gene Keys
+      minItems: 1
       examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
 query: |
   LET node_ids = (

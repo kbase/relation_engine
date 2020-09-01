@@ -175,7 +175,6 @@ class TestREClientIntegration(unittest.TestCase):
             {
                 'error': {
                     'message': 'Not found',
-                    'status': 404,
                     'details': "Collection 'xyz123' does not exist.",
                     'name': 'xyz123',
                 }

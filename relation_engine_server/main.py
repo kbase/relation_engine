@@ -18,6 +18,23 @@ app.url_map.strict_slashes = False  # allow both `get /v1/` and `get /v1`
 app.register_blueprint(api_v1, url_prefix='/api/v1')
 
 
+def return_error(error_dict, code):
+    """return the appropriate error structure and code
+
+    Errors returned by the server have the basic format
+
+    'error': {
+        'message': <text explanation of error>,
+    }
+
+    The 'error' dictionary may have extra keys if there is additional information.
+
+    This helper wraps the whole structure in an extra dict under the key 'error'.
+
+    """
+    return (flask.jsonify({'error': error_dict}), code)
+
+
 @app.route('/', methods=['GET'])
 def root():
     """Server status."""
@@ -40,29 +57,32 @@ def root():
 def json_decode_error(err):
     """A problem parsing json."""
     resp = {
-        'error': 'Unable to parse JSON',
+        'message': 'Unable to parse JSON',
         'source_json': err.doc,
         'pos': err.pos,
         'lineno': err.lineno,
-        'colno': err.colno
+        'colno': err.colno,
     }
-    return (flask.jsonify(resp), 400)
+    return return_error(resp, 400)
 
 
 @app.errorhandler(arango_client.ArangoServerError)
 def arango_server_error(err):
     resp = {
-        'error': str(err),
-        'arango_message': err.resp_json['errorMessage']
+        'message': str(err),
+        'arango_message': err.resp_json['errorMessage'],
     }
-    return (flask.jsonify(resp), 400)
+    return return_error(resp, 400)
 
 
+# Invalid request body json params or missing headers
+@app.errorhandler(MissingHeader)
 @app.errorhandler(InvalidParameters)
-def invalid_params(err):
-    """Invalid request body json params."""
-    resp = {'error': str(err)}
-    return (flask.jsonify(resp), 400)
+def generic_400(err):
+    resp = {
+        'message': str(err),
+    }
+    return return_error(resp, 400)
 
 
 @app.errorhandler(ValidationError)
@@ -71,63 +91,52 @@ def validation_error(err):
     # Refer to the documentation on jsonschema.exceptions.ValidationError:
     # https://python-jsonschema.readthedocs.io/en/stable/errors/
     resp = {
-        'error': err.message,
+        'message': err.message,
         'failed_validator': err.validator,
         'value': err.instance,
         'path': list(err.absolute_path),
     }
-    return (flask.jsonify(resp), 400)
+    return return_error(resp, 400)
 
 
 @app.errorhandler(UnauthorizedAccess)
 def unauthorized_access(err):
     resp = {
-        'error': {
-            'status': 403,
-            'message': 'Unauthorized',
-            'auth_url': err.auth_url,
-            'auth_response': err.response,
-        },
+        'message': 'Unauthorized',
+        'auth_url': err.auth_url,
+        'auth_response': err.response,
     }
-    return (flask.jsonify(resp), 403)
+    return return_error(resp, 403)
 
 
 @app.errorhandler(SchemaNonexistent)
 def schema_does_not_exist(err):
     """General error cases."""
     resp = {
-        'error': {
-            'message': 'Not found',
-            'status': 404,
-            'details': str(err),
-            'name': err.name,
-        }
+        'message': 'Not found',
+        'details': str(err),
+        'name': err.name,
     }
-    return (flask.jsonify(resp), 404)
+    return return_error(resp, 404)
 
 
 @app.errorhandler(NotFound)
 @app.errorhandler(404)
 def page_not_found(err):
     resp = {
-        'error': {
-            'message': 'Not found',
-            'status': 404,
-        }
+        'message': 'Not found',
     }
     if hasattr(err, 'details'):
-        resp['error']['details'] = err.details
-    return (flask.jsonify(resp), 404)
+        resp['details'] = err.details
+    return return_error(resp, 404)
 
 
 @app.errorhandler(405)
 def method_not_allowed(err):
-    return (flask.jsonify({'error': {'message': 'Method not allowed', 'status': 405}}), 405)
-
-
-@app.errorhandler(MissingHeader)
-def generic_400(err):
-    return (flask.jsonify({'error': {'message': str(err), 'status': 400}}), 400)
+    resp = {
+        'message': 'Method not allowed',
+    }
+    return return_error(resp, 405)
 
 
 # Any other unhandled exceptions -> 500
@@ -139,11 +148,13 @@ def server_error(err):
     print('-' * 80)
     traceback.print_exc()
     print('=' * 80)
-    resp = {'error': {'status': 500, 'message': 'Unexpected server error'}}
+    resp = {
+        'message': 'Unexpected server error'
+    }
     # TODO only set below two fields in dev mode
-    resp['error']['class'] = err.__class__.__name__
-    resp['error']['details'] = str(err)
-    return (flask.jsonify(resp), 500)
+    resp['class'] = err.__class__.__name__
+    resp['details'] = str(err)
+    return return_error(resp, 500)
 
 
 @app.after_request

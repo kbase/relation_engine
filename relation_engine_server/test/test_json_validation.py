@@ -96,6 +96,12 @@ class TestJsonValidation(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, err_str):
             run_validator(schema={}, data=None, data_file=None)
 
+        # invalid file type
+        test_file = os_path.join(*(test_data_dirs + ['test_file.md']))
+        err_msg = f'Unknown file type encountered: {test_file}'
+        with self.assertRaisesRegex(TypeError, err_msg):
+            run_validator(schema_file=test_file, data={})
+
         # invalid jsonpointer string - note the grammar error is from jsonpointer
         err_str = 'location must starts with /'
         json_loc = 'start validating here'

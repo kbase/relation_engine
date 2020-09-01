@@ -13,8 +13,10 @@ params:
       maximum: 100
     keys:
       type: array
-      items: {type: string}
+      items:
+        type: string
       title: Phenotype Keys
+      minItems: 1
       examples: [["As2"],["As2", "Na23"]]
 query: |
   LET node_ids = (

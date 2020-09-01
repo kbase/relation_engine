@@ -56,297 +56,421 @@
       {"_key": "SDV", "node_type": "pheno", "transcript": "", "gene_symbol": "", "gene_full_name": "", "gene_model_type": "", "tair_computational_description": "", "tair_curator_summary": "", "tair_short_description": "", "go_description": "", "go_terms": [], "mapman_bin": "", "mapman_name": "", "mapman_description": "", "pheno_aragwas_id": "10.21958/phenotype:104", "pheno_description": "Number of days following stratification to opening of first flower. The experiment was stopped at 200 d, and accessions that had not flowered at that point were assigned a value of 200", "pheno_pto_name": "days to flowering trait", "pheno_pto_description": "A flowering time trait (TO:0002616)which is the number of days required for an individual flower (PO:0009046), a whole plant (PO:0000003) or a plant population to reach flowering stage (PO:0007616) from a predetermined time point (e.g. the date of seed sowing, seedling transplant, or seedling emergence). [GR:pj, TO:cooperl]", "pheno_ref": "Atwell et. al, Nature 2010", "user_notes": ""}
     ]
   },
-  "fetch_all": {
-    "nodes": [
-      "As2",
-      "As75",
-      "AT1G01010",
-      "AT1G01020",
-      "AT1G01030",
-      "AT1G01040",
-      "AT1G01050",
-      "AT1G01060",
-      "AT1G01070",
-      "AT1G01080",
-      "AT1G01090",
-      "AT1G01100",
-      "Na23",
-      "SDV"
+  "queries": {
+    "djornl_fetch_phenotype": [
+      {
+        "params": {"keys": ["A", "B", "C"]},
+        "error": {
+          "details": "Stored query 'djornl_fetch_phenotype' does not exist.",
+          "message": "Not found",
+          "name": "djornl_fetch_phenotype"
+        }
+      }
     ],
-    "edges": [
-      "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-      "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-      "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-      "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-      "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-      "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-      "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-      "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-      "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
-      "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+    "djornl_fetch_all": [
+      {
+        "params": {},
+        "results": {
+          "nodes": [
+            "As2",
+            "As75",
+            "AT1G01010",
+            "AT1G01020",
+            "AT1G01030",
+            "AT1G01040",
+            "AT1G01050",
+            "AT1G01060",
+            "AT1G01070",
+            "AT1G01080",
+            "AT1G01090",
+            "AT1G01100",
+            "Na23",
+            "SDV"
+          ],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
+            "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      },
+      {
+        "params": {"musical": "Mary Poppins"},
+        "error": {
+          "message": "ArangoDB server error.",
+          "arango_message": "AQL: bind parameter 'musical' was not declared in the query (while parsing)"
+        }
+      }
+    ],
+    "djornl_fetch_genes": [
+      {
+        "params": {},
+        "error": {
+          "failed_validator": "required",
+          "message": "'keys' is a required property",
+          "path": [],
+          "value": {"ws_ids": []}
+        }
+      },
+      {
+        "params": {"keys": []},
+        "error": {
+          "failed_validator": "minItems",
+          "message": "[] is too short",
+          "path": ["keys"],
+          "value": []
+        }
+      },
+      {
+        "params": { "keys": ["Mary Poppins"], "distance": 0 },
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": { "keys": ["Mary Poppins"], "distance": 1 },
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": { "keys": ["Mary Poppins"], "distance": 5 },
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": { "keys": ["AT1G01010"], "distance": 0 },
+        "results": {
+          "nodes": ["AT1G01010"],
+          "edges": []
+        }
+      },
+      {
+        "params": { "keys": ["AT1G01010"], "distance": 1 },
+        "results": {
+          "nodes": [
+            "AT1G01010",
+            "AT1G01020",
+            "AT1G01030",
+            "AT1G01040"
+          ],
+          "edges": [
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5"
+          ]
+        }
+      },
+      {
+        "params": { "keys": ["AT1G01010"], "distance": 5 },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0 },
+        "results": {
+          "nodes": ["AT1G01020", "AT1G01070"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1 },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5 },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      }
+    ],
+    "djornl_fetch_phenotypes": [
+      {
+        "params": {"keys": "Mary Poppins"},
+        "error": {
+          "failed_validator": "type",
+          "message": "'Mary Poppins' is not of type 'array'",
+          "path": ["keys"],
+          "value": "Mary Poppins"
+        }
+      },
+      {
+        "params": {"keys": ["Mary Poppins"], "distance": 0},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"keys": ["Mary Poppins"], "distance": 1},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"keys": ["Mary Poppins"], "distance": 5},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"keys": ["As2"], "distance": 0},
+        "results": {
+          "nodes": ["As2"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"keys": ["As2"], "distance": 1},
+        "results": {
+          "nodes": ["As2", "AT1G01020", "AT1G01040"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["As2"], "distance": 5},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["As2", "Na23"], "distance": 0},
+        "results": {
+          "nodes": ["As2", "Na23"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"keys": ["As2", "Na23"], "distance": 1},
+        "results": {
+          "nodes": ["As2", "Na23", "AT1G01020", "AT1G01040"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["As2", "Na23"], "distance": 5},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "Na23"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      }
+    ],
+    "djornl_search_nodes": [
+      {
+        "params": {"search_text": "Mary Poppins", "distance": 0},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"search_text": "Mary Poppins", "distance": 1},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"search_text": "Mary Poppins", "distance": 5},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 0},
+        "results": {
+          "nodes": ["AT1G01040", "AT1G01090"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 1},
+        "results": {
+          "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
+          "edges": [
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 5},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
+            "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      }
+    ],
+    "djornl_fetch_clusters": [
+      {
+        "params": {"cluster_ids": "Mary Poppins"},
+        "error": {
+          "failed_validator": "type",
+          "message": "'Mary Poppins' is not of type 'array'",
+          "path": ["cluster_ids"],
+          "value": "Mary Poppins"
+        }
+      },
+      {
+        "params": {"cluster_ids": ["Mary Poppins"]},
+        "error": {
+          "failed_validator": "pattern",
+          "message": "'Mary Poppins' does not match '^\\\\w+:\\\\d+$'",
+          "path": ["cluster_ids", 0],
+          "value": "Mary Poppins"
+        }
+      },
+      {
+        "params": {"cluster_ids": []},
+        "error": {
+          "failed_validator": "minItems",
+          "message": "[] is too short",
+          "path": ["cluster_ids"],
+          "value": []
+        }
+      },
+      {
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 0},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 1},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 5},
+        "results": {"nodes": [], "edges": []}
+      },
+      {
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 0},
+        "results": {
+          "nodes": ["AT1G01040", "AT1G01090"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 1},
+        "results": {
+          "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
+          "edges": [
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 5},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
+            "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 0},
+        "results": {
+          "nodes": ["AT1G01020", "AT1G01070"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 1},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3"
+          ]
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 5},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+            "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      }
     ]
-  },
-  "fetch_genes": {
-    "keys": {
-      "Mary Poppins": {
-        "distance": {
-          "0": {"nodes": [], "edges": []},
-          "1": {"nodes": [], "edges": []},
-          "5": {"nodes": [], "edges": []}
-        }
-      },
-      "AT1G01010": {
-        "distance": {
-          "0": {
-            "nodes": ["AT1G01010"],
-            "edges": []
-          },
-          "1": {
-            "nodes": [
-              "AT1G01010",
-              "AT1G01020",
-              "AT1G01030",
-              "AT1G01040"
-            ],
-            "edges": [
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
-            ]
-          }
-        }
-      },
-      "AT1G01020__AT1G01070": {
-        "distance": {
-          "0": {
-            "nodes": ["AT1G01020", "AT1G01070"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
-            ]
-          }
-        }
-      }
-    }
-  },
-  "fetch_phenotypes": {
-    "keys": {
-      "Mary Poppins": {
-        "distance": {
-          "0": {"nodes": [], "edges": []},
-          "1": {"nodes": [], "edges": []},
-          "5": {"nodes": [], "edges": []}
-        }
-      },
-      "As2": {
-        "distance": {
-          "0": {
-            "nodes": ["As2"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "AT1G01020", "AT1G01040"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
-            ]
-          }
-        }
-      },
-      "As2__Na23": {
-        "distance": {
-          "0": {
-            "nodes": ["As2", "Na23"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "Na23", "AT1G01020", "AT1G01040"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "Na23"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
-            ]
-          }
-        }
-      }
-    }
-  },
-  "search_nodes": {
-    "search_text": {
-      "Mary Poppins": {
-        "distance": {
-          "0": {"nodes": [], "edges": []},
-          "1": {"nodes": [], "edges": []},
-          "5": {"nodes": [], "edges": []}
-        }
-      },
-      "GO:0005515": {
-        "distance": {
-          "0": {
-            "nodes": ["AT1G01040", "AT1G01090"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
-            "edges": [
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
-              "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
-            ]
-          }
-        }
-      }
-    }
-  },
-
-  "fetch_clusters": {
-    "cluster_ids": {
-      "Mary Poppins": {
-        "distance": {
-          "0": {"nodes": [], "edges": []},
-          "1": {"nodes": [], "edges": []},
-          "5": {"nodes": [], "edges": []}
-        }
-      },
-      "markov_i6:1": {
-        "distance": {
-          "0": {
-            "nodes": ["AT1G01040", "AT1G01090"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
-            "edges": [
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
-              "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
-            ]
-          }
-        }
-      },
-      "markov_i2:5__markov_i6:2": {
-        "distance": {
-          "0": {
-            "nodes": ["AT1G01020", "AT1G01070"],
-            "edges": []
-          },
-          "1": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3"
-            ]
-          },
-          "5": {
-            "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
-            "edges": [
-              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
-              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
-              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
-              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
-            ]
-          }
-        }
-      }
-    }
   }
 }

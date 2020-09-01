@@ -13,7 +13,8 @@ from spec.validate import (
     validate_stored_query,
     validate_data_source,
     validate_view,
-    validate_all
+    validate_all,
+    validate_all_by_type,
 )
 
 _TEST_DIR = '/app/spec/test/sample_schemas'
@@ -28,7 +29,7 @@ class TestValidate(unittest.TestCase):
     def test_validate_schema(self):
         """Validate a single file using the generic validate_schema method"""
 
-        err_msg = 'No validation schema found for made-up_schema'
+        err_msg = "No validation schema found for 'made-up_schema'"
         with self.assertRaisesRegex(ValueError, err_msg):
             validate_schema('/path/to/file', 'made-up_schema')
 
@@ -176,6 +177,16 @@ class TestValidate(unittest.TestCase):
     def test_validate_all(self):
         """test all the files in a directory"""
 
+        with self.assertRaisesRegex(ValueError, "No validation schema found for 'muffins'"):
+            validate_all('muffins')
+
+        def validate_all_duplicate_names(self):
+            with self.assertRaisesRegex(ValidationError, "duplicate_names failed validation"):
+                validate_all('collection', os_path.join(_TEST_DIR, 'duplicate_names'))
+
+        stdout = capture_stdout(validate_all_duplicate_names, self)
+        self.assertRegex(stdout, "Duplicate queries named 'test_vertex'")
+
         sample_schemas = {
             'collection': 'collections',
             'stored_query': 'stored_queries',
@@ -184,10 +195,20 @@ class TestValidate(unittest.TestCase):
         }
 
         for (schema_type, directory) in sample_schemas.items():
-
             # n.b. this assumes all the schemas in /spec are valid!
             stdout = capture_stdout(validate_all, schema_type)
             self.assertRegex(stdout, r'...all valid')
 
             with self.assertRaises(Exception):
                 validate_all(schema_type, os_path.join(_TEST_DIR, directory))
+
+    def test_validate_all_by_type(self):
+        """test all files of all types from a root directory"""
+
+        # use value from config
+        n_errors = validate_all_by_type()
+        self.assertEqual(n_errors, 0)
+
+        # known dodgy dir
+        n_errors = validate_all_by_type(_TEST_DIR)
+        self.assertGreater(n_errors, 0)

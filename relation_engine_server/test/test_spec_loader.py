@@ -24,7 +24,8 @@ class TestSpecLoader(unittest.TestCase):
 
         # this method should only be run from another test method
         if len(schema_type_names) == 0:
-            self.skipTest('No schema type names supplied. Skipping')
+            self.assertTrue(True)
+            return
 
         schema_type_singular = schema_type_names[0]
         schema_type_plural = schema_type_names[1]
@@ -63,7 +64,8 @@ class TestSpecLoader(unittest.TestCase):
 
         # only run the test if it's being called from another test
         if test_name is None:
-            self.skipTest('No test name supplied')
+            self.assertTrue(True)
+            return
 
         print("running test_run_spec_loading_tests with schema_type " + schema_type_names[0])
         method = getattr(spec_loader, 'get_' + schema_type_names[0])
@@ -127,8 +129,14 @@ class TestSpecLoader(unittest.TestCase):
 
         for schema in schema_type_list:
             self.test_run_spec_loading_tests(schema['schema_type_names'], schema['example'])
-            if schema['schema_type_names'][0] == 'collection':
+            if 'names' in schema:
                 self.test_get_names(schema['schema_type_names'], schema['names'])
+
+    def test_non_existent_schema(self):
+
+        err_msg = 'Reality does not exist'
+        with self.assertRaisesRegex(SchemaNonexistent, err_msg):
+            spec_loader.get_names('Reality')
 
     def test_get_schema_for_doc(self):
         """test getting the schema for a specific document"""
