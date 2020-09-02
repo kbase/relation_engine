@@ -69,7 +69,7 @@
     ],
     "djornl_fetch_all": [
       {
-        "params": {},
+        "params": {"edge_types": []},
         "results": {
           "nodes": [
             "As2",
@@ -230,26 +230,26 @@
         }
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 0 },
+        "params": { "keys": ["Mary Poppins"], "distance": 0, "edge_types": [] },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 1 },
+        "params": { "keys": ["Mary Poppins"], "distance": 1, "edge_types": [] },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 5 },
+        "params": { "keys": ["Mary Poppins"], "distance": 5, "edge_types": [] },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 0 },
+        "params": { "keys": ["AT1G01010"], "distance": 0, "edge_types": [] },
         "results": {
           "nodes": ["AT1G01010"],
           "edges": []
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 1 },
+        "params": { "keys": ["AT1G01010"], "distance": 1, "edge_types": [] },
         "results": {
           "nodes": [
             "AT1G01010",
@@ -266,7 +266,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5 },
+        "params": { "keys": ["AT1G01010"], "distance": 5, "edge_types": [] },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -283,7 +283,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5 },
+        "params": { "keys": ["AT1G01010"], "distance": 5, "edge_types": [] },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -300,14 +300,14 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0 },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0, "edge_types": [] },
         "results": {
           "nodes": ["AT1G01020", "AT1G01070"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1 },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1, "edge_types": [] },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -318,19 +318,45 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5 },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1, "edge_types": ["AraGWAS-Phenotype_Associations"] },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01020", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9"
+          ]
+        }
+      },
+      {
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5, "edge_types": [] },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
           "edges": [
-            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
-            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
-            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+              "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+              "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+              "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+              "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+              "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
+              "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+              "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+              "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+              "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      },
+      {
+        "params": {
+          "keys": ["AT1G01020", "AT1G01070"],
+          "distance": 5,
+          "edge_types": ["AraNetv2-CX_pairwise-gene-coexpression", "AraNetv2-DC_domain-co-occurrence", "AraNetv2-HT_high-throughput-ppi"]
+        },
+        "results": {
+          "nodes": ["AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01070"],
+          "edges": [
             "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
             "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
             "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
-            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
-            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
-            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6"
           ]
         }
       }
@@ -346,26 +372,26 @@
         }
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 0},
+        "params": {"keys": ["Mary Poppins"], "distance": 0, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 1},
+        "params": {"keys": ["Mary Poppins"], "distance": 1, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 5},
+        "params": {"keys": ["Mary Poppins"], "distance": 5, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["As2"], "distance": 0},
+        "params": {"keys": ["As2"], "distance": 0, "edge_types": []},
         "results": {
           "nodes": ["As2"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 1},
+        "params": {"keys": ["As2"], "distance": 1, "edge_types": []},
         "results": {
           "nodes": ["As2", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -375,7 +401,7 @@
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 5},
+        "params": {"keys": ["As2"], "distance": 5, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -392,14 +418,14 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 0},
+        "params": {"keys": ["As2", "Na23"], "distance": 0, "edge_types": []},
         "results": {
           "nodes": ["As2", "Na23"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 1},
+        "params": {"keys": ["As2", "Na23"], "distance": 1, "edge_types": []},
         "results": {
           "nodes": ["As2", "Na23", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -409,7 +435,7 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 5},
+        "params": {"keys": ["As2", "Na23"], "distance": 5, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "Na23"],
           "edges": [
@@ -424,30 +450,63 @@
             "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
           ]
         }
+      },
+      {
+        "params": {"keys": ["As2", "Na23"], "distance": 0, "edge_types": []},
+        "results": {
+          "nodes": ["As2", "Na23"],
+          "edges": []
+        }
+      },
+      {
+        "params": {
+          "keys": ["As2", "Na23"],
+          "distance": 5,
+          "edge_types": ["AraNetv2-CX_pairwise-gene-coexpression", "AraNetv2-DC_domain-co-occurrence", "AraNetv2-HT_high-throughput-ppi", "AraNetv2-LC_lit-curated-ppi"]
+        },
+        "results": {
+          "nodes": ["As2", "Na23"],
+          "edges": []
+        }
+      },
+      {
+        "params": {
+          "keys": ["As2", "Na23"],
+          "distance": 5,
+          "edge_types": ["AraGWAS-Phenotype_Associations"]
+        },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01020", "AT1G01040", "Na23"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9"
+          ]
+        }
       }
     ],
     "djornl_search_nodes": [
       {
-        "params": {"search_text": "Mary Poppins", "distance": 0},
+        "params": {"search_text": "Mary Poppins", "distance": 0, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "Mary Poppins", "distance": 1},
+        "params": {"search_text": "Mary Poppins", "distance": 1, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "Mary Poppins", "distance": 5},
+        "params": {"search_text": "Mary Poppins", "distance": 5, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 0},
+        "params": {"search_text": "GO:0005515", "distance": 0, "edge_types": []},
         "results": {
           "nodes": ["AT1G01040", "AT1G01090"],
           "edges": []
         }
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 1},
+        "params": {"search_text": "GO:0005515", "distance": 1, "edge_types": []},
         "results": {
           "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
           "edges": [
@@ -459,7 +518,7 @@
         }
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 5},
+        "params": {"search_text": "GO:0005515", "distance": 5, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
           "edges": [
@@ -473,6 +532,33 @@
             "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
             "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
             "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
+          ]
+        }
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 0, "edge_types": ["AraGWAS-Phenotype_Associations"]},
+        "results": {
+          "nodes": ["AT1G01040", "AT1G01090"],
+          "edges": []
+        }
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 1, "edge_types": ["AraGWAS-Phenotype_Associations"]},
+        "results": {
+          "nodes": ["As2", "AT1G01040", "AT1G01090"],
+          "edges": [
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4"
+          ]
+        }
+      },
+      {
+        "params": {"search_text": "GO:0005515", "distance": 5, "edge_types": ["AraGWAS-Phenotype_Associations"]},
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01020", "AT1G01040", "AT1G01090"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9"
           ]
         }
       }
@@ -506,26 +592,26 @@
         }
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 0},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 0, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 1},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 1, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 5},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 5, "edge_types": []},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 0},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 0, "edge_types": []},
         "results": {
           "nodes": ["AT1G01040", "AT1G01090"],
           "edges": []
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 1},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 1, "edge_types": []},
         "results": {
           "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
           "edges": [
@@ -537,7 +623,7 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 5},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 5, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
           "edges": [
@@ -555,14 +641,14 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 0},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 0, "edge_types": []},
         "results": {
           "nodes": ["AT1G01020", "AT1G01070"],
           "edges": []
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 1},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 1, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -573,7 +659,7 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 5},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 5, "edge_types": []},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
           "edges": [
@@ -583,6 +669,69 @@
             "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
             "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
             "AT1G01010__AT1G01040__AraNetv2-DC_domain-co-occurrence__2.5",
+            "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
+            "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
+            "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"
+          ]
+        }
+      },
+      {
+        "params": {
+          "cluster_ids": ["markov_i2:5", "markov_i6:2"],
+          "distance": 0,
+          "edge_types": ["AraNetv2-HT_high-throughput-ppi"]
+        },
+        "results": {
+          "nodes": ["AT1G01020", "AT1G01070"],
+          "edges": []
+        }
+      },
+      {
+        "params": {
+          "cluster_ids": ["markov_i2:5", "markov_i6:2"],
+          "distance": 1,
+          "edge_types": ["AraNetv2-HT_high-throughput-ppi"]
+        },
+        "results": {
+          "nodes": ["AT1G01010", "AT1G01020", "AT1G01070"],
+          "edges": [
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3"
+          ]
+        }
+      },
+      {
+        "params": {
+          "cluster_ids": ["markov_i2:5", "markov_i6:2"],
+          "distance": 5,
+          "edge_types": ["AraNetv2-HT_high-throughput-ppi"]
+        },
+        "results": {
+          "nodes": ["AT1G01010", "AT1G01020", "AT1G01030", "AT1G01070"],
+          "edges": [
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4"
+          ]
+        }
+      },
+      {
+        "params": {
+          "cluster_ids": ["markov_i2:5", "markov_i6:2"],
+          "distance": 5,
+          "edge_types": [
+            "AraGWAS-Phenotype_Associations",
+            "AraNetv2-HT_high-throughput-ppi",
+            "AraNetv2-LC_lit-curated-ppi",
+            "AraNetv2-CX_pairwise-gene-coexpression"
+          ]
+        },
+        "results": {
+          "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
+          "edges": [
+            "As2__AT1G01020__AraGWAS-Phenotype_Associations__8.4",
+            "As2__AT1G01040__AraGWAS-Phenotype_Associations__5.4",
+            "As75__AT1G01020__AraGWAS-Phenotype_Associations__39.9",
+            "AT1G01010__AT1G01020__AraNetv2-HT_high-throughput-ppi__2.3",
+            "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi__2.4",
             "AT1G01010__AT1G01040__AraNetv2-LC_lit-curated-ppi__170.5",
             "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression__2.6",
             "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7"

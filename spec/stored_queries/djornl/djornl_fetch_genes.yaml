@@ -14,17 +14,21 @@ params:
       examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
     distance:
       $ref: "../../datasets/distance.yaml"
+    edge_types:
+      $ref: "../../datasets/djornl/edge_types_filter.yaml"
 query: |
   LET node_ids = (
     FOR n IN djornl_node
       FILTER n._key IN @keys AND n.node_type == 'gene'
-      FOR node IN 0..@distance ANY n djornl_edge
+      FOR v, e, p IN 0..@distance ANY n djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
-        RETURN DISTINCT node._id
+        FILTER length(@edge_types) == 0 || p.edges[*].edge_type ALL IN @edge_types
+        RETURN DISTINCT v._id
   )
   LET edges = (
     FOR edge IN djornl_edge
       FILTER edge._from IN node_ids AND edge._to IN node_ids
+        AND (length(@edge_types) == 0 || edge.edge_type IN @edge_types)
       RETURN edge
   )
   LET nodes = (
