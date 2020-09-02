@@ -39,7 +39,7 @@ query: |
   LET edges = (
     FOR edge IN djornl_edge
       FILTER edge._from IN node_ids AND edge._to IN node_ids
-        AND (edge.edge_type IN @edge_types || length(@edge_types) == 0)
+        AND (length(@edge_types) == 0 || edge.edge_type IN @edge_types)
       RETURN edge
   )
   LET nodes = (

@@ -13,7 +13,7 @@ query: |
   )
   LET edges = (
     FOR e IN djornl_edge
-      FILTER length(@edge_types) > 0 && e.edge_type IN @edge_types || length(@edge_types) == 0
+      FILTER length(@edge_types) == 0 || e.edge_type IN @edge_types
       RETURN e
   )
   RETURN {nodes, edges}

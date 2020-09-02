@@ -2,6 +2,7 @@ $schema: "http://json-schema.org/draft-07/schema#"
 name: edge_types_filter
 title: Edge Types
 description: Edge types to filter on
+type: array
 items:
   $ref: "edge_type.yaml"
 default: []
