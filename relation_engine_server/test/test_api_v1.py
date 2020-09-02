@@ -60,6 +60,7 @@ class TestApi(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         wait_for_api()
+        cls.maxDiff = None
 
     def test_request(self, url=None, params=None, data=None, headers=None, method='get',
                      status_code=200, resp_json=None, resp_test=None):
@@ -566,7 +567,6 @@ class TestApi(unittest.TestCase):
     def test_admin_query_non_admin(self):
         """Test an ad-hoc query error as a non-admin."""
         query = 'for v in test_vertex sort rand() limit @count return v._id'
-        auth_response = '{"class":"Exception","error":"Unable to match endpoint: POST /"}\n'
         self.test_request(
             '/query_results',
             method='post',
@@ -576,15 +576,15 @@ class TestApi(unittest.TestCase):
             status_code=403,
             resp_json={'error': {
                 'message': 'Unauthorized',
-                'auth_url': 'http://workspace:5000',
-                'auth_response': auth_response
+                'auth_url': 'http://auth:5000',
+                'auth_response': 'Missing role'
             }},
         )
 
     def test_admin_query_invalid_auth(self):
         """Test the error response for an ad-hoc admin query without auth."""
 
-        # see ./mock_workspace/list_workspace_ids_invalid.json for response
+        # see ./mock_auth/auth_invalid.json for response
         query = 'for v in test_vertex sort rand() limit @count return v._id'
         self.test_request(
             '/query_results',
@@ -596,14 +596,16 @@ class TestApi(unittest.TestCase):
             resp_json={
                 'error': {
                     'message': 'Unauthorized',
-                    'auth_url': 'http://workspace:5000',
+                    'auth_url': 'http://auth:5000',
                     'auth_response': json.dumps({
-                        "version": "1.1",
                         "error": {
-                            "name": "JSONRPCError",
-                            "code": -32400,
-                            "message": "Token validation failed!",
-                            "error": "..."
+                          "httpcode": 401,
+                          "httpstatus": "Unauthorized",
+                          "appcode": 10020,
+                          "apperror": "Invalid token",
+                          "message": "10020 Invalid token",
+                          "callid": "1757210147564211",
+                          "time": 1542737889450
                         }
                     })
                 }
