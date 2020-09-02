@@ -11,6 +11,8 @@ params:
       examples: ['GO:0005515', 'organelle machinery']
     distance:
       $ref: "../../datasets/distance.yaml"
+    edge_types:
+      $ref: "../../datasets/djornl/edge_types_filter.yaml"
 query: |
   LET node_ids = (
     FOR g IN djornl_node_view
@@ -29,13 +31,15 @@ query: |
         )
         OR PHRASE(g.go_terms, @search_text)
         OR PHRASE(g.transcript, @search_text)
-      FOR node IN 0..@distance ANY g djornl_edge
+      FOR v, e, p IN 0..@distance ANY g djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
-        RETURN DISTINCT node._id
+        FILTER length(@edge_types) == 0 || p.edges[*].edge_type ALL IN @edge_types
+        RETURN DISTINCT v._id
   )
   LET edges = (
     FOR edge IN djornl_edge
       FILTER edge._from IN node_ids AND edge._to IN node_ids
+        AND (edge.edge_type IN @edge_types || length(@edge_types) == 0)
       RETURN edge
   )
   LET nodes = (

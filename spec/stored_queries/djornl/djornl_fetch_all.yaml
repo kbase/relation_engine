@@ -5,13 +5,7 @@ params:
   additionalProperties: false
   properties:
     edge_types:
-      type: array
-      title: Edge types
-      description: Permitted edge types
-      items:
-        $ref: "../../datasets/djornl/edge_type.yaml"
-      default: []
-      examples: [['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi'],['AraGWAS-Phenotype_Associations']]
+      $ref: "../../datasets/djornl/edge_types_filter.yaml"
 query: |
   LET nodes = (
     FOR v IN djornl_node

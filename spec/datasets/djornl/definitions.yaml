@@ -1,4 +1,4 @@
-"$schema": "http://json-schema.org/draft-07/schema#"
+$schema: "http://json-schema.org/draft-07/schema#"
 name: definitions
 title: DJORNL schema definitions
 description: Node and edge metadata definitions for the Dan Jacobson Exascale dataset
