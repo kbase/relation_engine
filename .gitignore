@@ -12,3 +12,4 @@
 coverage_report/
 .coverage
 *.egg-info/
+.*.sw[a-z]

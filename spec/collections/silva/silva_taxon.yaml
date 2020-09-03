@@ -1,0 +1,53 @@
+name: silva_taxon
+type: vertex
+delta: true
+
+indexes:
+  - type: fulltext
+    fields: [name]
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  description: Template for a vertex entry in the SILVA SSU taxonomy tree.
+  required: [id, name, rank]
+  properties:
+    id:
+      type: string
+      description: For taxon nodes, the SILVA taxon id. These will be "mostly stable in upcoming 
+        releases" as of SILVA 138. For sequence nodes, the INSDC primary accession identifier, and 
+        the start and stop of the 16S gene within the entry. See SILVA documentation for more 
+        details. 
+      examples: ['2', '44', '50000', 'CP010838.1980157.1981698']
+    name:
+      type: string
+      description: For taxon nodes, the name of the taxon. For sequence nodes, the organism name
+        given to the sequence.
+      examples: ['Ewamiania TS0513', 'Methyloligellaceae', 'BCP clade', 'uncultured', 
+        'Bordetella pertussis']
+    rank:
+      type: string
+      description: SILVA's taxonomic rank, with addition of `root_rank` and `sequence` for
+        root and sequence nodes, respectively
+      examples: ['superfamily', 'subphylum', 'subfamily', 'phylum', 'order', 'major_clade', 
+        'infraclass', 'suborder', 'family', 'superkingdom', 'domain', 'superphylum', 'superorder', 
+        'superclass', 'infraphylum', 'subclass', 'genus', 'class', 'kingdom', 'subkingdom', 
+        'root_rank', 'sequence']
+    release:
+      type: number
+      description: SILVA release number, primarily for taxon nodes
+      examples: [138.1, 138, 132, 128, 123.1, 123, 119.1, 119]
+    sequence:
+      type: string
+      description: rRNA sequence for sequence nodes
+    dataset:
+      type: array
+      items: string
+      description: The datasets that a sequence node is from. Composed of 'parc', 'ref', and 
+        'nr99', corresponding to the Parc, Ref and Ref NR99 datasets, respectively. 
+        Parc > Ref > NR99, with > denoting superset.
+      examples: [['parc'], ['parc', 'ref'], ['parc', 'ref', 'nr99']]
