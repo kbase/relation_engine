@@ -31,9 +31,9 @@ schema:
         'Bordetella pertussis']
     rank:
       type: string
-      description: SILVA's taxonomic rank, with addition of `root_rank` and `sequence` for
+      description: SILVA's taxonomic rank, with addition of 'root_rank' and 'sequence' for
         root and sequence nodes, respectively
-      examples: ['superfamily', 'subphylum', 'subfamily', 'phylum', 'order', 'major_clade', 
+      enum: ['superfamily', 'subphylum', 'subfamily', 'phylum', 'order', 'major_clade', 
         'infraclass', 'suborder', 'family', 'superkingdom', 'domain', 'superphylum', 'superorder', 
         'superclass', 'infraphylum', 'subclass', 'genus', 'class', 'kingdom', 'subkingdom', 
         'root_rank', 'sequence']
@@ -46,8 +46,9 @@ schema:
       description: rRNA sequence for sequence nodes
     dataset:
       type: array
-      items: string
+      items: 
+        type: string
       description: The datasets that a sequence node is from. Composed of 'parc', 'ref', and 
         'nr99', corresponding to the Parc, Ref and Ref NR99 datasets, respectively. 
-        Parc > Ref > NR99, with > denoting superset.
-      examples: [['parc'], ['parc', 'ref'], ['parc', 'ref', 'nr99']]
+        Parc > Ref > Ref NR99, with > denoting superset.
+      enum: [['parc'], ['parc', 'ref'], ['parc', 'ref', 'nr99']]
