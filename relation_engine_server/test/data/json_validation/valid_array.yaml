@@ -1,0 +1,5 @@
+name: valid_array
+distance: 3
+fruits:
+  - pear
+  - plum

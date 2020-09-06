@@ -4,6 +4,10 @@ title: Edge Types
 description: Edge types to filter on
 type: array
 items:
-  $ref: "edge_type.yaml"
+  $ref: edge_type.yaml
 default: []
-examples: [['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi'], ['AraGWAS-Phenotype_Associations']]
+uniqueItems: true
+examples:
+  - ['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi']
+  - ['AraGWAS-Phenotype_Associations']
+  - []

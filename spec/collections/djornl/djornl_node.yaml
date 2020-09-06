@@ -7,7 +7,7 @@ indexes:
     fields: ["clusters[*]"]
 
 schema:
-  "$schema": http://json-schema.org/draft-07/schema#
+  $schema: http://json-schema.org/draft-07/schema#
   title: Gene and Phenotype Vertices
   description: Arabidopsis gene and phenotype nodes from the Dan Jacobson Lab
   type: object
@@ -15,94 +15,44 @@ schema:
   additionalProperties: false
   properties:
     _key:
-      type: string
-      title: Key
-      examples: ["AT1G01010"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/_key
     clusters:
-      type: array
-      title: Clusters
-      description: Clusters to which the node has been assigned
-      items:
-        type: string
-        format: regex
-        pattern: ^\w+:\d+$
-      examples: [["markov_i2:1", "markov_i4:5"], ["markov_i6:3"]]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/clusters
     node_type:
-      type: string
-      title: Node type
-      examples: ["gene", "phenotype"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/node_type
     transcript:
-      type: string
-      title: Transcript
-      examples: ["AT1G01010.1"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/transcript
     gene_symbol:
-      type: string
-      title: Gene symbol
-      examples: ["NTL10"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/gene_symbol
     gene_full_name:
-      type: string
-      title: Gene full name
-      examples: ["NAC domain containing protein 1"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/gene_full_name
     gene_model_type:
-      type: string
-      title: Gene model type
-      examples: ["protein_coding"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/gene_model_type
     tair_computational_description:
-      type: string
-      title: TAIR computational description
-      examples: ["NAC domain containing protein 1;(source:Araport11)"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/tair_computational_description
     tair_curator_summary:
-      type: string
-      title: TAIR curator summary
-      examples: ["Encodes a plasma membrane-localized amino acid transporter likely involved in amino acid export in the developing seed."]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/tair_curator_summary
     tair_short_description:
-      type: string
-      title: TAIR short description
-      examples: ["NAC domain containing protein 1"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/tair_short_description
     go_description:
-      type: string
-      title: GO descriptions
-      examples: ["DNA-binding transcription factor activity"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/go_description
     go_terms:
-      type: array
-      title: GO term IDs
-      items: {type: string}
-      examples: [["GO:0003700", "GO:0005515"]]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/go_terms
     mapman_bin:
-      type: string
-      title: Mapman bin
-      examples: ["15.5.17"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/mapman_bin
     mapman_name:
-      type: string
-      title: Mapman name
-      examples: [".RNA biosynthesis.transcriptional regulation.transcription factor (NAC)"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/mapman_name
     mapman_description:
-      type: string
-      title: Mapman description
-      examples: ["transcription factor (NAC) (original description: pep chromosome:TAIR10:1:3631:5899:1 gene:AT1G01010 transcript:AT1G01010.1 gene_biotype:protein_coding transcript_biotype:protein_coding gene_symbol:NAC001 description:NAC domain-containing protein 1 [Source:UniProtKB/Swiss-Prot;Acc:Q0WV96])"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/mapman_description
     pheno_aragwas_id:
-      type: string
-      title: AraGWAS ID
-      examples: ["10.21958/phenotype:67"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/pheno_aragwas_id
     pheno_description:
-      type: string
-      title: Phenotype description
-      examples: ["Arsenic concentrations in leaves, grown in soil. Elemental analysis was performed with an ICP-MS (PerkinElmer). Sample normalized to calculated weights as described in Baxter et al., 2008"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/pheno_description
     pheno_pto_name:
-      type: string
-      title: PTO name
-      description: Plant Trait Ontology name
-      examples: ["arsenic concentration"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/pheno_pto_name
     pheno_pto_description:
-      type: string
-      title: PTO description
-      description: Plant Trait Ontology description
-      examples: ["A mineral and ion content related trait (TO:0000465) which is the concentration of arsenic (CHEBI:22632) in some plant structure (PO:0009011). [GR:Karthik]"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/pheno_pto_description
     pheno_ref:
-      type: string
-      title: Phenotype reference
-      examples: ["Atwell et. al, Nature 2010"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/pheno_ref
     user_notes:
-      type: string
-      title: User Notes
-      examples: ["flowering time related"]
+      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/user_notes

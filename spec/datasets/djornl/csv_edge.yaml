@@ -1,7 +1,7 @@
-"$schema": http://json-schema.org/draft-07/schema#
+$schema: http://json-schema.org/draft-07/schema#
 name: csv_edge
-title: Arabidopsis gene-gene or gene-phenotype edge
-description: Generic gene-to-gene or gene-to-phenotype edge for Dan Jacobson Arabidopsis data
+title: CSV edge file syntax
+description: Jacobson lab Arabidopsis edge data file columns for generic node-to-node edges with scores
 type: object
 required: [node1, node2, edge, layer_descrip]
 properties:
@@ -10,14 +10,9 @@ properties:
   node2:
     $ref: definitions.yaml#definitions/djornl_edge/_to
   edge:
+    # pre-transformation, the parser treats this as a string
     type: string
     format: regex
-    pattern: "^\\d*(\\.\\d+)?$"
+    pattern: ^\d+(\.\d+)?$
   layer_descrip:
-    type: string
-    oneOf:
-      - const: AraNetv2-DC_domain-co-occurrence
-      - const: AraNetv2-CX_pairwise-gene-coexpression
-      - const: AraGWAS-Phenotype_Associations
-      - const: AraNetv2-HT_high-throughput-ppi
-      - const: AraNetv2-LC_lit-curated-ppi
+    $ref: edge_type.yaml

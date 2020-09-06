@@ -24,3 +24,7 @@ properties:
         description: A type of dried fruit
         type: string
         format: date
+      fruits:
+        type: array
+        items:
+          type: string

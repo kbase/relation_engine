@@ -1,5 +1,17 @@
 """
 Test JSON validation functions
+
+The majority of the validation tests use `test_schema`, defined below and replicated as
+JSON and YAML files. The tests are run with files and data structures for both the schema
+and the data to be validated to ensure that all formats function the same.
+
+Test data files are in relation_engine_server/test/data/json_validation
+
+schema files: test_schema.json and test_schema.yaml (replicates test_schema)
+data files: generally named (in)?valid_<test_type>.(json|yaml)
+
+Other validation tests are at the bottom of the file.
+
 """
 import unittest
 import os.path as os_path
@@ -36,6 +48,14 @@ test_schema = {
                     'description': 'A type of dried fruit',
                     'type': 'string',
                     'format': 'date',
+                },
+                'fruits': {
+                    'title': 'Fruits',
+                    'type': 'array',
+                    'uniqueItems': True,
+                    'items': {
+                        'type': 'string'
+                    }
                 }
             }
         }
@@ -73,7 +93,7 @@ invalid_edge_data = {
 class TestJsonValidation(unittest.TestCase):
 
     def test_non_validation_validator_errors(self):
-        '''test errors in the validator that are unrelated to the valiation functionality'''
+        '''test errors in the validator that are unrelated to the validation functionality'''
 
         err_str = "Please supply either a schema or a schema file path"
         with self.assertRaisesRegex(ValueError, err_str):
@@ -122,12 +142,15 @@ class TestJsonValidation(unittest.TestCase):
         self.assertEqual(output, {'name': 'name', 'distance': 3})
 
     def test_json_validation(self):
+        """ Generic JSON validation tests to ensure that all is working as expected """
 
+        # run these tests with the schema as a data structure, as JSON, and as YAML
         test_list = [
-            self.add_defaults,
-            self.pattern_validation,
-            self.uri_validation,
-            self.date_format_validation,
+            self.test_add_defaults,
+            self.test_pattern_validation,
+            self.test_uri_validation,
+            self.test_date_format_validation,
+            self.test_array_validation,
         ]
 
         for test_schema in test_schema_list:
@@ -141,8 +164,13 @@ class TestJsonValidation(unittest.TestCase):
             for test in test_list:
                 test(schema_arg, schema_file_arg)
 
-    def add_defaults(self, schema_arg, schema_file_arg):
+    def test_add_defaults(self, schema_arg=None, schema_file_arg=None):
         """Test that the jsonschema validator sets default values."""
+
+        # skip if the test is not being called from test_json_validation
+        if schema_arg is None and schema_file_arg is None:
+            self.assertTrue(True)
+            return
 
         test_data = run_validator(
             schema=schema_arg,
@@ -163,8 +191,13 @@ class TestJsonValidation(unittest.TestCase):
                 {'name': 'blank', 'distance': 1}
             )
 
-    def pattern_validation(self, schema_arg, schema_file_arg):
+    def test_pattern_validation(self, schema_arg=None, schema_file_arg=None):
         '''Test pattern validation'''
+
+        # skip if the test is not being called from test_json_validation
+        if schema_arg is None and schema_file_arg is None:
+            self.assertTrue(True)
+            return
 
         # validation error - string does not match regex
         err_str = "'Mr Blobby' does not match .*?"
@@ -204,8 +237,13 @@ class TestJsonValidation(unittest.TestCase):
                 {'name': 'No_problem_with_this_string', 'distance': 3}
             )
 
-    def uri_validation(self, schema_arg, schema_file_arg):
+    def test_uri_validation(self, schema_arg=None, schema_file_arg=None):
         '''Test URI validation is operational'''
+
+        # skip if the test is not being called from test_json_validation
+        if schema_arg is None and schema_file_arg is None:
+            self.assertTrue(True)
+            return
 
         err_str = "'where is it\?' is not a 'uri'"
         with self.assertRaisesRegex(ValidationError, err_str):
@@ -249,8 +287,13 @@ class TestJsonValidation(unittest.TestCase):
                 }
             )
 
-    def date_format_validation(self, schema_arg, schema_file_arg):
+    def test_date_format_validation(self, schema_arg=None, schema_file_arg=None):
         '''ensure that fancy date formats are correctly validated'''
+
+        # skip if the test is not being called from test_json_validation
+        if schema_arg is None and schema_file_arg is None:
+            self.assertTrue(True)
+            return
 
         err_str = "'202001017' is not a 'date'"
         with self.assertRaisesRegex(ValidationError, err_str):
@@ -314,6 +357,74 @@ class TestJsonValidation(unittest.TestCase):
                 schema_file=schema_file_arg,
                 data_file=file_path,
                 validate_at=valid_json_loc)
+
+    def test_array_validation(self, schema_arg=None, schema_file_arg=None):
+        """ check array validation works correctly """
+
+        # skip if the test is not being called from test_json_validation
+        if schema_arg is None and schema_file_arg is None:
+            self.assertTrue(True)
+            return
+
+        err_str = "'pear' is not of type 'array'"
+        with self.assertRaisesRegex(ValidationError, err_str):
+            run_validator(
+                schema=schema_arg,
+                schema_file=schema_file_arg,
+                data={'name': 'blank', 'distance': 3, 'fruits': 'pear'},
+                validate_at=valid_json_loc)
+
+        err_str = "1 is not of type 'string'"
+        with self.assertRaisesRegex(ValidationError, err_str):
+            run_validator(
+                schema=schema_arg,
+                schema_file=schema_file_arg,
+                data={'name': 'blank', 'distance': 3, 'fruits': ['pear', 1, 'peach']},
+                validate_at=valid_json_loc)
+
+        # this string is OK
+        input = {'name': 'valid_uri', 'distance': 3, 'fruits': ['pear', 'plum']}
+        output = run_validator(
+            schema=schema_arg,
+            schema_file=schema_file_arg,
+            data=input,
+            validate_at=valid_json_loc)
+        self.assertEqual(output, input)
+
+        # data files
+        for file_ext in ['json', 'yaml']:
+            file_path = os_path.join(json_validation_dir, 'invalid_array.' + file_ext)
+            err_str = "'pear' is not of type 'array'"
+            with self.assertRaisesRegex(ValidationError, err_str):
+                run_validator(
+                    schema=schema_arg,
+                    schema_file=schema_file_arg,
+                    data_file=file_path,
+                    validate_at=valid_json_loc)
+
+        for file_ext in ['json', 'yaml']:
+            file_path = os_path.join(json_validation_dir, 'invalid_array_items.' + file_ext)
+            err_str = "1 is not of type 'string'"
+            with self.assertRaisesRegex(ValidationError, err_str):
+                run_validator(
+                    schema=schema_arg,
+                    schema_file=schema_file_arg,
+                    data_file=file_path,
+                    validate_at=valid_json_loc)
+
+            file_path = os_path.join(json_validation_dir, 'valid_array.' + file_ext)
+            self.assertEqual(
+                run_validator(
+                    schema=schema_arg,
+                    schema_file=schema_file_arg,
+                    data_file=file_path,
+                    validate_at=valid_json_loc),
+                {
+                    "name": "valid_array",
+                    "distance": 3,
+                    'fruits': ['pear', 'plum'],
+                }
+            )
 
     def test_schema_references(self):
         """Ensure referenced schemas, including those written in yaml, can be accessed."""

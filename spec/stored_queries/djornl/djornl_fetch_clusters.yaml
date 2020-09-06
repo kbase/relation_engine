@@ -12,6 +12,7 @@ params:
       items:
         $ref: "../../datasets/djornl/definitions.yaml#definitions/cluster_id"
       minItems: 1
+      uniqueItems: true
       examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
     distance:
       $ref: "../../datasets/distance.yaml"
