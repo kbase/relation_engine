@@ -7,20 +7,37 @@ from urllib.parse import urlparse
 from relation_engine_server.utils import spec_loader
 from relation_engine_server.utils.spec_loader import SchemaNonexistent
 from relation_engine_server.utils.config import get_config
-from relation_engine_server.utils.wait_for import wait_for_api
-
-_CONF = get_config()
-_TEST_DIR = os_path.join('/app', 'relation_engine_server', 'test', 'data')
 
 
 class TestSpecLoader(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        wait_for_api()
-        cls.config = get_config()
+        cls.test_dir = os_path.join('/app', 'relation_engine_server', 'test')
+        cls.test_spec_dir = os_path.join(cls.test_dir, 'spec_release', 'sample_spec_release')
+
+        config = get_config()
+        cls.repo_path = config['spec_paths']['repo']
+        for key in config['spec_paths'].keys():
+            if cls.repo_path in config['spec_paths'][key]:
+                config['spec_paths'][key] = config['spec_paths'][key].replace(
+                    cls.repo_path,
+                    cls.test_spec_dir
+                )
+        cls.config = config
+
+    @classmethod
+    def tearDownClass(cls):
+        # undo all the config changes
+        for key in cls.config['spec_paths'].keys():
+            if cls.test_spec_dir in cls.config['spec_paths'][key]:
+                cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(
+                    cls.test_spec_dir,
+                    cls.repo_path
+                )
 
     def test_get_names(self, schema_type_names=[], expected=[]):
+        """test getting the names of all the schemas of a given type"""
 
         # this method should only be run from another test method
         if len(schema_type_names) == 0:
@@ -32,20 +49,20 @@ class TestSpecLoader(unittest.TestCase):
         method = getattr(spec_loader, 'get_' + schema_type_singular + '_names')
 
         # save the original value
-        original_config_dir = _CONF['spec_paths'][schema_type_plural]
+        original_config_dir = self.config['spec_paths'][schema_type_plural]
         # set the config to the test directory
-        _CONF['spec_paths'][schema_type_plural] = os_path.join(_TEST_DIR, schema_type_plural)
+        self.config['spec_paths'][schema_type_plural] = os_path.join(self.test_dir, 'data', schema_type_plural)
 
         got_names_method = method()
         got_names_singular = spec_loader.get_names(schema_type_singular)
         got_names_plural = spec_loader.get_names(schema_type_plural)
 
-        _CONF['spec_paths'][schema_type_plural] = os_path.join(_TEST_DIR, 'empty')
+        self.config['spec_paths'][schema_type_plural] = os_path.join(self.test_dir, 'data', 'empty')
         got_names_method_empty = method()
         got_names_empty = spec_loader.get_names(schema_type_singular)
 
-        # restore the original value
-        _CONF['spec_paths'][schema_type_plural] = original_config_dir
+        # restore the original value before running tests
+        self.config['spec_paths'][schema_type_plural] = original_config_dir
 
         # ensure the results are as expected
         # get_collection_names
@@ -67,15 +84,17 @@ class TestSpecLoader(unittest.TestCase):
             self.assertTrue(True)
             return
 
-        print("running test_run_spec_loading_tests with schema_type " + schema_type_names[0])
-        method = getattr(spec_loader, 'get_' + schema_type_names[0])
+        schema_type_singular = schema_type_names[0]
+        schema_type_plural = schema_type_names[1]
+        # e.g. 'spec_loader.get_collection'
+        method = getattr(spec_loader, 'get_' + schema_type_singular)
 
         # get the path of the requested file
         result_path = method(test_name, path_only=True)
         self.assertIsInstance(result_path, str)
         self.assertIn(test_name, result_path)
         self.assertIn(
-            self.config['spec_paths'][schema_type_names[1]],
+            self.config['spec_paths'][schema_type_plural],
             result_path,
         )
 
@@ -92,18 +111,18 @@ class TestSpecLoader(unittest.TestCase):
         self.assertEqual(result_obj['name'], test_name)
 
         # check the contents of the dict when getting a data source
-        if schema_type_names[0] == 'data_source':
+        if schema_type_singular == 'data_source':
 
-            # logo_url should start with the same base as _CONF['kbase_endpoint']
-            endpoint = urlparse(_CONF['kbase_endpoint'])
+            # logo_url should start with the same base as config['kbase_endpoint']
+            endpoint = urlparse(self.config['kbase_endpoint'])
             self.assertIn(endpoint.scheme + '://' + endpoint.netloc, result_obj['logo_url'])
 
             # logo_path is deleted
             self.assertNotIn('logo_path', result_obj.keys())
 
         # a nonexistent file raises the appropriate error
-        fake_name = '../../../../spec/repo/collections/djornl/djornl_edge'
-        err_msg = schema_type_names[0].capitalize().replace("_", " ") + " '" + fake_name + "' does not exist."
+        fake_name = 'test/test_node'
+        err_msg = schema_type_singular.capitalize().replace("_", " ") + " '" + fake_name + "' does not exist."
         with self.assertRaisesRegex(SchemaNonexistent, err_msg):
             method(fake_name, path_only=True)
 
@@ -125,6 +144,10 @@ class TestSpecLoader(unittest.TestCase):
                 'schema_type_names': ['stored_query', 'stored_queries'],
                 'example': 'ncbi_fetch_taxon',
             },
+            {
+                'schema_type_names': ['view', 'views'],
+                'example': 'test_vertices',
+            }
         ]
 
         for schema in schema_type_list:
@@ -162,3 +185,22 @@ class TestSpecLoader(unittest.TestCase):
         err_msg = f"Collection 'fake_name' does not exist."
         with self.assertRaisesRegex(SchemaNonexistent, err_msg):
             spec_loader.get_schema_for_doc(fake_name, path_only=True)
+
+    def test_prevent_non_spec_dir_access(self):
+        """
+        Ensure that matching files in directories outside the designated spec repo cannot be retrieved
+        """
+
+        # this query is OK as the file is still in the spec repo
+        path_in_spec_repo = '../../../../../**/fetch_test_vertex'
+        result = spec_loader.get_schema('stored_queries', path_in_spec_repo, path_only=True)
+        self.assertEqual(
+            result,
+            os_path.join(self.test_spec_dir, 'stored_queries', 'test', 'fetch_test_vertex.yaml')
+        )
+
+        # this matches a file in one of the other test data dirs => should throw an error
+        path_outside_spec_repo = '../../../../data/collections/test_node'
+        err_msg = f"Stored query '{path_outside_spec_repo}' does not exist"
+        with self.assertRaisesRegex(SchemaNonexistent, err_msg):
+            spec_loader.get_schema('stored_queries', path_outside_spec_repo, path_only=True)
