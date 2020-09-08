@@ -47,16 +47,18 @@ def validate_all(schema_type, directory=None):
     if schema_type not in _VALID_SCHEMA_TYPES.keys():
         raise ValueError(f"No validation schema found for '{schema_type}'")
 
-    print(f'Validating {schema_type} schemas...')
-
-    err_count = 0
+    err_files = []
+    n_files = 0
     names = set()  # type: set
     if directory is None:
         type_dir_name = _VALID_SCHEMA_TYPES[schema_type]['plural']
         directory = _CONF['spec_paths'][type_dir_name]
 
+    print(f'Validating {schema_type} schemas in {directory}...')
+
     for path in glob.iglob(os.path.join(directory, '**', '*.*'), recursive=True):
         if path.endswith('.yaml') or path.endswith('.json'):
+            n_files += 1
             try:
                 data = validate_schema(path, schema_type)
                 # Check for any duplicate schema names
@@ -69,10 +71,19 @@ def validate_all(schema_type, directory=None):
             except Exception as err:
                 print(f"✕ {path} failed validation")
                 print(err)
-                err_count += 1
+                err_files.append([path, err])
 
-    if err_count:
-        raise ValidationError(f'{directory} failed validation')
+    if not n_files:
+        print(f'No schema files found')
+        return
+
+    if err_files:
+        err_file_str = '\n'.join([i[0] for i in err_files])
+        raise ValidationError(
+            f'{directory} failed validation\n'
+            f'files with errors:\n'
+            f'{err_file_str}'
+        )
 
     # all's well
     print('...all valid.')
@@ -95,7 +106,7 @@ def validate_all_by_type(validation_base_dir=None):
 
     """
 
-    n_errors = 0
+    n_errors = []
     for schema_type in sorted(_VALID_SCHEMA_TYPES.keys()):
         try:
             if validation_base_dir is None:
@@ -107,14 +118,16 @@ def validate_all_by_type(validation_base_dir=None):
                 )
                 validate_all(schema_type, directory)
         except Exception as err:
-            print(err)
-            n_errors += 1
+            n_errors.append(err)
         print("\n")
 
-    if n_errors > 0:
+    if n_errors:
         print('Validation failed!\n')
+        print("\n\n".join([str(n) for n in n_errors]))
+    else:
+        print('Validation succeeded!')
 
-    return n_errors
+    return len(n_errors)
 
 
 def validate_schema(path, schema_type):
