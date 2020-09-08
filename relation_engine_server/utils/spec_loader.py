@@ -74,11 +74,19 @@ def get_schema(schema_type, name, path_only=False):
 
     schema_search_type = pluralise_schema_type(schema_type)
 
-    try:
-        path = _find_paths(_CONF['spec_paths'][schema_search_type], name + '.yaml')[0]
-    except IndexError:
+    yaml_paths = _find_paths(_CONF['spec_paths'][schema_search_type], f'{name}.yaml')
+    json_paths = _find_paths(_CONF['spec_paths'][schema_search_type], f'{name}.json')
+    # ensure we're using the canonical path and that all paths are unique
+    # we are only interested in paths that are in the designated spec repo
+    repo_path = os.path.abspath(_CONF['spec_paths']['repo'])
+    all_paths_set = set(os.path.abspath(path) for path in yaml_paths + json_paths)
+    all_paths = [p for p in all_paths_set if p.startswith(repo_path)]
+
+    if len(all_paths) == 0:
         raise SchemaNonexistent(singularise_schema_type(schema_type), name)
 
+    # ignore duplicates or multiple results, just go with the first one
+    path = all_paths[0]
     if path_only:
         return path
 
@@ -112,6 +120,11 @@ def get_stored_query_names():
     return get_names('stored_queries')
 
 
+def get_view_names():
+    """Return an array of all view base names."""
+    return get_names('views')
+
+
 def get_collection(name, path_only=False):
     """Get YAML content (or file path) for a specific collection. Throws an error if nonexistent."""
     return get_schema('collection', name, path_only)
@@ -131,6 +144,11 @@ def get_data_source(name, path_only=False):
 def get_stored_query(name, path_only=False):
     """Get AQL content or file path for a specific stored query. Throws an error if nonexistent."""
     return get_schema('stored_query', name, path_only)
+
+
+def get_view(name, path_only=False):
+    """Get content or file path for a view file. Throws an error if nonexistent."""
+    return get_schema('view', name, path_only)
 
 
 def _find_paths(dir_path, file_pattern):
