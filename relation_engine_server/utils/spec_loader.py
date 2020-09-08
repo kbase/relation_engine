@@ -79,7 +79,8 @@ def get_schema(schema_type, name, path_only=False):
     # ensure we're using the canonical path and that all paths are unique
     # we are only interested in paths that are in the designated spec repo
     repo_path = os.path.abspath(_CONF['spec_paths']['repo'])
-    all_paths = [p for p in set(os.path.abspath(path) for path in yaml_paths + json_paths) if repo_path in p]
+    all_paths_set = set(os.path.abspath(path) for path in yaml_paths + json_paths)
+    all_paths = [p for p in all_paths_set if p.startswith(repo_path)]
 
     if len(all_paths) == 0:
         raise SchemaNonexistent(singularise_schema_type(schema_type), name)
@@ -120,7 +121,7 @@ def get_stored_query_names():
 
 
 def get_view_names():
-    """Return an array of all stored queries base names."""
+    """Return an array of all view base names."""
     return get_names('views')
 
 
@@ -146,7 +147,7 @@ def get_stored_query(name, path_only=False):
 
 
 def get_view(name, path_only=False):
-    """Get AQL content or file path for a specific stored query. Throws an error if nonexistent."""
+    """Get content or file path for a view file. Throws an error if nonexistent."""
     return get_schema('view', name, path_only)
 
 
