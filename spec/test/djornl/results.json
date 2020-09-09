@@ -230,26 +230,26 @@
         }
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 0, "edge_types": [] },
+        "params": { "keys": ["Mary Poppins"], "distance": 0 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 1, "edge_types": [] },
+        "params": { "keys": ["Mary Poppins"], "distance": 1 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 5, "edge_types": [] },
+        "params": { "keys": ["Mary Poppins"], "distance": 5 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 0, "edge_types": [] },
+        "params": { "keys": ["AT1G01010"], "distance": 0 },
         "results": {
           "nodes": ["AT1G01010"],
           "edges": []
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 1, "edge_types": [] },
+        "params": { "keys": ["AT1G01010"], "distance": 1 },
         "results": {
           "nodes": [
             "AT1G01010",
@@ -266,7 +266,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5, "edge_types": [] },
+        "params": { "keys": ["AT1G01010"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -283,7 +283,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5, "edge_types": [] },
+        "params": { "keys": ["AT1G01010"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -300,14 +300,14 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0, "edge_types": [] },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0 },
         "results": {
           "nodes": ["AT1G01020", "AT1G01070"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1, "edge_types": [] },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -328,7 +328,7 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5, "edge_types": [] },
+        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
           "edges": [
@@ -372,26 +372,26 @@
         }
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 0, "edge_types": []},
+        "params": {"keys": ["Mary Poppins"], "distance": 0},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 1, "edge_types": []},
+        "params": {"keys": ["Mary Poppins"], "distance": 1},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 5, "edge_types": []},
+        "params": {"keys": ["Mary Poppins"], "distance": 5},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["As2"], "distance": 0, "edge_types": []},
+        "params": {"keys": ["As2"], "distance": 0},
         "results": {
           "nodes": ["As2"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 1, "edge_types": []},
+        "params": {"keys": ["As2"], "distance": 1},
         "results": {
           "nodes": ["As2", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -401,7 +401,7 @@
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 5, "edge_types": []},
+        "params": {"keys": ["As2"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -418,14 +418,14 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 0, "edge_types": []},
+        "params": {"keys": ["As2", "Na23"], "distance": 0},
         "results": {
           "nodes": ["As2", "Na23"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 1, "edge_types": []},
+        "params": {"keys": ["As2", "Na23"], "distance": 1},
         "results": {
           "nodes": ["As2", "Na23", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -435,7 +435,7 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 5, "edge_types": []},
+        "params": {"keys": ["As2", "Na23"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "Na23"],
           "edges": [
@@ -452,7 +452,7 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 0, "edge_types": []},
+        "params": {"keys": ["As2", "Na23"], "distance": 0},
         "results": {
           "nodes": ["As2", "Na23"],
           "edges": []
@@ -487,26 +487,26 @@
     ],
     "djornl_search_nodes": [
       {
-        "params": {"search_text": "Mary Poppins", "distance": 0, "edge_types": []},
+        "params": {"search_text": "Mary Poppins", "distance": 0},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "Mary Poppins", "distance": 1, "edge_types": []},
+        "params": {"search_text": "Mary Poppins", "distance": 1},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "Mary Poppins", "distance": 5, "edge_types": []},
+        "params": {"search_text": "Mary Poppins", "distance": 5},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 0, "edge_types": []},
+        "params": {"search_text": "GO:0005515", "distance": 0},
         "results": {
           "nodes": ["AT1G01040", "AT1G01090"],
           "edges": []
         }
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 1, "edge_types": []},
+        "params": {"search_text": "GO:0005515", "distance": 1},
         "results": {
           "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
           "edges": [
@@ -518,7 +518,7 @@
         }
       },
       {
-        "params": {"search_text": "GO:0005515", "distance": 5, "edge_types": []},
+        "params": {"search_text": "GO:0005515", "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
           "edges": [
@@ -592,26 +592,26 @@
         }
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 0, "edge_types": []},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 0},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 1, "edge_types": []},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 1},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 5, "edge_types": []},
+        "params": {"cluster_ids": ["MaryPoppins:1"], "distance": 5},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 0, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 0},
         "results": {
           "nodes": ["AT1G01040", "AT1G01090"],
           "edges": []
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 1, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 1},
         "results": {
           "nodes": ["As2", "AT1G01010", "AT1G01040", "AT1G01080", "AT1G01090"],
           "edges": [
@@ -623,7 +623,7 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i6:1"], "distance": 5, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i6:1"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01080",  "AT1G01090"],
           "edges": [
@@ -641,14 +641,14 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 0, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 0},
         "results": {
           "nodes": ["AT1G01020", "AT1G01070"],
           "edges": []
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 1, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 1},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -659,7 +659,7 @@
         }
       },
       {
-        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 5, "edge_types": []},
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
           "edges": [

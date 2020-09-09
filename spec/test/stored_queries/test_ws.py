@@ -1,5 +1,8 @@
 """
-Tests for workspace workspace stored queries under the ws* namespace
+Tests for workspace stored queries under the ws* namespace
+
+
+These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
 """
 import unittest
 import json

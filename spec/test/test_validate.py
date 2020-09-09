@@ -1,5 +1,7 @@
 """
 Tests for the schema validation functions
+
+These tests run within the re_api docker image, and require access to the ArangoDB image for validation of AQL strings.
 """
 import unittest
 import os.path as os_path

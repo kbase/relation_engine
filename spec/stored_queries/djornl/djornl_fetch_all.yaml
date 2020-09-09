@@ -5,7 +5,17 @@ params:
   additionalProperties: false
   properties:
     edge_types:
-      $ref: "../../datasets/djornl/edge_types_filter.yaml"
+      title: Edge Types
+      description: Edge types to filter on
+      type: array
+      items:
+        $ref: ../../datasets/djornl/edge_type.yaml
+      default: []
+      uniqueItems: true
+      examples:
+        - ['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi']
+        - ['AraGWAS-Phenotype_Associations']
+        - []
 query: |
   LET nodes = (
     FOR v IN djornl_node

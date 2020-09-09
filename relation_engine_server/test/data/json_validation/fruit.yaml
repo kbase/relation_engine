@@ -1,0 +1,9 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+name: fruit
+type: string
+oneOf:
+  - const: peach
+  - const: plum
+  - const: dragonfruit
+  - const: strawberry
+  - const: pear

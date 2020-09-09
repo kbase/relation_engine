@@ -33,8 +33,10 @@
                 "fruits": {
                     "type": "array",
                     "items": {
-                        "type": "string"
-                    }
+                        "$ref": "fruit.yaml"
+                    },
+                    "default": [],
+                    "uniqueItems": "true"
                 }
             }
         }

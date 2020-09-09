@@ -27,4 +27,10 @@ properties:
       fruits:
         type: array
         items:
-          type: string
+          $ref: fruit.yaml
+        default: []
+        uniqueItems: true
+        examples:
+          - ['peach', 'plum']
+          - ['strawberry']
+          - []

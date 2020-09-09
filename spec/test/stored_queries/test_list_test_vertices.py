@@ -1,3 +1,10 @@
+"""
+Test the 'list_test_vertices' stored query (see
+relation_engine_server/test/spec_release/sample_spec_release/stored_queries/test for the query).
+
+These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
+
+"""
 import unittest
 import requests
 

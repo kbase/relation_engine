@@ -1,15 +1,18 @@
 """
 Tests for the Dan Jacobson ORNL Arabidopsis collection schemas.
 
-These tests ensure that specific elements of the collection schemas validate correctly.
+Tests to ensure that specific elements of the collection schemas validate correctly.
 
+These tests run within the re_api docker image.
 """
 import unittest
-
-from spec.test.helpers import check_spec_test_env
+from os.path import join as os_path_join
+from relation_engine_server.utils.config import get_config
 from relation_engine_server.utils.spec_loader import get_schema
 from relation_engine_server.utils.json_validation import get_schema_validator
 from jsonschema.exceptions import ValidationError
+
+_BASE_DIR = os_path_join('/app', 'spec')
 
 
 class Test_DJORNL_Collections(unittest.TestCase):
@@ -17,7 +20,24 @@ class Test_DJORNL_Collections(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.maxDiff = None
-        check_spec_test_env()
+        cls.config = get_config()
+        cls.repo_path = cls.config['spec_paths']['repo']
+        for key in cls.config['spec_paths'].keys():
+            if cls.repo_path in cls.config['spec_paths'][key]:
+                cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(
+                    cls.repo_path,
+                    _BASE_DIR
+                )
+
+    @classmethod
+    def tearDownClass(cls):
+        # undo all the config changes
+        for key in cls.config['spec_paths'].keys():
+            if _BASE_DIR in cls.config['spec_paths'][key]:
+                cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(
+                    _BASE_DIR,
+                    cls.repo_path
+                )
 
     def test_node(self, query_name=None, test_data=None):
         """ ensure node data validates correctly """

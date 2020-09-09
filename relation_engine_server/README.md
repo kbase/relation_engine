@@ -271,7 +271,7 @@ Example response:
 Get the schema for a specific data source
 
 ```sh
-GET "{root_url}/api/v1/specs/data_source?name=ncbi_taxonomy"
+GET "{root_url}/api/v1/specs/data_sources?name=ncbi_taxonomy"
 ```
 
 Example response:
@@ -338,7 +338,7 @@ Example response:
 Get the schema for a specific stored query
 
 ```sh
-GET "{root_url}/api/v1/specs/stored_query?name=ncbi_fetch_taxon"
+GET "{root_url}/api/v1/specs/stored_queries?name=ncbi_fetch_taxon"
 ```
 
 Example response:
