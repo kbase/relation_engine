@@ -1,6 +1,7 @@
+import re
 from yaml import safe_load
-from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from relation_engine_server.utils.json_validation import run_validator
 import os
 import unittest
 
@@ -247,15 +248,15 @@ class SILVATreeJSONSchemaTest(unittest.TestCase):
 
     def _test_type(self, schema, valid, invalid_errors):
         for inst in valid:
-            validate(inst, schema=schema)
+            run_validator(schema=schema, data=inst)
 
         for inst, err_expected in invalid_errors:
-            with self.assertRaises(ValidationError) as cm:
-                validate(inst, schema=schema)
-            msg = str(cm.exception).split('\n')[0]
+            with self.subTest(inst=inst):
+                with self.assertRaisesRegex(ValidationError, '^' + re.escape(err_expected) + '\n') as cm:
+                    run_validator(schema=schema, data=inst)
 
-            print(msg)
-            self.assertTrue(msg == err_expected, '`%s` vs `%s`' % (msg, err_expected))
+                msg = str(cm.exception).split('\n')[0]
+                print(msg)
 
     def test(self):
         self._test_type(self.schema_node, self.nodes_valid, self.nodes_invalid_errors)
