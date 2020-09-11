@@ -9,13 +9,29 @@ params:
       type: array
       title: Gene Keys
       items:
-        $ref: "../../datasets/djornl/definitions.yaml#definitions/djornl_node/_key"
+        $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/_key
       minItems: 1
+      uniqueItems: true
       examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
     distance:
-      $ref: "../../datasets/distance.yaml"
+      type: integer
+      title: Traversal Distance
+      description: How many hops to find neighbors and neighbors-of-neighbors
+      default: 1
+      minimum: 0
+      maximum: 100
     edge_types:
-      $ref: "../../datasets/djornl/edge_types_filter.yaml"
+      title: Edge Types
+      description: Edge types to filter on
+      type: array
+      items:
+        $ref: ../../datasets/djornl/edge_type.yaml
+      default: []
+      uniqueItems: true
+      examples:
+        - ['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi']
+        - ['AraGWAS-Phenotype_Associations']
+        - []
 query: |
   LET node_ids = (
     FOR n IN djornl_node

@@ -1,5 +1,7 @@
 """
-Test JSON validation functions
+Test spec_loader functions
+
+These tests run within the re_api docker image.
 """
 import unittest
 import os.path as os_path
@@ -16,15 +18,14 @@ class TestSpecLoader(unittest.TestCase):
         cls.test_dir = os_path.join('/app', 'relation_engine_server', 'test')
         cls.test_spec_dir = os_path.join(cls.test_dir, 'spec_release', 'sample_spec_release')
 
-        config = get_config()
-        cls.repo_path = config['spec_paths']['repo']
-        for key in config['spec_paths'].keys():
-            if cls.repo_path in config['spec_paths'][key]:
-                config['spec_paths'][key] = config['spec_paths'][key].replace(
+        cls.config = get_config()
+        cls.repo_path = cls.config['spec_paths']['repo']
+        for key in cls.config['spec_paths'].keys():
+            if cls.repo_path in cls.config['spec_paths'][key]:
+                cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(
                     cls.repo_path,
                     cls.test_spec_dir
                 )
-        cls.config = config
 
     @classmethod
     def tearDownClass(cls):
@@ -151,9 +152,10 @@ class TestSpecLoader(unittest.TestCase):
         ]
 
         for schema in schema_type_list:
-            self.test_run_spec_loading_tests(schema['schema_type_names'], schema['example'])
-            if 'names' in schema:
-                self.test_get_names(schema['schema_type_names'], schema['names'])
+            with self.subTest(schema=schema['schema_type_names'][0]):
+                self.test_run_spec_loading_tests(schema['schema_type_names'], schema['example'])
+                if 'names' in schema:
+                    self.test_get_names(schema['schema_type_names'], schema['names'])
 
     def test_non_existent_schema(self):
 

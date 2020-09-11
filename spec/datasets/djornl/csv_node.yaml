@@ -1,7 +1,7 @@
-"$schema": http://json-schema.org/draft-07/schema#
+$schema: http://json-schema.org/draft-07/schema#
 name: csv_node
 title: CSV node file syntax
-description: Arabidopsis gene and phenotype nodes from the Dan Jacobson Lab
+description: Jacobson lab Arabidopsis gene and phenotype data file columns
 type: object
 required: [node_id, node_type]
 additionalProperties: false
@@ -10,8 +10,11 @@ properties:
     $ref: definitions.yaml#definitions/djornl_node/_key
   node_type:
     $ref: definitions.yaml#definitions/djornl_node/node_type
+  # comma-separated array of cluster IDs
   clusters:
-    $ref: definitions.yaml#definitions/djornl_node/clusters
+    type: string
+    format: regex
+    pattern: ^(\w+:\d+, ?)*(\w+:\d+)?$
   transcript:
     $ref: definitions.yaml#definitions/djornl_node/transcript
   gene_symbol:
@@ -26,10 +29,11 @@ properties:
     $ref: definitions.yaml#definitions/djornl_node/tair_curator_summary
   tair_short_description:
     $ref: definitions.yaml#definitions/djornl_node/tair_short_description
+  # comma-separated array of GO terms
   go_terms:
     type: string
     format: regex
-    pattern: "^(GO:\\d{7}, ?)*(GO:\\d{7})?$"
+    pattern: ^(GO:\d{7}, ?)*(GO:\d{7})?$
   go_description:
     $ref: definitions.yaml#definitions/djornl_node/go_description
   mapman_bin:

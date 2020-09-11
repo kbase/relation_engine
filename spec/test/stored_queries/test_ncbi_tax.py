@@ -1,5 +1,7 @@
 """
 Tests for the ncbi taxonomy stored queries.
+
+These tests require access to the ArangoDB, auth, and workspace images.
 """
 import json
 import time

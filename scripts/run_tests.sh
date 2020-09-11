@@ -11,15 +11,11 @@ mkdir /spec/repo
 cp -r /app/spec/* /spec/repo/
 # start server, using the specs in /spec/repo
 sh /app/scripts/start_server.sh &
+coverage erase
 # spec validation
 python -m spec.validate &&
-# spec stored query tests
-coverage run --parallel-mode -m unittest discover spec/test &&
-# importer tests
-coverage run --parallel-mode  -m unittest discover importers/test &&
-# RE API tests
-coverage run --parallel-mode  -m unittest discover relation_engine_server/test &&
+# run importer/, relation_engine_server/, and spec/ tests
+coverage run --branch -m unittest discover -v &&
 # RE client tests
-PYTHONPATH=client_src coverage run --parallel-mode -m unittest discover client_src/test
-coverage combine
+PYTHONPATH=client_src python -m unittest discover client_src/test &&
 coverage html --omit=*/test_*

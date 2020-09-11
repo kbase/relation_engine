@@ -10,9 +10,24 @@ params:
       title: Search text
       examples: ['GO:0005515', 'organelle machinery']
     distance:
-      $ref: "../../datasets/distance.yaml"
+      type: integer
+      title: Traversal Distance
+      description: How many hops to find neighbors and neighbors-of-neighbors
+      default: 1
+      minimum: 0
+      maximum: 100
     edge_types:
-      $ref: "../../datasets/djornl/edge_types_filter.yaml"
+      title: Edge Types
+      description: Edge types to filter on
+      type: array
+      items:
+        $ref: ../../datasets/djornl/edge_type.yaml
+      default: []
+      uniqueItems: true
+      examples:
+        - ['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi']
+        - ['AraGWAS-Phenotype_Associations']
+        - []
 query: |
   LET node_ids = (
     FOR g IN djornl_node_view

@@ -1,0 +1,13 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+name: fruits_array
+definitions:
+  fruits:
+    type: array
+    items:
+      $ref: fruit.yaml
+    default: []
+    uniqueItems: true
+    examples:
+      - ['peach', 'plum']
+      - ['strawberry']
+      - []

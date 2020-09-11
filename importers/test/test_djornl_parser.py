@@ -3,6 +3,8 @@ Tests for the DJORNL Parser
 
 At the present time, this just ensures that the files are parsed correctly;
 it does not check data loading into the db.
+
+These tests run within the re_api docker image.
 """
 import json
 import unittest

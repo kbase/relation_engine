@@ -1,7 +1,7 @@
 """
 Simple integration tests on the API itself.
 
-We make actual ajax requests to the running docker container.
+These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
 """
 import unittest
 import requests

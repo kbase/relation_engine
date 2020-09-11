@@ -40,18 +40,12 @@ definitions:
       type: array
       title: Clusters
       description: Clusters to which the node has been assigned
+      uniqueItems: true
       items:
-        $ref: #definitions/cluster_id
+        $ref: "#/definitions/cluster_id"
       examples: [["markov_i2:1", "markov_i4:5"], ["markov_i6:3"]]
     node_type:
-      type: string
-      title: Node type
-      oneOf:
-        - const: gene
-          title: Gene
-        - const: pheno
-          title: Phenotype
-      examples: ["gene", "pheno"]
+      $ref: node_type.yaml
     transcript:
       type: string
       title: Transcript
@@ -87,8 +81,9 @@ definitions:
     go_terms:
       type: array
       title: GO term IDs
+      uniqueItems: true
       items:
-        $ref: #definitions/go_term
+        $ref: "#/definitions/go_term"
     mapman_bin:
       type: string
       title: Mapman bin

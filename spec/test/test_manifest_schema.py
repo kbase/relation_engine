@@ -1,7 +1,9 @@
 """
 Tests for manifest.schema.json
 
-Ensure that the manifest schema correctly validates data
+Ensure that the manifest schema correctly validates data.
+
+These tests run within the re_api docker image.
 """
 import unittest
 import os.path as os_path

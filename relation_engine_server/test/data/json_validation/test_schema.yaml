@@ -24,3 +24,13 @@ properties:
         description: A type of dried fruit
         type: string
         format: date
+      fruits:
+        type: array
+        items:
+          $ref: fruit.yaml
+        default: []
+        uniqueItems: true
+        examples:
+          - ['peach', 'plum']
+          - ['strawberry']
+          - []

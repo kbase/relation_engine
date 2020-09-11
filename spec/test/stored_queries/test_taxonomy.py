@@ -1,5 +1,7 @@
 """
 Tests for the ncbi taxonomy stored queries.
+
+These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
 """
 import json
 import time
