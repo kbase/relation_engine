@@ -1,7 +1,6 @@
 import re
-from yaml import safe_load
 from jsonschema.exceptions import ValidationError
-from relation_engine_server.utils.json_validation import run_validator
+from relation_engine_server.utils.json_validation import get_schema_validator
 import os
 import unittest
 
@@ -20,10 +19,8 @@ class SILVATreeJSONSchemaTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(node_yaml_flpth) as fh:
-            cls.schema_node = safe_load(fh)['schema']
-        with open(edge_yaml_flpth) as fh:
-            cls.schema_edge = safe_load(fh)['schema']
+        cls.validator_node = get_schema_validator(schema_file=node_yaml_flpth, validate_at='/schema')
+        cls.validator_edge = get_schema_validator(schema_file=edge_yaml_flpth, validate_at='/schema')
 
         cls.nodes_valid = [
             {
@@ -246,21 +243,24 @@ class SILVATreeJSONSchemaTest(unittest.TestCase):
             )
         ]
 
-    def _test_type(self, schema, valid, invalid_errors):
-        for inst in valid:
-            run_validator(schema=schema, data=inst)
-
-        for inst, err_expected in invalid_errors:
+    def _test_type(self, validator, insts_valid, insts_invalid_errors):
+        for inst in insts_valid:
             with self.subTest(inst=inst):
-                with self.assertRaisesRegex(ValidationError, '^' + re.escape(err_expected) + '\n') as cm:
-                    run_validator(schema=schema, data=inst)
+                validator.validate(inst)
 
-                msg = str(cm.exception).split('\n')[0]
-                print(msg)
+                print('v', end='')
+        print()
+
+        for inst, err_expected in insts_invalid_errors:
+            with self.subTest(inst=inst):
+                with self.assertRaisesRegex(ValidationError, '^' + re.escape(err_expected) + '\n'):
+                    validator.validate(inst)
+
+                print(err_expected)
 
     def test(self):
-        self._test_type(self.schema_node, self.nodes_valid, self.nodes_invalid_errors)
-        self._test_type(self.schema_edge, self.edges_valid, self.edges_invalid_errors)
+        self._test_type(self.validator_node, self.nodes_valid, self.nodes_invalid_errors)
+        self._test_type(self.validator_edge, self.edges_valid, self.edges_invalid_errors)
 
 
 if __name__ == '__main__':
