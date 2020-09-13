@@ -1,5 +1,5 @@
 name: djornl_fetch_all
-description: Fetch all node and edge data from the djornl subgraph
+description: Fetch all node and edge data, optionally filtering on edge type.
 params:
   type: object
   additionalProperties: false

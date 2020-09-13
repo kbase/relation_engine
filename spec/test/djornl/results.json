@@ -59,7 +59,7 @@
   "queries": {
     "djornl_fetch_phenotype": [
       {
-        "params": {"keys": ["A", "B", "C"]},
+        "params": {"phenotype_keys": ["A", "B", "C"]},
         "error": {
           "details": "Stored query 'djornl_fetch_phenotype' does not exist.",
           "message": "Not found",
@@ -215,41 +215,41 @@
         "params": {},
         "error": {
           "failed_validator": "required",
-          "message": "'keys' is a required property",
+          "message": "'gene_keys' is a required property",
           "path": [],
           "value": {}
         }
       },
       {
-        "params": {"keys": []},
+        "params": {"gene_keys": []},
         "error": {
           "failed_validator": "minItems",
           "message": "[] is too short",
-          "path": ["keys"],
+          "path": ["gene_keys"],
           "value": []
         }
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 0 },
+        "params": { "gene_keys": ["Mary Poppins"], "distance": 0 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 1 },
+        "params": { "gene_keys": ["Mary Poppins"], "distance": 1 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["Mary Poppins"], "distance": 5 },
+        "params": { "gene_keys": ["Mary Poppins"], "distance": 5 },
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 0 },
+        "params": { "gene_keys": ["AT1G01010"], "distance": 0 },
         "results": {
           "nodes": ["AT1G01010"],
           "edges": []
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 1 },
+        "params": { "gene_keys": ["AT1G01010"], "distance": 1 },
         "results": {
           "nodes": [
             "AT1G01010",
@@ -266,7 +266,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5 },
+        "params": { "gene_keys": ["AT1G01010"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -283,7 +283,7 @@
         }
       },
       {
-        "params": { "keys": ["AT1G01010"], "distance": 5 },
+        "params": { "gene_keys": ["AT1G01010"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -300,14 +300,14 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 0 },
+        "params": {"gene_keys": ["AT1G01020", "AT1G01070"], "distance": 0 },
         "results": {
           "nodes": ["AT1G01020", "AT1G01070"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1 },
+        "params": {"gene_keys": ["AT1G01020", "AT1G01070"], "distance": 1 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -318,7 +318,7 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 1, "edge_types": ["AraGWAS-Phenotype_Associations"] },
+        "params": {"gene_keys": ["AT1G01020", "AT1G01070"], "distance": 1, "edge_types": ["AraGWAS-Phenotype_Associations"] },
         "results": {
           "nodes": ["As2", "As75", "AT1G01020", "AT1G01070"],
           "edges": [
@@ -328,7 +328,7 @@
         }
       },
       {
-        "params": {"keys": ["AT1G01020", "AT1G01070"], "distance": 5 },
+        "params": {"gene_keys": ["AT1G01020", "AT1G01070"], "distance": 5 },
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "AT1G01070"],
           "edges": [
@@ -346,7 +346,7 @@
       },
       {
         "params": {
-          "keys": ["AT1G01020", "AT1G01070"],
+          "gene_keys": ["AT1G01020", "AT1G01070"],
           "distance": 5,
           "edge_types": ["AraNetv2-CX_pairwise-gene-coexpression", "AraNetv2-DC_domain-co-occurrence", "AraNetv2-HT_high-throughput-ppi"]
         },
@@ -363,35 +363,35 @@
     ],
     "djornl_fetch_phenotypes": [
       {
-        "params": {"keys": "Mary Poppins"},
+        "params": {"phenotype_keys": "Mary Poppins"},
         "error": {
           "failed_validator": "type",
           "message": "'Mary Poppins' is not of type 'array'",
-          "path": ["keys"],
+          "path": ["phenotype_keys"],
           "value": "Mary Poppins"
         }
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 0},
+        "params": {"phenotype_keys": ["Mary Poppins"], "distance": 0},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 1},
+        "params": {"phenotype_keys": ["Mary Poppins"], "distance": 1},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["Mary Poppins"], "distance": 5},
+        "params": {"phenotype_keys": ["Mary Poppins"], "distance": 5},
         "results": {"nodes": [], "edges": []}
       },
       {
-        "params": {"keys": ["As2"], "distance": 0},
+        "params": {"phenotype_keys": ["As2"], "distance": 0},
         "results": {
           "nodes": ["As2"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 1},
+        "params": {"phenotype_keys": ["As2"], "distance": 1},
         "results": {
           "nodes": ["As2", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -401,7 +401,7 @@
         }
       },
       {
-        "params": {"keys": ["As2"], "distance": 5},
+        "params": {"phenotype_keys": ["As2"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060"],
           "edges": [
@@ -418,14 +418,14 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 0},
+        "params": {"phenotype_keys": ["As2", "Na23"], "distance": 0},
         "results": {
           "nodes": ["As2", "Na23"],
           "edges": []
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 1},
+        "params": {"phenotype_keys": ["As2", "Na23"], "distance": 1},
         "results": {
           "nodes": ["As2", "Na23", "AT1G01020", "AT1G01040"],
           "edges": [
@@ -435,7 +435,7 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 5},
+        "params": {"phenotype_keys": ["As2", "Na23"], "distance": 5},
         "results": {
           "nodes": ["As2", "As75", "AT1G01010", "AT1G01020", "AT1G01030", "AT1G01040", "AT1G01050", "AT1G01060", "Na23"],
           "edges": [
@@ -452,7 +452,7 @@
         }
       },
       {
-        "params": {"keys": ["As2", "Na23"], "distance": 0},
+        "params": {"phenotype_keys": ["As2", "Na23"], "distance": 0},
         "results": {
           "nodes": ["As2", "Na23"],
           "edges": []
@@ -460,7 +460,7 @@
       },
       {
         "params": {
-          "keys": ["As2", "Na23"],
+          "phenotype_keys": ["As2", "Na23"],
           "distance": 5,
           "edge_types": ["AraNetv2-CX_pairwise-gene-coexpression", "AraNetv2-DC_domain-co-occurrence", "AraNetv2-HT_high-throughput-ppi", "AraNetv2-LC_lit-curated-ppi"]
         },
@@ -471,7 +471,7 @@
       },
       {
         "params": {
-          "keys": ["As2", "Na23"],
+          "phenotype_keys": ["As2", "Na23"],
           "distance": 5,
           "edge_types": ["AraGWAS-Phenotype_Associations"]
         },
