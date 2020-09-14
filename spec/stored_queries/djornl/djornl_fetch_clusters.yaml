@@ -8,16 +8,18 @@ params:
     cluster_ids:
       type: array
       title: Cluster IDs
-      description: Cluster IDs, in the form "clustering_system_name:cluster_id"
+      description: Fetch nodes by cluster ID, in the form "clustering_system_name:cluster_id"
       items:
         $ref: ../../datasets/djornl/definitions.yaml#definitions/cluster_id
       minItems: 1
       uniqueItems: true
-      examples: [['markov_i2:5', 'markov_i6:2'],['markov_i6:1']]
+      examples:
+        - ['markov_i2:5', 'markov_i6:2']
+        - ['markov_i6:1']
     distance:
       type: integer
       title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
+      description: Number of hops to find neighbors and neighbors-of-neighbors
       default: 1
       minimum: 0
       maximum: 100

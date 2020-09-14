@@ -8,11 +8,14 @@ params:
     search_text:
       type: string
       title: Search text
-      examples: ['GO:0005515', 'organelle machinery']
+      description: Search nodes and their metadata for the search string
+      examples:
+        - 'GO:0005515'
+        - 'organelle machinery'
     distance:
       type: integer
       title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
+      description: Number of hops to find neighbors and neighbors-of-neighbors
       default: 1
       minimum: 0
       maximum: 100

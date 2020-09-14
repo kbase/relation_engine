@@ -3,20 +3,23 @@ description: Fetch a gene or list of genes by key, and the edges and nodes withi
 params:
   type: object
   additionalProperties: false
-  required: [keys]
+  required: [gene_keys]
   properties:
-    keys:
+    gene_keys:
       type: array
       title: Gene Keys
+      description: Fetch a gene or list of genes by ID
       items:
         $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_node/_key
       minItems: 1
       uniqueItems: true
-      examples: [["AT1G01010"],["AT1G01020","AT1G01070"]]
+      examples:
+        - ["AT1G01020","AT1G01070"]
+        - ["AT1G01010"]
     distance:
       type: integer
       title: Traversal Distance
-      description: How many hops to find neighbors and neighbors-of-neighbors
+      description: Number of hops to find neighbors and neighbors-of-neighbors
       default: 1
       minimum: 0
       maximum: 100
@@ -35,7 +38,7 @@ params:
 query: |
   LET node_ids = (
     FOR n IN djornl_node
-      FILTER n._key IN @keys AND n.node_type == 'gene'
+      FILTER n._key IN @gene_keys AND n.node_type == 'gene'
       FOR v, e, p IN 0..@distance ANY n djornl_edge
         OPTIONS {bfs: true, uniqueVertices: "global"}
         FILTER length(@edge_types) == 0 || p.edges[*].edge_type ALL IN @edge_types
