@@ -17,12 +17,12 @@ schema:
   additionalProperties: false
   properties:
     _key:
-      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_edge/_key
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_key
     _from:
-      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_edge/_from
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_from
     _to:
-      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_edge/_to
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_to
     score:
-      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_edge/score
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/score
     edge_type:
-      $ref: ../../datasets/djornl/definitions.yaml#definitions/djornl_edge/edge_type
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/edge_type

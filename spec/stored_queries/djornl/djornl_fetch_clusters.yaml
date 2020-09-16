@@ -10,7 +10,7 @@ params:
       title: Cluster IDs
       description: Fetch nodes by cluster ID, in the form "clustering_system_name:cluster_id"
       items:
-        $ref: ../../datasets/djornl/definitions.yaml#definitions/cluster_id
+        $ref: ../../datasets/djornl/definitions.yaml#/definitions/cluster_id
       minItems: 1
       uniqueItems: true
       examples:
