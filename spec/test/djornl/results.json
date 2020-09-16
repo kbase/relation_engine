@@ -69,7 +69,7 @@
     ],
     "djornl_fetch_all": [
       {
-        "params": {"edge_types": []},
+        "params": {},
         "results": {
           "nodes": [
             "As2",
@@ -212,7 +212,7 @@
     ],
     "djornl_fetch_genes": [
       {
-        "params": {},
+        "params": { "distance": 0 },
         "error": {
           "failed_validator": "required",
           "message": "'gene_keys' is a required property",
