@@ -217,7 +217,7 @@
           "failed_validator": "required",
           "message": "'gene_keys' is a required property",
           "path": [],
-          "value": {}
+          "value": {"distance": 0}
         }
       },
       {
@@ -227,6 +227,15 @@
           "message": "[] is too short",
           "path": ["gene_keys"],
           "value": []
+        }
+      },
+      {
+        "params": { "gene_keys": ["Mary Poppins"], "phenotype_keys": 0 },
+        "error": {
+          "failed_validator": "additionalProperties",
+          "message": "Additional properties are not allowed ('phenotype_keys' was unexpected)",
+          "path": [],
+          "value": {"gene_keys": ["Mary Poppins"], "phenotype_keys": 0}
         }
       },
       {
@@ -486,6 +495,24 @@
       }
     ],
     "djornl_search_nodes": [
+      {
+        "params": {"search_text": "Mary Poppins", "distance": 500},
+        "error": {
+          "failed_validator": "maximum",
+          "message": "500 is greater than the maximum of 100",
+          "path": ["distance"],
+          "value": 500
+        }
+      },
+      {
+        "params": "erm... what?",
+        "error": {
+          "failed_validator": "type",
+          "message": "'erm... what?' is not of type 'object'",
+          "path": [],
+          "value": "erm... what?"
+        }
+      },
       {
         "params": {"search_text": "Mary Poppins", "distance": 0},
         "results": {"nodes": [], "edges": []}
