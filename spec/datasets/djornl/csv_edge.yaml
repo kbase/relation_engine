@@ -6,9 +6,9 @@ type: object
 required: [node1, node2, edge, layer_descrip]
 properties:
   node1:
-    $ref: definitions.yaml#definitions/djornl_edge/_from
+    $ref: definitions.yaml#/definitions/djornl_edge/_from
   node2:
-    $ref: definitions.yaml#definitions/djornl_edge/_to
+    $ref: definitions.yaml#/definitions/djornl_edge/_to
   edge:
     # pre-transformation, the parser treats this as a string
     type: string
