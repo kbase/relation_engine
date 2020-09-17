@@ -20,7 +20,7 @@ params:
       type: integer
       title: Traversal Distance
       description: Number of hops to find neighbors and neighbors-of-neighbors
-      default: 1
+      default: 0
       minimum: 0
       maximum: 100
     edge_types:

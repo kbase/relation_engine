@@ -393,6 +393,13 @@
         "results": {"nodes": [], "edges": []}
       },
       {
+        "params": {"phenotype_keys": ["As2"]},
+        "results": {
+          "nodes": ["As2"],
+          "edges": []
+        }
+      },
+      {
         "params": {"phenotype_keys": ["As2"], "distance": 0},
         "results": {
           "nodes": ["As2"],
@@ -665,6 +672,13 @@
             "AT1G01050__AT1G01060__AraNetv2-LC_lit-curated-ppi__2.7",
             "AT1G01080__AT1G01090__AraNetv2-LC_lit-curated-ppi__2.8"
           ]
+        }
+      },
+      {
+        "params": {"cluster_ids": ["markov_i2:5", "markov_i6:2"]},
+        "results": {
+          "nodes": ["AT1G01020", "AT1G01070"],
+          "edges": []
         }
       },
       {
