@@ -12,3 +12,6 @@
 coverage_report/
 .coverage
 *.egg-info/
+
+# Test spec archive
+/relation_engine_server/test/spec_release/spec.tar.gz
