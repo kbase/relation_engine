@@ -16,7 +16,7 @@ services:
 #    uncomment to mount local directories
 #    volumes:
 #      - ${PWD}:/app
-#      - "./spec:/spec/repo"
+#      - "./spec:/spec"
     depends_on:
       - auth
       - workspace

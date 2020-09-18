@@ -16,10 +16,10 @@ class TestSpecLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.test_dir = os_path.join('/app', 'relation_engine_server', 'test')
-        cls.test_spec_dir = os_path.join(cls.test_dir, 'spec_release', 'sample_spec_release')
+        cls.test_spec_dir = os_path.join(cls.test_dir, 'spec_release', 'sample_spec_release', 'spec')
 
         cls.config = get_config()
-        cls.repo_path = cls.config['spec_paths']['repo']
+        cls.repo_path = cls.config['spec_paths']['root']
         for key in cls.config['spec_paths'].keys():
             if cls.repo_path in cls.config['spec_paths'][key]:
                 cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(

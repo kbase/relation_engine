@@ -21,7 +21,7 @@ class Test_DJORNL_Collections(unittest.TestCase):
     def setUpClass(cls):
         cls.maxDiff = None
         cls.config = get_config()
-        cls.repo_path = cls.config['spec_paths']['repo']
+        cls.repo_path = cls.config['spec_paths']['root']
         for key in cls.config['spec_paths'].keys():
             if cls.repo_path in cls.config['spec_paths'][key]:
                 cls.config['spec_paths'][key] = cls.config['spec_paths'][key].replace(
@@ -58,7 +58,7 @@ class Test_DJORNL_Collections(unittest.TestCase):
             {
                 'data': {'_key': 'ABCDE', 'clusters': ['GO:0003700', 'GO:0003700']},
                 'valid': False,
-                'error': "\['GO:0003700', 'GO:0003700'\] has non-unique elements"
+                'error': "\\['GO:0003700', 'GO:0003700'\\] has non-unique elements"
             }
         ]
 

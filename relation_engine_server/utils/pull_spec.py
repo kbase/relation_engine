@@ -19,11 +19,11 @@ def download_specs(init_collections=True, release_url=None, reset=False):
     if reset or not os.path.exists(_CONF['spec_paths']['root']):
         # Remove the spec directory, ignoring if it is already missing
         shutil.rmtree(_CONF['spec_paths']['root'], ignore_errors=True)
-        # Recreate the spec directory so we have a clean slate, avoiding name conflicts
-        os.makedirs(_CONF['spec_paths']['root'])
+        # Directory to extract into
+        temp_dir = tempfile.mkdtemp()
         # Download and extract a new release to /spec/repo
         if _CONF['spec_release_path']:
-            _extract_tarball(_CONF['spec_release_path'], _CONF['spec_paths']['root'])
+            _extract_tarball(_CONF['spec_release_path'], temp_dir)
         else:
             if _CONF['spec_release_url']:
                 tarball_url = _CONF['spec_release_url']
@@ -35,10 +35,14 @@ def download_specs(init_collections=True, release_url=None, reset=False):
                 # Download from the tarball url to the temp file
                 _download_file(resp, temp_file.name)
                 # Extract the downloaded tarball into the spec path
-                _extract_tarball(temp_file.name, _CONF['spec_paths']['root'])
-        # The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
-        # We want to move that to /spec/repo
-        _rename_directories(_CONF['spec_paths']['root'], _CONF['spec_paths']['repo'])
+                _extract_tarball(temp_file.name, temp_dir)
+        # At this point, the repo content is extracted into the temp directory
+        # Remove the top-level directory extracted from the tarball
+        subdir = os.listdir(temp_dir)[0]
+        # We can move /tmp/temp_dir/spec into /spec
+        shutil.move(os.path.join(temp_dir, subdir, 'spec'), _CONF['spec_paths']['root'])
+        # Remove our temporary extraction directory
+        shutil.rmtree(temp_dir)
     # Initialize all the collections
     if init_collections:
         do_init_collections()
@@ -87,19 +91,6 @@ def _extract_tarball(tar_path, dest_dir):
     """Extract a gzipped tarball to a destination directory."""
     with tarfile.open(tar_path, 'r:gz') as tar:
         tar.extractall(path=dest_dir)
-
-
-def _rename_directories(dir_path, dest_path):
-    """
-    Rename directories under a path.
-    The files will be extracted into a directory like /spec/kbase-relation_engine_spec-xyz
-    We want to move it to /spec/repo.
-    This could probably be improved to be less confusing.
-    """
-    for file_name in os.listdir(dir_path):
-        file_path = os.path.join(dir_path, file_name)
-        if os.path.isdir(file_path):
-            os.rename(file_path, dest_path)
 
 
 def _has_latest_spec(info):

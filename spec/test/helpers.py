@@ -75,8 +75,9 @@ def check_spec_test_env():
         shutil.rmtree(_CONF['spec_paths']['root'], ignore_errors=True)
         # Recreate the spec directory so we have a clean slate, avoiding name conflicts
         os.makedirs(_CONF['spec_paths']['root'])
-        # copy the contents of /app/spec into /spec/repo
-        shutil.copytree('/app/spec', _CONF['spec_paths']['repo'])
+        # copy the contents of /app/spec into /spec
+        shutil.rmtree(_CONF['spec_paths']['root'], ignore_errors=True)
+        shutil.copytree('/app/spec', _CONF['spec_paths']['root'])
         download_specs()
         os.environ.update({'SPEC_TEST_READY': "Done"})
 
