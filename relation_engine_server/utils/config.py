@@ -12,7 +12,7 @@ def get_config():
     spec_path = os.environ.get('SPEC_PATH', '/spec')  # /spec
     spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
 
-    spec_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
+    spec_url = 'https://api.github.com/repos/kbase/relation_engine'
     spec_release_url = os.environ.get('SPEC_RELEASE_URL')
     spec_release_path = os.environ.get('SPEC_RELEASE_PATH')
 
@@ -46,10 +46,10 @@ def get_config():
             'root': spec_path,  # /spec
             'release_id': os.path.join(spec_path, '.release_id'),
             'repo': spec_repo_path,  # /spec/repo
-            'collections': os.path.join(spec_repo_path, 'collections'),  # /spec/repo/collections
-            'datasets': os.path.join(spec_repo_path, 'datasets'),
-            'data_sources': os.path.join(spec_repo_path, 'data_sources'),
-            'stored_queries': os.path.join(spec_repo_path, 'stored_queries'),
-            'views': os.path.join(spec_repo_path, 'views'),
+            'collections': os.path.join(spec_repo_path, 'spec', 'collections'),  # /spec/repo/spec/collections
+            'datasets': os.path.join(spec_repo_path, 'spec', 'datasets'),
+            'data_sources': os.path.join(spec_repo_path, 'spec', 'data_sources'),
+            'stored_queries': os.path.join(spec_repo_path, 'spec', 'stored_queries'),
+            'views': os.path.join(spec_repo_path, 'spec', 'views'),
         }
     }
