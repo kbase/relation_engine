@@ -37,9 +37,9 @@ def download_specs(init_collections=True, release_url=None, reset=False):
                 # Extract the downloaded tarball into the spec path
                 _extract_tarball(temp_file.name, temp_dir)
         # At this point, the repo content is extracted into the temp directory
-        # Remove the top-level directory extracted from the tarball
+        # Get the top-level directory name from the tarball
         subdir = os.listdir(temp_dir)[0]
-        # We can move /tmp/temp_dir/spec into /spec
+        # Move /tmp/temp_dir/x/spec into /spec
         shutil.move(os.path.join(temp_dir, subdir, 'spec'), _CONF['spec_paths']['root'])
         # Remove our temporary extraction directory
         shutil.rmtree(temp_dir)
