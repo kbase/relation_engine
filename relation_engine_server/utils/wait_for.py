@@ -38,9 +38,9 @@ def get_service_conf(service_name):
 
     service_conf = {
         'arangodb': {
-            'url': _CONF['db_url'] + '/_admin/cluster/health',
+            'url': _CONF['db_url'],
             # server auth credentials
-            'auth': (_CONF['db_user'], _CONF['db_pass']),
+            # 'auth': (_CONF['db_user'], _CONF['db_pass']),
         },
         'auth': {
             'url': _CONF['auth_url'],
