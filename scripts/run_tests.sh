@@ -2,6 +2,10 @@
 
 set -e
 
+# Create tarball of the test spec directory
+(cd /app/relation_engine_server/test/spec_release && \
+  tar czvf spec.tar.gz sample_spec_release)
+
 flake8 --max-complexity 15 /app
 mypy --ignore-missing-imports /app
 bandit -r /app

@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 def get_config():
     """Load environment configuration data."""
     spec_path = os.environ.get('SPEC_PATH', '/spec')  # /spec
-    spec_repo_path = os.path.join(spec_path, 'repo')  # /spec/repo
 
     spec_url = 'https://api.github.com/repos/kbase/relation_engine_spec'
     spec_release_url = os.environ.get('SPEC_RELEASE_URL')
@@ -45,11 +44,10 @@ def get_config():
         'spec_paths': {
             'root': spec_path,  # /spec
             'release_id': os.path.join(spec_path, '.release_id'),
-            'repo': spec_repo_path,  # /spec/repo
-            'collections': os.path.join(spec_repo_path, 'collections'),  # /spec/repo/collections
-            'datasets': os.path.join(spec_repo_path, 'datasets'),
-            'data_sources': os.path.join(spec_repo_path, 'data_sources'),
-            'stored_queries': os.path.join(spec_repo_path, 'stored_queries'),
-            'views': os.path.join(spec_repo_path, 'views'),
+            'collections': os.path.join(spec_path, 'collections'),  # /spec/collections
+            'datasets': os.path.join(spec_path, 'datasets'),
+            'data_sources': os.path.join(spec_path, 'data_sources'),
+            'stored_queries': os.path.join(spec_path, 'stored_queries'),
+            'views': os.path.join(spec_path, 'views'),
         }
     }

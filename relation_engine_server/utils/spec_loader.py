@@ -78,7 +78,7 @@ def get_schema(schema_type, name, path_only=False):
     json_paths = _find_paths(_CONF['spec_paths'][schema_search_type], f'{name}.json')
     # ensure we're using the canonical path and that all paths are unique
     # we are only interested in paths that are in the designated spec repo
-    repo_path = os.path.abspath(_CONF['spec_paths']['repo'])
+    repo_path = os.path.abspath(_CONF['spec_paths']['root'])
     all_paths_set = set(os.path.abspath(path) for path in yaml_paths + json_paths)
     all_paths = [p for p in all_paths_set if p.startswith(repo_path)]
 
