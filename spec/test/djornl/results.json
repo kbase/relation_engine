@@ -378,7 +378,8 @@
           "message": "'Mary Poppins' is not of type 'array'",
           "path": ["phenotype_keys"],
           "value": "Mary Poppins"
-        }
+        },
+        "coerce": {"nodes": [], "edges": []}
       },
       {
         "params": {"phenotype_keys": ["Mary Poppins"], "distance": 0},
