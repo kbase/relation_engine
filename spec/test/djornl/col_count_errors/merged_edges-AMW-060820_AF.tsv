@@ -1,4 +1,4 @@
-node1	node2	edge	edge_descrip	layer_descrip
+node1	node2	score	edge_descrip	edge_type
 As2	AT1G01040	5.422046084731258	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
 As75	AT1G01020	39.98573324312915	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
 AT1G01010	AT1G01020	2.39322646755088	AraNetv2_log-likelihood-score	AraNetv2-HT_high-throughput-ppi

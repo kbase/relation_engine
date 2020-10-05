@@ -72,6 +72,15 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, err_str):
             self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
+    def test_load_missing_files(self):
+        """ test loading when files cannot be found """
+
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_files')
+        # not found
+        err_str = os.path.join(RES_ROOT_DATA_PATH, "edges.tsv") + ': file does not exist'
+        with self.assertRaisesRegex(RuntimeError, err_str):
+            self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
     def test_load_empty_files(self):
         """ test loading files containing no data """
 
@@ -98,14 +107,37 @@ class Test_DJORNL_Parser(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, err_str):
             parser.load_clusters()
 
-    def test_load_missing_files(self):
-        """ test loading when files cannot be found """
+    def test_load_missing_headers(self):
+        """ test loading when files lack required headers """
 
-        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_files')
-        # not found
-        err_str = os.path.join(RES_ROOT_DATA_PATH, "edges.tsv") + ': file does not exist'
-        with self.assertRaisesRegex(RuntimeError, err_str):
-            self.init_parser_with_path(RES_ROOT_DATA_PATH)
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_required_headers')
+        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
+        def create_err(args):
+            (file_name, missing_list) = args
+            return f"{file_name}: missing required headers: " + ", ".join(sorted(missing_list))
+
+        errs = {
+            'clusters': [
+                # tuple containing file name and list of column headers missing in that file
+                ("I2_named.tsv", ["cluster_id", "node_ids"])
+            ],
+            'edges': [
+                ("edges.tsv", ["score"]),
+                ("hithruput-edges.csv", ["edge_type"])
+            ],
+            'nodes': [
+                ("extra_node.tsv", ["node_type"]),
+                ("pheno_nodes.csv", ["node_id"]),
+            ],
+        }
+
+        for data_type in errs.keys():
+            with self.subTest(data_type=data_type):
+                method = f"load_{data_type}"
+                err_str = "\n".join(map(create_err, errs[data_type]))
+                with self.assertRaisesRegex(RuntimeError, err_str):
+                    getattr(parser, method)()
 
     def test_load_invalid_edges(self):
         """ test file format errors """
