@@ -177,8 +177,8 @@ def show_config():
 def _preprocess_stored_query(query_text, config):
     """Inject some default code into each stored query."""
     ws_id_text = " LET ws_ids = @ws_ids " if 'ws_ids' in query_text else ""
-    return (
-        config.get('query_prefix', '') +
-        ws_id_text +
+    return '\n'.join([
+        config.get('query_prefix', ''),
+        ws_id_text,
         query_text
-    )
+    ])
