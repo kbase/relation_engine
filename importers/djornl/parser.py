@@ -288,6 +288,78 @@ class DJORNL_Parser(object):
             'edges': edge_ix.values(),
         }
 
+    def _try_node_merge(self, existing_node, new_node, path=[]):
+        """
+        Try to merge two data structures. These should be JSON compatible, so they will be limited
+        to lists, dicts, and scalar data types.
+
+        This method tests the keys/values of the two dict objects provided and depending on the type
+        of the values, merges them or records an error:
+
+        - scalar (strings, ints, floats, etc.): record an error on mismatches
+        - list: merge list contents, removing duplicates and preserving order
+        - dict: run _try_node_merge recursively on it
+        - mismatch of data types between the two nodes: record an error
+
+        :param existing_node: (dict)    existing node
+        :param new_node: (dict)         node data to be merged into it
+        :param path: (list)             path to this node in a larger data structure
+
+        :return (merge, err_list): (tuple)
+                                        If successful, the method returns the merged dict and []
+                                        If there were errors, err_list will be populated with the
+                                        keys/values where mismatches occurred.
+        """
+
+        # merge the dictionaries
+        merge = {**existing_node, **new_node}
+
+        # find the shared keys -- keys in both existing and new nodes where the values differ
+        shared_keys = [i for i in new_node if i in existing_node and new_node[i] != existing_node[i]]
+
+        # if there were no shared keys, return the merged list
+        if not shared_keys:
+            return (merge, [])
+
+        # otherwise, we need to remove the shared keys and examine them individually
+        for k in shared_keys:
+            del merge[k]
+
+        err_list = []
+        # go through the dict keys, checking their type
+        for k in sorted(shared_keys):
+            value_type = type(existing_node[k])
+
+            # do the types match? If not, these values cannot be merged
+            if type(new_node[k]) != value_type:
+                err_list.append("/".join(path+[k]))
+                continue
+
+            if value_type == list:
+                # merge lists, preserving order. Data type agnostic.
+                merge[k] = []
+                for i in existing_node[k] + new_node[k]:
+                    if i not in merge[k]:
+                        merge[k].append(i)
+                continue
+
+            elif value_type == dict:
+                # recursively check dict data using _try_node_merge
+                (k_merged, k_errs) = self._try_node_merge(existing_node[k], new_node[k], path+[k])
+                if k_errs:
+                    err_list = err_list + k_errs
+                    continue
+                merge[k] = k_merged
+
+            else:
+                # this is a scalar (string, number, etc.) so it can't be merged
+                err_list.append("/".join(path+[k]))
+
+        # at some point, it may be useful to examine these errors in more detail
+        if err_list:
+            merge = None
+        return (merge, err_list)
+
     def load_nodes(self):
         """Load node metadata"""
 
@@ -332,11 +404,15 @@ class DJORNL_Parser(object):
         def store_nodes(datum):
             # check whether we have this node already
             if datum['_key'] in node_ix:
-                # report non-matching data
-                if datum != node_ix[datum['_key']]:
-                    return f"duplicate data for node {datum['_key']}"
-                # otherwise, it's duplicated line: ignore
-                return None
+                # identical data: ignore it
+                if datum == node_ix[datum['_key']]:
+                    return None
+
+                # try merging the data
+                (merged, err_list) = self._try_node_merge(node_ix[datum['_key']], datum)
+                if err_list:
+                    return "duplicate data for node " + datum['_key']
+                datum = merged
 
             node_ix[datum['_key']] = datum
             return None
