@@ -50,7 +50,7 @@ properties:
     $ref: definitions.yaml#/definitions/djornl_node/pheno_pto_name
   pheno_pto_description:
     $ref: definitions.yaml#/definitions/djornl_node/pheno_pto_description
-  pheno_ref:
-    $ref: definitions.yaml#/definitions/djornl_node/pheno_ref
+  pheno_reference:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_reference
   user_notes:
     $ref: definitions.yaml#/definitions/djornl_node/user_notes

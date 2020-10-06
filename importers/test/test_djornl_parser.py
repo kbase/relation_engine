@@ -86,7 +86,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
     def test_load_missing_files(self):
         """ test loading when files cannot be found """
-
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_files')
         # not found
         err_str = os.path.join(RES_ROOT_DATA_PATH, "edges.tsv") + ': file does not exist'
@@ -116,7 +115,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
     def test_load_missing_headers(self):
         """ test loading when files lack required headers """
-
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_required_headers')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
@@ -260,3 +258,83 @@ class Test_DJORNL_Parser(unittest.TestCase):
             cluster_data,
             self.json_data["load_clusters"]
         )
+
+    def test_try_node_merge(self):
+        """test node merging"""
+
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
+        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
+        tests = [
+            {
+                'desc': 'existing node is just a _key',
+                'old': {'_key': 'abcde'},
+                'new': {'_key': 'abcde', 'node_type': 'gene', 'node_quality': 'highest'},
+                'out': ({'_key': 'abcde', 'node_type': 'gene', 'node_quality': 'highest'}, []),
+            },
+            {
+                'desc': 'new node is just a _key',
+                'old': {'_key': 'abcde', 'node_type': 'gene'},
+                'new': {'_key': 'abcde'},
+                'out': ({'_key': 'abcde', 'node_type': 'gene'}, []),
+            },
+            {
+                'desc': 'no overlapping keys',
+                'old': {'_key': 'abcde', 'node_type': 'gene'},
+                'new': {'_key': 'abcde', 'node_size': 24},
+                'out': ({'_key': 'abcde', 'node_type': 'gene', 'node_size': 24}, []),
+            },
+            {
+                'desc': 'mergeable fields',
+                'old': {'_key': 'abcde', 'go_terms': ['this', 'that'], 'colour': 'pink'},
+                'new': {'_key': 'abcde', 'go_terms': ['the other']},
+                'out': ({'_key': 'abcde', 'go_terms': ['this', 'that', 'the other'], 'colour': 'pink'}, []),
+            },
+            {
+                'desc': 'mergeable fields, removing list duplicates',
+                'old': {'_key': 'abcde', 'go_terms': ['this', 'that', 'this', 'that', 'the'], 'colour': 'pink'},
+                'new': {'_key': 'abcde', 'go_terms': ['this', 'the', 'that', 'that', 'other', 'other']},
+                'out': ({'_key': 'abcde', 'go_terms': ['this', 'that', 'the', 'other'], 'colour': 'pink'}, []),
+            },
+            {
+                'desc': 'mergeable fields, complex list contents, removing list duplicates',
+                'old': {'_key': 123, 'list': [{'a': 'b'}, {'a': 'b'}, {'c': 'd'}]},
+                'new': {'_key': 123, 'list': [{'a': 'b'}, {'a': 'c'}, {'c': 'd'}]},
+                'out': ({'_key': 123, 'list': [{'a': 'b'}, {'c': 'd'}, {'a': 'c'}]}, []),
+            },
+            {
+                'desc': 'mergeable fields, no overlapping keys, nested version',
+                'old': {'_key': 'abcde', 'type': 'gene', 'info': {'teeth': 16}},
+                'new': {'_key': 'abcde', 'size': 24, 'info': {'colour': 'pinkish'}},
+                'out': ({'_key': 'abcde', 'type': 'gene', 'size': 24, 'info': {'teeth': 16, 'colour': 'pinkish'}}, []),
+            },
+            {
+                'desc': 'single field error: duplicate',
+                'old': {'_key': 'abcde', 'node_type': 'gene'},
+                'new': {'_key': 'abcde', 'node_type': 'pheno'},
+                'out': (None, ['node_type']),
+            },
+            {
+                'desc': 'single field error: type mismatch',
+                'old': {'_key': 'abcde', 'node_type': 'gene'},
+                'new': {'_key': 'abcde', 'node_type': ['pheno']},
+                'out': (None, ['node_type']),
+            },
+            {
+                'desc': 'multiple field errors',
+                'old': {'_key': 'abcde', 'node_type': 'gene', 'shark': 'Jaws'},
+                'new': {'_key': 'abcde', 'node_type': 'pheno', 'shark': 'Loan', 'fish': 'guppy'},
+                'out': (None, ['node_type', 'shark']),
+            },
+            {
+                'desc': 'multiple field errors, nested dicts',
+                'old': {'_key': 123, 'a': 'A', 'b': {'c': {'d': 'D'}, 'e': {}, 'f': 'F'}},
+                'new': {'_key': 123, 'a': 'A', 'b': {'c': {'d': ['D']}, 'e': 'E', 'f': 'f'}},
+                'out': (None, ['b/c/d', 'b/e', 'b/f']),
+            }
+        ]
+
+        for t in tests:
+            with self.subTest(desc=t['desc']):
+                output = parser._try_node_merge(t['old'], t['new'])
+                self.assertEqual(output, t['out'])
