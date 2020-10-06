@@ -113,7 +113,6 @@ class TestApi(unittest.TestCase):
         self.assertTrue(len(resp_json['kbase_endpoint']))
         self.assertTrue(len(resp_json['db_url']))
         self.assertTrue(len(resp_json['db_name']))
-        self.assertTrue(len(resp_json['spec_url']))
 
     def test_update_specs(self):
         """Test the endpoint that triggers an update on the specs."""
