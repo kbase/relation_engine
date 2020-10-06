@@ -1,8 +1,19 @@
 """
-Loads the Dan Jacobson/ORNL group's gene and phenotype network data into
-arangodb.
+Loads the Dan Jacobson/ORNL group's gene and phenotype network data into arangodb.
 
 Running this requires a set of source files provided by the ORNL group.
+
+The parser sets up its configuration, including the files it will parse, from the RES_ROOT_DATA_PATH
+environment variable once per instantiation. To parse a set of files from a different directory,
+create a new parser with RES_ROOT_DATA_PATH set appropriately.
+
+Sample usage:
+
+from the command line:
+
+# load files from /path/to/data/dir
+RES_ROOT_DATA_PATH=/path/to/data/dir python -m importers.djornl.parser
+
 """
 import json
 import requests
@@ -144,9 +155,46 @@ class DJORNL_Parser(object):
                 msg = f"expected {expected_col_count} cols, found {col_count}"
                 yield(line_no, None, f"{file['path']} line {line_no}: {msg}")
 
+    def check_headers(self, headers, validator=None):
+        """
+        Ensure that the file headers contain required columns for the data type. Checks the schema
+        in the validator to ensure that all required fields are present in the headers.
+
+        :param headers: (list)          list containing headers
+
+        :param validator: (obj)         validator object, with the appropriate schema loaded
+
+        :return missing_headers: (list) list of required headers that are missing from the input.
+                                        If the list of headers supplied is valid--i.e. it
+                                        contains all the fields marked as required in the validator
+                                        schema--or no validator has been supplied, the method
+                                        returns an empty list
+        """
+
+        if validator is None:
+            return []
+
+        # check that each required header in the schema is present in headers
+        required_props = validator.schema['required']
+        return [i for i in required_props if i not in headers]
+
     def remap_object(self, raw_data, remap_functions):
-        """ Given a dict, raw_data, create a new dict, remapped_data, using the functions in the
-        dictionary `remap_functions`. """
+        """
+        Given a dict, raw_data, create a new dict, remapped_data, using the functions in the
+        dictionary `remap_functions`.
+
+        :param raw_data: (dict)         input data for remapping
+
+        :param remap_fn: (dict)         mapping of output param names to functions
+
+                                        Each function should take the raw_data object as an
+                                        argument and return the value for the output parameter.
+                                        For parameters that can be copied over to the output
+                                        object without modification, set the value to `None`
+                                        instead of a function.
+
+        :return remapped_data: (dict)   the remapped data!
+        """
         remapped_data = {}
         for (key, function) in remap_functions.items():
             # these keys get copied over unchanged to the new object if they exist in the input obj
@@ -189,6 +237,12 @@ class DJORNL_Parser(object):
             err_list.append(f"{file['path']}: no header line found")
             return
 
+        missing_headers = self.check_headers(cols, validator)
+        if missing_headers:
+            err_list.append(
+                f"{file['path']}: missing required headers: " + ", ".join(sorted(missing_headers))
+            )
+            return
         headers = cols
         n_stored = 0
         for (line_no, cols, err_str) in file_parser:
@@ -210,8 +264,15 @@ class DJORNL_Parser(object):
                     err_list.append(err_msg)
                     continue
 
-            # transform it using the remap_functions
-            datum = self.remap_object(row_object, remap_fn)
+            try:
+                # transform it using the remap_functions
+                datum = self.remap_object(row_object, remap_fn)
+            except Exception as err:
+                err_type = type(err)
+                err_list.append(
+                    f"{file['path']} line {line_no}: error remapping data: {err_type} {err}"
+                )
+                continue
 
             # and store it
             storage_error = store_fn(datum)
@@ -239,6 +300,8 @@ class DJORNL_Parser(object):
         node_name = self.config('node_name')
         # these functions remap the values in the columns of the input file to
         # appropriate values to go into Arango
+        # note that the functions that assume the presence of a certain key in the input
+        # can do so because that key is in a 'required' property in the CSV spec file
         remap_functions = {
             # create a unique key for each record
             '_key': lambda row: '__'.join([row[_] for _ in ['node1', 'node2', 'edge_type', 'score']]),
@@ -254,7 +317,7 @@ class DJORNL_Parser(object):
         def store_edges(datum):
             # there should only be one value for each node<->node edge of a given type,
             # so use these values as an index key
-            edge_key = "__".join([datum['node1'], datum['node2'], datum['edge_type']])
+            edge_key = "__".join([*sorted([datum['node1'], datum['node2']]), datum['edge_type']])
 
             if edge_key in edge_ix:
                 # duplicate lines can be ignored
@@ -265,7 +328,7 @@ class DJORNL_Parser(object):
 
             # keep track of the nodes mentioned in this edge set
             for node_n in ["1", "2"]:
-                node_ix[datum[f"node{node_n}"]] = 1
+                node_ix[datum[f"node{node_n}"]] = {'_key': datum[f"node{node_n}"]}
                 del datum[f"node{node_n}"]
 
             edge_ix[edge_key] = datum
@@ -284,7 +347,7 @@ class DJORNL_Parser(object):
             raise RuntimeError('\n'.join(err_list))
 
         return {
-            'nodes': [{'_key': n} for n in node_ix.keys()],
+            'nodes': node_ix.values(),
             'edges': edge_ix.values(),
         }
 
@@ -366,19 +429,21 @@ class DJORNL_Parser(object):
 
         # these functions remap the values in the columns of the input file to
         # appropriate values to go into Arango
+        # the 'cluster_id' remap function is assigned below on a per-file basis
         remap_functions = {
             'node_ids': lambda row: [n.strip() for n in row['node_ids'].split(',')]
         }
 
-        # store clusters in a dictionary with key node_id and value list of cluster IDs to which
-        # the node is assigned
+        # store cluster IDs in a list under the key 'clusters'
         def store_clusters(datum):
             cluster_id = datum['cluster_id']
             for node_id in datum['node_ids']:
                 if node_id not in node_ix:
-                    node_ix[node_id] = [cluster_id]
-                elif cluster_id not in node_ix[node_id]:
-                    node_ix[node_id].append(cluster_id)
+                    node_ix[node_id] = {'_key': node_id, 'clusters': [cluster_id]}
+                elif 'clusters' not in node_ix[node_id]:
+                    node_ix[node_id]['clusters'] = [cluster_id]
+                elif cluster_id not in node_ix[node_id]['clusters']:
+                    node_ix[node_id]['clusters'].append(cluster_id)
             return None
 
         for file in self.config('cluster_files'):
@@ -396,13 +461,7 @@ class DJORNL_Parser(object):
         if len(err_list):
             raise RuntimeError('\n'.join(err_list))
 
-        # gather a list of cluster IDs for each node
-        nodes = [{
-            '_key': key,
-            'clusters': cluster_data
-        } for (key, cluster_data) in node_ix.items()]
-
-        return {'nodes': nodes}
+        return {'nodes': list(node_ix.values())}
 
     def save_dataset(self, dataset):
 

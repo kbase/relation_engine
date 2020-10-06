@@ -4,6 +4,6 @@ AT1G01010,AT1G01030,2.4,AraNetv2_log-likelihood-score,AraNetv2-HT_high-throughpu
 # potentially erroneous line
 AT1G01010,AT1G01030,2.7,AraNetv2_log-likelihood-score,AraNetv2-HT_high-throughput-ppi
 # duplicated line from the other file
-AT1G01050,AT1G01060,2.7,AraNetv2_log-likelihood-score,AraNetv2-LC_lit-curated-ppi
+AT1G01060,AT1G01050,2.7,AraNetv2_log-likelihood-score,AraNetv2-LC_lit-curated-ppi
 # potentially erroneous duplication from the other file
-AT1G01030,AT1G01050,2.6000001,AraNetv2_log-likelihood-score,AraNetv2-CX_pairwise-gene-coexpression
+AT1G01050,AT1G01030,2.6000001,AraNetv2_log-likelihood-score,AraNetv2-CX_pairwise-gene-coexpression
