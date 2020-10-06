@@ -1,5 +1,5 @@
 # data_type: edge
-node1	node2	edge	edge_descrip	layer_descrip
+node1	node2	score	edge_descrip	edge_type
 As2	AT1G01020	8.422046084731258	AraGWAS-Association_score	Same-Old-Stuff
 As2	AT1G01040	6	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
 As75	AT1G01020	39.98573324312915	AraGWAS-Association_score	AraGWAS-Phenotype_Associations
