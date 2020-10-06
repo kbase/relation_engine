@@ -114,7 +114,7 @@ definitions:
       title: PTO description
       description: Plant Trait Ontology description
       examples: ["A mineral and ion content related trait (TO:0000465) which is the concentration of arsenic (CHEBI:22632) in some plant structure (PO:0009011). [GR:Karthik]"]
-    pheno_ref:
+    pheno_reference:
       type: string
       title: Phenotype reference
       examples: ["Atwell et. al, Nature 2010"]

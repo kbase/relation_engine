@@ -241,13 +241,13 @@ class DJORNL_Parser(object):
         # appropriate values to go into Arango
         remap_functions = {
             # create a unique key for each record
-            '_key': lambda row: '__'.join([row[_] for _ in ['node1', 'node2', 'layer_descrip', 'edge']]),
+            '_key': lambda row: '__'.join([row[_] for _ in ['node1', 'node2', 'edge_type', 'score']]),
             'node1': None,  # this will be deleted in the 'store' step
             'node2': None,  # as will this
             '_from': lambda row: node_name + '/' + row['node1'],
             '_to': lambda row: node_name + '/' + row['node2'],
-            'score': lambda row: float(row['edge']),
-            'edge_type': lambda row: row['layer_descrip'],
+            'score': lambda row: float(row['score']),
+            'edge_type': None,
         }
 
         # store edge data, checking for potential duplicates
@@ -316,7 +316,7 @@ class DJORNL_Parser(object):
             'pheno_description': None,
             'pheno_pto_description': None,
             'pheno_pto_name': None,
-            'pheno_ref': None,
+            'pheno_reference': None,
             'tair_computational_description': None,
             'tair_curator_summary': None,
             'tair_short_description': None,
