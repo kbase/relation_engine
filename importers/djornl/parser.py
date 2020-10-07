@@ -174,22 +174,46 @@ class DJORNL_Parser(object):
 
         :param validator: (obj)         validator object, with the appropriate schema loaded
 
-        :return missing_headers: (list) list of required headers that are missing from the input.
+        :return header_errs: (dict)     dict of header errors:
+                                        'missing': required headers that are missing from the input
+                                        'invalid': additional headers that should not be in the input
+                                        'duplicate': duplicated headers (content would be overwritten)
                                         If the list of headers supplied is valid--i.e. it
                                         contains all the fields marked as required in the validator
                                         schema--or no validator has been supplied, the method
-                                        returns an empty list
+                                        returns an empty dict
         """
 
         if validator is None:
-            return []
+            return {}
+
+        header_errs = {}
+
+        all_headers = {}
+        # ensure we don't have any duplicate headers
+        for h in headers:
+            if h in all_headers:
+                all_headers[h] += 1
+            else:
+                all_headers[h] = 1
+
+        duplicate_headers = [h for h in all_headers.keys() if all_headers[h] != 1]
+        if duplicate_headers:
+            header_errs['duplicate'] = duplicate_headers
 
         # check that each required header in the schema is present in headers
         required_props = validator.schema['required']
+        missing_headers = [i for i in required_props if i not in headers]
+        if missing_headers:
+            header_errs['missing'] = missing_headers
 
-        # TODO: check if additional properties are allowed
+        if 'additionalProperties' in validator.schema and validator.schema['additionalProperties'] is False:
+            all_props = validator.schema['properties'].keys()
+            extra_headers = [i for i in headers if i not in all_props]
+            if extra_headers:
+                header_errs['invalid'] = extra_headers
 
-        return [i for i in required_props if i not in headers]
+        return header_errs
 
     def remap_object(self, raw_data, remap_functions):
         """
@@ -251,12 +275,21 @@ class DJORNL_Parser(object):
             err_list.append(f"{file['path']}: no header line found")
             return
 
-        missing_headers = self.check_headers(cols, validator)
-        if missing_headers:
-            err_list.append(
-                f"{file['path']}: missing required headers: " + ", ".join(sorted(missing_headers))
-            )
+        header_errors = self.check_headers(cols, validator)
+        if header_errors.keys():
+            err_str = {
+                'duplicate': 'duplicate',
+                'missing': 'missing required',
+                'invalid': 'invalid additional',
+            }
+            for err_type in ['missing', 'invalid', 'duplicate']:
+                if err_type in header_errors:
+                    err_list.append(
+                        f"{file['path']}: {err_str[err_type]} headers: "
+                        + ", ".join(sorted(header_errors[err_type]))
+                    )
             return
+
         headers = cols
         n_stored = 0
         for (line_no, cols, err_str) in file_parser:

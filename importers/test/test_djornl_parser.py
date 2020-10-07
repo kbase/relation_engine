@@ -46,14 +46,13 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 continue
 
             all_errs = all_errs + errs[data_type]
-            for data_type in errs.keys():
-                method = f"load_{data_type}"
-                output = getattr(parser, method)()
-                with self.subTest(data_type=data_type):
-                    self.assertEqual(
-                        output['err_list'],
-                        errs[data_type]
-                    )
+            method = f"load_{data_type}"
+            output = getattr(parser, method)()
+            with self.subTest(data_type=data_type):
+                self.assertEqual(
+                    output['err_list'],
+                    errs[data_type]
+                )
 
         with self.subTest(data_type="all types"):
             # test all errors
@@ -134,21 +133,32 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_required_headers')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        def create_err(file_name, missing_list):
-            return f"{file_name}: missing required headers: " + ", ".join(sorted(missing_list))
+        def invalid_err(file_name, header_list):
+            return f"{file_name}: invalid additional headers: " + ", ".join(sorted(header_list))
+
+        def missing_err(file_name, header_list):
+            return f"{file_name}: missing required headers: " + ", ".join(sorted(header_list))
+
+        def dupe_err(file_name, header_list):
+            return f"{file_name}: duplicate headers: " + ", ".join(sorted(header_list))
 
         errs = {
             'clusters': [
                 # tuple containing file name and list of column headers missing in that file
-                create_err("I2_named.tsv", ["cluster_id", "node_ids"])
+                missing_err("I2_named.tsv", ["cluster_id", "node_ids"]),
+                invalid_err("I2_named.tsv", ["cluster", "node_list"]),
+                invalid_err("I4_named.tsv", ["other cool stuff"]),
+                dupe_err("I6_named.tsv", ["node_ids"]),
             ],
             'edges': [
-                create_err("edges.tsv", ["score"]),
-                create_err("hithruput-edges.csv", ["edge_type"])
+                missing_err("edges.tsv", ["score"]),
+                missing_err("hithruput-edges.csv", ["edge_type"])
             ],
             'nodes': [
-                create_err("extra_node.tsv", ["node_type"]),
-                create_err("pheno_nodes.csv", ["node_id"]),
+                missing_err("extra_node.tsv", ["node_type"]),
+                invalid_err("extra_node.tsv", ["node_types"]),
+                missing_err("pheno_nodes.csv", ["node_id"]),
+                invalid_err("pheno_nodes.csv", ["id", "pheno_ref", "usernotes"]),
             ],
         }
         self.test_errors(parser, errs)
@@ -171,9 +181,6 @@ class Test_DJORNL_Parser(unittest.TestCase):
             'nodes': [
                 # invalid node type
                 r"nodes.csv line 5: 'Monkey' is not valid under any of the given schemas",
-                # invalid extra header property
-                r"pheno_nodes.csv line 3: Additional properties are not allowed ('pheno_ref' was unexpected)",
-                r"pheno_nodes.csv line 4: Additional properties are not allowed ('pheno_ref' was unexpected)",
                 r"pheno_nodes.csv: no valid data found"
             ],
             'clusters': [

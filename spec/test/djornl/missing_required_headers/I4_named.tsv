@@ -1,4 +1,4 @@
-cluster_id	node_ids
+cluster_id	node_ids	other cool stuff
 # cluster_prefix: markov_i4
 # title: Markov clustering, inflation = 4
 # data_type: cluster
