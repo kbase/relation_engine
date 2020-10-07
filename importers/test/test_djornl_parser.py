@@ -40,12 +40,28 @@ class Test_DJORNL_Parser(unittest.TestCase):
             self.assertTrue(True)
             return
 
-        for data_type in errs.keys():
-            with self.subTest(data_type=data_type):
+        all_errs = []
+        for data_type in parser.parse_order:
+            if data_type not in errs:
+                continue
+
+            all_errs = all_errs + errs[data_type]
+            for data_type in errs.keys():
                 method = f"load_{data_type}"
-                err_str = "\n".join(errs[data_type])
-                with self.assertRaisesRegex(RuntimeError, err_str):
-                    getattr(parser, method)()
+                output = getattr(parser, method)()
+                with self.subTest(data_type=data_type):
+                    self.assertEqual(
+                        output['err_list'],
+                        errs[data_type]
+                    )
+
+        with self.subTest(data_type="all types"):
+            # test all errors
+            with self.assertRaisesRegex(RuntimeError, all_errs[0]) as cm:
+                parser.load_data()
+                exception = cm.exception
+                err_list = exception.split("\n")
+                self.assertEqual(err_list, all_errs)
 
     def test_missing_required_env_var(self):
         '''test that the parser exits with code 1 if the RES_ROOT_DATA_PATH env var is not set'''
@@ -118,31 +134,24 @@ class Test_DJORNL_Parser(unittest.TestCase):
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'missing_required_headers')
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
-        def create_err(args):
-            (file_name, missing_list) = args
+        def create_err(file_name, missing_list):
             return f"{file_name}: missing required headers: " + ", ".join(sorted(missing_list))
 
         errs = {
             'clusters': [
                 # tuple containing file name and list of column headers missing in that file
-                ("I2_named.tsv", ["cluster_id", "node_ids"])
+                create_err("I2_named.tsv", ["cluster_id", "node_ids"])
             ],
             'edges': [
-                ("edges.tsv", ["score"]),
-                ("hithruput-edges.csv", ["edge_type"])
+                create_err("edges.tsv", ["score"]),
+                create_err("hithruput-edges.csv", ["edge_type"])
             ],
             'nodes': [
-                ("extra_node.tsv", ["node_type"]),
-                ("pheno_nodes.csv", ["node_id"]),
+                create_err("extra_node.tsv", ["node_type"]),
+                create_err("pheno_nodes.csv", ["node_id"]),
             ],
         }
-
-        for data_type in errs.keys():
-            with self.subTest(data_type=data_type):
-                method = f"load_{data_type}"
-                err_str = "\n".join(map(create_err, errs[data_type]))
-                with self.assertRaisesRegex(RuntimeError, err_str):
-                    getattr(parser, method)()
+        self.test_errors(parser, errs)
 
     def test_load_invalid_types(self):
         """ test file format errors """
@@ -155,16 +164,21 @@ class Test_DJORNL_Parser(unittest.TestCase):
             # invalid edge type, invalid scores
             'edges': [
                 r"edges.tsv line 3: 'Same-Old-Stuff' is not valid under any of the given schemas",
-                r"edges.tsv line 7: '2.' does not match .*?",
+                r"edges.tsv line 7: '2.' does not match '^\\d+(\\.\\d+)?$'",
                 r"edges.tsv line 8: 'raNetv2-DC_' is not valid under any of the given schemas",
-                r"edges.tsv line 10: 'score!' does not match .*?"
+                r"edges.tsv line 10: 'score!' does not match '^\\d+(\\.\\d+)?$'"
             ],
-            # invalid node type
             'nodes': [
-                "nodes.csv line 5: 'Monkey' is not valid under any of the given schemas",
+                # invalid node type
+                r"nodes.csv line 5: 'Monkey' is not valid under any of the given schemas",
+                # invalid extra header property
+                r"pheno_nodes.csv line 3: Additional properties are not allowed ('pheno_ref' was unexpected)",
+                r"pheno_nodes.csv line 4: Additional properties are not allowed ('pheno_ref' was unexpected)",
+                r"pheno_nodes.csv: no valid data found"
             ],
             'clusters': [
-                "markov2_named.tsv line 7: 'HoneyNutCluster3' does not match"
+                r"markov2_named.tsv line 7: 'HoneyNutCluster3' does not match '^Cluster\\d+$'",
+                r'markov2_named.tsv line 8: expected 2 cols, found 1',
             ]
         }
         self.test_errors(parser, errs)
@@ -198,6 +212,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         for data_structure in [edge_data, expected]:
             for k in data_structure.keys():
                 data_structure[k] = sorted(data_structure[k], key=lambda n: n['_key'])
+        expected['err_list'] = []
 
         self.assertEqual(edge_data, expected)
 
@@ -214,6 +229,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             for k in data_structure.keys():
                 data_structure[k] = sorted(data_structure[k], key=lambda n: n['_key'])
                 data_structure[k] = [n['_key'] for n in data_structure[k]]
+        expected['err_list'] = []
 
         self.assertEqual(node_data, expected)
 
@@ -224,10 +240,10 @@ class Test_DJORNL_Parser(unittest.TestCase):
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
         cluster_data = parser.load_clusters()
-        self.assertEqual(
-            cluster_data,
-            self.json_data["load_clusters"]
-        )
+        expected = self.json_data["load_clusters"]
+        expected['err_list'] = []
+
+        self.assertEqual(cluster_data, expected)
 
     def test_duplicate_data(self):
         """ test files with duplicate data that should throw an error """
@@ -237,8 +253,10 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         errs = {
             'edges': [
-                "hithruput-edges.csv line 5: duplicate data for edge AT1G01010__AT1G01030__AraNetv2-HT_.*?",
-                "hithruput-edges.csv line 9: duplicate data for edge AT1G01030__AT1G01050__AraNetv2-CX_.*?"
+                "hithruput-edges.csv line 5: duplicate data for edge "
+                + "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi",
+                "hithruput-edges.csv line 9: duplicate data for edge "
+                + "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression"
             ],
             'nodes': [
                 "extra_node.tsv line 5: duplicate data for node AT1G01080"
@@ -254,9 +272,33 @@ class Test_DJORNL_Parser(unittest.TestCase):
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
         cluster_data = parser.load_clusters()
+        expected = self.json_data["load_clusters"]
+        expected['err_list'] = []
+
+        self.assertEqual(cluster_data, expected)
+
+    def test_dry_run(self):
+
+        RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, 'djornl', 'test_data')
+        parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
+
+        output = parser.load_data(dry_run=True)
         self.assertEqual(
-            cluster_data,
-            self.json_data["load_clusters"]
+            {
+                'edge_type_count': {
+                    'AraGWAS-Phenotype_Associations': 3,
+                    'AraNetv2-CX_pairwise-gene-coexpression': 1,
+                    'AraNetv2-DC_domain-co-occurrence': 1,
+                    'AraNetv2-HT_high-throughput-ppi': 2,
+                    'AraNetv2-LC_lit-curated-ppi': 3
+                },
+                'edges_total': 10,
+                'node_data_available': {'cluster': 0, 'full': 14, 'key_only': 0},
+                'node_type_count': {'__NO_TYPE__': 0, 'gene': 10, 'pheno': 4},
+                'nodes_in_edge': 10,
+                'nodes_total': 14
+            },
+            output
         )
 
     def test_try_node_merge(self):
