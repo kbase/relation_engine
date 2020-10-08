@@ -5,11 +5,12 @@ import requests
 import time
 import sys
 from relation_engine_server.utils.config import get_config
+from typing import List
 
 _CONF = get_config()
 
 
-def wait_for_service(service_list):
+def wait_for_service(service_list: List[str]) -> None:
     '''wait for a service or list of services to start up'''
     timeout = int(time.time()) + 60
     services_pending = set(service_list)
@@ -53,7 +54,7 @@ def wait_for_api():
     wait_for_service(['localhost'])
 
 
-def _assert_json_content(resp):
+def _assert_json_content(resp: requests.models.Response) -> None:
     """Assert that a response body has non-empty JSON content."""
     if len(resp.content) == 0:
         raise RuntimeError("No content in response")
