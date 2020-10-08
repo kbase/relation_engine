@@ -1,6 +1,9 @@
 # Environment variables
 .env
 
+# Test coverage
+/htmlcov/
+
 # Caches and temp dirs
 /build/
 /dist/

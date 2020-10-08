@@ -27,7 +27,8 @@ services:
       - KBASE_AUTH_URL=http://auth:5000
       - KBASE_WORKSPACE_URL=http://workspace:5000
       - PYTHONUNBUFFERED=true
-      - SPEC_RELEASE_PATH=/app/relation_engine_server/test/spec_release/spec.tar.gz- DB_URL=http://arangodb:8529
+      - SPEC_RELEASE_PATH=/app/relation_engine_server/test/spec_release/spec.tar.gz
+      - DB_URL=http://arangodb:8529
       - DB_USER=root
       - RE_API_URL=http://127.0.0.1:5000
 
