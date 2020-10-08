@@ -21,7 +21,9 @@ def wait_for_service(service_list):
                 name = service['name']
                 url = service['url']
                 if service['auth'] is not None:
-                    requests.get(service['url'], auth=service['auth']).raise_for_status()
+                    resp = requests.get(service['url'], auth=service['auth']).raise_for_status()
+                    if service.get('callback') is not None:
+                        service['callback'](resp)
                 else:
                     # auth and workspace both return 500, so don't raise_for_status
                     requests.get(service['url'])
@@ -38,7 +40,8 @@ def get_service_conf(service_name):
 
     service_conf = {
         'arangodb': {
-            'url': _CONF['db_url'],
+            'url': _CONF['api_url'] + '/database/current',
+            'callback': _assert_content,
         },
         'auth': {
             'url': _CONF['auth_url'],
@@ -64,7 +67,6 @@ def get_service_conf(service_name):
 
 def wait_for_arangodb():
     '''wait for arangodb to be ready'''
-
     wait_for_service(['arangodb'])
 
 
@@ -79,6 +81,12 @@ def wait_for_api():
 
     wait_for_services()
     wait_for_service(['localhost'])
+
+
+def _assert_content(resp):
+    """Assert that a response body is non-empty"""
+    if len(resp.content) == 0:
+        raise RuntimeError("No content in response")
 
 
 if __name__ == '__main__':

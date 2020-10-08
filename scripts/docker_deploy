@@ -9,7 +9,6 @@ set -o xtrace
 ver=$(cat VERSION)
 export IMAGE_NAME="kbase/relation_engine_api:$ver"
 export BRANCH=`git symbolic-ref --short HEAD`
-export BRANCH_IMAGE_NAME="kbase/relation_engine_api:$BRANCH"
 export DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 export COMMIT=`git rev-parse --short HEAD`
 docker build --build-arg BUILD_DATE=$DATE \
@@ -17,8 +16,3 @@ docker build --build-arg BUILD_DATE=$DATE \
              --build-arg BRANCH=$BRANCH \
              -t ${IMAGE_NAME} .
 docker push $IMAGE_NAME
-docker build --build-arg BUILD_DATE=$DATE \
-             --build-arg VCS_REF=$COMMIT \
-             --build-arg BRANCH=$BRANCH \
-             -t ${BRANCH_IMAGE_NAME} .
-docker push $BRANCH_IMAGE_NAME
