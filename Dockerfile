@@ -27,7 +27,8 @@ RUN apk --update add --virtual build-dependencies build-base python3-dev && \
 COPY . /app
 
 # Create tarball of the spec directory so we have it cached in the image
-RUN tar czvf /app/spec.tar.gz /app/spec
+RUN tar czvf /opt/spec.tar.gz /app/spec
+ENV SPEC_RELEASE_PATH=/opt/spec.tar.gz
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/kbase/relation_engine_api" \

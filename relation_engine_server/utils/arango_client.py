@@ -91,7 +91,7 @@ def create_collection(name, config):
         if 'duplicate' not in resp_json['errorMessage']:
             # Unable to create a collection
             raise ArangoServerError(resp.text)
-    print(f'Successfully created index {name}')
+    print(f'Successfully created collection {name}')
     if config.get('indexes'):
         _create_indexes(name, config)
 
