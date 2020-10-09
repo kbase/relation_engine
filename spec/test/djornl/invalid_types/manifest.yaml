@@ -10,3 +10,6 @@ file_list:
   - data_type: cluster
     path: markov2_named.tsv
     cluster_prefix: markov_i2
+
+  - data_type: node
+    path: pheno_nodes.csv

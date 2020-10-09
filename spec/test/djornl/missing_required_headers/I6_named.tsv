@@ -1,4 +1,4 @@
-cluster_id	node_ids
+cluster_id	node_ids	node_ids
 # data_type: cluster
 # cluster_prefix: markov_i6
 # title: Markov clustering, inflation = 6
