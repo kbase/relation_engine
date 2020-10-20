@@ -28,8 +28,8 @@ params:
       default: []
       uniqueItems: true
       examples:
-        - ['AraNetv2-HT_high-throughput-ppi', 'AraNetv2-LC_lit-curated-ppi']
-        - ['AraGWAS-Phenotype_Associations']
+        - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curation_AraNet_v2']
+        - ['phenotype-association_AraGWAS']
         - []
 query: |
   LET node_ids = (

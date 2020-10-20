@@ -261,9 +261,9 @@ class Test_DJORNL_Parser(unittest.TestCase):
         errs = {
             'edges': [
                 "hithruput-edges.csv line 5: duplicate data for edge "
-                + "AT1G01010__AT1G01030__AraNetv2-HT_high-throughput-ppi",
+                + "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2",
                 "hithruput-edges.csv line 9: duplicate data for edge "
-                + "AT1G01030__AT1G01050__AraNetv2-CX_pairwise-gene-coexpression"
+                + "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2"
             ],
             'nodes': [
                 "extra_node.tsv line 5: duplicate data for node AT1G01080"
@@ -293,11 +293,11 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.assertEqual(
             {
                 'edge_type_count': {
-                    'AraGWAS-Phenotype_Associations': 3,
-                    'AraNetv2-CX_pairwise-gene-coexpression': 1,
-                    'AraNetv2-DC_domain-co-occurrence': 1,
-                    'AraNetv2-HT_high-throughput-ppi': 2,
-                    'AraNetv2-LC_lit-curated-ppi': 3
+                    'phenotype-association_AraGWAS': 3,
+                    'pairwise-gene-coexpression_AraNet_v2': 1,
+                    'domain-co-occurrence_AraNet_v2': 1,
+                    'protein-protein-interaction_high-throughput_AraNet_v2': 2,
+                    'protein-protein-interaction_literature-curation_AraNet_v2': 3
                 },
                 'edges_total': 10,
                 'node_data_available': {'cluster': 0, 'full': 14, 'key_only': 0},
