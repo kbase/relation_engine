@@ -4,22 +4,22 @@ title: Edge Type
 description: Edge types in Dan Jacobson Arabidopsis Exascale dataset
 type: string
 oneOf:
-  - const: AraGWAS-Phenotype_Associations
-    title: AraGWAS phenotype associations
+  - const: phenotype-association_AraGWAS
+    title: AraGWAS phenotype association
     description: GWAS associations produced by analyzing a subset of phenotypes and SNPs in the Arabidopsis 1001 Genomes database. Edge values are significant association scores after FDR correction.
 
-  - const: AraNetv2-CX_pairwise-gene-coexpression
+  - const: pairwise-gene-coexpression_AraNet_v2
     title: AraNetv2 pairwise gene coexpression
     description: A subset of pairwise gene coexpression values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from Pearson correlation coefficients to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
 
-  - const: AraNetv2-DC_domain-co-occurrence
+  - const: domain-co-occurrence_AraNet_v2
     title: AraNetv2 domain co-occurrence
     description: A layer of protein domain co-occurrence values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from weighted mutual information scores to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
 
-  - const: AraNetv2-HT_high-throughput-ppi
+  - const: protein-protein-interaction_high-throughput_AraNet_v2
     title: AraNetv2 high-throughput protein-protein interaction
     description: Log likelihood score. A layer of protein-protein interaction values derived from four high-throughput PPI screening experiments; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
 
-  - const: AraNetv2-LC_lit-curated-ppi
+  - const: protein-protein-interaction_literature-curation_AraNet_v2
     title: AraNetv2 literature-curated protein-protein interaction
     description: A layer of protein-protein interaction values from literature-curated small- to medium-scale experimental data; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).

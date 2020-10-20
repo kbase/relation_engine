@@ -1,3 +1,3 @@
 node1,node2,score,edge_descrip,edge_type
-AT1G01010,AT1G01020,2.3,AraNetv2_log-likelihood-score,AraNetv2-HT_high-throughput-ppi
-AT1G01010,AT1G01030,2.4,AraNetv2_log-likelihood-score,AraNetv2-HT_high-throughput-ppi
+AT1G01010,AT1G01020,2.3,AraNetv2_log-likelihood-score,protein-protein-interaction_high-throughput_AraNet_v2
+AT1G01010,AT1G01030,2.4,AraNetv2_log-likelihood-score,protein-protein-interaction_high-throughput_AraNet_v2
