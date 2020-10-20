@@ -17,3 +17,16 @@ can also run `make test-schemas` or `make test-schema <schema-path>` to test sch
 ## Resources
 
 - Quickly validate JSON schemas: https://www.jsonschemavalidator.net/
+
+## Data
+
+### Ontologies
+
+* Gene Ontology (GO): **[go/](/spec/collections/GO)**
+* Environmental Ontology (ENVO): **[envo/](/spec/collections/ENVO)**
+
+### Taxonomies
+
+* Genome Taxonomy Database (GTDB): **[gtdb/](/spec/collections/gtdb)**
+* Ribosomal Database Project (RDP): **[rdp/](/spec/collections/rdp)**
+* SILVA: **[silva/](/spec/collections/silva)**
