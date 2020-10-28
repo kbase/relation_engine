@@ -56,11 +56,9 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         with self.subTest(data_type="all types"):
             # test all errors
-            with self.assertRaisesRegex(RuntimeError, all_errs[0]) as cm:
-                parser.load_data()
-                exception = cm.exception
-                err_list = exception.split("\n")
-                self.assertEqual(err_list, all_errs)
+            summary = parser.load_data(dry_run=True)
+            err_list = summary['errors']
+            self.assertEqual(err_list, all_errs)
 
     def test_missing_required_env_var(self):
         '''test that the parser exits with code 1 if the RES_ROOT_DATA_PATH env var is not set'''
@@ -303,7 +301,9 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 'node_data_available': {'cluster': 0, 'full': 14, 'key_only': 0},
                 'node_type_count': {'__NO_TYPE__': 0, 'gene': 10, 'pheno': 4},
                 'nodes_in_edge': 10,
-                'nodes_total': 14
+                'nodes_total': 14,
+                'errors_total': 0,
+                'errors': []
             },
             output
         )
