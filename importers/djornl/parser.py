@@ -666,8 +666,8 @@ class DJORNL_Parser(object):
             if output['err_list']:
                 all_errs = all_errs + output['err_list']
 
-        # save the dataset, unless this is a dry run
-        if not dry_run:
+        # if there are no errors then save the dataset unless this is a dry run
+        if len(all_errs) == 0 and not dry_run:
             self.save_dataset()
 
         # report stats on the data that has been gathered
