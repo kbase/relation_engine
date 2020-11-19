@@ -7,19 +7,40 @@ import sys
 from relation_engine_server.utils.config import get_config
 from typing import List
 
-_CONF = get_config()
+
+def get_service_conf():
+
+    _CONF = get_config()
+    return {
+        'arangodb': {
+            'url': _CONF['api_url'] + '/collection',
+            'callback': _assert_json_content,
+            'raise_for_status': True,
+        },
+        'auth': {
+            'url': _CONF['auth_url'],
+        },
+        'workspace': {
+            'url': _CONF['workspace_url'],
+        },
+        'localhost': {
+            'url': 'http://127.0.0.1:5000',
+            'raise_for_status': True,
+        }
+    }
 
 
 def wait_for_service(service_list: List[str]) -> None:
     '''wait for a service or list of services to start up'''
     timeout = int(time.time()) + 60
     services_pending = set(service_list)
+    service_conf = get_service_conf()
 
     while services_pending:
         still_pending = set()
         for name in services_pending:
             try:
-                conf = _SERVICE_CONF[name]
+                conf = service_conf[name]
                 resp = requests.get(conf['url'], auth=conf.get('auth'))
                 if conf.get('raise_for_status'):
                     resp.raise_for_status()
@@ -59,25 +80,6 @@ def _assert_json_content(resp: requests.models.Response) -> None:
     if len(resp.content) == 0:
         raise RuntimeError("No content in response")
     resp.json()
-
-
-_SERVICE_CONF = {
-    'arangodb': {
-        'url': _CONF['api_url'] + '/collection',
-        'callback': _assert_json_content,
-        'raise_for_status': True,
-    },
-    'auth': {
-        'url': _CONF['auth_url'],
-    },
-    'workspace': {
-        'url': _CONF['workspace_url'],
-    },
-    'localhost': {
-        'url': 'http://127.0.0.1:5000',
-        'raise_for_status': True,
-    }
-}
 
 
 if __name__ == '__main__':
