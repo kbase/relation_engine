@@ -4,6 +4,9 @@ file_list:
   - data_type: edge
     path: edges.tsv
 
+  - data_type: edge
+    path: directed_edges.tsv
+
   - data_type: node
     path: nodes.csv
 

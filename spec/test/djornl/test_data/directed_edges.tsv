@@ -1,0 +1,4 @@
+node1	node2	score	edge_descrip	edge_type	directed
+SDV	AT1G01100	8.4	AraGWAS-Association_score	protein-protein-interaction_literature-curation_AraNet_v2	0
+SDV	AT1G01100	5.4	AraGWAS-Association_score	protein-protein-interaction_literature-curation_AraNet_v2	1
+AT1G01100	SDV	2.4	AraGWAS-Association_score	protein-protein-interaction_literature-curation_AraNet_v2	1

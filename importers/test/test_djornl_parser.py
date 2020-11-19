@@ -154,7 +154,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         errs = {
             "clusters": [
-                # tuple containing file name and list of column headers missing in that file
+                # tuple containing file name and list of invalid column headers in that file
                 missing_err("I2_named.tsv", ["cluster_id", "node_ids"]),
                 invalid_err("I2_named.tsv", ["cluster", "node_list"]),
                 invalid_err("I4_named.tsv", ["other cool stuff"]),
@@ -181,16 +181,30 @@ class Test_DJORNL_Parser(unittest.TestCase):
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
         errs = {
-            # invalid edge type, invalid scores
             "edges": [
+                # invalid edge type
                 r"edges.tsv line 3: 'Same-Old-Stuff' is not valid under any of the given schemas",
+                # empty to/from
+                r"edges.tsv line 4: '' does not match '^\\S{2,}.*$'",
+                r"edges.tsv line 5: '' does not match '^\\S{2,}.*$'",
+                # empty edge type
+                r"edges.tsv line 6: '' is not valid under any of the given schemas",
+                # invalid score
                 r"edges.tsv line 7: '2.' does not match '^\\d+(\\.\\d+)?$'",
+                # invalid edge type
                 r"edges.tsv line 8: 'raNetv2-DC_' is not valid under any of the given schemas",
+                # invalid score
                 r"edges.tsv line 10: 'score!' does not match '^\\d+(\\.\\d+)?$'",
+                # various permutations of edge directedness
+                r"directed_edges.tsv line 4: 'true' is not one of ['1', '0']",
+                r"directed_edges.tsv line 5: '' is not one of ['1', '0']",
+                r"directed_edges.tsv line 6: 'directed' is not one of ['1', '0']",
+                r"directed_edges.tsv line 8: 'false' is not one of ['1', '0']",
             ],
             "nodes": [
                 # invalid node type
                 r"nodes.csv line 5: 'Monkey' is not valid under any of the given schemas",
+                r"nodes.csv line 7: 'A' does not match '^\\S{2,}.*$'",
                 r"pheno_nodes.csv: no valid data found",
             ],
             "clusters": [
@@ -209,11 +223,12 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         errs = {
             "edges": [
-                "merged_edges-AMW-060820_AF.tsv line 6: expected 5 cols, found 3"
+                "edges.tsv line 2: expected 5 cols, found 6",
+                "edges.tsv line 6: expected 5 cols, found 3",
+                "directed_edges.tsv line 4: expected 6 cols, found 5",
+                "directed_edges.tsv line 6: expected 6 cols, found 3",
             ],
-            "nodes": [
-                "aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv line 3: expected 20 cols, found 22"
-            ],
+            "nodes": ["nodes.csv line 3: expected 20 cols, found 22"],
         }
         self.test_errors(parser, errs)
 
@@ -270,10 +285,14 @@ class Test_DJORNL_Parser(unittest.TestCase):
 
         errs = {
             "edges": [
+                "edges.tsv line 17: duplicate data for edge "
+                + "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__False",
                 "hithruput-edges.csv line 5: duplicate data for edge "
-                + "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2",
+                + "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False",
                 "hithruput-edges.csv line 9: duplicate data for edge "
-                + "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2",
+                + "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False",
+                "hithruput-edges.csv line 11: duplicate data for edge "
+                + "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True",
             ],
             "nodes": ["extra_node.tsv line 5: duplicate data for node AT1G01080"],
         }
@@ -282,7 +301,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
     def test_duplicate_cluster_data(self):
         """ test files with duplicate cluster data, which should be seamlessly merged """
 
-        # path: test/djornl/col_count_errors
+        # path: test/djornl/duplicate_data
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "duplicate_data")
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
@@ -305,12 +324,12 @@ class Test_DJORNL_Parser(unittest.TestCase):
                     "pairwise-gene-coexpression_AraNet_v2": 1,
                     "domain-co-occurrence_AraNet_v2": 1,
                     "protein-protein-interaction_high-throughput_AraNet_v2": 2,
-                    "protein-protein-interaction_literature-curation_AraNet_v2": 3,
+                    "protein-protein-interaction_literature-curation_AraNet_v2": 6,
                 },
-                "edges_total": 10,
+                "edges_total": 13,
                 "node_data_available": {"cluster": 0, "full": 14, "key_only": 0},
                 "node_type_count": {"__NO_TYPE__": 0, "gene": 10, "pheno": 4},
-                "nodes_in_edge": 10,
+                "nodes_in_edge": 12,
                 "nodes_total": 14,
             },
             output,

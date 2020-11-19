@@ -16,3 +16,10 @@ properties:
     pattern: ^\d+(\.\d+)?$
   edge_type:
     $ref: edge_type.yaml
+  directed:
+    # pre-transform: parser treats this as a string
+    type: string
+    default: "0"
+    enum:
+      - "1"
+      - "0"

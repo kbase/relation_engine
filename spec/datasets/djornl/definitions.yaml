@@ -21,20 +21,31 @@ definitions:
       pattern: ^(\S+__){3}(\S+)$
     _from:
       type: string
-      title: Gene ID
+      title: Node ID
+      format: regex
+      pattern: ^\S{2,}.*$
     _to:
       type: string
-      title: Gene or Phenotype ID
+      title: Node ID
+      format: regex
+      pattern: ^\S{2,}.*$
     score:
       title: Edge Score (Weight)
       # (float)
       type: number
     edge_type:
       $ref: edge_type.yaml
+    directed:
+      type: boolean
+      title: Directed edge
+      description: Whether or not the edge is directed
+      default: false
   djornl_node:
     _key:
       type: string
       title: Key
+      format: regex
+      pattern: ^\S{2,}.*$
       examples: ["AT1G01010", "As2"]
     clusters:
       type: array

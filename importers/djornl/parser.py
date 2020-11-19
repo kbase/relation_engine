@@ -148,7 +148,7 @@ class DJORNL_Parser(object):
             line_no = 0
             for row in csv_reader:
                 line_no += 1
-                if not len(row) or row[0][0] == "#":
+                if not len(row) or len(row[0]) and row[0][0] == "#":
                     # comment / metadata
                     continue
 
@@ -312,11 +312,8 @@ class DJORNL_Parser(object):
             if validator is not None:
                 # validate the object
                 if not validator.is_valid(row_object):
-                    err_msg = "".join(
-                        f"{file['path']} line {line_no}: " + e.message
-                        for e in sorted(validator.iter_errors(row_object), key=str)
-                    )
-                    err_list.append(err_msg)
+                    for e in sorted(validator.iter_errors(row_object), key=str):
+                        err_list.append(f"{file['path']} line {line_no}: " + e.message)
                     continue
 
             try:
@@ -345,17 +342,29 @@ class DJORNL_Parser(object):
 
         Nodes are indexed by the '_key' attribute. Parsed edge data only contains node '_key' values.
 
-        Edges are indexed by the unique combination of the two node IDs and the edge type. It is
-        assumed that if there is more than one score for a given combination of node IDs and edge
-        type, the datum is erroneous.
+        Edges are indexed by the unique combination of the two node IDs, the edge type, and whether
+        or not it is a directed edge. It is assumed that if there is more than one score for a given
+        combination of node IDs and edge type, the datum is erroneous.
         """
 
         # there should only be one value for each node<->node edge of a given type,
         # so use these values as an index key
-        # sort the nodes to ensure no dupes slip through
-        edge_key = "__".join(
-            [*sorted([datum["node1"], datum["node2"]]), datum["edge_type"]]
-        )
+        if datum["directed"]:
+            property_array = [
+                datum["node1"],
+                datum["node2"],
+                datum["edge_type"],
+                str(datum["directed"]),
+            ]
+        else:
+            # sort undirected nodes to ensure no dupes slip through
+            property_array = [
+                *sorted([datum["node1"], datum["node2"]]),
+                datum["edge_type"],
+                str(datum["directed"]),
+            ]
+
+        edge_key = "__".join(property_array)
 
         if edge_key in self.edge_ix:
             # duplicate lines can be ignored
@@ -363,6 +372,14 @@ class DJORNL_Parser(object):
                 return None
             # report non-matching data
             return f"duplicate data for edge {edge_key}"
+
+        # create a unique key for the DB for this record
+        datum["_key"] = "__".join(
+            [
+                str(datum[_])
+                for _ in ["node1", "node2", "edge_type", "directed", "score"]
+            ]
+        )
 
         # keep track of the nodes mentioned in this edge set
         for node_n in ["1", "2"]:
@@ -389,16 +406,13 @@ class DJORNL_Parser(object):
         # note that the functions that assume the presence of a certain key in the input
         # can do so because that key is in a 'required' property in the CSV spec file
         remap_functions = {
-            # create a unique key for each record
-            "_key": lambda row: "__".join(
-                [row[_] for _ in ["node1", "node2", "edge_type", "score"]]
-            ),
             "node1": None,  # this will be deleted in the 'store' step
             "node2": None,  # as will this
             "_from": lambda row: node_name + "/" + row["node1"],
             "_to": lambda row: node_name + "/" + row["node2"],
             "score": lambda row: float(row["score"]),
             "edge_type": None,
+            "directed": lambda row: True if row.get("directed", "") == "1" else False,
         }
 
         for file in self.config("edge_files"):
