@@ -170,7 +170,9 @@ def show_config():
         'kbase_endpoint': conf['kbase_endpoint'],
         'db_url': conf['db_url'],
         'db_name': conf['db_name'],
-        'spec_url': conf['spec_url']
+        'spec_repo_url': conf['spec_repo_url'],
+        'spec_release_url': conf['spec_release_url'],
+        'spec_release_path': conf['spec_release_path'],
     })
 
 

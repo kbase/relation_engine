@@ -72,7 +72,7 @@ def do_init_views():
 def _fetch_github_release_url():
     """Find the latest relation engine spec release using the github api."""
     # Download information about the latest release
-    release_resp = requests.get(_CONF['spec_url'] + '/releases/latest')
+    release_resp = requests.get(_CONF['spec_repo_url'] + '/releases/latest')
     release_info = release_resp.json()
     if release_resp.status_code != 200:
         # This may be a github API rate usage limit, or some other error

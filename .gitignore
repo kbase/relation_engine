@@ -1,6 +1,9 @@
 # Environment variables
 .env
 
+# Test coverage
+/htmlcov/
+
 # Caches and temp dirs
 /build/
 /dist/
@@ -13,5 +16,5 @@ coverage_report/
 .coverage
 *.egg-info/
 
-# Test spec archive
-/relation_engine_server/test/spec_release/spec.tar.gz
+# Spec archives
+spec.tar.gz

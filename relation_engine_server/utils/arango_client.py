@@ -82,7 +82,8 @@ def create_collection(name, config):
         'keyOptions': {'allowUserKeys': True},
         'name': name,
         'type': collection_type,
-        'numberOfShards': num_shards
+        'numberOfShards': num_shards,
+        'waitForSync': True,
     })
     resp = requests.post(url, data, auth=(_CONF['db_user'], _CONF['db_pass']))
     resp_json = resp.json()
@@ -90,6 +91,7 @@ def create_collection(name, config):
         if 'duplicate' not in resp_json['errorMessage']:
             # Unable to create a collection
             raise ArangoServerError(resp.text)
+    print(f'Successfully created collection {name}')
     if config.get('indexes'):
         _create_indexes(name, config)
 
@@ -109,15 +111,16 @@ def _create_indexes(coll_name, config):
         idx_type = idx_conf['type']
         idx_url = url + '#' + idx_type
         idx_conf['type'] = idx_type
+        print(f'Creating {idx_type} index for collection {coll_name}: {idx_conf}')
         resp = requests.post(
             idx_url,
             params={'collection': coll_name},
             data=json.dumps(idx_conf),
-            auth=(_CONF['db_user'], _CONF['db_pass'])
+            auth=auth,
         )
         if not resp.ok:
             raise RuntimeError(resp.text)
-        print(f'Created new {idx_type} index on {idx_conf["fields"]} for {coll_name}.')
+        print(f'Successfully created {idx_type} index on {idx_conf["fields"]} for {coll_name}.')
 
 
 def _index_exists(idx_conf, indexes):
