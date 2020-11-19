@@ -12,26 +12,26 @@ def get_service_conf():
 
     _CONF = get_config()
     return {
-        'arangodb': {
-            'url': _CONF['api_url'] + '/collection',
-            'callback': _assert_json_content,
-            'raise_for_status': True,
+        "arangodb": {
+            "url": _CONF["api_url"] + "/collection",
+            "callback": _assert_json_content,
+            "raise_for_status": True,
         },
-        'auth': {
-            'url': _CONF['auth_url'],
+        "auth": {
+            "url": _CONF["auth_url"],
         },
-        'workspace': {
-            'url': _CONF['workspace_url'],
+        "workspace": {
+            "url": _CONF["workspace_url"],
         },
-        'localhost': {
-            'url': 'http://127.0.0.1:5000',
-            'raise_for_status': True,
-        }
+        "localhost": {
+            "url": "http://127.0.0.1:5000",
+            "raise_for_status": True,
+        },
     }
 
 
 def wait_for_service(service_list: List[str]) -> None:
-    '''wait for a service or list of services to start up'''
+    """wait for a service or list of services to start up"""
     timeout = int(time.time()) + 60
     services_pending = set(service_list)
     service_conf = get_service_conf()
@@ -41,11 +41,11 @@ def wait_for_service(service_list: List[str]) -> None:
         for name in services_pending:
             try:
                 conf = service_conf[name]
-                resp = requests.get(conf['url'], auth=conf.get('auth'))
-                if conf.get('raise_for_status'):
+                resp = requests.get(conf["url"], auth=conf.get("auth"))
+                if conf.get("raise_for_status"):
                     resp.raise_for_status()
-                if conf.get('callback') is not None:
-                    conf['callback'](resp)
+                if conf.get("callback") is not None:
+                    conf["callback"](resp)
                 # The service is up
             except Exception:
                 print(f"Still waiting for {name} to start...")
@@ -58,21 +58,21 @@ def wait_for_service(service_list: List[str]) -> None:
 
 
 def wait_for_arangodb():
-    '''wait for arangodb to be ready'''
-    wait_for_service(['arangodb'])
+    """wait for arangodb to be ready"""
+    wait_for_service(["arangodb"])
 
 
 def wait_for_services():
-    '''wait for the workspace, auth, and arango to start up'''
+    """wait for the workspace, auth, and arango to start up"""
 
-    wait_for_service(['auth', 'workspace', 'arangodb'])
+    wait_for_service(["auth", "workspace", "arangodb"])
 
 
 def wait_for_api():
-    '''wait for the workspace, auth, arango, AND localhost:5000 to start up'''
+    """wait for the workspace, auth, arango, AND localhost:5000 to start up"""
 
     wait_for_services()
-    wait_for_service(['localhost'])
+    wait_for_service(["localhost"])
 
 
 def _assert_json_content(resp: requests.models.Response) -> None:
@@ -82,8 +82,8 @@ def _assert_json_content(resp: requests.models.Response) -> None:
     resp.json()
 
 
-if __name__ == '__main__':
-    if sys.argv[1] == 'services':
+if __name__ == "__main__":
+    if sys.argv[1] == "services":
         wait_for_services()
-    elif sys.argv[1] == 'api':
+    elif sys.argv[1] == "api":
         wait_for_api()

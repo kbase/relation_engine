@@ -1,4 +1,3 @@
-
 class REServerError(Exception):
     """Server-originated error from RE API (ie. 500+)"""
 

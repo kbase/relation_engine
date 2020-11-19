@@ -19,11 +19,10 @@ from spec.validate import (
     validate_all_by_type,
 )
 
-_TEST_DIR = '/app/spec/test/sample_schemas'
+_TEST_DIR = "/app/spec/test/sample_schemas"
 
 
 class TestValidate(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         wait_for_arangodb()
@@ -33,53 +32,53 @@ class TestValidate(unittest.TestCase):
 
         err_msg = "No validation schema found for 'made-up_schema'"
         with self.assertRaisesRegex(ValueError, err_msg):
-            validate_schema('/path/to/file', 'made-up_schema')
+            validate_schema("/path/to/file", "made-up_schema")
 
     def test_validate_collection_errors(self):
         """Testing collection-specific schema errors"""
 
-        base_dir = os_path.join(_TEST_DIR, 'collections')
+        base_dir = os_path.join(_TEST_DIR, "collections")
 
         error_list = [
             {
-                'msg': "Name key should match filename: test_nodes vs wrong_name",
-                'file': 'wrong_name.yaml',
-                'err': ValueError
+                "msg": "Name key should match filename: test_nodes vs wrong_name",
+                "file": "wrong_name.yaml",
+                "err": ValueError,
             },
             {
-                'msg': "'http://json-schema.org/draft-07/schema#' is not of type 'object'",
-                'file': 'schema_not_object.yaml',
+                "msg": "'http://json-schema.org/draft-07/schema#' is not of type 'object'",
+                "file": "schema_not_object.yaml",
             },
             {
-                'msg': "Additional properties are not allowed \('title' was unexpected\)",
-                'file': 'extra_top_level_entries.yaml',
+                "msg": "Additional properties are not allowed \('title' was unexpected\)",
+                "file": "extra_top_level_entries.yaml",
             },
             {
-                'msg': 'Time-travel edge schemas must require "from" and "to" attributes in ',
-                'file': 'edge_delta_missing_to_from.yaml',
+                "msg": 'Time-travel edge schemas must require "from" and "to" attributes in ',
+                "file": "edge_delta_missing_to_from.yaml",
             },
             {
-                'msg': 'Edge schemas must require "_from" and "_to" attributes in ',
-                'file': 'edge_missing_to_from.yaml',
+                "msg": 'Edge schemas must require "_from" and "_to" attributes in ',
+                "file": "edge_missing_to_from.yaml",
             },
             {
-                'msg': 'Vertex schemas must require the "_key" attribute in ',
-                'file': 'vertex_missing_key.yaml',
+                "msg": 'Vertex schemas must require the "_key" attribute in ',
+                "file": "vertex_missing_key.yaml",
             },
             {
-                'msg': 'Time-travel vertex schemas must require the "id" attribute in ',
-                'file': 'vertex_missing_id.yaml',
+                "msg": 'Time-travel vertex schemas must require the "id" attribute in ',
+                "file": "vertex_missing_id.yaml",
             },
         ]
 
         for entry in error_list:
-            err_type = entry['err'] if 'err' in entry else ValidationError
+            err_type = entry["err"] if "err" in entry else ValidationError
             # generic method, requires schema type
-            with self.assertRaisesRegex(err_type, entry['msg']):
-                validate_schema(os_path.join(base_dir, entry['file']), 'collection')
+            with self.assertRaisesRegex(err_type, entry["msg"]):
+                validate_schema(os_path.join(base_dir, entry["file"]), "collection")
             # specific method
-            with self.assertRaisesRegex(err_type, entry['msg']):
-                validate_collection(os_path.join(base_dir, entry['file']))
+            with self.assertRaisesRegex(err_type, entry["msg"]):
+                validate_collection(os_path.join(base_dir, entry["file"]))
 
         # TODO: add an example of a schema that validates but where data['schema'] is
         # not a valid json schema.
@@ -87,119 +86,120 @@ class TestValidate(unittest.TestCase):
     def test_validate_collection(self):
         """Testing collection-specific schema errors"""
 
-        base_dir = os_path.join(_TEST_DIR, 'collections')
+        base_dir = os_path.join(_TEST_DIR, "collections")
 
         # valid schemas -- check delta is set appropriately
-        for type in ['edge', 'vertex']:
-            data = validate_collection(os_path.join(base_dir, 'test_' + type + '.yaml'))
-            self.assertEqual(data['delta'], False)
+        for type in ["edge", "vertex"]:
+            data = validate_collection(os_path.join(base_dir, "test_" + type + ".yaml"))
+            self.assertEqual(data["delta"], False)
 
             # delta is true:
-            data = validate_collection(os_path.join(base_dir, 'test_delta_' + type + '.yaml'))
-            self.assertEqual(data['delta'], True)
+            data = validate_collection(
+                os_path.join(base_dir, "test_delta_" + type + ".yaml")
+            )
+            self.assertEqual(data["delta"], True)
 
     def test_validate_data_source(self):
 
-        base_dir = os_path.join(_TEST_DIR, 'data_sources')
+        base_dir = os_path.join(_TEST_DIR, "data_sources")
 
         # working example
-        output = validate_data_source(os_path.join(base_dir, 'minimal.yaml'))
+        output = validate_data_source(os_path.join(base_dir, "minimal.yaml"))
         self.assertEqual(
             output,
             {
                 "name": "minimal",
                 "category": "network",
                 "title": "Example minimal data source",
-            }
+            },
         )
 
         error_list = [
             {
-                'msg': "Additional properties are not allowed \('type' was unexpected\)",
-                'file': 'invalid_additional_property.json',
+                "msg": "Additional properties are not allowed \('type' was unexpected\)",
+                "file": "invalid_additional_property.json",
             },
             {
-                'msg': "'this is not a valid URI' is not a 'uri'",
-                'file': 'uri_validation.json',
-
-            }
+                "msg": "'this is not a valid URI' is not a 'uri'",
+                "file": "uri_validation.json",
+            },
         ]
 
         for entry in error_list:
-            err_type = entry['err'] if 'err' in entry else ValidationError
+            err_type = entry["err"] if "err" in entry else ValidationError
 
             # generic method
-            with self.assertRaisesRegex(err_type, entry['msg']):
-                validate_schema(os_path.join(base_dir, entry['file']), 'data_source')
+            with self.assertRaisesRegex(err_type, entry["msg"]):
+                validate_schema(os_path.join(base_dir, entry["file"]), "data_source")
 
             # same thing as above via specific method
-            with self.assertRaisesRegex(err_type, entry['msg']):
-                validate_data_source(os_path.join(base_dir, entry['file']))
+            with self.assertRaisesRegex(err_type, entry["msg"]):
+                validate_data_source(os_path.join(base_dir, entry["file"]))
 
     def test_validate_stored_query(self):
 
-        base_dir = os_path.join(_TEST_DIR, 'stored_queries')
+        base_dir = os_path.join(_TEST_DIR, "stored_queries")
 
         err_str = "False is not of type 'object'"
         with self.assertRaisesRegex(ValidationError, err_str):
-            validate_stored_query(os_path.join(base_dir, 'params_not_object.yaml'))
+            validate_stored_query(os_path.join(base_dir, "params_not_object.yaml"))
 
         # total nonsense instead of AQL
-        err_str = 'syntax error, unexpected identifier, expecting assignment'
+        err_str = "syntax error, unexpected identifier, expecting assignment"
         with self.assertRaisesRegex(ValueError, err_str):
-            validate_stored_query(os_path.join(base_dir, 'invalid_aql.yaml'))
+            validate_stored_query(os_path.join(base_dir, "invalid_aql.yaml"))
 
         # invalid bind params
-        err_str = 'Bind vars are invalid'
+        err_str = "Bind vars are invalid"
         with self.assertRaisesRegex(ValueError, err_str):
-            validate_stored_query(os_path.join(base_dir, 'invalid_bind_params.yaml'))
+            validate_stored_query(os_path.join(base_dir, "invalid_bind_params.yaml"))
 
     def test_validate_view(self):
 
-        base_dir = os_path.join(_TEST_DIR, 'views')
+        base_dir = os_path.join(_TEST_DIR, "views")
         output = {
             "name": "minimal",
             "type": "arangosearch",
         }
 
         self.assertEqual(
-            validate_schema(os_path.join(base_dir, 'minimal.json'), 'view'),
-            output
+            validate_schema(os_path.join(base_dir, "minimal.json"), "view"), output
         )
 
-        self.assertEqual(
-            validate_view(os_path.join(base_dir, 'minimal.json')),
-            output
-        )
+        self.assertEqual(validate_view(os_path.join(base_dir, "minimal.json")), output)
 
         err_str = "'from the shore' is not one of \['arangosearch'\]"
         with self.assertRaisesRegex(ValidationError, err_str):
-            validate_view(os_path.join(base_dir, 'wrong_type.json'))
+            validate_view(os_path.join(base_dir, "wrong_type.json"))
 
     def test_validate_all(self):
         """test all the files in a directory"""
 
-        with self.assertRaisesRegex(ValueError, "No validation schema found for 'muffins'"):
-            validate_all('muffins')
+        with self.assertRaisesRegex(
+            ValueError, "No validation schema found for 'muffins'"
+        ):
+            validate_all("muffins")
 
         def validate_all_duplicate_names(self):
-            with self.assertRaisesRegex(ValidationError, "duplicate_names failed validation"):
-                validate_all('collection', os_path.join(_TEST_DIR, 'duplicate_names'))
+            with self.assertRaisesRegex(
+                ValidationError, "duplicate_names failed validation"
+            ):
+                validate_all("collection", os_path.join(_TEST_DIR, "duplicate_names"))
 
         stdout = capture_stdout(validate_all_duplicate_names, self)
         self.assertRegex(stdout, "Duplicate queries named 'test_vertex'")
 
         sample_schemas = {
-            'collection': 'collections',
-            'stored_query': 'stored_queries',
-            'view': 'views',
-            'data_source': 'data_sources',
+            "collection": "collections",
+            "stored_query": "stored_queries",
+            "view": "views",
+            "data_source": "data_sources",
         }
 
         for (schema_type, directory) in sample_schemas.items():
             # n.b. this assumes all the schemas in /spec are valid!
             stdout = capture_stdout(validate_all, schema_type)
-            self.assertRegex(stdout, r'...all valid')
+            self.assertRegex(stdout, r"...all valid")
 
             with self.assertRaises(Exception):
                 validate_all(schema_type, os_path.join(_TEST_DIR, directory))

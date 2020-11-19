@@ -6,9 +6,11 @@ set -e
 (cd /app/relation_engine_server/test/spec_release && \
   tar czvf spec.tar.gz sample_spec_release)
 
+black .
 flake8 --max-complexity 15 /app
 mypy --ignore-missing-imports /app
 bandit -r /app
+
 # start server, using the specs in /spec/repo
 sh /app/scripts/start_server.sh &
 coverage erase

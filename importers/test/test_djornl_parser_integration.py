@@ -10,18 +10,19 @@ import os
 from importers.djornl.parser import DJORNL_Parser
 from spec.test.helpers import modified_environ, check_spec_test_env
 
-_TEST_DIR = '/app/spec/test'
+_TEST_DIR = "/app/spec/test"
 
 
 class Test_DJORNL_Parser_Integration(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         check_spec_test_env()
 
     def test_the_full_shebang(self):
 
-        with modified_environ(RES_ROOT_DATA_PATH=os.path.join(_TEST_DIR, 'djornl', 'test_data')):
+        with modified_environ(
+            RES_ROOT_DATA_PATH=os.path.join(_TEST_DIR, "djornl", "test_data")
+        ):
             parser = DJORNL_Parser()
             parser.load_data()
             self.assertEqual(True, parser.load_data())
