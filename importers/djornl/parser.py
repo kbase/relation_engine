@@ -22,11 +22,13 @@ import csv
 import yaml
 
 import importers.utils.config as config
-from relation_engine_server.utils.json_validation import run_validator, get_schema_validator
+from relation_engine_server.utils.json_validation import (
+    run_validator,
+    get_schema_validator,
+)
 
 
 class DJORNL_Parser(object):
-
     def __init__(self):
 
         # dict of nodes, indexed by node ID (node1 and node2 from the file)
@@ -35,33 +37,33 @@ class DJORNL_Parser(object):
         self.edge_ix = {}
 
         # the order in which to parse the different data files
-        self.parse_order = ['edges', 'nodes', 'clusters']
+        self.parse_order = ["edges", "nodes", "clusters"]
 
     def config(self, value):
-        if not hasattr(self, '_config'):
+        if not hasattr(self, "_config"):
             self._configure()
 
         if value not in self._config:
-            raise KeyError(f'No such config value: {value}')
+            raise KeyError(f"No such config value: {value}")
 
         return self._config[value]
 
     def _configure(self):
 
-        configuration = config.load_from_env(extra_required=['ROOT_DATA_PATH'])
+        configuration = config.load_from_env(extra_required=["ROOT_DATA_PATH"])
 
         # Collection name config
-        configuration['node_name'] = 'djornl_node'
-        configuration['edge_name'] = 'djornl_edge'
+        configuration["node_name"] = "djornl_node"
+        configuration["edge_name"] = "djornl_edge"
 
         # fetch the manifest and make sure all the files listed actually exist
         manifest = self._get_manifest(configuration)
-        for type in ['node', 'edge', 'cluster']:
-            configuration[type + '_files'] = []
+        for type in ["node", "edge", "cluster"]:
+            configuration[type + "_files"] = []
 
         error_list = []
-        for file in manifest['file_list']:
-            file_path = os.path.join(configuration['ROOT_DATA_PATH'], file['path'])
+        for file in manifest["file_list"]:
+            file_path = os.path.join(configuration["ROOT_DATA_PATH"], file["path"])
 
             if not os.path.exists(file_path):
                 error_list.append(f"{file_path}: file does not exist")
@@ -72,8 +74,8 @@ class DJORNL_Parser(object):
                 continue
 
             # add the file to the appropriate list
-            file['file_path'] = file_path
-            configuration[file['data_type'] + '_files'].append(file)
+            file["file_path"] = file_path
+            configuration[file["data_type"] + "_files"].append(file)
 
         if error_list:
             raise RuntimeError("\n".join(error_list))
@@ -83,13 +85,15 @@ class DJORNL_Parser(object):
 
     def _get_manifest_schema_file(self):
 
-        return os.path.join(self._get_dataset_schema_dir(), 'manifest.schema.json')
+        return os.path.join(self._get_dataset_schema_dir(), "manifest.schema.json")
 
     def _get_dataset_schema_dir(self):
 
-        if not hasattr(self, '_dataset_schema_dir'):
+        if not hasattr(self, "_dataset_schema_dir"):
             dir_path = os.path.dirname(os.path.realpath(__file__))
-            self._dataset_schema_dir = os.path.join(dir_path, '../', '../', 'spec', 'datasets', 'djornl')
+            self._dataset_schema_dir = os.path.join(
+                dir_path, "../", "../", "spec", "datasets", "djornl"
+            )
 
         return self._dataset_schema_dir
 
@@ -102,7 +106,7 @@ class DJORNL_Parser(object):
         schema_file = self._get_manifest_schema_file()
 
         # load the manifest and validate it against the schema
-        manifest_file = os.path.join(configuration['ROOT_DATA_PATH'], 'manifest.yaml')
+        manifest_file = os.path.join(configuration["ROOT_DATA_PATH"], "manifest.yaml")
 
         try:
             with open(manifest_file) as fd:
@@ -115,10 +119,7 @@ class DJORNL_Parser(object):
             )
 
         try:
-            validated_manifest = run_validator(
-                schema_file=schema_file,
-                data=manifest
-            )
+            validated_manifest = run_validator(schema_file=schema_file, data=manifest)
         except Exception as err:
             print(err)
             raise RuntimeError(
@@ -128,22 +129,26 @@ class DJORNL_Parser(object):
         return validated_manifest
 
     def _get_file_reader(self, fd, file):
-        '''Given a dict containing file information, instantiate the correct type of parser'''
+        """Given a dict containing file information, instantiate the correct type of parser"""
 
-        delimiter = '\t'
-        if 'file_format' in file and file['file_format'].lower() == 'csv' or file['path'].lower().endswith('.csv'):
-            delimiter = ','
+        delimiter = "\t"
+        if (
+            "file_format" in file
+            and file["file_format"].lower() == "csv"
+            or file["path"].lower().endswith(".csv")
+        ):
+            delimiter = ","
         return csv.reader(fd, delimiter=delimiter)
 
     def parser_gen(self, file):
         """generator function to parse a file"""
         expected_col_count = 0
-        with open(file['file_path'], newline='') as fd:
+        with open(file["file_path"], newline="") as fd:
             csv_reader = self._get_file_reader(fd, file)
             line_no = 0
             for row in csv_reader:
                 line_no += 1
-                if not len(row) or row[0][0] == '#':
+                if not len(row) or len(row[0]) and row[0][0] == "#":
                     # comment / metadata
                     continue
 
@@ -163,7 +168,7 @@ class DJORNL_Parser(object):
                 # otherwise, this row does not have the correct number of columns
                 col_count = len(cols)
                 msg = f"expected {expected_col_count} cols, found {col_count}"
-                yield(line_no, None, f"{file['path']} line {line_no}: {msg}")
+                yield (line_no, None, f"{file['path']} line {line_no}: {msg}")
 
     def check_headers(self, headers, validator=None):
         """
@@ -199,19 +204,22 @@ class DJORNL_Parser(object):
 
         duplicate_headers = [h for h in all_headers.keys() if all_headers[h] != 1]
         if duplicate_headers:
-            header_errs['duplicate'] = duplicate_headers
+            header_errs["duplicate"] = duplicate_headers
 
         # check that each required header in the schema is present in headers
-        required_props = validator.schema['required']
+        required_props = validator.schema["required"]
         missing_headers = [i for i in required_props if i not in headers]
         if missing_headers:
-            header_errs['missing'] = missing_headers
+            header_errs["missing"] = missing_headers
 
-        if 'additionalProperties' in validator.schema and validator.schema['additionalProperties'] is False:
-            all_props = validator.schema['properties'].keys()
+        if (
+            "additionalProperties" in validator.schema
+            and validator.schema["additionalProperties"] is False
+        ):
+            all_props = validator.schema["properties"].keys()
             extra_headers = [i for i in headers if i not in all_props]
             if extra_headers:
-                header_errs['invalid'] = extra_headers
+                header_errs["invalid"] = extra_headers
 
         return header_errs
 
@@ -244,7 +252,7 @@ class DJORNL_Parser(object):
         return remapped_data
 
     def process_file(self, file, remap_fn, store_fn, err_list, validator=None):
-        """ process an input file to generate a dataset and possibly an error list
+        """process an input file to generate a dataset and possibly an error list
 
         Each valid line in the file is turned into a dictionary using the header row, and then
         validated against the csv validation schema in spec/datasets/djornl/csv_<file_type>.
@@ -266,7 +274,7 @@ class DJORNL_Parser(object):
         :param validator: (Validator)   jsonschema validator object
 
         """
-        print("Parsing " + file['data_type'] + " file " + file['file_path'])
+        print("Parsing " + file["data_type"] + " file " + file["file_path"])
         file_parser = self.parser_gen(file)
         try:
             (line_no, cols, err_str) = next(file_parser)
@@ -278,11 +286,11 @@ class DJORNL_Parser(object):
         header_errors = self.check_headers(cols, validator)
         if header_errors.keys():
             err_str = {
-                'duplicate': 'duplicate',
-                'missing': 'missing required',
-                'invalid': 'invalid additional',
+                "duplicate": "duplicate",
+                "missing": "missing required",
+                "invalid": "invalid additional",
             }
-            for err_type in ['missing', 'invalid', 'duplicate']:
+            for err_type in ["missing", "invalid", "duplicate"]:
                 if err_type in header_errors:
                     err_list.append(
                         f"{file['path']}: {err_str[err_type]} headers: "
@@ -304,11 +312,8 @@ class DJORNL_Parser(object):
             if validator is not None:
                 # validate the object
                 if not validator.is_valid(row_object):
-                    err_msg = "".join(
-                        f"{file['path']} line {line_no}: " + e.message
-                        for e in sorted(validator.iter_errors(row_object), key=str)
-                    )
-                    err_list.append(err_msg)
+                    for e in sorted(validator.iter_errors(row_object), key=str):
+                        err_list.append(f"{file['path']} line {line_no}: " + e.message)
                     continue
 
             try:
@@ -337,22 +342,44 @@ class DJORNL_Parser(object):
 
         Nodes are indexed by the '_key' attribute. Parsed edge data only contains node '_key' values.
 
-        Edges are indexed by the unique combination of the two node IDs and the edge type. It is
-        assumed that if there is more than one score for a given combination of node IDs and edge
-        type, the datum is erroneous.
+        Edges are indexed by the unique combination of the two node IDs, the edge type, and whether
+        or not it is a directed edge. It is assumed that if there is more than one score for a given
+        combination of node IDs and edge type, the datum is erroneous.
         """
 
         # there should only be one value for each node<->node edge of a given type,
         # so use these values as an index key
-        # sort the nodes to ensure no dupes slip through
-        edge_key = "__".join([*sorted([datum['node1'], datum['node2']]), datum['edge_type']])
+        if datum["directed"]:
+            property_array = [
+                datum["node1"],
+                datum["node2"],
+                datum["edge_type"],
+                str(datum["directed"]),
+            ]
+        else:
+            # sort undirected nodes to ensure no dupes slip through
+            property_array = [
+                *sorted([datum["node1"], datum["node2"]]),
+                datum["edge_type"],
+                str(datum["directed"]),
+            ]
+
+        edge_key = "__".join(property_array)
 
         if edge_key in self.edge_ix:
             # duplicate lines can be ignored
-            if datum['score'] == self.edge_ix[edge_key]['score']:
+            if datum["score"] == self.edge_ix[edge_key]["score"]:
                 return None
             # report non-matching data
             return f"duplicate data for edge {edge_key}"
+
+        # create a unique key for the DB for this record
+        datum["_key"] = "__".join(
+            [
+                str(datum[_])
+                for _ in ["node1", "node2", "edge_type", "directed", "score"]
+            ]
+        )
 
         # keep track of the nodes mentioned in this edge set
         for node_n in ["1", "2"]:
@@ -370,26 +397,25 @@ class DJORNL_Parser(object):
         # error accumulator
         err_list = []
 
-        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_edge.yaml')
+        schema_file = os.path.join(self._get_dataset_schema_dir(), "csv_edge.yaml")
         validator = get_schema_validator(schema_file=schema_file)
 
-        node_name = self.config('node_name')
+        node_name = self.config("node_name")
         # these functions remap the values in the columns of the input file to
         # appropriate values to go into Arango
         # note that the functions that assume the presence of a certain key in the input
         # can do so because that key is in a 'required' property in the CSV spec file
         remap_functions = {
-            # create a unique key for each record
-            '_key': lambda row: '__'.join([row[_] for _ in ['node1', 'node2', 'edge_type', 'score']]),
-            'node1': None,  # this will be deleted in the 'store' step
-            'node2': None,  # as will this
-            '_from': lambda row: node_name + '/' + row['node1'],
-            '_to': lambda row: node_name + '/' + row['node2'],
-            'score': lambda row: float(row['score']),
-            'edge_type': None,
+            "node1": None,  # this will be deleted in the 'store' step
+            "node2": None,  # as will this
+            "_from": lambda row: node_name + "/" + row["node1"],
+            "_to": lambda row: node_name + "/" + row["node2"],
+            "score": lambda row: float(row["score"]),
+            "edge_type": None,
+            "directed": lambda row: True if row.get("directed", "") == "1" else False,
         }
 
-        for file in self.config('edge_files'):
+        for file in self.config("edge_files"):
             self.process_file(
                 file=file,
                 remap_fn=remap_functions,
@@ -399,9 +425,9 @@ class DJORNL_Parser(object):
             )
 
         return {
-            'nodes': self.node_ix.values(),
-            'edges': self.edge_ix.values(),
-            'err_list': err_list,
+            "nodes": self.node_ix.values(),
+            "edges": self.edge_ix.values(),
+            "err_list": err_list,
         }
 
     def _try_node_merge(self, existing_node, new_node, path=[]):
@@ -431,7 +457,11 @@ class DJORNL_Parser(object):
         merge = {**existing_node, **new_node}
 
         # find the shared keys -- keys in both existing and new nodes where the values differ
-        shared_keys = [i for i in new_node if i in existing_node and new_node[i] != existing_node[i]]
+        shared_keys = [
+            i
+            for i in new_node
+            if i in existing_node and new_node[i] != existing_node[i]
+        ]
 
         # if there were no shared keys, return the merged list
         if not shared_keys:
@@ -448,7 +478,7 @@ class DJORNL_Parser(object):
 
             # do the types match? If not, these values cannot be merged
             if type(new_node[k]) != value_type:
-                err_list.append("/".join(path+[k]))
+                err_list.append("/".join(path + [k]))
                 continue
 
             if value_type == list:
@@ -461,7 +491,9 @@ class DJORNL_Parser(object):
 
             elif value_type == dict:
                 # recursively check dict data using _try_node_merge
-                (k_merged, k_errs) = self._try_node_merge(existing_node[k], new_node[k], path+[k])
+                (k_merged, k_errs) = self._try_node_merge(
+                    existing_node[k], new_node[k], path + [k]
+                )
                 if k_errs:
                     err_list = err_list + k_errs
                     continue
@@ -469,7 +501,7 @@ class DJORNL_Parser(object):
 
             else:
                 # this is a scalar (string, number, etc.) so it can't be merged
-                err_list.append("/".join(path+[k]))
+                err_list.append("/".join(path + [k]))
 
         # at some point, it may be useful to examine these errors in more detail
         if err_list:
@@ -483,18 +515,20 @@ class DJORNL_Parser(object):
         If a node is already present, new data is checked for conflicts with existing data
         """
         # check whether we have this node already
-        if datum['_key'] in self.node_ix:
+        if datum["_key"] in self.node_ix:
             # identical data: ignore it
-            if datum == self.node_ix[datum['_key']]:
+            if datum == self.node_ix[datum["_key"]]:
                 return None
 
             # try merging the data
-            (merged, err_list) = self._try_node_merge(self.node_ix[datum['_key']], datum)
+            (merged, err_list) = self._try_node_merge(
+                self.node_ix[datum["_key"]], datum
+            )
             if err_list:
-                return "duplicate data for node " + datum['_key']
+                return "duplicate data for node " + datum["_key"]
             datum = merged
 
-        self.node_ix[datum['_key']] = datum
+        self.node_ix[datum["_key"]] = datum
         return None
 
     def load_nodes(self):
@@ -502,41 +536,41 @@ class DJORNL_Parser(object):
 
         err_list = []
 
-        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_node.yaml')
+        schema_file = os.path.join(self._get_dataset_schema_dir(), "csv_node.yaml")
         validator = get_schema_validator(schema_file=schema_file)
 
         def go_terms(row):
-            if 'go_terms' in row and len(row['go_terms']):
-                return [c.strip() for c in row['go_terms'].split(',')]
+            if "go_terms" in row and len(row["go_terms"]):
+                return [c.strip() for c in row["go_terms"].split(",")]
             return []
 
         remap_functions = {
             # these pass straight through
-            'gene_full_name': None,
-            'gene_model_type': None,
-            'gene_symbol': None,
-            'go_description': None,
-            'mapman_bin': None,
-            'mapman_description': None,
-            'mapman_name': None,
-            'node_type': None,
-            'pheno_aragwas_id': None,
-            'pheno_description': None,
-            'pheno_pto_description': None,
-            'pheno_pto_name': None,
-            'pheno_reference': None,
-            'tair_computational_description': None,
-            'tair_curator_summary': None,
-            'tair_short_description': None,
-            'transcript': None,
-            'user_notes': None,
+            "gene_full_name": None,
+            "gene_model_type": None,
+            "gene_symbol": None,
+            "go_description": None,
+            "mapman_bin": None,
+            "mapman_description": None,
+            "mapman_name": None,
+            "node_type": None,
+            "pheno_aragwas_id": None,
+            "pheno_description": None,
+            "pheno_pto_description": None,
+            "pheno_pto_name": None,
+            "pheno_reference": None,
+            "tair_computational_description": None,
+            "tair_curator_summary": None,
+            "tair_short_description": None,
+            "transcript": None,
+            "user_notes": None,
             # rename
-            '_key': lambda row: row['node_id'],
+            "_key": lambda row: row["node_id"],
             # see functions above
-            'go_terms': go_terms,
+            "go_terms": go_terms,
         }
 
-        for file in self.config('node_files'):
+        for file in self.config("node_files"):
             self.process_file(
                 file=file,
                 remap_fn=remap_functions,
@@ -546,8 +580,8 @@ class DJORNL_Parser(object):
             )
 
         return {
-            'nodes': self.node_ix.values(),
-            'err_list': err_list,
+            "nodes": self.node_ix.values(),
+            "err_list": err_list,
         }
 
     def store_parsed_cluster_data(self, datum):
@@ -561,15 +595,15 @@ class DJORNL_Parser(object):
         Cluster IDs are stored in the 'clusters' node attribute as a list, with new IDs added to
         (rather than replacing) existing IDs
         """
-        cluster_id = datum['cluster_id']
+        cluster_id = datum["cluster_id"]
         # gather a list of cluster IDs for each node
-        for node_id in datum['node_ids']:
+        for node_id in datum["node_ids"]:
             if node_id not in self.node_ix:
-                self.node_ix[node_id] = {'_key': node_id, 'clusters': [cluster_id]}
-            elif 'clusters' not in self.node_ix[node_id]:
-                self.node_ix[node_id]['clusters'] = [cluster_id]
-            elif cluster_id not in self.node_ix[node_id]['clusters']:
-                self.node_ix[node_id]['clusters'].append(cluster_id)
+                self.node_ix[node_id] = {"_key": node_id, "clusters": [cluster_id]}
+            elif "clusters" not in self.node_ix[node_id]:
+                self.node_ix[node_id]["clusters"] = [cluster_id]
+            elif cluster_id not in self.node_ix[node_id]["clusters"]:
+                self.node_ix[node_id]["clusters"].append(cluster_id)
         return None
 
     def load_clusters(self):
@@ -577,19 +611,21 @@ class DJORNL_Parser(object):
 
         err_list = []
 
-        schema_file = os.path.join(self._get_dataset_schema_dir(), 'csv_cluster.yaml')
+        schema_file = os.path.join(self._get_dataset_schema_dir(), "csv_cluster.yaml")
         validator = get_schema_validator(schema_file=schema_file)
 
         # these functions remap the values in the columns of the input file to
         # appropriate values to go into Arango
         # the 'cluster_id' remap function is assigned below on a per-file basis
         remap_functions = {
-            'node_ids': lambda row: [n.strip() for n in row['node_ids'].split(',')]
+            "node_ids": lambda row: [n.strip() for n in row["node_ids"].split(",")]
         }
 
-        for file in self.config('cluster_files'):
-            prefix = file['cluster_prefix']
-            remap_functions['cluster_id'] = lambda row: prefix + ':' + row['cluster_id'].replace('Cluster', '')
+        for file in self.config("cluster_files"):
+            prefix = file["cluster_prefix"]
+            remap_functions["cluster_id"] = (
+                lambda row: prefix + ":" + row["cluster_id"].replace("Cluster", "")
+            )
 
             self.process_file(
                 file=file,
@@ -600,51 +636,51 @@ class DJORNL_Parser(object):
             )
 
         return {
-            'nodes': list(self.node_ix.values()),
-            'err_list': err_list,
+            "nodes": list(self.node_ix.values()),
+            "err_list": err_list,
         }
 
     def save_dataset(self, dataset=None):
 
         if dataset is None:
             dataset = {
-                'nodes': list(self.node_ix.values()),
-                'edges': list(self.edge_ix.values()),
+                "nodes": list(self.node_ix.values()),
+                "edges": list(self.edge_ix.values()),
             }
 
-        if 'nodes' in dataset and len(dataset['nodes']) > 0:
-            self.save_docs(self.config('node_name'), dataset['nodes'])
+        if "nodes" in dataset and len(dataset["nodes"]) > 0:
+            self.save_docs(self.config("node_name"), dataset["nodes"])
 
-        if 'edges' in dataset and len(dataset['edges']) > 0:
-            self.save_docs(self.config('edge_name'), dataset['edges'])
+        if "edges" in dataset and len(dataset["edges"]) > 0:
+            self.save_docs(self.config("edge_name"), dataset["edges"])
 
-    def save_docs(self, coll_name, docs, on_dupe='update'):
+    def save_docs(self, coll_name, docs, on_dupe="update"):
 
         resp = requests.put(
-            self.config('API_URL') + '/api/v1/documents',
-            params={'collection': coll_name, 'on_duplicate': on_dupe},
-            headers={'Authorization': self.config('AUTH_TOKEN')},
-            data='\n'.join(json.dumps(d) for d in docs)
+            self.config("API_URL") + "/api/v1/documents",
+            params={"collection": coll_name, "on_duplicate": on_dupe},
+            headers={"Authorization": self.config("AUTH_TOKEN")},
+            data="\n".join(json.dumps(d) for d in docs),
         )
         if not resp.ok:
             raise RuntimeError(resp.text)
 
         print(f"Saved docs to collection {coll_name}!")
         print(resp.text)
-        print('=' * 80)
+        print("=" * 80)
         return resp
 
     def load_data(self, dry_run=False):
         all_errs = []
         method_ix = {
-            'clusters': self.load_clusters,
-            'edges': self.load_edges,
-            'nodes': self.load_nodes,
+            "clusters": self.load_clusters,
+            "edges": self.load_edges,
+            "nodes": self.load_nodes,
         }
         for data_type in self.parse_order:
             output = method_ix[data_type]()
-            if output['err_list']:
-                all_errs = all_errs + output['err_list']
+            if output["err_list"]:
+                all_errs = all_errs + output["err_list"]
 
         if all_errs:
             raise RuntimeError("\n".join(all_errs))
@@ -663,56 +699,50 @@ class DJORNL_Parser(object):
         # go through the node index, checking for nodes that only have one attribute ('_key') or
         # were loaded from the clusters files, with their only attributes being '_key' and 'clusters'
 
-        node_type_ix = {
-            '__NO_TYPE__': 0
-        }
-        node_data = {
-            'key_only': [],
-            'cluster': [],
-            'full': []
-        }
+        node_type_ix = {"__NO_TYPE__": 0}
+        node_data = {"key_only": [], "cluster": [], "full": []}
 
         for node in self.node_ix.values():
-            if len(node.keys()) == 2 and 'clusters' in node:
-                node_data['cluster'].append(node)
+            if len(node.keys()) == 2 and "clusters" in node:
+                node_data["cluster"].append(node)
             elif len(node.keys()) == 1:
-                node_data['key_only'].append(node)
+                node_data["key_only"].append(node)
             else:
-                node_data['full'].append(node)
+                node_data["full"].append(node)
 
-            if 'node_type' in node:
-                if node['node_type'] in node_type_ix:
-                    node_type_ix[node['node_type']] += 1
+            if "node_type" in node:
+                if node["node_type"] in node_type_ix:
+                    node_type_ix[node["node_type"]] += 1
                 else:
-                    node_type_ix[node['node_type']] = 1
+                    node_type_ix[node["node_type"]] = 1
             else:
-                node_type_ix['__NO_TYPE__'] += 1
+                node_type_ix["__NO_TYPE__"] += 1
 
         nodes_in_edge_ix = {}
         edge_type_ix = {}
         for edge in self.edge_ix.values():
-            nodes_in_edge_ix[edge['_from']] = 1
-            nodes_in_edge_ix[edge['_to']] = 1
-            if edge['edge_type'] in edge_type_ix:
-                edge_type_ix[edge['edge_type']] += 1
+            nodes_in_edge_ix[edge["_from"]] = 1
+            nodes_in_edge_ix[edge["_to"]] = 1
+            if edge["edge_type"] in edge_type_ix:
+                edge_type_ix[edge["edge_type"]] += 1
             else:
-                edge_type_ix[edge['edge_type']] = 1
+                edge_type_ix[edge["edge_type"]] = 1
 
         return {
-            'nodes_total': len(self.node_ix.keys()),
-            'edges_total': len(self.edge_ix.keys()),
-            'nodes_in_edge': len(nodes_in_edge_ix.keys()),
-            'node_type_count': node_type_ix,
-            'edge_type_count': edge_type_ix,
-            'node_data_available': {
-                'key_only': len(node_data['key_only']),
-                'cluster': len(node_data['cluster']),
-                'full': len(node_data['full'])
+            "nodes_total": len(self.node_ix.keys()),
+            "edges_total": len(self.edge_ix.keys()),
+            "nodes_in_edge": len(nodes_in_edge_ix.keys()),
+            "node_type_count": node_type_ix,
+            "edge_type_count": edge_type_ix,
+            "node_data_available": {
+                "key_only": len(node_data["key_only"]),
+                "cluster": len(node_data["cluster"]),
+                "full": len(node_data["full"]),
             },
         }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = DJORNL_Parser()
     try:
         parser.load_data()

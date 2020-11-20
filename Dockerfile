@@ -20,8 +20,8 @@ RUN apk --update add --virtual build-dependencies curl tar gzip && \
 # Install dependencies
 RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     pip install --upgrade pip && \
-    pip install --no-cache-dir -r /tmp/requirements.txt && \
-    if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
+    pip install --use-feature=2020-resolver --no-cache-dir -r /tmp/requirements.txt && \
+    if [ "$DEVELOPMENT" ]; then pip install --use-feature=2020-resolver --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies
 
 COPY . /app

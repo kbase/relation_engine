@@ -4,14 +4,13 @@ from typing import Optional, List, Dict, Union
 
 from .exceptions import REServerError, RERequestError, RENotFound
 
-_QUERY_METHOD = 'POST'
-_QUERY_ENDPOINT = '/api/v1/query_results'
-_SAVE_METHOD = 'PUT'
-_SAVE_ENDPOINT = '/api/v1/documents'
+_QUERY_METHOD = "POST"
+_QUERY_ENDPOINT = "/api/v1/query_results"
+_SAVE_METHOD = "PUT"
+_SAVE_ENDPOINT = "/api/v1/documents"
 
 
 class REClient:
-
     def __init__(self, api_url: str, token: str = None):
         self.api_url = api_url
         self.token = token
@@ -19,7 +18,7 @@ class REClient:
         if not self.api_url or not isinstance(self.api_url, str):
             raise TypeError("The Relation Engine API URL was not provided.")
         # Remove any trailing slash in the API URL so we can append paths
-        self.api_url = self.api_url.strip('/')
+        self.api_url = self.api_url.strip("/")
 
     def admin_query(self, query: str, bind_vars: dict, raise_not_found=False):
         """
@@ -42,14 +41,15 @@ class REClient:
             raise TypeError("`raise_not_found` argument must be a bool")
         # Construct and execute the request
         req_body = dict(bind_vars)
-        req_body['query'] = query
+        req_body["query"] = query
         url = str(self.api_url) + _QUERY_ENDPOINT
         resp = self._make_request(
             method=_QUERY_METHOD,
             url=url,
             data=json.dumps(req_body),
             params={},
-            raise_not_found=raise_not_found)
+            raise_not_found=raise_not_found,
+        )
         return resp
 
     def stored_query(self, stored_query: str, bind_vars: dict, raise_not_found=False):
@@ -78,15 +78,17 @@ class REClient:
             method=_QUERY_METHOD,
             url=url,
             data=json.dumps(req_body),
-            params={'stored_query': stored_query},
-            raise_not_found=raise_not_found)
+            params={"stored_query": stored_query},
+            raise_not_found=raise_not_found,
+        )
 
     def save_docs(
-            self,
-            coll: str,
-            docs: Union[Dict, List[Dict]],
-            on_duplicate: Optional[str] = None,
-            display_errors=False):
+        self,
+        coll: str,
+        docs: Union[Dict, List[Dict]],
+        on_duplicate: Optional[str] = None,
+        display_errors=False,
+    ):
         """
         Save documents to a collection in the relation engine.
         Requires an auth token with RE admin privileges.
@@ -113,18 +115,19 @@ class REClient:
             raise TypeError("`on_duplicate` argument must bea str")
         if not isinstance(display_errors, bool):
             raise TypeError("`display_errors` argument must be a bool")
-        params = {'collection': coll}
+        params = {"collection": coll}
         if display_errors:
-            params['display_errors'] = '1'
-        params['on_duplicate'] = on_duplicate or 'error'
-        req_body = '\n'.join(json.dumps(d) for d in docs)
+            params["display_errors"] = "1"
+        params["on_duplicate"] = on_duplicate or "error"
+        req_body = "\n".join(json.dumps(d) for d in docs)
         url = str(self.api_url) + _SAVE_ENDPOINT
         return self._make_request(
             method=_SAVE_METHOD,
             url=url,
             data=req_body,
             params=params,
-            raise_not_found=False)
+            raise_not_found=False,
+        )
 
     def _make_request(self, method, url, data, params, raise_not_found):
         """
@@ -133,8 +136,10 @@ class REClient:
         """
         headers = {}
         if self.token:
-            headers['Authorization'] = self.token
-        resp = requests.request(method=method, url=url, data=data, params=params, headers=headers)
+            headers["Authorization"] = self.token
+        resp = requests.request(
+            method=method, url=url, data=data, params=params, headers=headers
+        )
         if resp.status_code >= 500:
             # Server error
             raise REServerError(resp)
@@ -143,9 +148,10 @@ class REClient:
             raise RERequestError(resp)
         elif not resp.ok:
             raise RuntimeError(
-                f"Unknown RE API error:\nURL: {resp.url}\nMethod: {method}\n{resp.text}")
+                f"Unknown RE API error:\nURL: {resp.url}\nMethod: {method}\n{resp.text}"
+            )
         resp_json = resp.json()
-        if raise_not_found and not len(resp_json['results']):
+        if raise_not_found and not len(resp_json["results"]):
             # Results were required to be non-empty
             raise RENotFound(req_body=data, req_params=params)
         return resp_json

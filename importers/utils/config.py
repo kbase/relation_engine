@@ -6,14 +6,14 @@ import os
 
 
 REQUIRED = []
-OPTIONAL = ['AUTH_TOKEN', 'API_URL']
+OPTIONAL = ["AUTH_TOKEN", "API_URL"]
 DEFAULTS = {
-    'AUTH_TOKEN': 'admin_token',  # test default
-    'API_URL': 'http://localhost:5000',  # test default
+    "AUTH_TOKEN": "admin_token",  # test default
+    "API_URL": "http://localhost:5000",  # test default
 }
 
 
-def load_from_env(extra_required=None, extra_optional=None, prefix='RES_'):
+def load_from_env(extra_required=None, extra_optional=None, prefix="RES_"):
     """Load all configuration vars from environment variables"""
     conf = dict(DEFAULTS)
     required = list(REQUIRED) + (extra_required or [])

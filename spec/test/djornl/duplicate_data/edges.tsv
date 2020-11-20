@@ -1,11 +1,17 @@
-node1	node2	score	edge_descrip	edge_type
-As2	AT1G01020	8.4	AraGWAS-Association_score	phenotype-association_AraGWAS
-As2	AT1G01040	5.4	AraGWAS-Association_score	phenotype-association_AraGWAS
-As75	AT1G01020	39.9	AraGWAS-Association_score	phenotype-association_AraGWAS
-AT1G01010	AT1G01040	2.5	AraNetv2_log-likelihood-score	domain-co-occurrence_AraNet_v2
-AT1G01010	AT1G01040	170.5	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2
-AT1G01030	AT1G01050	2.6	AraNetv2_log-likelihood-score	pairwise-gene-coexpression_AraNet_v2
-AT1G01050	AT1G01060	2.7	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2
+node1	node2	score	directed	edge_type
+As2	AT1G01020	8.4	0	phenotype-association_AraGWAS
+As2	AT1G01040	5.4	0	phenotype-association_AraGWAS
+As75	AT1G01020	39.9	0	phenotype-association_AraGWAS
+AT1G01010	AT1G01040	2.5	0	domain-co-occurrence_AraNet_v2
+AT1G01010	AT1G01040	170.5	0	protein-protein-interaction_literature-curation_AraNet_v2
+AT1G01030	AT1G01050	2.6	0	pairwise-gene-coexpression_AraNet_v2
+AT1G01050	AT1G01060	2.7	0	protein-protein-interaction_literature-curation_AraNet_v2
 # duplicated line
-AT1G01010	AT1G01040	2.5	AraNetv2_log-likelihood-score	domain-co-occurrence_AraNet_v2
-AT1G01080	AT1G01090	2.8	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2
+AT1G01010	AT1G01040	2.5	0	domain-co-occurrence_AraNet_v2
+AT1G01080	AT1G01090	2.8	0	protein-protein-interaction_literature-curation_AraNet_v2
+# these are OK
+SDV	AT1G01100	8.4	0	protein-protein-interaction_literature-curation_AraNet_v2
+SDV	AT1G01100	5.4	1	protein-protein-interaction_literature-curation_AraNet_v2
+AT1G01100	SDV	2.4	1	protein-protein-interaction_literature-curation_AraNet_v2
+# this is a dupe!
+AT1G01100	SDV	8.5	0	protein-protein-interaction_literature-curation_AraNet_v2

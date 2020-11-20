@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.11] - 2020-11-19
+### Changed
+- DJORNL edge spec (`spec/collections/djornl/djornl_edge.yaml``) updated to indicate whether or not the edge is directed.
+- DJORNL parser and test suite updated accordingly.
+
 ## [0.0.10] - 2020-10-08
 ### Changed
 - Clean up some of the configuration logic, and add the `SPEC_REPO_URL` env var instead of hard-coding

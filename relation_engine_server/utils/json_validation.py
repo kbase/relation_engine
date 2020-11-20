@@ -57,7 +57,12 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
 
     """
 
-    if schema == schema_file and schema is None or schema is not None and schema_file is not None:
+    if (
+        schema == schema_file
+        and schema is None
+        or schema is not None
+        and schema_file is not None
+    ):
         raise ValueError("Please supply either a schema or a schema file path")
 
     # schema to validate against
@@ -73,13 +78,18 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
         resolver = ExtendedRefResolver.from_schema(schema)
 
     return Validator(
-        validation_schema,
-        format_checker=FormatChecker(),
-        resolver=resolver
+        validation_schema, format_checker=FormatChecker(), resolver=resolver
     )
 
 
-def run_validator(schema=None, schema_file=None, validate_at="", data=None, data_file=None, nicer_errors=False):
+def run_validator(
+    schema=None,
+    schema_file=None,
+    validate_at="",
+    data=None,
+    data_file=None,
+    nicer_errors=False,
+):
     """
     Validate data against a schema, filling in defaults if appropriate
 
@@ -119,7 +129,9 @@ def run_validator(schema=None, schema_file=None, validate_at="", data=None, data
         # this will throw a ValidationError
         validator.validate(data)
 
-    err_msg = "".join(e.message + "\n" for e in sorted(validator.iter_errors(data), key=str))
+    err_msg = "".join(
+        e.message + "\n" for e in sorted(validator.iter_errors(data), key=str)
+    )
 
     raise ValidationError(err_msg)
 
@@ -128,23 +140,22 @@ def _load_json_schema(file):
     """ Loads the given schema file """
 
     with open(file) as fd:
-        if file.endswith('.yaml') or file.endswith('.yml'):
+        if file.endswith(".yaml") or file.endswith(".yml"):
             return yaml.safe_load(fd)
 
-        if file.endswith('.json'):
+        if file.endswith(".json"):
             return json.load(fd)
 
-        raise TypeError('Unknown file type encountered: ' + file)
+        raise TypeError("Unknown file type encountered: " + file)
 
 
 class ExtendedRefResolver(RefResolver):
-
     def resolve_remote(self, uri):
 
         scheme = urlsplit(uri).scheme
         # if there's no scheme, it's a local file, so prefix it with "file://"
-        if scheme == '':
-            uri = 'file://' + uri
+        if scheme == "":
+            uri = "file://" + uri
 
         if scheme in self.handlers:
             result = self.handlers[scheme](uri)
@@ -156,7 +167,7 @@ class ExtendedRefResolver(RefResolver):
             # Otherwise, pass off to urllib and assume utf-8
             with urlopen(uri) as url:
                 content = url.read().decode("utf-8")
-                if uri.endswith('.yaml') or uri.endswith('.yml'):
+                if uri.endswith(".yaml") or uri.endswith(".yml"):
                     result = yaml.safe_load(content)
                 else:
                     result = json.loads(content)

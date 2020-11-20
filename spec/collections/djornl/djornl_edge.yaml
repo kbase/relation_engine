@@ -13,7 +13,7 @@ schema:
   title: Arabidopsis gene-gene or gene-phenotype edge
   description: Generic gene-to-gene or gene-to-phenotype edge for Dan Jacobson Arabidopsis data
   type: object
-  required: [score, edge_type, _from, _to, _key]
+  required: [score, edge_type, _from, _to, _key, directed]
   additionalProperties: false
   properties:
     _key:
@@ -26,3 +26,5 @@ schema:
       $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/score
     edge_type:
       $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/edge_type
+    directed:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/directed
