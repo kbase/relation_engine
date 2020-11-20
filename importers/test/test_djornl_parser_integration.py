@@ -25,4 +25,4 @@ class Test_DJORNL_Parser_Integration(unittest.TestCase):
         ):
             parser = DJORNL_Parser()
             parser.load_data()
-            self.assertEqual(True, parser.load_data())
+            self.assertTrue(bool(parser.load_data()))
