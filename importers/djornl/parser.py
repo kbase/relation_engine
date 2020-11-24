@@ -274,7 +274,6 @@ class DJORNL_Parser(object):
         file_parser = self.parser_gen(file)
 
         def add_error(error):
-            print(error)
             err_list.append(error)
 
         try:
