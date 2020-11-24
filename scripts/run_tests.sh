@@ -7,7 +7,7 @@ set -e
   tar czvf spec.tar.gz sample_spec_release)
 
 black .
-flake8 --max-complexity 15 /app
+flake8 --max-complexity 20 /app
 mypy --ignore-missing-imports /app
 bandit -r /app
 
