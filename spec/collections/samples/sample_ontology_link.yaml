@@ -1,0 +1,47 @@
+name: sample_ontology_link
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to, created]
+  description: The _from sample node is associated with the _to taxon.
+  properties:
+    _from:
+      type: string
+      description: the sample node _id (as found in sample_nodes collection)
+    _to:
+      type: string
+      description: The _id of an ontology vertex, such as from ENVO, GO, etc.
+    created:
+      type: integer
+      description: timestamp of when the link was created
+    createdby:
+      type: string
+      description: Who made this sample-ontology link?
+    expired:
+      type: integer
+      description: timestamp of when this link expires
+    sample_id:
+      type: string
+      description: uui identifier for sample object. corresponds to sample id provided by SampleService
+    sample_version:
+      type: integer
+      description: integer version of sample object (1, 2, etc.)
+    sample_version_uuid:
+      type: string
+      description: uuid identifier for sample object version in sample version collection
+    sample_node_name:
+      type: string
+      description: name of sample node in Sample
+    sample_node_uuid:
+      type: string
+      description: uuid identifier for sample node in sample nodes collection
+    sample_metadata_term:
+      type: integer
+      description: metadata term in sample associated with ontology term
+    ontology_term:
+      type: string
+      description: identifier for term in ontology_collection
+    ontology_collection:
+      type: string
+      description: name of collection containing ontology_term
