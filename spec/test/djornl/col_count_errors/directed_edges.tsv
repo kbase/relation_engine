@@ -5,4 +5,4 @@ AT1G01010	AT1G01020	2.39322646755088	AraNetv2_log-likelihood-score	protein-prote
 AT1G01010	AT1G01030	2.39322646755088	AraNetv2_log-likelihood-score	protein-protein-interaction_high-throughput_AraNet_v2	1
 AT1G01010	AT1G01040	2.39322646755088
 AT1G01030	AT1G01050	2.5494618241936697	AraNetv2_log-likelihood-score	pairwise-gene-coexpression_AraNet_v2	1
-AT1G01050	AT1G01060	4.34242054808616	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2	1
+AT1G01050	AT1G01060	4.34242054808616	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curated_AraNet_v2	1

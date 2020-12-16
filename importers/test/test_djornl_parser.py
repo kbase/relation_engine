@@ -284,13 +284,13 @@ class Test_DJORNL_Parser(unittest.TestCase):
         errs = {
             "edges": [
                 "edges.tsv line 17: duplicate data for edge "
-                + "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__False",
+                + "AT1G01100__SDV__protein-protein-interaction_literature-curated_AraNet_v2__False",
                 "hithruput-edges.csv line 5: duplicate data for edge "
                 + "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False",
                 "hithruput-edges.csv line 9: duplicate data for edge "
                 + "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False",
                 "hithruput-edges.csv line 11: duplicate data for edge "
-                + "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True",
+                + "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True",
             ],
             "nodes": ["extra_node.tsv line 5: duplicate data for node AT1G01080"],
         }
@@ -322,7 +322,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
                     "pairwise-gene-coexpression_AraNet_v2": 1,
                     "domain-co-occurrence_AraNet_v2": 1,
                     "protein-protein-interaction_high-throughput_AraNet_v2": 2,
-                    "protein-protein-interaction_literature-curation_AraNet_v2": 6,
+                    "protein-protein-interaction_literature-curated_AraNet_v2": 6,
                 },
                 "edges_total": 13,
                 "node_data_available": {"cluster": 0, "full": 14, "key_only": 0},

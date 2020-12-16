@@ -63,10 +63,10 @@
         "directed": false
       },
       {
-        "_key": "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+        "_key": "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
         "_from": "djornl_node/AT1G01010",
         "_to": "djornl_node/AT1G01040",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 170.5,
         "directed": false
       },
@@ -79,42 +79,42 @@
         "directed": false
       },
       {
-        "_key": "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
+        "_key": "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
         "_from": "djornl_node/AT1G01050",
         "_to": "djornl_node/AT1G01060",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 2.7,
         "directed": false
       },
       {
-        "_key": "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8",
+        "_key": "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8",
         "_from": "djornl_node/AT1G01080",
         "_to": "djornl_node/AT1G01090",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 2.8,
         "directed": false
       },
       {
-        "_key": "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__True__2.4",
+        "_key": "AT1G01100__SDV__protein-protein-interaction_literature-curated_AraNet_v2__True__2.4",
         "_from": "djornl_node/AT1G01100",
         "_to": "djornl_node/SDV",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 2.4,
         "directed": true
       },
       {
-        "_key": "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__False__8.4",
+        "_key": "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__False__8.4",
         "_from": "djornl_node/SDV",
         "_to": "djornl_node/AT1G01100",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 8.4,
         "directed": false
       },
       {
-        "_key": "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True__5.4",
+        "_key": "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True__5.4",
         "_from": "djornl_node/SDV",
         "_to": "djornl_node/AT1G01100",
-        "edge_type": "protein-protein-interaction_literature-curation_AraNet_v2",
+        "edge_type": "protein-protein-interaction_literature-curated_AraNet_v2",
         "score": 5.4,
         "directed": true
       }
@@ -189,13 +189,13 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8",
-            "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__True__2.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__False__8.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True__5.4"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8",
+            "AT1G01100__SDV__protein-protein-interaction_literature-curated_AraNet_v2__True__2.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__False__8.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True__5.4"
           ]
         }
       },
@@ -243,13 +243,13 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8",
-            "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__True__2.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__False__8.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True__5.4"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8",
+            "AT1G01100__SDV__protein-protein-interaction_literature-curated_AraNet_v2__True__2.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__False__8.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True__5.4"
           ]
         }
       },
@@ -280,7 +280,7 @@
         }
       },
       {
-        "params": {"edge_types": ["phenotype-association_AraGWAS", "protein-protein-interaction_high-throughput_AraNet_v2", "protein-protein-interaction_literature-curation_AraNet_v2"]},
+        "params": {"edge_types": ["phenotype-association_AraGWAS", "protein-protein-interaction_high-throughput_AraNet_v2", "protein-protein-interaction_literature-curated_AraNet_v2"]},
         "results": {
           "nodes": [
             "As2",
@@ -304,12 +304,12 @@
             "As75__AT1G01020__phenotype-association_AraGWAS__False__39.9",
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8",
-            "AT1G01100__SDV__protein-protein-interaction_literature-curation_AraNet_v2__True__2.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__False__8.4",
-            "SDV__AT1G01100__protein-protein-interaction_literature-curation_AraNet_v2__True__5.4"
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8",
+            "AT1G01100__SDV__protein-protein-interaction_literature-curated_AraNet_v2__True__2.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__False__8.4",
+            "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True__5.4"
           ]
         }
       }
@@ -374,7 +374,7 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5"
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5"
           ]
         }
       },
@@ -389,9 +389,9 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -406,9 +406,9 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -451,9 +451,9 @@
               "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
               "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
               "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-              "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+              "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
               "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-              "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+              "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -532,9 +532,9 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -566,9 +566,9 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -583,7 +583,7 @@
         "params": {
           "phenotype_keys": ["As2", "Na23"],
           "distance": 5,
-          "edge_types": ["pairwise-gene-coexpression_AraNet_v2", "domain-co-occurrence_AraNet_v2", "protein-protein-interaction_high-throughput_AraNet_v2", "protein-protein-interaction_literature-curation_AraNet_v2"]
+          "edge_types": ["pairwise-gene-coexpression_AraNet_v2", "domain-co-occurrence_AraNet_v2", "protein-protein-interaction_high-throughput_AraNet_v2", "protein-protein-interaction_literature-curated_AraNet_v2"]
         },
         "results": {
           "nodes": ["As2", "Na23"],
@@ -651,8 +651,8 @@
           "edges": [
             "As2__AT1G01040__phenotype-association_AraGWAS__False__5.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8"
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8"
           ]
         }
       },
@@ -667,10 +667,10 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8"
           ]
         }
       },
@@ -756,8 +756,8 @@
           "edges": [
             "As2__AT1G01040__phenotype-association_AraGWAS__False__5.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8"
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8"
           ]
         }
       },
@@ -772,10 +772,10 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7",
-            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curation_AraNet_v2__False__2.8"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7",
+            "AT1G01080__AT1G01090__protein-protein-interaction_literature-curated_AraNet_v2__False__2.8"
           ]
         }
       },
@@ -815,9 +815,9 @@
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
             "AT1G01010__AT1G01040__domain-co-occurrence_AraNet_v2__False__2.5",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       },
@@ -866,7 +866,7 @@
           "edge_types": [
             "phenotype-association_AraGWAS",
             "protein-protein-interaction_high-throughput_AraNet_v2",
-            "protein-protein-interaction_literature-curation_AraNet_v2",
+            "protein-protein-interaction_literature-curated_AraNet_v2",
             "pairwise-gene-coexpression_AraNet_v2"
           ]
         },
@@ -878,9 +878,9 @@
             "As75__AT1G01020__phenotype-association_AraGWAS__False__39.9",
             "AT1G01010__AT1G01020__protein-protein-interaction_high-throughput_AraNet_v2__False__2.3",
             "AT1G01010__AT1G01030__protein-protein-interaction_high-throughput_AraNet_v2__False__2.4",
-            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curation_AraNet_v2__False__170.5",
+            "AT1G01010__AT1G01040__protein-protein-interaction_literature-curated_AraNet_v2__False__170.5",
             "AT1G01030__AT1G01050__pairwise-gene-coexpression_AraNet_v2__False__2.6",
-            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curation_AraNet_v2__False__2.7"
+            "AT1G01050__AT1G01060__protein-protein-interaction_literature-curated_AraNet_v2__False__2.7"
           ]
         }
       }
