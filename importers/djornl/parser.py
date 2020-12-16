@@ -801,6 +801,8 @@ Node data available
 """.format(
         value_width
     )
+    if summary.get("errors_total") > 0:
+      text_summary = text_summary + "\n" + "\n".join(summary.get("errors"))
     return text_summary
 
 
