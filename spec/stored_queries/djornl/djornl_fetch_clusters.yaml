@@ -32,7 +32,7 @@ params:
       default: []
       uniqueItems: true
       examples:
-        - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curation_AraNet_v2']
+        - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curated_AraNet_v2']
         - ['phenotype-association_AraGWAS']
         - []
 query: |

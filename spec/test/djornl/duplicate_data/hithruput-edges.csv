@@ -4,9 +4,9 @@ AT1G01010,AT1G01030,2.4,AraNetv2_log-likelihood-score,protein-protein-interactio
 # potentially erroneous line
 AT1G01010,AT1G01030,2.7,AraNetv2_log-likelihood-score,protein-protein-interaction_high-throughput_AraNet_v2,0
 # duplicated line from the other file
-AT1G01060,AT1G01050,2.7,AraNetv2_log-likelihood-score,protein-protein-interaction_literature-curation_AraNet_v2,0
+AT1G01060,AT1G01050,2.7,AraNetv2_log-likelihood-score,protein-protein-interaction_literature-curated_AraNet_v2,0
 # potentially erroneous duplication from the other file
 AT1G01050,AT1G01030,2.6000001,AraNetv2_log-likelihood-score,pairwise-gene-coexpression_AraNet_v2,0
 # directed edge dupe
-SDV,AT1G01100,2001,whatever,protein-protein-interaction_literature-curation_AraNet_v2,1
+SDV,AT1G01100,2001,whatever,protein-protein-interaction_literature-curated_AraNet_v2,1
 
