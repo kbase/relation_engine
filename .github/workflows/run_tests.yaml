@@ -34,9 +34,9 @@ jobs:
     - name: set env vars
       shell: bash
       run: |
-        echo ::set-env name=DATE::$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        echo ::set-env name=BRANCH::$(git symbolic-ref --short HEAD)
-        echo ::set-env name=COMMIT::$(git rev-parse --short HEAD)
+        echo "DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+        echo "BRANCH=$(git symbolic-ref --short HEAD)" >> $GITHUB_ENV
+        echo "COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: build and push to dockerhub
       uses: opspresso/action-docker@master
