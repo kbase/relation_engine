@@ -2,7 +2,10 @@ name: Dan Jacobson Exascale data
 release_date: "2020-06-06"
 file_list:
   - data_type: edge
-    path: merged_edges-AMW-060820_AF.tsv
+    path: edges.tsv
+
+  - data_type: edge
+    path: directed_edges.tsv
 
   - data_type: node
-    path: aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv
+    path: nodes.csv

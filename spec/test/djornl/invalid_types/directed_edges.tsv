@@ -1,0 +1,10 @@
+# data_type: edge
+node1	node2	score	edge_descrip	edge_type	directed
+As2	AT1G01020	8.4	AraGWAS-Association_score	phenotype-association_AraGWAS	1
+As2	AT1G01040	5.4	AraGWAS-Association_score	phenotype-association_AraGWAS	true
+As75	AT1G01020	39.9	AraGWAS-Association_score	phenotype-association_AraGWAS	""
+AT1G01010	AT1G01040	2.5	AraNetv2_log-likelihood-score	domain-co-occurrence_AraNet_v2	directed
+AT1G01010	AT1G01040	170.5	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2	"0"
+AT1G01030	AT1G01050	2.6	AraNetv2_log-likelihood-score	pairwise-gene-coexpression_AraNet_v2	false
+AT1G01050	AT1G01060	2.7	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2	"1"
+AT1G01080	AT1G01090	2.8	AraNetv2_log-likelihood-score	protein-protein-interaction_literature-curation_AraNet_v2	0

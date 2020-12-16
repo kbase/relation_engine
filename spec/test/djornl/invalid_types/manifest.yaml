@@ -4,9 +4,15 @@ file_list:
   - data_type: edge
     path: edges.tsv
 
+  - data_type: edge
+    path: directed_edges.tsv
+
   - data_type: node
     path: nodes.csv
 
   - data_type: cluster
     path: markov2_named.tsv
     cluster_prefix: markov_i2
+
+  - data_type: node
+    path: pheno_nodes.csv

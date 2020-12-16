@@ -52,7 +52,7 @@ schema:
       $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_pto_name
     pheno_pto_description:
       $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_pto_description
-    pheno_ref:
-      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_ref
+    pheno_reference:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_reference
     user_notes:
       $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/user_notes

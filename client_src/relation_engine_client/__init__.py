@@ -1,3 +1,3 @@
 from .main import REClient
 
-__all__ = ['REClient']
+__all__ = ["REClient"]

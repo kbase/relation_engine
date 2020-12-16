@@ -20,11 +20,15 @@ RUN apk --update add --virtual build-dependencies curl tar gzip && \
 # Install dependencies
 RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     pip install --upgrade pip && \
-    pip install --no-cache-dir -r /tmp/requirements.txt && \
-    if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
+    pip install --use-feature=2020-resolver --no-cache-dir -r /tmp/requirements.txt && \
+    if [ "$DEVELOPMENT" ]; then pip install --use-feature=2020-resolver --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies
 
 COPY . /app
+
+# Create tarball of the spec directory so we have it cached in the image
+RUN tar czvf /opt/spec.tar.gz /app/spec
+ENV SPEC_RELEASE_PATH=/opt/spec.tar.gz
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/kbase/relation_engine_api" \
