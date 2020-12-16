@@ -23,3 +23,32 @@ oneOf:
   - const: protein-protein-interaction_literature-curation_AraNet_v2
     title: AraNetv2 literature-curated protein-protein interaction
     description: A layer of protein-protein interaction values from literature-curated small- to medium-scale experimental data; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+
+  - const: protein-protein-interaction_biogrid_date/release3.5.188
+    title: BIOGRID ORGANISM Arabidopsis thaliana Columbia 3.5.188 tab3 PPI
+    description: BioGRID interactions are relationships between two proteins or genes; the term “interaction” includes direct physical binding of two proteins, and co-existence in a stable complex and genetic interaction.  see https://wiki.thebiogrid.org/doku.php/experimental_systems
+
+  - const: protein-protein-interaction_AtPIN
+    title: AtPIN PPI
+    description: The interactions database includes all interactions present at the Arabidopsis thaliana Protein Interactome Database, the Predicted Interactome for Arabidopsis, Arabidopsis protein-protein interaction data curated from the literature by TAIR curators, BIOGRID and IntAct. https://atpin.bioinfoguy.net/cgi-bin/atpin.pl
+      
+  - const: protein-protein-interaction_Mentha_A_thaliana_3702_040319
+    title: Mentha AT 3702 040319 PPI
+    description: Mentha archives evidence collected from different sources and presents these data in a complete and comprehensive way. Its data comes from manually curated protein-protein interaction databases that have adhered to the IMEx consortium and assigns to each interaction a reliability score that takes into account all the supporting evidence.  https://mentha.uniroma2.it/about.php
+
+  - const: protein-protein-interaction_literature_curated_AraNet_v2_subnet
+    title: AraNetv2 subnet AT-LC PPI
+    description: Literature curated PPI of A. thaliana. https://www.inetbio.org/aranet/dl.php?f=AT-LC
+
+  - const: phenotype-association_GWAS_gene_to_metabolite_10.1371/journal.pgen.1006363
+    title: Wu2016 s015 Gene-to-Metab GeneToPhenotype
+    description: GWAS hits ftom a Gene-to-Metaboiltes GWAS. Phenotypes (metabolites) have a unique ID from the Wu 2016 study and need to be given our own UID for future use.
+
+  - const: phenotype-association_AraGWAS_subnet_permsig_geni
+    title: AraGWAS subnet permsig geni GeneToPhenotype
+    description: Phenotypes mapped to SNP position and GeneID if available from AraGWAS database filtered for overFDR threshold.
+
+  - const: transcription-factor-regulatory-interaction_literature_curated_ATRM_01082020
+    title: ATRM TF to Target LitCurated 01082020 TranscriptionFactorToGene
+    description: Contains literature mined and manually curated TF regulatory interactions for A.thaliana from 1701 TFFs from PlantTFDB 2.0 and 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Downloaded from http://atrm.cbi.pku.edu.cn/download.php
+
