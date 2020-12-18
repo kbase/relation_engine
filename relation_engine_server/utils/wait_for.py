@@ -40,6 +40,7 @@ def wait_for_service(service_list: List[str]) -> None:
             try:
                 conf = service_conf[name]
                 auth = (conf.get("db_user"), conf.get("db_pass"))
+                print("auth is", auth)
                 resp = requests.get(conf["url"], auth=auth)
                 if conf.get("raise_for_status"):
                     resp.raise_for_status()
