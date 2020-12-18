@@ -7,9 +7,10 @@ import sys
 from relation_engine_server.utils.config import get_config
 from typing import List
 
+_CONF = get_config()
+
 
 def get_service_conf():
-    _CONF = get_config()
     return {
         "arangodb": {
             "url": _CONF["api_url"] + "/collection",
@@ -39,7 +40,7 @@ def wait_for_service(service_list: List[str]) -> None:
         for name in services_pending:
             try:
                 conf = service_conf[name]
-                auth = (conf.get("db_user"), conf.get("db_pass"))
+                auth = (_CONF["db_user"], _CONF["db_pass"])
                 print("auth is", auth)
                 resp = requests.get(conf["url"], auth=auth)
                 if conf.get("raise_for_status"):
