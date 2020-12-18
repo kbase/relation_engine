@@ -9,7 +9,6 @@ from typing import List
 
 
 def get_service_conf():
-
     _CONF = get_config()
     return {
         "arangodb": {
@@ -35,7 +34,6 @@ def wait_for_service(service_list: List[str]) -> None:
     timeout = int(time.time()) + 60
     services_pending = set(service_list)
     service_conf = get_service_conf()
-
     while services_pending:
         still_pending = set()
         for name in services_pending:
@@ -47,10 +45,10 @@ def wait_for_service(service_list: List[str]) -> None:
                 if conf.get("callback") is not None:
                     conf["callback"](resp)
                 # The service is up
-            except Exception:
+            except Exception as err:
                 print(f"Still waiting for {name} to start...")
                 if int(time.time()) > timeout:
-                    raise RuntimeError(f"Timed out waiting for {name} to start")
+                    raise RuntimeError(f"Timed out waiting for {name} to start with error: {err}")
                 still_pending.add(name)
                 time.sleep(3)
         services_pending = still_pending
@@ -64,13 +62,11 @@ def wait_for_arangodb():
 
 def wait_for_services():
     """wait for the workspace, auth, and arango to start up"""
-
     wait_for_service(["auth", "workspace", "arangodb"])
 
 
 def wait_for_api():
     """wait for the workspace, auth, arango, AND localhost:5000 to start up"""
-
     wait_for_services()
     wait_for_service(["localhost"])
 
