@@ -39,7 +39,8 @@ def wait_for_service(service_list: List[str]) -> None:
         for name in services_pending:
             try:
                 conf = service_conf[name]
-                resp = requests.get(conf["url"], auth=conf.get("auth"))
+                auth = (conf.get("db_user"), conf.get("db_pass"))
+                resp = requests.get(conf["url"], auth=auth)
                 if conf.get("raise_for_status"):
                     resp.raise_for_status()
                 if conf.get("callback") is not None:
@@ -48,7 +49,9 @@ def wait_for_service(service_list: List[str]) -> None:
             except Exception as err:
                 print(f"Still waiting for {name} to start...")
                 if int(time.time()) > timeout:
-                    raise RuntimeError(f"Timed out waiting for {name} to start with error: {err}")
+                    raise RuntimeError(
+                        f"Timed out waiting for {name} to start with error: {err}"
+                    )
                 still_pending.add(name)
                 time.sleep(3)
         services_pending = still_pending
