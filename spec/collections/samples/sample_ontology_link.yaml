@@ -1,17 +1,18 @@
 name: sample_ontology_link
 type: edge
+delta: true
 schema:
   "$schema": http://json-schema.org/draft-07/schema#
   type: object
-  required: [_from, _to, created]
+  required: [from, to, created, expired, sample_metadata_term]
   description: minimum necessary terms for sample -> ontology edge link.
   properties:
-    _from:
+    from:
       type: string
       description: the sample node _id (as found in sample_nodes collection)
       examples: ["samples_nodes/465b1476-3699-4e6c-a06b-8d384fcc41f3_6d5999ee-42fb-4bad-a3b9-901aa1b490c5_f4bc367798eb923f77d7405031723908"]
       pattern: ^[\w-]+\/[\w-]+_[\w-]+_[\w-]+
-    _to:
+    to:
       type: string
       description: The _id of an ontology vertex, such as from ENVO, GO, etc.
       examples: ["ENVO_terms/ENVO:01000221_v2019-03-14", 'GO_terms/GO:0047161_v2019-01-01']
