@@ -1,6 +1,6 @@
 # Get the associated ws objects of this term
 
-name: GO_get_associated_ws_objects
+name: GO_get_associated_ws_genomes
 params:
   type: object
   required: [id, ts]
