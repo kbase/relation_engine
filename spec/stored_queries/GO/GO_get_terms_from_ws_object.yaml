@@ -1,6 +1,6 @@
 # Get the terms from a workspace object reference
 
-name: GO_get_terms_from_ws_objects
+name: GO_get_terms_from_ws_object
 params:
   type: object
   required: [obj_ref, ts]
