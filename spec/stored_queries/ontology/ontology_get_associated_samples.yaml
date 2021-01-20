@@ -8,7 +8,7 @@ params:
     id:
       type: string
       title: Document ID
-      description: Ontology id of the term you want to get all the ancestors of 
+      description: Ontology ID of the term you want to get all the associated samples 
     limit:
         type: integer
         default: 20
@@ -25,6 +25,8 @@ params:
     "@onto_terms":
       type: string
       title: Ontology terms collection name
+      description: the name of the vertex collection holding the ontology term data
+      examples: [ENVO_terms, GO_terms]
 query_prefix: WITH samples_nodes
 query: |
   LET results=(
