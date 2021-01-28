@@ -27,20 +27,21 @@ params:
       title: Ontology terms collection name
       description: the name of the vertex collection holding the ontology term data
       examples: [ENVO_terms, GO_terms]
-query_prefix: WITH samples_nodes
+query_prefix: WITH samples_nodes, samples_version, samples_sample
 query: |
   LET results=(
     FOR t in @@onto_terms
       FILTER t.id == @id
       FILTER t.created <= @ts AND t.expired > @ts
       limit 1
-      FOR v, e, p IN 1 INBOUND t sample_ontology_link
-        FILTER v.saved * 1000 >= t.created AND v.saved * 1000 < t.expired
-          AND e.created * 1000 <= @ts AND e.expired * 1000 > @ts
-        SORT v.id ASC
+      FOR v, e, p IN 3 OUTBOUND t INBOUND sample_ontology_link, samples_nodes_edge, samples_ver_edge
+        FILTER p.vertices[1].saved * 1000 >= t.created AND p.vertices[1].saved * 1000 < t.expired
+          AND p.edges[0].created * 1000 <= @ts AND p.edges[0].expired * 1000 > @ts
+        SORT p.vertices[1].id ASC
         RETURN {
-          sample: v,
-          sample_metadata_key: e.sample_metadata_term
+          sample: p.vertices[1],
+          sample_metadata_key: p.edges[0].sample_metadata_term,
+          sample_access: v
         }
   )
   LET total_count=COUNT(results)
