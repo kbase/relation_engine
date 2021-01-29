@@ -3,6 +3,7 @@ Loads and initializes configuration data for importers using environment
 variables and a set of default values.
 """
 import os
+from typing import List
 
 
 REQUIRED = [] # type: List[str]
