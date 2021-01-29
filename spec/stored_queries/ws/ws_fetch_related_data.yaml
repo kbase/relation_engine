@@ -6,7 +6,7 @@ params:
     obj_key:
       type: string
       description: Key of the wsprov_object to search on
-query_prefix: WITH ws_type_version
+query_prefix: WITH ws_type_version, ws_object, ws_workspace
 query: |
   LET obj_id = concat('ws_object_version/', @obj_key)
   FOR obj IN ws_object_version
