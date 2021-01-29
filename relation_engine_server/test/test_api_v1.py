@@ -138,7 +138,11 @@ class TestApi(unittest.TestCase):
         )
         resp_json = resp.json()
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(len(resp_json["status"]))
+        self.assertEqual(resp_json["status"], "updated")
+        self.assertEqual(
+            resp_json["updated_from"],
+            "/app/relation_engine_server/test/spec_release/spec.tar.gz",
+        )
 
         # delete the SPEC_TEST_READY env var as it is no longer true
         os.environ.pop("SPEC_TEST_READY", None)
