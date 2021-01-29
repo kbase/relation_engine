@@ -6,7 +6,7 @@ import os
 from typing import List
 
 
-REQUIRED = [] # type: List[str]
+REQUIRED: List[str] = []
 OPTIONAL = ["AUTH_TOKEN", "API_URL"]
 DEFAULTS = {
     "AUTH_TOKEN": "admin_token",  # test default
