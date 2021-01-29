@@ -3,9 +3,10 @@ Loads and initializes configuration data for importers using environment
 variables and a set of default values.
 """
 import os
+from typing import List
 
 
-REQUIRED = []
+REQUIRED: List[str] = []
 OPTIONAL = ["AUTH_TOKEN", "API_URL"]
 DEFAULTS = {
     "AUTH_TOKEN": "admin_token",  # test default
