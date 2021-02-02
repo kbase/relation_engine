@@ -43,15 +43,7 @@ class Importer(object):
         return self._config[key]
 
     def _configure(self):
-        configuration = config.load_from_env(extra_optional=["ROOT_DATA_PATH"])
-
-        # TODO: make configuration with:
-        # node_files - required - listing of files with node data
-        # node_name - required -
-        # AUTH_TOKEN - optional
-        # API_URL - optional
-
-        self._config = configuration
+        self._config = config.load_from_env(extra_optional=["ROOT_DATA_PATH"])
         return self._config
 
     def get_dataset_schema_dir(self):
@@ -71,23 +63,26 @@ class Importer(object):
         return os.path.join(*path)
 
     def load_data(self, dry_run=False):
-        # Load data file (just a single one)
-
-        # The save_dataset method expects a list of documents
-        # to save, so we are already set!
-        schema_file = os.path.join(self.get_dataset_schema_dir(), "data_sources_nodes.yaml")
-        validator = get_schema_validator(schema_file=schema_file)
+        print('[importer] Loading data')
+        print('[importer] Parameters:')
+        print(f'[importer]     API_URL: {self.get_config_or_fail("API_URL")}')
+        print(f'[importer]     dry run: {dry_run}')
 
         # TODO: just get all files in the directory
         default_data_dir = self.get_relative_dir('data')
         env_data_dir = self.get_config('ROOT_DATA_PATH', None)
         if env_data_dir is not None:
-            print('[importer] Taking data dir from environment variable "RES_ROOT_DATA_PATH"')
+            print('[importer]     (Taking data dir from environment variable "RES_ROOT_DATA_PATH")')
             data_dir = env_data_dir
         else:
-            print('[importer] Taking data dir from default')
+            print('[importer]     (Taking data dir from default)')
             data_dir = default_data_dir
-        print(f'[importer] data_dir: "{data_dir}"')
+        print(f'[importer]     data_dir: "{data_dir}"')
+
+        # The save_dataset method expects a list of documents
+        # to save, so we are already set!
+        schema_file = os.path.join(self.get_dataset_schema_dir(), "data_sources_nodes.yaml")
+        validator = get_schema_validator(schema_file=schema_file)
 
         file_path = os.path.join(data_dir, 'data_sources.json')
         with open(file_path, 'r') as data_file:
@@ -107,12 +102,10 @@ class Importer(object):
             else:
                 self.save_docs('data_sources_nodes', data_sources)
 
-    # Saving
-
     def save_docs(self, collection, docs, on_duplicate="update"):
         """  Saves the source_data docs via into the RE database via the RE api"""
         resp = requests.put(
-            self.get_config_or_fail("API_URL") + "/api/v1/documents",
+            f'{self.get_config_or_fail("API_URL")}/api/v1/documents',
             params={
                 "collection": collection,
                 "on_duplicate": on_duplicate
@@ -153,7 +146,7 @@ def main():
         print(traceback.format_exc())
         exit(1)
     finally:
-        print('[importer] done')
+        print('[importer] Done')
 
 
 if __name__ == "__main__":
