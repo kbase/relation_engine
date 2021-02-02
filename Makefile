@@ -5,6 +5,9 @@ test:
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
+start-ui-dev:
+	cd local-ui-dev && docker-compose up re_api && docker-compose down && docker-compose rm --force
+	
 shell:
 	docker-compose down --remove-orphans
 	docker-compose build
