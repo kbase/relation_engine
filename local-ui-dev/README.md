@@ -6,7 +6,7 @@ This is enabled by running on the docker network `kbase-dev`.
 
 The `docker-compose.yaml` in this directory takes care of that.
 
-In addition, the configuration ensures that the entire schema set is loaded into Arango. This facilitates the usage of any collection during development. 
+In addition, the configuration ensures that the entire schema set is loaded into Arango. This facilitates the usage of any collection during development.
 
 You'll need to take care of data loading.
 
@@ -94,7 +94,6 @@ make start-ui-dev
 Finally, if you have `kbase-ui` set up for local development, you can use the `dynamic-services` option to trap calls to a given dynamic service and route them within the local docker network.
 
 Below is an example which allows one to have normal `CI` requests routed to the local taxonomy api, which itself talks to the local Re api.
-
 
 ```bash
 make start dynamic-services="taxonomy-re-api"
