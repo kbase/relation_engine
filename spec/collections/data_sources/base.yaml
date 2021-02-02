@@ -1,0 +1,166 @@
+"$schema": http://json-schema.org/draft-07/schema#
+title: Data Source
+description: |
+  A description of an external data source. 
+  Data sources are external entities, usually governed and managed by an organization,
+  with data repositories, data policies, and specific data structures. 
+  (e.g. taxonomy, ontology), individual data sources may provide data beyond this
+  general structure; the data source definition must provide a description 
+  of those additional fields so that they can be utilized by interfaces.
+definitions:
+  SourceFieldDefinition:
+    description: |
+      Describes an individual source metadata field
+    type: object
+    additionalProperties: false
+    required: [id, type, label, tooltip, description]
+    properties:
+      id:
+        description: |
+          An identifier for the source; must be unique within the set of 
+          fields for a source
+        type: string
+      type:
+        "$ref": "#definitions/SourceFieldDataType"
+      label:
+        description: Used to display a label for the field in interfaces and reports
+        type: string
+      tooltip:
+        description: A short description of the field, suitable for a popup "tooltip" in an interface
+        type: string
+      description:
+        description: |
+          A full description of the field, suitable for display in a scrolling area.
+          May utilize "markdown" markup
+        type: string
+  SourceFieldDataType:
+    description: |
+      A type identifier for an additional data source metadata field.
+      Some of the scalar types are identifiable (string, boolean, number)
+      as generally JSON compatible types.
+      Sequences are recorded as "array<type>" where "array" is fixed, and the 
+      type id within the pointy brackets need not be separately defined.
+      There is no enforcement of this syntax, it is just a convention; the 
+      string itself serves as the type id.
+      Specialized types like "sequence" should be utilized if they need special 
+      treatment, even if another type already provides the same storage type.
+    type: string
+    enum:
+      - string
+      - number
+      - boolean
+      - array<string>
+      - array<alias>
+      - array<synonym>
+      - sequence
+  DataSource:
+    title: Data Source
+    description: |
+      A description of an external data source. 
+      Data sources are external entities, usually governed and managed by an organization,
+      with data repositories, data policies, and specific data structures. 
+      (e.g. taxonomy, ontology), individual data sources may provide data beyond this
+      general structure; the data source definition must provide a description 
+      of those additional fields so that they can be utilized by interfaces.
+    type: object
+    additionalProperties: false
+    required:
+      [
+        ns,
+        type,
+        title,
+        short_title,
+        data_url,
+        home_url,
+        logo_url,
+        license,
+        item_link,
+        citation,
+        additional_fields,
+      ]
+    properties:
+      ns:
+        type: string
+        description: The RE namespace id for the data source
+        examples:
+          - ncbi_taxonomy
+          - go_ontology
+      type:
+        type: string
+        description: The type of RE namespace and data source
+        examples:
+          - taxonomy
+          - ontology
+      title:
+        type: string
+        description: The fully spelled out title of the organization which manages the data source
+        examples: National Center for Biotechnology Information
+      short_title:
+        type: string
+        description: The shortened name of the organization, e.g. initialization, acronym
+        examples:
+          - NCBI
+      data_url:
+        type: string
+        description: A URL which points to a data repository at which the data loaded into the database is available.
+        examples:
+          - ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/
+      home_url:
+        type: string
+        description: A URL which points to the home page for the organization responsible for the data source
+        examples:
+          - https://www.ncbi.nlm.nih.gov/taxonomy
+      logo_url:
+        type: string
+        description: A URL which points to an image which serves as the logo for the organization responsible for the data source.
+        examples:
+          - https://ci.kbase.us/ui-assets/images/third-party-data-sources/ncbi/logo-51-64.png
+      license:
+        description: An optional url and label which points to the license
+        oneOf:
+          - type: "null"
+          - type: object
+            additionalProperties: false
+            required: [url, label]
+            properties:
+              url:
+                type: string
+                examples:
+                  - http://creativecommons.org/licenses/by-sa/4.0/
+              label:
+                type: string
+                examples:
+                  - Creative Commons Attribution-ShareAlike 4.0 International License
+      item_link:
+        description: |
+          Defines a link to an individual item at the source repository; optional.
+          Note that the url template uses Mustache-style variable markers "{{ field }}"", and that  
+          fields replaced in the template must be from the node type defined for the source.
+        oneOf:
+          - type: "null"
+          - type: object
+            additionalProperties: false
+            required: [url_template, label]
+            properties:
+              url_template:
+                type: string
+                description:
+                examples:
+                  - https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={{id}}
+              label:
+                type: string
+                examples:
+                  - NCBI Taxonomy
+      citation:
+        description: Text provided by the source specifying the citation to use when their data is used.
+        type: string
+        examples:
+          - "Schoch CL, et al. NCBI Taxonomy: a comprehensive update on curation, resources and tools. Database (Oxford). 2020: baaa062. [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/32761142)\n\nSayers EW, et al. GenBank. Nucleic Acids Res. 2019. 47(D1):D94-D99. [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/30365038)"
+      additional_fields:
+        description: |
+          Data sources of a given type within RE have a base definition. Individual data sources
+          may provide additional information in the form of additional fields.
+          These fields are documented here.
+        type: array
+        items:
+          "$ref": "#definitions/SourceFieldDefinition"
