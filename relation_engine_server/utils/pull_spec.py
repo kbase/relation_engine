@@ -6,7 +6,7 @@ import shutil
 import json
 import glob
 import yaml
-
+from typing import Optional
 
 from relation_engine_server.utils import arango_client
 from relation_engine_server.utils.config import get_config
@@ -14,8 +14,17 @@ from relation_engine_server.utils.config import get_config
 _CONF = get_config()
 
 
-def download_specs(init_collections=True, release_url=None, reset=False):
-    """Check and download the latest spec and extract it to the spec path."""
+def download_specs(
+    init_collections: bool = True,
+    release_url: Optional[str] = None,
+    reset: bool = False,
+) -> Optional[str]:
+    """
+    Check and download the latest spec and extract it to the spec path.
+    Returns:
+        The name or path of the release used to update the specs
+    """
+    update_name: Optional[str] = None
     if reset or not os.path.exists(_CONF["spec_paths"]["root"]):
         # Remove the spec directory, ignoring if it is already missing
         shutil.rmtree(_CONF["spec_paths"]["root"], ignore_errors=True)
@@ -23,12 +32,14 @@ def download_specs(init_collections=True, release_url=None, reset=False):
         temp_dir = tempfile.mkdtemp()
         # Download and extract a new release to /spec/repo
         if _CONF["spec_release_path"]:
+            update_name = _CONF["spec_release_path"]
             _extract_tarball(_CONF["spec_release_path"], temp_dir)
         else:
             if _CONF["spec_release_url"]:
                 tarball_url = _CONF["spec_release_url"]
             else:
                 tarball_url = _fetch_github_release_url()
+            update_name = tarball_url
             resp = requests.get(tarball_url, stream=True)
             with tempfile.NamedTemporaryFile() as temp_file:
                 # The temp file will be closed/deleted when the context ends
@@ -47,6 +58,7 @@ def download_specs(init_collections=True, release_url=None, reset=False):
     if init_collections:
         do_init_collections()
         do_init_views()
+    return update_name
 
 
 def do_init_collections():
