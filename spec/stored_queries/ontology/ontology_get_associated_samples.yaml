@@ -54,7 +54,7 @@ query: |
       FILTER @user_id == r.sample_access.acls.owner 
         OR @user_id IN r.sample_access.acls.admin
         OR @user_id IN r.sample_access.acls.read
-        OR r.sample_access_acls.pubread
+        OR r.sample_access.acls.pubread
       RETURN KEEP(r, 'sample', 'sample_metadata_key')
   )
   LET total_accessible_count=COUNT(filtered)
