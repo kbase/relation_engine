@@ -47,7 +47,7 @@ schema:
       description: uuid identifier for sample node in sample nodes collection
       examples: ['f4bc367798eb923f77d7405031723908']
     sample_metadata_term:
-      type: integer
+      type: string
       description: metadata term in sample associated with ontology term
       examples: ['biome', 'ENIGMA:material', 'feature']
     ontology_term:
