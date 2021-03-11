@@ -20,6 +20,24 @@ from relation_engine_server.utils.json_validation import (
 )
 
 
+def get_relative_dir(path):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
+    if isinstance(path, str):
+        path = [path]
+
+    path = [dir_path] + path
+    return os.path.join(*path)
+
+
+def get_dataset_schema_dir():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    # TODO:  factor out "data_sources"
+    return os.path.join(
+        dir_path, "../", "../", "spec", "datasets", "data_sources"
+    )
+
+
 class Importer(object):
     def __init__(self):
         pass
@@ -46,22 +64,6 @@ class Importer(object):
         self._config = config.load_from_env(extra_optional=["ROOT_DATA_PATH"])
         return self._config
 
-    def get_dataset_schema_dir(self):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        # TODO:  factor out "data_sources"
-        return os.path.join(
-            dir_path, "../", "../", "spec", "datasets", "data_sources"
-        )
-
-    def get_relative_dir(self, path):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-
-        if isinstance(path, str):
-            path = [path]
-
-        path = [dir_path] + path
-        return os.path.join(*path)
-
     def load_data(self, dry_run=False):
         print('[importer] Loading data')
         print('[importer] Parameters:')
@@ -69,7 +71,7 @@ class Importer(object):
         print(f'[importer]     dry run: {dry_run}')
 
         # TODO: just get all files in the directory
-        default_data_dir = self.get_relative_dir('data')
+        default_data_dir = get_relative_dir('data')
         env_data_dir = self.get_config('ROOT_DATA_PATH', None)
         if env_data_dir is not None:
             print('[importer]     (Taking data dir from environment variable "RES_ROOT_DATA_PATH")')
@@ -81,7 +83,7 @@ class Importer(object):
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
-        schema_file = os.path.join(self.get_dataset_schema_dir(), "data_sources_nodes.yaml")
+        schema_file = os.path.join(get_dataset_schema_dir(), "data_sources_nodes.yaml")
         validator = get_schema_validator(schema_file=schema_file)
 
         file_path = os.path.join(data_dir, 'data_sources.json')
