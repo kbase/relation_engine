@@ -20,6 +20,14 @@ from relation_engine_server.utils.json_validation import (
 )
 
 
+def get_dataset_schema_dir():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    # TODO:  factor out "data_sources"
+    return os.path.join(
+        dir_path, "../", "../", "spec", "datasets", "data_sources"
+    )
+
+
 def get_relative_dir(path):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -28,14 +36,6 @@ def get_relative_dir(path):
 
     path = [dir_path] + path
     return os.path.join(*path)
-
-
-def get_dataset_schema_dir():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    # TODO:  factor out "data_sources"
-    return os.path.join(
-        dir_path, "../", "../", "spec", "datasets", "data_sources"
-    )
 
 
 class Importer(object):
