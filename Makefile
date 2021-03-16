@@ -7,7 +7,10 @@ test:
 
 start-ui-dev:
 	cd local-ui-dev && docker-compose up re_api && docker-compose down && docker-compose rm --force
-	
+
+build-ui-dev:
+	cd local-ui-dev && docker-compose build
+
 shell:
 	docker-compose down --remove-orphans
 	docker-compose build
