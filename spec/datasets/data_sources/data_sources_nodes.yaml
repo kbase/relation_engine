@@ -1,2 +1,2 @@
 "$schema": http://json-schema.org/draft-07/schema#
-"$ref": "../../collections/data_sources/base.yaml#definitions/DataSource"
+"$ref": definitions.yaml#definitions/DataSource

@@ -1,12 +1,7 @@
-"$schema": http://json-schema.org/draft-07/schema#
-title: Data Source
-description: |
-  A description of an external data source. 
-  Data sources are external entities, usually governed and managed by an organization,
-  with data repositories, data policies, and specific data structures. 
-  (e.g. taxonomy, ontology), individual data sources may provide data beyond this
-  general structure; the data source definition must provide a description 
-  of those additional fields so that they can be utilized by interfaces.
+$schema: http://json-schema.org/draft-07/schema#
+name: definitions
+title: Data Sources schema definitions
+description: Node and edge metadata definitions for Data Sources
 definitions:
   SourceFieldDefinition:
     description: |
@@ -17,11 +12,11 @@ definitions:
     properties:
       id:
         description: |
-          An identifier for the source; must be unique within the set of 
+          An identifier for the source; must be unique within the set of
           fields for a source
         type: string
       type:
-        "$ref": "#definitions/SourceFieldDataType"
+        $ref: "#definitions/SourceFieldDataType"
       label:
         description: Used to display a label for the field in interfaces and reports
         type: string
@@ -38,11 +33,11 @@ definitions:
       A type identifier for an additional data source metadata field.
       Some of the scalar types are identifiable (string, boolean, number)
       as generally JSON compatible types.
-      Sequences are recorded as "array<type>" where "array" is fixed, and the 
+      Sequences are recorded as "array<type>" where "array" is fixed, and the
       type id within the pointy brackets need not be separately defined.
-      There is no enforcement of this syntax, it is just a convention; the 
+      There is no enforcement of this syntax, it is just a convention; the
       string itself serves as the type id.
-      Specialized types like "sequence" should be utilized if they need special 
+      Specialized types like "sequence" should be utilized if they need special
       treatment, even if another type already provides the same storage type.
     type: string
     enum:
@@ -56,16 +51,17 @@ definitions:
   DataSource:
     title: Data Source
     description: |
-      A description of an external data source. 
+      A description of an external data source.
       Data sources are external entities, usually governed and managed by an organization,
-      with data repositories, data policies, and specific data structures. 
+      with data repositories, data policies, and specific data structures.
       (e.g. taxonomy, ontology), individual data sources may provide data beyond this
-      general structure; the data source definition must provide a description 
+      general structure; the data source definition must provide a description
       of those additional fields so that they can be utilized by interfaces.
     type: object
     additionalProperties: false
     required:
       [
+        _key,
         ns,
         type,
         title,
@@ -79,8 +75,18 @@ definitions:
         additional_fields,
       ]
     properties:
+      _key:
+        type: string
+        format: regex
+        pattern: "^[a-z0-9]+[a-z0-9_]*[a-z0-9]$"
+        description: The RE namespace id for the data source
+        examples:
+          - ncbi_taxonomy
+          - go_ontology
       ns:
         type: string
+        format: regex
+        pattern: "^[a-z0-9]+[a-z0-9_]*[a-z0-9]$"
         description: The RE namespace id for the data source
         examples:
           - ncbi_taxonomy
@@ -134,7 +140,7 @@ definitions:
       item_link:
         description: |
           Defines a link to an individual item at the source repository; optional.
-          Note that the url template uses Mustache-style variable markers "{{ field }}"", and that  
+          Note that the url template uses Mustache-style variable markers "{{ field }}"", and that
           fields replaced in the template must be from the node type defined for the source.
         oneOf:
           - type: "null"
@@ -144,7 +150,7 @@ definitions:
             properties:
               url_template:
                 type: string
-                description:
+                description: A template for a url which displays or describes the data source; id field may be substituted
                 examples:
                   - https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={{id}}
               label:
@@ -163,4 +169,4 @@ definitions:
           These fields are documented here.
         type: array
         items:
-          "$ref": "#definitions/SourceFieldDefinition"
+          $ref: "#definitions/SourceFieldDefinition"

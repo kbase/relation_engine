@@ -1,4 +1,4 @@
-name: data_sources_node
+name: data_sources_nodes
 type: vertex
 delta: false
 
@@ -7,5 +7,5 @@ indexes:
     fields: [type, ns]
 
 schema:
-  "$schema": http://json-schema.org/draft-07/schema#
-  "$ref": "base.json#definitions/DataSource"
+  $schema: http://json-schema.org/draft-07/schema#
+  $ref: ../../datasets/data_sources/definitions.yaml#/definitions/DataSource
