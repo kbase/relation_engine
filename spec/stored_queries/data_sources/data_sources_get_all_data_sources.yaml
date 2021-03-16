@@ -1,5 +1,5 @@
 # Get all data sources matching the given type
-name: data_sources_get_data_sources
+name: data_sources_get_all_data_sources
 params:
   type: object
   required: [type]
