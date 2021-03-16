@@ -32,7 +32,7 @@ source venv/bin/activate
 Install Python dependencies:
 
 ```bash
-pip install -r dev-requirement.txt
+pip install -r dev-requirements.txt
 ```
 
 Run your data importer. Each importer is an independent script, but they will probably follow a pattern similar to this example.
