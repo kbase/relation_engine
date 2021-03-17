@@ -38,6 +38,21 @@ def get_relative_dir(path):
     return os.path.join(*path)
 
 
+def note(type, message):
+    icon = ''
+    if type == 'info':
+        icon = 'ℹ'
+    elif type == 'success':
+        icon = '✓'
+    elif type == 'warning':
+        icon = '⚠';
+    elif type == 'error':
+        icon = '🐛'
+    else:
+        icon = '?'
+    print(f'[importer] {icon} {message}')
+
+
 class Importer(object):
     def __init__(self):
         pass
@@ -65,21 +80,23 @@ class Importer(object):
         return self._config
 
     def load_data(self, dry_run=False):
-        print('[importer] Loading data')
-        print('[importer] Parameters:')
-        print(f'[importer]     API_URL: {self.get_config_or_fail("API_URL")}')
-        print(f'[importer]     dry run: {dry_run}')
+        note('info', 'Loading data')
+        note('info', 'Parameters:')
+        note('info', f'     API_URL: {self.get_config_or_fail("API_URL")}')
+        note('info', f'     dry run: {dry_run}')
+
+        is_error = False
 
         # TODO: just get all files in the directory
         default_data_dir = get_relative_dir('data')
         env_data_dir = self.get_config('ROOT_DATA_PATH', None)
         if env_data_dir is not None:
-            print('[importer]     (Taking data dir from environment variable "RES_ROOT_DATA_PATH")')
+            note('info', '     (Taking data dir from environment variable "RES_ROOT_DATA_PATH")')
             data_dir = env_data_dir
         else:
-            print('[importer]     (Taking data dir from default)')
+            note('info', '     (Taking data dir from default)')
             data_dir = default_data_dir
-        print(f'[importer]     data_dir: "{data_dir}"')
+        note('info', f'     data_dir: "{data_dir}"')
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
@@ -93,18 +110,27 @@ class Importer(object):
             for data_source in data_sources:
                 if not validator.is_valid(data_source):
                     for e in sorted(validator.iter_errors(data_source), key=str):
-                        print(f'[importer] Validation error: {e.message}')
-                        return
+                        is_error = True
+                        note('error', f'Validation error: {e.message}')
+                    continue
                 else:
                     data_source['_key'] = data_source['ns']
                     data_sources_to_save.append(data_source)
 
-            print('[importer] Data loaded and validated successfully')
+            if is_error:
+                note('error', 'Data did not validate')
+                if dry_run:
+                    note('error', 'Dry run completed with errors')
+                else:
+                    note('error', 'Due to errors, data will not be loaded')
+                return
+
+            note('success', 'Data loaded and validated successfully')
 
             # if there are no errors then save the dataset unless this is a dry run
             if dry_run:
-                print('[importer] Dry run completed successfully')
-                print('[importer] REMEMBER: Data not loaded')
+                note('success', 'Dry run completed successfully')
+                note('warning', 'REMEMBER: Data not loaded')
             else:
                 self.save_docs('data_sources_nodes', data_sources_to_save)
 
@@ -124,9 +150,9 @@ class Importer(object):
         if not resp.ok:
             raise RuntimeError(resp.text)
 
-        print(f"[importer] Saved docs to collection {collection}!")
+        note('success', f"Saved docs to collection {collection}!")
         for key, value in resp.json().items():
-            print(f'[importer]     {key}: {value}')
+            note('info', f'     {key}: {value}')
         return resp
 
 
@@ -148,11 +174,11 @@ def main():
     try:
         importer.load_data(dry_run=args.dry)
     except Exception as err:
-        print("[importer] Unhandled exception", err)
-        print(traceback.format_exc())
+        note('error', "Unhandled exception", err)
+        note('error', traceback.format_exc())
         exit(1)
     finally:
-        print('[importer] Done')
+        note('success', 'Done')
 
 
 if __name__ == "__main__":
