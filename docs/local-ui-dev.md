@@ -15,14 +15,14 @@ You'll need to take care of data loading.
 From the repo root:
 
 ```bash
-make start-ui-dev
+make start-dev
 ```
 
 ## Install your data
 
 At present, only instructions for installing the `data_sources` are provided. Clearly a complete local workflow would involve installing major chunks of the RE graph.
 
-see [importers/data_sources/README.md](importers/data_sources/README.md#procedure).
+see [importers/data_sources/README.md](../importers/data_sources/README.md#procedure).
 
 ## Point services to relation-engine-api
 

@@ -1,17 +1,20 @@
 .PHONY: test reset
 
-test:
+dev-network:
+	docker network create kbase-dev || true
+
+test: dev-network
 	docker-compose build
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
-start-ui-dev:
-	cd local-ui-dev && docker-compose up re_api && docker-compose down && docker-compose rm --force
+start-dev: dev-network
+	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up re_api && docker-compose down && docker-compose rm --force
 
-build-ui-dev:
-	cd local-ui-dev && docker-compose build
+dev-image:
+	docker-compose build
 
-shell:
+shell: dev-network
 	docker-compose down --remove-orphans
 	docker-compose build
 	docker-compose run re_api sh
