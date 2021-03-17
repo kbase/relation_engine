@@ -4,7 +4,7 @@ The script and data within this directory allow one to load the _data sources_ i
 
 This script has only been used in development thus far. In this case, the local RE Api container must be started via `make start-ui-dev`, as this starts the services with the `docker-compose.yaml` configuration located in `local-ui-dev`, which initializes all collections.
 
-Of course, in development you may have a different process; and in production I (Erik) have no clue how data is initialized or loaded. This script should work fine for initial load, and can be used for subsequent updates if the script is pointed at a data file which contains just the new documents.
+> This document describes a procedure for loading data locally, but does not claim provenance over production data provisioning. This script should work fine for initial load, and can be used for subsequent updates if the script is pointed at a data file which contains just the new documents.
 
 ## Procedure
 
