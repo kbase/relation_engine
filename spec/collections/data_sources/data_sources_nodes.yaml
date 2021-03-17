@@ -4,7 +4,7 @@ delta: false
 
 indexes:
   - type: persistent
-    fields: [type, ns]
+    fields: [ type, ns ]
 
 schema:
   $schema: http://json-schema.org/draft-07/schema#
@@ -19,20 +19,18 @@ schema:
   type: object
   additionalProperties: false
   required:
-    [
-      _key,
-      ns,
-      type,
-      title,
-      short_title,
-      data_url,
-      home_url,
-      logo_url,
-      license,
-      item_link,
-      citation,
-      additional_fields,
-    ]
+    - _key
+    - ns
+    - type
+    - title
+    - short_title
+    - data_url
+    - home_url
+    - logo_url
+    - license
+    - item_link
+    - citation
+    - additional_fields
   properties:
     _key:
       $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/ns
