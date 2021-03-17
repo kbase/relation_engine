@@ -174,7 +174,8 @@ def main():
     try:
         importer.load_data(dry_run=args.dry)
     except Exception as err:
-        note('error', "Unhandled exception", err)
+        note('error', "Unhandled exception:")
+        note('error', str(err))
         note('error', traceback.format_exc())
         exit(1)
     finally:
