@@ -104,35 +104,41 @@ class Importer(object):
         validator = get_schema_validator(schema_file=schema_file)
 
         file_path = os.path.join(data_dir, 'data_sources.json')
-        with open(file_path, 'r') as data_file:
-            data_sources = json.load(data_file)
-            data_sources_to_save = []
-            for data_source in data_sources:
-                if not validator.is_valid(data_source):
-                    for e in sorted(validator.iter_errors(data_source), key=str):
-                        is_error = True
-                        note('error', f'Validation error: {e.message}')
-                    continue
-                else:
-                    data_source['_key'] = data_source['ns']
-                    data_sources_to_save.append(data_source)
 
-            if is_error:
-                note('error', 'Data did not validate')
-                if dry_run:
-                    note('error', 'Dry run completed with errors')
-                else:
-                    note('error', 'Due to errors, data will not be loaded')
-                return
+        try:
+            with open(file_path, 'r') as data_file:
+                data_sources = json.load(data_file)
+        except OSError as ose:
+            note('error', 'Error loading import data file')
+            return
 
-            note('success', 'Data loaded and validated successfully')
-
-            # if there are no errors then save the dataset unless this is a dry run
-            if dry_run:
-                note('success', 'Dry run completed successfully')
-                note('warning', 'REMEMBER: Data not loaded')
+        data_sources_to_save = []
+        for data_source in data_sources:
+            if not validator.is_valid(data_source):
+                for e in sorted(validator.iter_errors(data_source), key=str):
+                    is_error = True
+                    note('error', f'Validation error: {e.message}')
+                continue
             else:
-                self.save_docs('data_sources_nodes', data_sources_to_save)
+                data_source['_key'] = data_source['ns']
+                data_sources_to_save.append(data_source)
+
+        if is_error:
+            note('error', 'Data did not validate')
+            if dry_run:
+                note('error', 'Dry run completed with errors')
+            else:
+                note('error', 'Due to errors, data will not be loaded')
+            return
+
+        note('success', 'Data loaded and validated successfully')
+
+        # if there are no errors then save the dataset unless this is a dry run
+        if dry_run:
+            note('success', 'Dry run completed successfully')
+            note('warning', 'REMEMBER: Data not loaded')
+        else:
+            self.save_docs('data_sources_nodes', data_sources_to_save)
 
     def save_docs(self, collection, docs, on_duplicate="update"):
         """  Saves the source_data docs via into the RE database via the RE api"""
@@ -179,7 +185,7 @@ def main():
         note('error', traceback.format_exc())
         exit(1)
     finally:
-        note('success', 'Done')
+        note('info', 'Finished')
 
 
 if __name__ == "__main__":
