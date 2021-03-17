@@ -89,11 +89,15 @@ class Importer(object):
         file_path = os.path.join(data_dir, 'data_sources.json')
         with open(file_path, 'r') as data_file:
             data_sources = json.load(data_file)
+            data_sources_to_save = []
             for data_source in data_sources:
                 if not validator.is_valid(data_source):
                     for e in sorted(validator.iter_errors(data_source), key=str):
                         print(f'[importer] Validation error: {e.message}')
                         return
+                else:
+                    data_source['_key'] = data_source['ns']
+                    data_sources_to_save.append(data_source)
 
             print('[importer] Data loaded and validated successfully')
 
@@ -102,7 +106,7 @@ class Importer(object):
                 print('[importer] Dry run completed successfully')
                 print('[importer] REMEMBER: Data not loaded')
             else:
-                self.save_docs('data_sources_nodes', data_sources)
+                self.save_docs('data_sources_nodes', data_sources_to_save)
 
     def save_docs(self, collection, docs, on_duplicate="update"):
         """  Saves the source_data docs via into the RE database via the RE api"""

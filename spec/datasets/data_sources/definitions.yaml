@@ -61,7 +61,6 @@ definitions:
     additionalProperties: false
     required:
       [
-        _key,
         ns,
         type,
         title,
@@ -75,14 +74,6 @@ definitions:
         additional_fields,
       ]
     properties:
-      _key:
-        type: string
-        format: regex
-        pattern: "^[a-z0-9]+[a-z0-9_]*[a-z0-9]$"
-        description: The RE namespace id for the data source
-        examples:
-          - ncbi_taxonomy
-          - go_ontology
       ns:
         type: string
         format: regex

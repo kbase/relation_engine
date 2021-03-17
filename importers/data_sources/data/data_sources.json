@@ -1,6 +1,5 @@
 [
     {
-        "_key": "ncbi_taxonomy",
         "ns": "ncbi_taxonomy",
         "type": "taxonomy",
         "title": "National Center for Biotechnology Information",
@@ -39,7 +38,6 @@
         ]
     },
     {
-        "_key": "gtdb",
         "ns": "gtdb",
         "type": "taxonomy",
         "title": "Genome Taxonomy Database",
@@ -59,7 +57,6 @@
         "additional_fields": []
     },
     {
-        "_key":  "rdp_taxonomy",
         "ns": "rdp_taxonomy",
         "type": "taxonomy",
         "title": "Ribosomal Database Project",
@@ -98,7 +95,6 @@
         ]
     },
     {
-        "_key": "silva_taxonoomy",
         "ns": "silva_taxonomy",
         "type": "taxonomy",
         "title": "SILVA",
@@ -133,7 +129,6 @@
         ]
     },
     {
-        "_key": "go_ontology",
         "ns": "go_ontology",
         "type": "ontology",
         "title": "Gene Ontology",
@@ -161,7 +156,6 @@
         ]
     },
     {
-        "_key": "envo_ontology",
         "ns": "envo_ontology",
         "type": "ontology",
         "title": "Environmental Ontology",
