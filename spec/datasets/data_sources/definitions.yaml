@@ -8,7 +8,7 @@ definitions:
       Describes an individual source metadata field
     type: object
     additionalProperties: false
-    required: [id, type, label, tooltip, description]
+    required: [ id, type, label, tooltip, description ]
     properties:
       id:
         description: |
@@ -60,19 +60,17 @@ definitions:
     type: object
     additionalProperties: false
     required:
-      [
-        ns,
-        type,
-        title,
-        short_title,
-        data_url,
-        home_url,
-        logo_url,
-        license,
-        item_link,
-        citation,
-        additional_fields,
-      ]
+      - ns
+      - type
+      - title
+      - short_title
+      - data_url
+      - home_url
+      - logo_url
+      - license
+      - item_link
+      - citation
+      - additional_fields
     properties:
       ns:
         type: string
@@ -118,7 +116,7 @@ definitions:
           - type: "null"
           - type: object
             additionalProperties: false
-            required: [url, label]
+            required: [ url, label ]
             properties:
               url:
                 type: string
@@ -137,7 +135,7 @@ definitions:
           - type: "null"
           - type: object
             additionalProperties: false
-            required: [url_template, label]
+            required: [ url_template, label ]
             properties:
               url_template:
                 type: string
