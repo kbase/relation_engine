@@ -75,8 +75,11 @@ definitions:
       ns:
         type: string
         format: regex
-        pattern: "^[a-z0-9]+[a-z0-9_]*[a-z0-9]$"
-        description: The RE namespace id for the data source
+        pattern: "^[a-z0-9]+(?:[a-z0-9_]*[a-z0-9])*$"
+        description: |
+          The RE namespace id for the data source; accepts forms composed of
+          lower case alphabeti characters, numeric characters and _; underscore
+          not allowed at the begin or end; at least one character in length.
         examples:
           - ncbi_taxonomy
           - go_ontology
