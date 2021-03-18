@@ -12,6 +12,7 @@ All that is required is to:
 import argparse
 import json
 import os
+import sys
 import traceback
 import requests
 import importers.utils.config as config
@@ -22,7 +23,6 @@ from relation_engine_server.utils.json_validation import (
 
 def get_dataset_schema_dir():
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    # TODO:  factor out "data_sources"
     return os.path.join(
         dir_path, "../", "../", "spec", "datasets", "data_sources"
     )
@@ -30,11 +30,7 @@ def get_dataset_schema_dir():
 
 def get_relative_dir(path):
     dir_path = os.path.dirname(os.path.realpath(__file__))
-
-    if isinstance(path, str):
-        path = [path]
-
-    path = [dir_path] + path
+    path = [dir_path] + [path]
     return os.path.join(*path)
 
 
@@ -110,7 +106,7 @@ class Importer(object):
                 data_sources = json.load(data_file)
         except OSError as ose:
             note('error', 'Error loading import data file')
-            return
+            return False
 
         data_sources_to_save = []
         for data_source in data_sources:
@@ -129,7 +125,7 @@ class Importer(object):
                 note('error', 'Dry run completed with errors')
             else:
                 note('error', 'Due to errors, data will not be loaded')
-            return
+            return False
 
         note('success', 'Data loaded and validated successfully')
 
@@ -139,6 +135,7 @@ class Importer(object):
             note('warning', 'REMEMBER: Data not loaded')
         else:
             self.save_docs('data_sources_nodes', data_sources_to_save)
+        return True
 
     def save_docs(self, collection, docs, on_duplicate="update"):
         """  Saves the source_data docs via into the RE database via the RE api"""
@@ -162,31 +159,40 @@ class Importer(object):
         return resp
 
 
-def main():
-    argparser = argparse.ArgumentParser(description="Load data_sources data")
-    argparser.add_argument(
-        "--dry-run",
-        dest="dry",
-        action="store_true",
-        help="Perform all actions of the parser, except loading the data.",
-    )
-    argparser.add_argument(
-        "--output",
-        default="text",
-        help="Specify the format of any output generated. (text or json)",
-    )
-    args = argparser.parse_args()
+def do_import(dry_run=False):
+    note('info', 'Starting Import')
     importer = Importer()
     try:
-        importer.load_data(dry_run=args.dry)
+        importer.load_data(dry_run=dry_run)
     except Exception as err:
         note('error', "Unhandled exception:")
         note('error', str(err))
         note('error', traceback.format_exc())
-        exit(1)
+        sys.exit(1)
     finally:
-        note('info', 'Finished')
+        note('info', 'Finished Import')
 
 
-if __name__ == "__main__":
-    main()
+def get_args():
+    argparser = argparse.ArgumentParser(description="Load data_sources data")
+    argparser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Perform all actions of the importer, except loading the data.",
+    )
+    return argparser.parse_args()
+
+
+def main():
+    args = get_args()
+    do_import(args.dry_run)
+    sys.exit(0)
+
+
+def init():
+    if __name__ == "__main__":
+        main()
+
+
+init()
