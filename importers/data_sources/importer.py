@@ -1,13 +1,24 @@
 """
 Loads data sources into RE.
-This is a simple importer, as the data source load data is quite simple, 
-and also in it's ultimate form, requiring no transformation.
-All that is required is to:
-- read in the source  data json
-- uses the source_data schema to validate
-- save as separate files, one  per node
-- load and import those nodes 
-- using the same source_data schema to validate
+
+This is a simple importer, as the data_sources load data is quite simple,
+and also very similar to its ultimate form, requiring little transformation.
+
+Note that the schema files are located in two places:
+- spec/datasets/data_sources/definitions.yaml - reference types
+- spec/datasets/data_sources/data_sources_nodes.yaml - definition of each data_source
+      being loaded as a DataSource object
+- spec/collections/data_sources/data_sources_nodes.yaml - replication of the DataSource
+      object with the addition of a  _key property; all fields by reference to the
+      definigions in spec/datasets/data_sources
+
+TODO: A DRYer design would be for the schemas in spec/collections to use an allOf to
+extend the base DataSource type in spec/datasets.
+However, the schema for collection definition files located in spec/collections
+expects that the schemas in spec/collections be be an object.
+I expect, though, that in many cases the collection and import data will be different
+enough that there will be less overlap between the collections and import data than in
+this case.
 """
 import argparse
 import json
