@@ -39,7 +39,7 @@ query: |
       FILTER t.created <= @ts AND t.expired > @ts
       limit 1
       FOR v, e, p IN 3 OUTBOUND t INBOUND sample_ontology_link, samples_nodes_edge, samples_ver_edge
-        FILTER p.vertices[1].saved * 1000 >= t.created AND p.vertices[1].saved * 1000 < t.expired
+        FILTER p.vertices[1].saved >= t.created AND p.vertices[1].saved < t.expired
           AND p.edges[0].created <= @ts AND p.edges[0].expired > @ts
         SORT p.vertices[1].id ASC
         RETURN {
