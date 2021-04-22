@@ -1,0 +1,41 @@
+# Get ontology term by searching name
+
+name: ontology_get_term_by_name
+params:
+  type: object
+  required: [name, ts, "@onto_terms", "@onto_edges"]
+  properties:
+    name:
+      type: string
+      title: Ontology term's name
+      description: Name of the Ontology term you want to get
+      examples: ["terrestrial biome"]
+    ancestor_term:
+      type: string
+      title: Ancestor ontology term
+      description: Optional ancestor ontology term 
+      examples: ["ENVO:00000428"]
+    ts:
+      type: integer
+      title: Versioning timestamp
+    "@onto_terms":
+      type: string
+      title: Ontology terms collection name
+      examples: ["ENVO_terms"]
+    "@onto_edges":
+      type: string
+      title: Ontology edges collection name
+      examples: ["ENVO_edges"]
+query_prefix: WITH @@onto_terms
+query: |
+  LET ancestor_term_null=IS_NULL(@ancestor_term) OR LENGTH(@ancestor_term) == 0
+  FOR t in @@onto_terms
+    FILTER LOWER(t.name) == LOWER(@name)
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v, e, p IN 1..100 OUTBOUND t @@onto_edges
+      FILTER ancestor_term_null OR v.id == @ancestor_term 
+      FILTER p.edges[*].created ALL <= @ts 
+        AND p.edges[*].expired ALL >= @ts 
+        AND p.edges[*].type ALL == "is_a"
+      RETURN DISTINCT t
