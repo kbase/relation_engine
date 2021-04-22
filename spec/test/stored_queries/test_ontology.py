@@ -210,7 +210,7 @@ class TestOntology(unittest.TestCase):
         ).json()
         self.assertEqual(resp["count"], 2)
         ids = [r["term"]["id"] for r in resp["results"]]
-        self.assertEqual(ids, ["ENVO:00000446", "ENVO:00002030"])
+        self.assertCountEqual(ids, ["ENVO:00000446", "ENVO:00002030"])
 
     def test_get_parents(self):
         """Test query of ontology parents."""
@@ -246,7 +246,7 @@ class TestOntology(unittest.TestCase):
         ).json()
         self.assertEqual(resp["count"], 3)
         ids = [r["term"]["id"] for r in resp["results"]]
-        self.assertEqual(ids, ["ENVO:00000446", "ENVO:00000428", "ENVO:00002030"])
+        self.assertCountEqual(ids, ["ENVO:00000446", "ENVO:00000428", "ENVO:00002030"])
 
     def test_get_ancestors(self):
         """Test query of ontology ancestors."""
@@ -264,7 +264,7 @@ class TestOntology(unittest.TestCase):
         ).json()
         self.assertEqual(resp["count"], 3)
         ids = [r["term"]["id"] for r in resp["results"]]
-        self.assertEqual(ids, ["ENVO:00000428", "ENVO:01000254", "ENVO:01001110"])
+        self.assertCountEqual(ids, ["ENVO:00000428", "ENVO:01000254", "ENVO:01001110"])
 
     def test_get_siblings(self):
         """Test query of ontology siblings."""
@@ -299,7 +299,7 @@ class TestOntology(unittest.TestCase):
         ).json()
         self.assertEqual(resp["count"], 2)
         ids = [r["id"] for r in resp["results"]]
-        self.assertEqual(ids, ["ENVO:00000446", "ENVO:00002030"])
+        self.assertCountEqual(ids, ["ENVO:00000446", "ENVO:00002030"])
 
 
 # -- Test helpers
