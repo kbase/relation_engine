@@ -13,7 +13,7 @@ Set up a Python environment:
 At top level of repo:
 
 ```bash
-virtualenv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
@@ -22,6 +22,9 @@ Install Python dependencies:
 ```bash
 pip install -r dev-requirement.txt
 ```
+
+> Tip: If you encounter an install error, you should first try updating pip:
+> `pip install --upgrade pip`
 
 Run the data importer. Each importer is an independent script, but they will probably follow a pattern similar to this example.
 
