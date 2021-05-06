@@ -70,14 +70,6 @@ class Test_data_sources_functions(unittest.TestCase):
 
 
 class Test_data_sources_Importer(unittest.TestCase):
-    # @classmethod
-    # def setUp(cls):
-    #     # import the results file
-    #     # results_file = os.path.join(_TEST_DIR, "djornl", "results.json")
-    #     dir_path = os.path.dirname(os.path.realpath(__file__))
-    #     root_data_path = os.path.join(dir_path, "data")
-    #     with modified_environ(RES_ROOT_DATA_PATH=root_data_path):
-
     def test_get_config(self):
         imp = make_importer('standard')
         self.assertIsNotNone(imp.get_config('API_URL', None))
@@ -138,14 +130,14 @@ class Test_data_sources_Importer(unittest.TestCase):
         self.assertTrue(True)
 
     @responses.activate
-    def test_do_import_dry_run(self):
+    def test_do_import_not_dry_run(self):
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=200)
         do_import(dry_run=False)
         self.assertTrue(True)
 
     @responses.activate
-    def test_do_import_dry_run(self):
+    def test_do_import_exits_with_error(self):
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=400)
         with self.assertRaises(SystemExit) as se:
@@ -190,16 +182,3 @@ class MyArgs:
     def __init__(self, dry_run):
         self.dry_run = dry_run
 
-
-# def make_my_args(dry_run):
-#     args = MyArgs(dry_run)
-
-# tests:
-# happy path:
-# - load data
-
-
-
-
-# sad  path:
-# - load dta with all sorts of problems
