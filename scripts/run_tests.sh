@@ -6,8 +6,6 @@ set -e
 (cd /app/relation_engine_server/test/spec_release && \
   tar czvf spec.tar.gz sample_spec_release)
 
-# TODO: why reformatting code?
-# black .
 flake8 --max-complexity 20 /app/relation_engine_server
 mypy --ignore-missing-imports /app/relation_engine_server
 bandit -r /app/relation_engine_server
