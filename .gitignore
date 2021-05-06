@@ -21,3 +21,6 @@ spec.tar.gz
 
 # IDEs
 /.idea/
+
+# Python virtual environment directory
+/venv/
