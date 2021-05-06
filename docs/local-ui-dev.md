@@ -1,6 +1,6 @@
 # Local UI Development
 
-This directory contains tools and instructions for using the RE api in a local development context which allows close operation with other kbase services in a custom docker network.
+This directory contains tools and instructions for using the RE api in a local development context which allows close operation with other KBase services in a custom docker network.
 
 This is enabled by running on the docker network `kbase-dev`.
 
@@ -26,11 +26,11 @@ see [importers/data_sources/README.md](../importers/data_sources/README.md#proce
 
 ## Point services to relation-engine-api
 
-Within the `kbase-dev` docker network, the RE api is associated with the host `relation-engine-api`, and is bound to port `5000` as KBase services typically are.
+Within the `kbase-dev` docker network, the RE API is associated with the host `relation-engine-api`, and is bound to port `5000` as KBase services typically are.
 
-### Example: Taxonomy RE API
+### Example: Taxonomy API
 
-The [Taxonomy RE API](https://github.com/kbase/taxonomy_re_api) can be run in a _local-ui-dev mode_ as well, in which case it is configured with the correct RE api base url in the `docker-compose.yaml` file.
+The [Taxonomy API](https://github.com/kbase/taxonomy_re_api) can be run in a _local-ui-dev mode_ as well, in which case it is configured with the correct RE API base url in the `docker-compose.yaml` file.
 
 ```bash
 git clone https://github.com/kbase/taxonomy_re_api
@@ -42,7 +42,7 @@ make start-ui-dev
 
 Finally, if you have `kbase-ui` set up for local development, you can use the `dynamic-services` option to trap calls to a given dynamic service and route them within the local docker network.
 
-Below is an example which allows one to have normal `CI` requests routed to the local taxonomy api, which itself talks to the local Re api.
+Below is an example which allows one to have normal `CI` requests routed to the local Taxonomy API, which itself talks to the local RE API.
 
 First route ci.kbase.us locally:
 
@@ -62,11 +62,11 @@ Then start kbase-ui, configuring the development proxy to route requests normall
 make start dynamic-services="taxonomy-re-api"
 ```
 
-Note that the Taxonomy RE Api service will not be fully functional unless the entire graph enabling taxonomy is loaded.
+Note that the Taxonomy RE API service will not be fully functional unless the entire graph enabling taxonomy is loaded.
 
-However, this workflow is still useful for probing Taxonomy RE API methods. 
+However, this workflow is still useful for probing Taxonomy RE API methods.
 
-E.g. I'm using the following url to probe the taxonomy api, which should return the data source definition for "ncbi_taxonomy".
+E.g. I'm using the following url to probe the Taxonomy API, which should return the data source definition for "ncbi_taxonomy".
 
 ```bash
 curl -X POST https://ci.kbase.us:443/dynserv/5a120b167a19b7b5fb87a11c7c35f704a225c156.taxonomy-re-api \
