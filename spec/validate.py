@@ -74,7 +74,7 @@ def validate_all(schema_type, directory=None):
                 err_files.append([path, err])
 
     if not n_files:
-        print(f"No schema files found")
+        print("No schema files found")
         return
 
     if err_files:
@@ -254,7 +254,7 @@ def validate_aql_on_arango(data):
     params = set(data.get("params", {}).get("properties", {}).keys())
     if params != query_bind_vars:
         raise ValueError(
-            f"Bind vars are invalid.\n"
+            "Bind vars are invalid.\n"
             + f"  Extra vars in query: {query_bind_vars - params}.\n"
             + f"  Extra params in schema: {params - query_bind_vars}"
         )

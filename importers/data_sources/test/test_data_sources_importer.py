@@ -11,7 +11,7 @@ from spec.test.helpers import modified_environ
 API_URL = 'http://localhost:5000'
 
 
-def make_importer(data_path, warm_config=True, use_env_data=True):
+def make_importer(data_path, use_env_data=True):
     # Data files are located in the test directory
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -22,18 +22,9 @@ def make_importer(data_path, warm_config=True, use_env_data=True):
     if use_env_data:
         with modified_environ(RES_ROOT_DATA_PATH=test_data_path):
             importer = Importer()
-            # coerce the importer to pick up ROOT_DATA_PATH from the temporary
-            # env. If done after leaving this block, the env var will return to
-            # its previous value.
-            if warm_config:
-                path = importer.get_config_or_fail('ROOT_DATA_PATH')
-                assert path == test_data_path
             return importer
     else:
         importer = Importer()
-        if warm_config:
-            path = importer.get_config_or_fail('API_URL')
-            assert path is not None
         return importer
 
 
@@ -71,19 +62,32 @@ class Test_data_sources_functions(unittest.TestCase):
 
 class Test_data_sources_Importer(unittest.TestCase):
     def test_get_config(self):
+        """
+        The `get_config` method does returns either the 
+        requested config value, or a defult value
+        """
         imp = make_importer('standard')
+        # The `API_URL` key should be defined.
         self.assertIsNotNone(imp.get_config('API_URL', None))
+        # But "foo" not, and None is a good default value signal.
         self.assertIsNone(imp.get_config('foo', None))
-        imp = make_importer('standard', warm_config=False)
-        self.assertIsNotNone(imp.get_config('API_URL', None))
+        # But "foo" not, leave out default value.
+        self.assertIsNone(imp.get_config('foo', None))
+        # Provide a silly default values.
+        # But "foo" not
+        self.assertEquals(imp.get_config('foo', 'silly'), 'silly')
 
     def test_get_config_or_fail(self):
+        """
+        The `get_config_or_fail` method, on the other hand, raises a
+        `KeyError` if the given config key does not exist.
+        """
         imp = make_importer('standard')
+        # The `API_URL` key should be defined.
         self.assertIsNotNone(imp.get_config_or_fail('API_URL'))
+        # But the `foo` key is not, and should raise
         with self.assertRaises(KeyError):
             imp.get_config_or_fail('foo')
-        imp = make_importer('standard', warm_config=False)
-        self.assertIsNotNone(imp.get_config_or_fail('API_URL'))
 
     def test_happy_load(self):
         imp = make_importer('standard')
