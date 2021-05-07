@@ -1,5 +1,6 @@
 """
-Loads data sources into RE.
+Loads canonical (defined in the codebase) or separate (defined elsewhere) 
+documents into the data_sources collection in the Relation Engine (RE).
 
 This is a simple importer, as the data_sources load data is quite simple,
 and also very similar to its ultimate form, requiring little transformation.
@@ -10,7 +11,7 @@ Note that the schema files are located in two places:
       being loaded as a DataSource object
 - spec/collections/data_sources/data_sources_nodes.yaml - replication of the DataSource
       object with the addition of a  _key property; all fields by reference to the
-      definigions in spec/datasets/data_sources
+      definitions in spec/datasets/data_sources
 
 TODO: A DRYer design would be for the schemas in spec/collections to use an allOf to
 extend the base DataSource type in spec/datasets.
@@ -33,6 +34,10 @@ from relation_engine_server.utils.json_validation import (
 
 
 def get_dataset_schema_dir():
+    """
+    Returns the canonical location for the data_sources collection
+    schema files.
+    """
     dir_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(
         dir_path, "../", "../", "spec", "datasets", "data_sources"
@@ -40,19 +45,26 @@ def get_dataset_schema_dir():
 
 
 def get_relative_dir(path):
+    """
+    Utility function to return the full path for a given sub-path
+    relative to the directory this source file resides in.
+    """
     dir_path = os.path.dirname(os.path.realpath(__file__))
     path = [dir_path] + [path]
     return os.path.join(*path)
 
 
 def note(type, message):
+    """
+    Print a nice message to the console, with an icon prefixing the given message.
+    """
     icon = ''
     if type == 'info':
         icon = 'ℹ'
     elif type == 'success':
         icon = '✓'
     elif type == 'warning':
-        icon = '⚠';
+        icon = '⚠'
     elif type == 'error':
         icon = '🐛'
     else:
@@ -62,31 +74,45 @@ def note(type, message):
 
 class Importer(object):
     def __init__(self):
-        pass
+        self.load_config()
 
     def get_config_or_fail(self, key):
-        if not hasattr(self, "_config"):
-            self._configure()
-
+        """
+        Return the value for a given config key, or raise a KeyError if it does not exist.
+        """
         if key not in self._config:
             raise KeyError(f'No such config key: "{key}"')
 
         return self._config[key]
 
     def get_config(self, key, default_value):
-        if not hasattr(self, "_config"):
-            self._configure()
-
+        """
+        Return the value for a given config key, return the given default_value if it does not exist.
+        """
         if key not in self._config:
             return default_value
 
         return self._config[key]
 
-    def _configure(self):
+    def load_config(self):
+        """
+        Loads the standard configuration with the addition of the `ROOT_DATA_PATH`
+        environment variable utilized by the importer to locate the data files.
+        """
         self._config = config.load_from_env(extra_optional=["ROOT_DATA_PATH"])
-        return self._config
 
     def load_data(self, dry_run=False):
+        """
+        Load the data_sources source data files located in `ROOT_DATA_PATH` via the 
+        RE API located at `API_URL`. Data files are validated with the jsonschema
+        located in the path returned by `get_dataset_schema_dir()` defined above.
+
+        The `dry_run` parameter will cause the loading process to stop just shy of 
+        calling the RE API to store the data in the database. This is a useful for
+        validating the data before actual loading, because the loading process is not
+        transactional -- any documents loaded before an error is encountered will 
+        be stored, leaving the collection in an inconsistent state.
+        """
         note('info', 'Loading data')
         note('info', 'Parameters:')
         note('info', f'     API_URL: {self.get_config_or_fail("API_URL")}')
@@ -149,7 +175,9 @@ class Importer(object):
         return True
 
     def save_docs(self, collection, docs, on_duplicate="update"):
-        """  Saves the source_data docs via into the RE database via the RE api"""
+        """  
+        Saves the source_data docs into the RE database via the RE api
+        """
         resp = requests.put(
             f'{self.get_config_or_fail("API_URL")}/api/v1/documents',
             params={
@@ -171,6 +199,11 @@ class Importer(object):
 
 
 def do_import(dry_run=False):
+    """
+    Wraps the loading process, passing the `dry_run` parameter to the 
+    `load_data()` method. It traps exceptions, displaying them and exiting with
+    the exit status code 1.
+    """
     note('info', 'Starting Import')
     importer = Importer()
     try:
@@ -185,6 +218,9 @@ def do_import(dry_run=False):
 
 
 def get_args():
+    """
+    Convenience function to define and parse command line arguments.
+    """
     argparser = argparse.ArgumentParser(description="Load data_sources data")
     argparser.add_argument(
         "--dry-run",
@@ -196,12 +232,20 @@ def get_args():
 
 
 def main():
+    """
+    The canonical main function is the interface between command line usage and 
+    the import process defined above.
+    """
     args = get_args()
     do_import(args.dry_run)
     sys.exit(0)
 
 
 def init():
+    """
+    The init function wraps the standard `main` invocation method, rather than have
+    the code exist out in the open. (Allows for testing of this logic.)
+    """
     if __name__ == "__main__":
         main()
 
