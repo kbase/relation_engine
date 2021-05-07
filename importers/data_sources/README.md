@@ -1,8 +1,10 @@
 # Install data_sources dataset
 
-The script and data within this directory allow one to load the _data sources_ into the RE database. The default RE base url is `http://localhost:5000`, as defined in `importers/utils/config.py`, which can be redefined with the environment variable `RES_API_URL`. 
+The script and data within this directory allow one to load the _data sources_ into the RE database via the RE API. The default RE API base url is `http://localhost:5000`, as defined in `importers/utils/config.py`, which can be redefined with the environment variable `RES_API_URL`.
 
-This script has only been used in development thus far. In this case, the local RE Api container must be started via `make start-ui-dev`, as this starts the services with the `docker-compose.yaml` configuration located in `local-ui-dev`, which initializes all collections.
+A set of data files is located in the `importers/data_sources/data` directory, which will be used unless the `RES_ROOT_DATA_PATH` environment variable is set before calling the importer script.
+
+This script has only been used in development thus far. In this case, the local RE API container must be started via `make start-ui-dev`, as this starts the services with the `docker-compose.yaml` configuration located in `local-ui-dev`, which initializes all collections.
 
 > This document describes a procedure for loading data locally, but does not claim provenance over production data provisioning. This script should work fine for initial load, and can be used for subsequent updates if the script is pointed at a data file which contains just the new documents.
 
