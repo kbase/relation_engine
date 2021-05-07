@@ -28,7 +28,7 @@ def make_importer(data_path, use_env_data=True):
         return importer
 
 
-class Test_data_sources_functions(unittest.TestCase):
+class TestDataSourcesFunctions(unittest.TestCase):
     def test_note(self):
         cases = [
             {
@@ -59,12 +59,11 @@ class Test_data_sources_functions(unittest.TestCase):
                 self.assertEqual(mock_stdout.getvalue(), case['expected'])
 
 
-
-class Test_data_sources_Importer(unittest.TestCase):
+class TestDataSourcesImporter(unittest.TestCase):
     def test_get_config(self):
         """
         The `get_config` method does returns either the 
-        requested config value, or a defult value
+        requested config value, or a default value
         """
         imp = make_importer('standard')
         # The `API_URL` key should be defined.
@@ -127,7 +126,7 @@ class Test_data_sources_Importer(unittest.TestCase):
                       json={'do_not': 'care'}, status=400)
         imp = make_importer('standard')
         with self.assertRaises(RuntimeError):
-            result = imp.load_data(dry_run=False)
+            imp.load_data(dry_run=False)
 
     def test_do_import_dry_run(self):
         do_import(dry_run=True)
