@@ -24,7 +24,7 @@ class Test_Manifest_Schema(unittest.TestCase):
             {
                 # no file list provided
                 "file": "no_file_list",
-                "msg": "'file_list' is a required property",
+                "msg": r"'file_list' is a required property",
             },
             {
                 # a cluster file entry should have a prefix
@@ -34,23 +34,23 @@ class Test_Manifest_Schema(unittest.TestCase):
             {
                 # each file_list entry has to have a path
                 "file": "missing_path",
-                "msg": "'path' is a required property",
+                "msg": r"'path' is a required property",
             },
             {
                 # if the date is not quoted, pyyaml will turn it into a date object. Doh!
                 "file": "date_not_in_quotes",
-                "msg": "datetime.date\(2020, 12, 25\) is not of type 'string'",
+                "msg": r"datetime.date\(2020, 12, 25\) is not of type 'string'",
             },
             {
                 # file format is invalid
                 "file": "invalid_format",
-                "msg": "'txt' is not one of \['tsv', 'csv'\]",
+                "msg": r"'txt' is not one of \['tsv', 'csv'\]",
             },
             {
                 # there must be an indicator of file format
                 "file": "no_file_format",
                 "msg": r"{'data_type': 'edge', 'date': '2020-12-25', 'path': 'edge_data'}"
-                + " is not valid under any of the given schemas",
+                + r" is not valid under any of the given schemas",
             },
         ]
 

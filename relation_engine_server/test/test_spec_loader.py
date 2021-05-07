@@ -202,7 +202,7 @@ class TestSpecLoader(unittest.TestCase):
 
         fake_name = "fake_name/12345"
         # a nonexistent file raises the appropriate error
-        err_msg = f"Collection 'fake_name' does not exist."
+        err_msg = "Collection 'fake_name' does not exist."
         with self.assertRaisesRegex(SchemaNonexistent, err_msg):
             spec_loader.get_schema_for_doc(fake_name, path_only=True)
 

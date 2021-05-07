@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Added support for data_sources collection
+  - collection definition
+  - stored queries (one for all, one filtered by ns)
+  - importer
+  - sample data which can be used to populate RE for testing, etc.
+- Added support to make development alongside a downstream api (e.g. Taxonomy API) easier.
+
 ## [0.0.12] - 2021-01-29
 ### Added
 - In the API, show the source file path or URL when updating the specs

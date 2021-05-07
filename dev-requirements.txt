@@ -1,8 +1,9 @@
 mypy>=0.630
-bandit==1.5.1
+bandit==1.7.0
 mccabe==0.6.1
-flake8==3.5.0
-grequests==0.3.0
-coverage==5.2.1
+flake8==3.9.0
+grequests==0.6.0
+coverage==5.5
 typed-ast>=1.4.0
 black==20.8b1
+responses==0.13.1

@@ -160,8 +160,8 @@ class TestJsonValidation(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, err_msg):
             run_validator(schema_file=test_file, data={})
 
-        # invalid jsonpointer string - note the grammar error is from jsonpointer
-        err_str = "location must starts with /"
+        # invalid jsonpointer string
+        err_str = "Location must start with /"
         json_loc = "start validating here"
         with self.assertRaisesRegex(JsonPointerException, err_str):
             run_validator(schema=test_schema, data={}, validate_at=json_loc)
@@ -271,7 +271,7 @@ class TestJsonValidation(unittest.TestCase):
                     "distance": 3,
                 },
                 "file": "invalid_pattern",
-                "err_str": '"what\'s-the-problem with-this-string\?" does not match .*?',
+                "err_str": r'"what\'s-the-problem with-this-string\?" does not match .*?',
             },
             {
                 "input": {"name": "No_problem_with_this_string", "distance": 3},
@@ -309,7 +309,7 @@ class TestJsonValidation(unittest.TestCase):
             {
                 "input": {"name": "invalid_uri", "home_page": "where is it?"},
                 "file": "invalid_uri",
-                "err_str": "'where is it\?' is not a 'uri'",
+                "err_str": r"'where is it\?' is not a 'uri'",
             },
         ]
 
@@ -350,7 +350,7 @@ class TestJsonValidation(unittest.TestCase):
 
         # pyyaml-specific issue: dates get automatically parsed into datetime objects (doh!)
         file_path = os_path.join(json_validation_dir, "unquoted_date.yaml")
-        err_str = "datetime.date\(2020, 6, 6\) is not of type 'string'"
+        err_str = r"datetime.date\(2020, 6, 6\) is not of type 'string'"
         with self.assertRaisesRegex(ValidationError, err_str):
             run_validator(
                 schema=schema_arg,

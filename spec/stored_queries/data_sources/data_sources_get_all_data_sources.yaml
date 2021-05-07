@@ -1,0 +1,15 @@
+# Get all data sources matching the given type
+name: data_sources_get_all_data_sources
+params:
+  type: object
+  required: [type]
+  properties:
+    type:
+      type: string
+      title: Type
+      description: The type of namespace with which to filter the data sources
+query_prefix: WITH data_sources_nodes
+query: |
+  FOR d IN data_sources_nodes
+    FILTER d.type == @type
+    RETURN d

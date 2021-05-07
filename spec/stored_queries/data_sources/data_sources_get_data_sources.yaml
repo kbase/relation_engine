@@ -1,0 +1,22 @@
+# Get 0 or more data sources matching the given type, optionally
+# filtered by an array of namespace ids
+name: data_sources_get_data_sources
+params:
+  type: object
+  required: [type, ns]
+  properties:
+    type:
+      type: string
+      title: Type
+      description: The type of namespace with which to filter the data sources
+    ns:
+      type: array
+      title: Namespace
+      description: The taxonomy namespaces with which to filter the data sources
+      items:
+        type: string
+query_prefix: WITH data_sources_nodes
+query: |
+  FOR d IN data_sources_nodes
+    FILTER d.type == @type && d.ns in @ns
+    RETURN d

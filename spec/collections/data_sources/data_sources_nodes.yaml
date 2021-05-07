@@ -1,0 +1,58 @@
+name: data_sources_nodes
+type: vertex
+delta: false
+
+indexes:
+  - type: persistent
+    fields: [ type, ns ]
+
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  title: Data Source
+  description: |
+    A description of an external data source.
+    Data sources are external entities, usually governed and managed by an organization,
+    with data repositories, data policies, and specific data structures.
+    (e.g. taxonomy, ontology), individual data sources may provide data beyond this
+    general structure; the data source definition must provide a description
+    of those additional fields so that they can be utilized by interfaces.
+  type: object
+  additionalProperties: false
+  required:
+    - _key
+    - ns
+    - type
+    - title
+    - short_title
+    - data_url
+    - home_url
+    - logo_url
+    - license
+    - item_link
+    - citation
+    - additional_fields
+  properties:
+    _key:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/ns
+    ns:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/ns
+    type:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/type
+    title:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/title
+    short_title:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/short_title
+    data_url:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/data_url
+    home_url:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/home_url
+    logo_url:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/logo_url
+    license:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/license
+    item_link:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/item_link
+    citation:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/citation
+    additional_fields:
+      $ref: ../../datasets/data_sources/definitions.yaml#definitions/DataSource/properties/additional_fields

@@ -13,9 +13,7 @@ jobs:
       env:
         GITHUB_ACTIONS_CI: 1
       run: |
-        docker-compose build
-        docker-compose run re_api sh scripts/run_tests.sh
-        docker-compose down --remove-orphans
+        make test
 
   docker_build_and_push:
     runs-on: ubuntu-latest

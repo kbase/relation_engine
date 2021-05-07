@@ -17,3 +17,15 @@ Global env vars:
 RES_ROOT_DATA_PATH=/path/to/djornl_data \
 python -m importers.djornl.parser
 ```
+
+### data_sources
+
+```sh
+export RES_ROOT_DATA_PATH=/path/to/data_sources
+export RES_API_URL=re_api_url
+python -m importers.data_sources.importer
+```
+
+Note that `RES_ROOT_DATA_PATH` defaults to `importers/data_sources/data` and `RES_API_URL` defaults to `http://localhost:5000`, so both will may need to be overridden depending on the circumstance.
+
+See [the readme](data_sources/README.md) and the source code for further details.
