@@ -1,0 +1,42 @@
+name: GAZ_edges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: GAZ_edges
+    type: object
+    description: A entry for edges in the Gazetteer Ontology (GAZ) hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+        examples:
+          - GAZ:00563959::GAZ:00562535::located_in
+          - GAZ:00514533::GAZ:00513052::located_in
+      type:
+        type: string
+        description: GAZ edge type
+        examples:
+          - located_in
+      from:
+        type: string
+        description: GAZ id
+        examples:
+          - GAZ:00563959
+      to:
+        type: string
+        title: GAZ id
+        examples:
+          - GAZ:00562535
+    required:
+      - id
+      - type
+      - from
+      - to
