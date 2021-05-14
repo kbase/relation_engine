@@ -2,4 +2,4 @@ name: gaz_ontology
 category: ontology
 title:  Gazetteer Ontology
 home_url: "http://environmentontology.github.io/gaz/"
-data_url: "http://environmentontology.github.io/gaz/"
+data_url: "http://purl.obolibrary.org/obo/gaz.obo"

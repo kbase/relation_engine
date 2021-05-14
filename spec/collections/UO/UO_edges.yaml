@@ -1,0 +1,41 @@
+name: UO_edges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: UO_edges
+    type: object
+    description: A entry for edges in the Unit Ontology (UO) hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+        examples:
+          - UO:0000271::UO:0000270::is_a
+      type:
+        type: string
+        description: UO edge type
+        examples:
+          - is_a
+      from:
+        type: string
+        description: UO id
+        examples:
+          - UO:0000271
+      to:
+        type: string
+        title: UO id
+        examples:
+          - UO:0000270
+    required:
+      - id
+      - type
+      - from
+      - to

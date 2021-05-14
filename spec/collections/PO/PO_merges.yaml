@@ -1,0 +1,42 @@
+name: PO_merges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: PO_merges
+    type: object
+    description: A entry for merge edges in the Plant Ontology (PO) hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+        examples:
+          - PO:00563959::PO:00562535::consider
+      type:
+        type: string
+        description: PO merge edge type
+        examples:
+          - consider
+          - replaced_by
+      from:
+        type: string
+        description: PO id
+        examples:
+          - PO:00563959
+      to:
+        type: string
+        title: PO id
+        examples:
+          - PO:00562535
+    required:
+      - id
+      - type
+      - from
+      - to
