@@ -11,6 +11,7 @@ from spec.test.helpers import modified_environ
 API_URL = 'http://localhost:5000'
 
 
+
 def make_importer(data_path, use_env_data=True):
     # Data files are located in the test directory
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,6 +31,9 @@ def make_importer(data_path, use_env_data=True):
 
 class TestDataSourcesFunctions(unittest.TestCase):
     def test_note(self):
+        """
+        Tests all note styles, and a non-existent style.
+        """
         cases = [
             {
                 'input': ['info', 'hi'],
@@ -88,24 +92,36 @@ class TestDataSourcesImporter(unittest.TestCase):
         with self.assertRaises(KeyError):
             imp.get_config_or_fail('foo')
 
-    def test_happy_load(self):
+    def test_load_data_dry_run(self):
+        """
+        A dry run load using standard test data.
+        """
         imp = make_importer('standard')
         self.assertTrue(imp)
         result = imp.load_data(dry_run=True)
         self.assertTrue(result)
 
-    def test_happy_load_default_data_dir(self):
-        """Create importer which uses canonical data"""
+    def test_load_data_dry_run_default_data_dir(self):
+        """
+        A dry run load which uses the canonical (built-in) data
+        """
         imp = make_importer('standard', use_env_data=False)
         result = imp.load_data(dry_run=True)
         self.assertTrue(result)
 
-    def test_happy_load_bad_dir(self):
+    def test_load_data_dry_run_bad_dir(self):
+        """
+        A dry run load which uses a bad data loading directory.
+        (Really a test of our test helper function.)
+        """
         imp = make_importer('bad_dir')
-        result = imp.load_data(dry_run=True)
-        self.assertFalse(result)
+        with self.assertRaises(Exception):
+            imp.load_data(dry_run=True)
 
-    def test_bad_ns(self):
+    def test_load_data_bad_ns(self):
+        """
+        Dry and non-dry runs using load data with bad namespaces (ns)
+        """
         imp = make_importer('bad_ns')
         result = imp.load_data(dry_run=True)
         self.assertFalse(result)
@@ -113,7 +129,10 @@ class TestDataSourcesImporter(unittest.TestCase):
         self.assertFalse(result)
 
     @responses.activate
-    def test_save_docs(self):
+    def test_load_data_non_dry_run_mocked(self):
+        """
+        Non-dry run load using a mocked RE API endpoint which should succeed.
+        """
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=200)
         imp = make_importer('standard')
@@ -121,7 +140,11 @@ class TestDataSourcesImporter(unittest.TestCase):
         self.assertTrue(result)
 
     @responses.activate
-    def test_save_docs_error(self):
+    def test_load_data_non_dry_run_mocked_error_response(self):
+        """
+        Non-dry run load using a moocked RE API endpoint which
+        should fail.
+        """
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=400)
         imp = make_importer('standard')
@@ -134,6 +157,9 @@ class TestDataSourcesImporter(unittest.TestCase):
 
     @responses.activate
     def test_do_import_not_dry_run(self):
+        """
+
+        """
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=200)
         do_import(dry_run=False)
@@ -148,27 +174,27 @@ class TestDataSourcesImporter(unittest.TestCase):
         self.assertEqual(se.exception.code, 1)
 
     def test_main_dry_run(self):
-        my_get_args = MyArgs(True)
+        my_get_args = MyArgs(True, True)
         with patch('importers.data_sources.importer.get_args', return_value=my_get_args) as mock_get_args:
             with self.assertRaises(SystemExit) as se:
                 main()
             self.assertEqual(se.exception.code, 0)
 
     def test_get_args_(self):
-        my_get_args = MyArgs(True)
-        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args) as mock_parse_args:
+        my_get_args = MyArgs(True, True)
+        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
             args = get_args()
             self.assertEqual(args.dry_run, True)
 
-        my_get_args = MyArgs(False)
-        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args) as mock_parse_args:
+        my_get_args = MyArgs(False, True)
+        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
             args = get_args()
             self.assertEqual(args.dry_run, False)
 
     def test__main__dry_run(self):
         from importers.data_sources import importer
-        my_get_args = MyArgs(True)
-        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args) as mock_parse_args:
+        my_get_args = MyArgs(True, True)
+        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
             with patch.object(importer, '__name__', '__main__'):
                 with self.assertRaises(SystemExit) as se:
                     init()
@@ -182,6 +208,7 @@ class TestDataSourcesImporter(unittest.TestCase):
 
 
 class MyArgs:
-    def __init__(self, dry_run):
+    def __init__(self, dry_run, quiet):
         self.dry_run = dry_run
+        self.quiet = quiet
 

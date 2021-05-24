@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - importer
   - sample data which can be used to populate RE for testing, etc.
 - Added support to make development alongside a downstream api (e.g. Taxonomy API) easier.
+- Added support for integration tests
+  - add integration tests for data_sources importing
 
 ## [0.0.12] - 2021-01-29
 ### Added

@@ -1,5 +1,5 @@
 """
-Loads canonical (defined in the codebase) or separate (defined elsewhere) 
+Loads canonical (defined in the codebase) or separate (defined elsewhere)
 documents into the data_sources collection in the Relation Engine (RE).
 
 This is a simple importer, as the data_sources load data is quite simple,
@@ -33,6 +33,7 @@ from relation_engine_server.utils.json_validation import (
 )
 
 QUIET = False
+ARANGO_URL = 'http://localhost:8529'
 
 
 def get_dataset_schema_dir():
@@ -46,13 +47,14 @@ def get_dataset_schema_dir():
     )
 
 
-def get_relative_dir(relative_path):
+def get_relative_dir(path):
     """
     Utility function to return the full path for a given sub-path
     relative to the directory this source file resides in.
     """
-    this_dir_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(this_dir_path, relative_path)
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = [dir_path] + [path]
+    return os.path.join(*path)
 
 
 def note(note_type, message):
@@ -75,27 +77,22 @@ def note(note_type, message):
     print(f'[importer] {icon} {message}')
 
 
-class Importer(object):
+class Emptyer(object):
     def __init__(self):
         self.load_config()
 
     def get_config_or_fail(self, key):
         """
-        Return the value for a given config key, or raise a KeyError if it does not
-        exist.
+        Return the value for a given config key, or raise a KeyError if it does not exist.
         """
         if key not in self._config:
             raise KeyError(f'No such config key: "{key}"')
-
-        note('info', self._config)
-        note('info', os.environ)
 
         return self._config[key]
 
     def get_config(self, key, default_value):
         """
-        Return the value for a given config key, return the given default_value if it
-        does not exist.
+        Return the value for a given config key, return the given default_value if it does not exist.
         """
         if key not in self._config:
             return default_value
@@ -111,14 +108,14 @@ class Importer(object):
 
     def load_data(self, dry_run=False):
         """
-        Load the data_sources source data files located in `ROOT_DATA_PATH` via the 
+        Load the data_sources source data files located in `ROOT_DATA_PATH` via the
         RE API located at `API_URL`. Data files are validated with the jsonschema
         located in the path returned by `get_dataset_schema_dir()` defined above.
 
-        The `dry_run` parameter will cause the loading process to stop just shy of 
+        The `dry_run` parameter will cause the loading process to stop just shy of
         calling the RE API to store the data in the database. This is a useful for
         validating the data before actual loading, because the loading process is not
-        transactional -- any documents loaded before an error is encountered will 
+        transactional -- any documents loaded before an error is encountered will
         be stored, leaving the collection in an inconsistent state.
         """
         note('info', 'Loading data')
@@ -128,20 +125,16 @@ class Importer(object):
 
         is_error = False
 
+        # TODO: just get all files in the directory
         default_data_dir = get_relative_dir('data')
         env_data_dir = self.get_config('ROOT_DATA_PATH', None)
         if env_data_dir is not None:
-            note('info',
-                 '     (Taking data dir from environment variable '
-                 '"RES_ROOT_DATA_PATH")')
+            note('info', '     (Taking data dir from environment variable "RES_ROOT_DATA_PATH")')
             data_dir = env_data_dir
         else:
             note('info', '     (Taking data dir from default)')
             data_dir = default_data_dir
         note('info', f'     data_dir: "{data_dir}"')
-
-        if not os.path.isdir(data_dir):
-            raise Exception(f'data directory does not exist: {data_dir}')
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
@@ -209,18 +202,40 @@ class Importer(object):
             note('info', f'     {key}: {value}')
         return resp
 
+    def empty_docs(self, collection):
+        """
+        Removes all docs from the given collection
+        """
+        resp = requests.put(
+            f'{self.get_config_or_fail("API_URL")}/api/v1/documents',
+            params={
+                "collection": collection,
+                "on_duplicate": on_duplicate
+            },
+            headers={
+                "Authorization": self.get_config_or_fail("AUTH_TOKEN")
+            },
+            data="\n".join(json.dumps(d) for d in docs),
+        )
+        if not resp.ok:
+            raise RuntimeError(resp.text)
+
+        note('success', f"Saved docs to collection {collection}!")
+        for key, value in resp.json().items():
+            note('info', f'     {key}: {value}')
+        return resp
+
 
 def do_import(dry_run=False):
     """
-    Wraps the loading process, passing the `dry_run` parameter to the 
+    Wraps the loading process, passing the `dry_run` parameter to the
     `load_data()` method. It traps exceptions, displaying them and exiting with
     the exit status code 1.
     """
     note('info', 'Starting Import')
     importer = Importer()
     try:
-        if not importer.load_data(dry_run=dry_run):
-            sys.exit(1)
+        importer.load_data(dry_run=dry_run)
     except Exception as err:
         note('error', "Unhandled exception:")
         note('error', str(err))
@@ -250,7 +265,7 @@ def get_args():
 
 def main():
     """
-    The canonical main function is the interface between command line usage and 
+    The canonical main function is the interface between command line usage and
     the import process defined above.
     """
     global QUIET
