@@ -3,8 +3,7 @@ version: '3'
 # This docker-compose is for developer convenience, not for running in production.
 networks:
   kbase-dev:
-    external:
-      name: kbase-dev
+    name: kbase-dev
 services:
 
   # For running the Flask server and tests
