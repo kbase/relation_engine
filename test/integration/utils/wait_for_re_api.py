@@ -11,7 +11,7 @@ from test.integration.utils.clock import Clock
 TIMEOUT = 60
 POLL_INTERVAL = 0.5
 
-RE_API_URL = os.environ.get('RE_API_URL')
+RE_API_URL = os.environ.get("RE_API_URL")
 if RE_API_URL is None:
     print('the "RE_API_URL" environment variable is required')
     sys.exit(1)
@@ -21,11 +21,11 @@ def wait_for_re_api() -> None:
     """wait for a service or list of services to start up"""
     TIMEOUT
     POLL_INTERVAL
-    print(f'Waiting for RE_API to be available at {RE_API_URL}...', end='')
+    print(f"Waiting for RE_API to be available at {RE_API_URL}...", end="")
     timeout = int(time.time()) + TIMEOUT
     clock = Clock()
     while True:
-        print(clock.tick(), end='\b')
+        print(clock.tick(), end="\b")
         try:
             resp = requests.get(RE_API_URL)
             resp.raise_for_status()

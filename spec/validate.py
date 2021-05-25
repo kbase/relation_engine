@@ -105,7 +105,7 @@ def validate_all_by_type(validation_base_dir=None):
     """
 
     n_errors = []
-    print(f'validate_all_by_type, {validation_base_dir}')
+    print(f"validate_all_by_type, {validation_base_dir}")
     for schema_type in sorted(_VALID_SCHEMA_TYPES.keys()):
         try:
             if validation_base_dir is None:
