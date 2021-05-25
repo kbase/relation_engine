@@ -10,7 +10,7 @@ unit-tests: dev-network
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
-integration-tests: dev-network start-dev run-integration-tests stop-dev
+integration-tests: dev-network start-dev run-integration-tests
 
 run-integration-tests:
 	cd test/integration && \
