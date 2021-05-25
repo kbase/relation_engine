@@ -10,12 +10,10 @@ unit-tests: dev-network
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
-integration-tests: dev-network start-dev run-integration-tests
+integration-tests: dev-network start-dev run-integration-tests stop-dev
 
 run-integration-tests:
-	cd test/integration && \
-	docker-compose run testrunner && \
-	docker-compose down
+	cd test/integration && docker-compose run testrunner
 
 start-dev:
 	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
