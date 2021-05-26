@@ -1,15 +1,16 @@
+import io
 import os
 import unittest
-import io
-import responses
 from unittest.mock import patch
+
+import responses
+
 from importers.data_sources.importer import \
     Importer, note, do_import, main, get_args, \
     init, get_relative_dir
 from spec.test.helpers import modified_environ
 
 API_URL = 'http://localhost:5000'
-
 
 
 def make_importer(data_path, use_env_data=True):
@@ -58,9 +59,15 @@ class TestDataSourcesFunctions(unittest.TestCase):
         ]
 
         for case in cases:
-            with patch('sys.stdout', new = io.StringIO()) as mock_stdout:
+            with patch('sys.stdout', new=io.StringIO()) as mock_stdout:
                 note(*case['input'])
                 self.assertEqual(mock_stdout.getvalue(), case['expected'])
+
+
+class MyArgs:
+    def __init__(self, dry_run, quiet):
+        self.dry_run = dry_run
+        self.quiet = quiet
 
 
 class TestDataSourcesImporter(unittest.TestCase):
@@ -158,7 +165,7 @@ class TestDataSourcesImporter(unittest.TestCase):
     @responses.activate
     def test_do_import_not_dry_run(self):
         """
-
+        Non-dry-run load should be happy with a 200 response
         """
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=200)
@@ -167,6 +174,10 @@ class TestDataSourcesImporter(unittest.TestCase):
 
     @responses.activate
     def test_do_import_exits_with_error(self):
+        """
+        Non-dry-run load should exit with an error return code (1) if
+        the attempt yields a 400 error response.
+        """
         responses.add(responses.PUT, f'{API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=400)
         with self.assertRaises(SystemExit) as se:
@@ -174,26 +185,40 @@ class TestDataSourcesImporter(unittest.TestCase):
         self.assertEqual(se.exception.code, 1)
 
     def test_main_dry_run(self):
-        my_get_args = MyArgs(True, True)
-        with patch('importers.data_sources.importer.get_args', return_value=my_get_args) as mock_get_args:
+        """
+        Calling the main() entry point with with a dry run requested,
+        using the default data path should succeed.
+        """
+        my_get_args = MyArgs(dry_run=True, quiet=True)
+        with patch('importers.data_sources.importer.get_args',
+                   return_value=my_get_args) as mock_get_args:
             with self.assertRaises(SystemExit) as se:
                 main()
             self.assertEqual(se.exception.code, 0)
 
     def test_get_args_(self):
-        my_get_args = MyArgs(True, True)
-        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
-            args = get_args()
-            self.assertEqual(args.dry_run, True)
+        """
+        Ensure that the MyArgs helper class works correctly.
+        """
+        cases = []
+        for dry_run in [True, False]:
+            for quiet in [True, False]:
+                cases.append({'dry_run': dry_run, 'quiet': quiet})
 
-        my_get_args = MyArgs(False, True)
-        with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
-            args = get_args()
-            self.assertEqual(args.dry_run, False)
+        for case in cases:
+            my_get_args = MyArgs(dry_run=case['dry_run'], quiet=case['quiet'])
+            with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
+                args = get_args()
+                self.assertEqual(args.dry_run, case['dry_run'])
+                self.assertEqual(args.quiet, case['quiet'])
 
     def test__main__dry_run(self):
+        """
+        Ensure that the init() entry point, when invoked for dry run and
+        using the default data files, succeeds.
+        """
         from importers.data_sources import importer
-        my_get_args = MyArgs(True, True)
+        my_get_args = MyArgs(dry_run=True, quiet=True)
         with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
             with patch.object(importer, '__name__', '__main__'):
                 with self.assertRaises(SystemExit) as se:
@@ -201,14 +226,12 @@ class TestDataSourcesImporter(unittest.TestCase):
                 self.assertEqual(se.exception.code, 0)
 
     def test_get_relative_dir(self):
+        """
+        Ensure that the helper function "get_relative_dir" finds a
+        directory relative to the parent directory of the current script
+        (mocked).
+        """
         from importers.data_sources import importer
         with patch.object(importer, '__file__', '/foo/file.py'):
             result = get_relative_dir('bar')
             self.assertEqual(result, '/foo/bar')
-
-
-class MyArgs:
-    def __init__(self, dry_run, quiet):
-        self.dry_run = dry_run
-        self.quiet = quiet
-
