@@ -13,7 +13,7 @@ unit-tests: dev-network
 integration-tests: dev-network start-dev run-integration-tests stop-dev
 
 run-integration-tests:
-	cd test/integration && docker-compose run testrunner
+	cd test/integration && docker-compose run --rm testrunner
 
 start-dev:
 	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
@@ -32,3 +32,6 @@ shell: dev-network
 reset:
 	docker-compose --rmi all -v
 	docker-compose build
+
+interpreter-container:
+	cd dev/interpreter && sh build.sh
