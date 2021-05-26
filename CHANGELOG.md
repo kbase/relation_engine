@@ -8,14 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added support for data_sources collection
+- Support for data_sources collection
   - collection definition
   - stored queries (one for all, one filtered by ns)
   - importer
   - sample data which can be used to populate RE for testing, etc.
-- Added support to make development alongside a downstream api (e.g. Taxonomy API) easier.
-- Added support for integration tests
+- Support to make development alongside a downstream api (e.g. Taxonomy API) easier.
+- Support for integration tests
   - add integration tests for data_sources importing
+- Python docker container for usage with PyCharm or other IDEs which can use a Python docker container with an interpreter.
 
 ## [0.0.12] - 2021-01-29
 ### Added

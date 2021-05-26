@@ -5,7 +5,6 @@ networks:
   kbase-dev:
     name: kbase-dev
 services:
-
   # For running integration tests
   testrunner:
     build:

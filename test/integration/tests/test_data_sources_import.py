@@ -1,9 +1,15 @@
-import subprocess
-import requests
 import json
-import sys
 import os
+import subprocess
+import sys
 import unittest
+import yaml
+
+import requests
+
+from common.json_validation import (
+    get_schema_validator,
+)
 
 #
 # We are already running Python, of course, but we need to invoke another
@@ -97,8 +103,8 @@ def query(token, collection_type, namespaces):
     )
 
 
-def fetch_data_sources(token, source_type):
-    return query(token, source_type, None)
+def fetch_data_sources(token, source_type, namespaces=None):
+    return query(token, source_type, namespaces)
 
 
 def check_response(response):
@@ -119,6 +125,17 @@ def do_import(token, data_path=None):
     subprocess.run(command_args, check=True, env=env)
 
 
+def get_collection_schema_dir(collection):
+    """
+    Returns the canonical location for the data_sources collection
+    schema files.
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(
+        dir_path, "..", "..", "..", "spec", "collections", collection
+    )
+
+
 # The Tests
 
 
@@ -128,13 +145,23 @@ class DataSourcesTests(unittest.TestCase):
         collection_stats = check_response(collection_count()).json()
         self.assertEqual(collection_stats["count"], count)
 
-    def assert_data_sources_count(self, source_type, count):
+    def assert_data_sources_in_re(self, source_type, count, namespaces=None):
         all_data_sources = check_response(
-            fetch_data_sources("non_admin_token", source_type)
+            fetch_data_sources("non_admin_token", source_type, namespaces)
         ).json()
         self.assertEqual(all_data_sources["count"], count)
         self.assertFalse(all_data_sources["has_more"])
         self.assertEqual(len(all_data_sources["results"]), count)
+        # now apply the jsonschema.
+        spec_path = os.path.join(get_collection_schema_dir("data_sources"),
+                                   "data_sources_nodes.yaml")
+        validator = get_schema_validator(schema_file=spec_path, validate_at="/schema")
+        # Expect each doc to be just like uploaded, with the exception of keys
+        # added by arangodb (_id, _rev) and by RE (updated_at).
+        for data_source in all_data_sources["results"]:
+            for extra_key in ['_id', '_rev', 'updated_at']:
+                del data_source[extra_key]
+            validator.validate(instance=data_source)
 
     def assert_will_fail(self, fun):
         expected_code = 1
@@ -148,54 +175,107 @@ class DataSourcesTests(unittest.TestCase):
 
     # Tests
     def test_import_admin(self):
+        """
+        Ensures that a normal import succeeds and that the api fetches the expected
+        items.
+        Note that the counts being asserted are based on knowledge of the
+        data being imported.
+        """
         check_response(clear_collection())
         self.assert_collection_count(0)
         do_import("admin_token")
         self.assert_collection_count(6)
-        self.assert_data_sources_count("taxonomy", 4)
-        self.assert_data_sources_count("ontology", 2)
+        self.assert_data_sources_in_re("taxonomy", 4)
+        self.assert_data_sources_in_re("ontology", 2)
+        # exercise the api for subsets of sources
+        self.assert_data_sources_in_re("taxonomy", 2, ["gtdb", "ncbi_taxonomy"])
+        self.assert_data_sources_in_re("ontology", 1, ["envo_ontology"])
+        # finally, validate actual returned content:
+        self.assert_data_sources_in_re("taxonomy", 4)
+        self.assert_data_sources_in_re("ontology", 2)
+
+    def test_import_admin_query_subset(self):
+        """
+        Ensures that a normal import succeeds.
+        Note that the counts being asserted are based on knowledge of the
+        data being imported.
+        """
+        check_response(clear_collection())
+        self.assert_collection_count(0)
+        do_import("admin_token")
+        self.assert_collection_count(6)
+        self.assert_data_sources_in_re("taxonomy", 4)
+        self.assert_data_sources_in_re("ontology", 2)
 
     def test_import_non_admin(self):
+        """
+        Ensure that an attempt to import with a valid but non-admin account fails.
+        """
+
         def importer():
             do_import("non_admin_token")
 
         self.assert_will_fail(importer)
 
     def test_import_invalid_token(self):
+        """
+        Ensure that an attempt to import with an invalid token fails.
+        """
+
         def importer():
             do_import("invalid_token")
 
         self.assert_will_fail(importer)
 
     def test_import_no_token(self):
+        """
+        Ensure that an attempt to import without a token fails.
+        """
+
         def importer():
             do_import("")
 
         self.assert_will_fail(importer)
 
     def test_import_alternate_data(self):
+        """
+        Ensure that an attempt to import with a different, valid data source
+        succeeds.
+        """
         check_response(clear_collection())
         self.assert_collection_count(0)
         do_import("admin_token", get_relative_dir("data/data_sources/good"))
         self.assert_collection_count(3)
-        self.assert_data_sources_count("taxonomy", 2)
-        self.assert_data_sources_count("ontology", 1)
+        self.assert_data_sources_in_re("taxonomy", 2)
+        self.assert_data_sources_in_re("ontology", 1)
 
     def test_import_bad_data(self):
+        """
+        Ensure that an attempt to import with a invalid data fails.
+        """
+
         def importer():
             do_import("admin_token", get_relative_dir("data/data_sources/bad"))
 
         self.assert_will_fail(importer)
 
     def test_import_alternate_no_data(self):
+        """
+        Ensure that an attempt to import with an empty directory succeeds, but
+        creates not documents.
+        """
         check_response(clear_collection())
         self.assert_collection_count(0)
         do_import("admin_token", get_relative_dir("data/data_sources/none"))
         self.assert_collection_count(0)
-        self.assert_data_sources_count("taxonomy", 0)
-        self.assert_data_sources_count("ontology", 0)
+        self.assert_data_sources_in_re("taxonomy", 0)
+        self.assert_data_sources_in_re("ontology", 0)
 
     def test_import_bad_directory(self):
+        """
+        Ensure that an attempt to import with a non-existent data directory fails.
+        """
+
         def importer():
             do_import(
                 "admin_token", get_relative_dir("data/data_sources/does_not_exist")

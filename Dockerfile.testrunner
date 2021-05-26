@@ -5,16 +5,18 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG BRANCH=develop
 
+# Note that we use a specific subset of dependencies, just enough to support
+# the integration tests.
 COPY test/integration/requirements.txt /tmp/
-WORKDIR /app
 
 # Install dependencies
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY importers /app
-COPY client_src /app
-COPY test /app
+WORKDIR /app
+
+# Also note that we don't copy any source files. This image is always run with the current repo
+# mounted at /app.
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/kbase/relation_engine" \
