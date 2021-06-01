@@ -52,20 +52,24 @@ oneOf:
     title: ATRM TF to Target LitCurated 01082020 TranscriptionFactorToGene
     description: Contains literature mined and manually curated TF regulatory interactions for A.thaliana from 1701 TFFs from PlantTFDB 2.0 and 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Downloaded from http://atrm.cbi.pku.edu.cn/download.php
 
-  - const       : 'Metabolic_AraCyc_Gene_to_Gene'
-    title       : 'AraCyc_Gene_to_Gene'
-    description : "AraCyc.  GeneA connects to GeneB if they are both enzymes and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1.  Date accessed 03/18/2021.  All enzymatic reactions and associated genes (enzymes) and compounds were downloaded from AraCyc as smarttables, and transformed by custom R script to generate the appropriate network format linking gene to gene based on intermediary compounds.  Bringing to-spec, 322 non-standard edges were removed and 3,243 duplicates were removed."
-  - const       : 'GO'
-    title       : 'Athal_GOSemSim_BP_WangResCombined.score0.3'
-    description : "GO networks are Gene-Gene networks where an edge indicates that two genes are similar to each other based on shared GO terms.  D.Kainer used the GoSemSim R package to get pairwise similarity between all GO annotated genes.  Only GO annotations with solid evidence codes were used. The following GO codes were dropped: badcodes <- c(IEA,ISS,NAS,ND,RCA) Two Semantic Similarity measures were used: 1. Wang: a graph-based measure 2. Resnik: a simple Information Content based measure.  The average was used as the final score."
-  - const       : 'PPI_At_PPI_6merged'
-    title       : 'At_PPI_6merged'
-    description : "Made by taking the union of 6 different PPI networks: AraNet2 LC, AraNet2 HT, AraPPInet2 0.60, BIOGRID 4.3.194 physical, AtPIN, Mentha.  These 6 were all relatively good scoring with GOintersect. StringDB scored badly so was not included. dkainer (4-26-2021)"
-  - const       : 'Knockout_Oellrich_2015_supp9_Athal_gene_gene_phenosemsim'
-    title       : 'Oellrich_2015_supp9_Athal_gene-gene-phenosemsim'
-    description : "This is a network provided in the paper Oellrich 2015.  The study took the experimentally known phenotypes of over 2000 mutant konockout lines from Lloyd 2012 paper, and annotated them using the PATO trait ontology system. They then ran semantic similarity pairwise between each mutated gene resulting in a network of about 450,000 edges where an edge shows that two knocked out genes cause a phenotype that is semantically similar (0 > weight >= 1).  Uploaded by DKainer on Nov 16, 2020."
-  - const       : 'Regulation_Plantregmap_predicted_merged_Ath_minscore3_unweighted'
-    title       : 'Plantregmap_predicted_merged_Ath.minscore3_unweighted'
-    description : "Downloaded TF-to-gene data from http://plantregmap.cbi.pku.edu.cn/download.php#networks.  Contains predicted TF-Target relationships based on motifs, algorithms, ChipSeq. Plus some lit curated edges..  DK removed all Lit curated edges and then gave one point to each line of evidence (e.g. Motif, TFBS, ChipSeq...) for an edge. Then summed them up to give an edge weight..  Highest scoring regulatory edges have 5. Lowest scoring have 1.  Networks are named for their score threshold. e.g. minscore3 means there were atleast 3 supporting lines of evidence for the TF-Gene relationship."
+  - const       : "GO"
+    title       : "GO"
+    description : "GeneA connects to GeneB if the two genes have semantically similar GO terms (with a similarity score > 0). This network is used to evaluate other networks for biological functional content. DOI: [TODO]"
+
+  - const       : "Knockout"
+    title       : "Knockout"
+    description : "GeneA connects to GeneB if the phenotypic effect of knocking out GeneA is similar to the phenotypic effect of knocking out GeneB. Similarity is based on Phenotype Ontology semantic similarity. DOI: https://doi.org/10.1186/s13007-015-0053-y"
+
+  - const       : "Metabolic-AraCyc"
+    title       : "Metabolic-AraCyc"
+    description : "GeneA connects to GeneB if they are both enzymes and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1. DOI: [TODO]"
+
+  - const       : "PPI-6merged"
+    title       : "PPI-6merged"
+    description : "GeneA connects to GeneB if their protein products have been shown to bind to interact with each other, typically through experimental evidence. The PPI-6merged network is the union of 6 different A.thaliana PPI networks: AraNet2 LC, AraNet2 HT, AraPPInet2 0.60, BIOGRID 4.3.194 physical, AtPIN, Mentha. These 6 were all relatively high scoring with GOintersect. DOI: [TODO]"
+
+  - const       : "Regulation-ATRM"
+    title       : "Regulation-ATRM"
+    description : "GeneA connects to GeneB if GeneA is a Transcription Factor (TF) that is shown to interact with GeneB (which may or may not be a TF). This dataset contains literature mined and manually curated TF regulatory interactions for A.thaliana. Started from 1701 TFs from PlantTFDB 2.0 and retrieved 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Final result is 1431 confirmed TF regulatory interactions, of which 637 are TF-TF. Data origin:  http://atrm.cbi.pku.edu.cn/download.php DOI: [TODO]"
 
 
