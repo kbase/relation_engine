@@ -14,6 +14,7 @@
 /tmp/
 coverage_report/
 .coverage
+.coverage.*
 *.egg-info/
 
 # Spec archives
