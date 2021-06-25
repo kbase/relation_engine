@@ -1,0 +1,185 @@
+[
+    {
+        "ns": "ncbi_taxonomy",
+        "type": "taxonomy",
+        "title": "National Center for Biotechnology Information",
+        "short_title": "NCBI",
+        "data_url": "ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/",
+        "home_url": "https://www.ncbi.nlm.nih.gov/taxonomy",
+        "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/ncbi/logo-51-64.png",
+        "license": null,
+        "item_link": {
+            "url_template": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={{id}}",
+            "label": "NCBI Taxonomy"
+        },
+        "citation": "Schoch CL, et al. NCBI Taxonomy: a comprehensive update on curation, resources and tools. Database (Oxford). 2020: baaa062. [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/32761142)\n\nSayers EW, et al. GenBank. Nucleic Acids Res. 2019. 47(D1):D94-D99. [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/30365038)",
+        "additional_fields": [
+            {
+                "id": "ncbi_taxon_id",
+                "type": "number",
+                "label": "NCBI ID",
+                "tooltip": "ID for this taxon at NCBI",
+                "description": ""
+            },
+            {
+                "id": "gencode",
+                "type": "number",
+                "label": "Genetic Code",
+                "tooltip": "NCBI Genetic code",
+                "description": ""
+            },
+            {
+                "id": "aliases",
+                "type": "array<alias>",
+                "label": "Aliases",
+                "tooltip": "Aliases for this taxon",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "ns": "gtdb",
+        "type": "taxonomy",
+        "title": "Genome Taxonomy Database",
+        "short_title": "GTDB",
+        "data_url": "https://data.ace.uq.edu.au/public/gtdb/data/releases/",
+        "home_url": "https://gtdb.ecogenomic.org",
+        "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/gtdb/logo-128-64.png",
+        "license": {
+            "url": "http://creativecommons.org/licenses/by-sa/4.0/",
+            "label": "Creative Commons Attribution-ShareAlike 4.0 International License"
+        },
+        "item_link": {
+            "url_template": "https://gtdb.ecogenomic.org/genomes?gid={{id}}",
+            "label": "GTDB Taxonomy"
+        },
+        "citation": "Parks, D.H., et al. (2020). [\"A complete domain-to-species taxonomy for Bacteria and Archaea.\"](https://rdcu.be/b3OI7) Nature Biotechnology, https://doi.org/10.1038/s41587-020-0501-8.\n\nParks, D.H., et al. (2018). [\"A standardized bacterial taxonomy based on genome phylogeny substantially revises the tree of life.\"](https://www.nature.com/articles/nbt.4229) Nature Biotechnology, 36: 996-1004.",
+        "additional_fields": []
+    },
+    {
+        "ns": "rdp_taxonomy",
+        "type": "taxonomy",
+        "title": "Ribosomal Database Project",
+        "short_title": "RDP",
+        "data_url": "http://rdp.cme.msu.edu/misc/resources.jsp",
+        "home_url": "http://rdp.cme.msu.edu/taxomatic/main.spr",
+        "logo_url": "http://rdp.cme.msu.edu/images/rdpinsider108x81.png",
+        "license": {
+            "url": "http://creativecommons.org/licenses/by-sa/3.0/",
+            "label": "Creative Commons Attribution-ShareAlike 3.0 Unported License"
+        },
+        "item_link": null,
+        "citation": "Cole, J. R., Q. Wang, J. A. Fish, B. Chai, D. M. McGarrell, Y. Sun, C. T. Brown, A. Porras-Alfaro, C. R. Kuske, and J. M. Tiedje. 2014. Ribosomal Database Project: data and tools for high throughput rRNA analysis Nucl. Acids Res. 42(Database issue):D633-D642; doi: [10.1093/nar/gkt1244](http://dx.doi.org/10.1093/nar/gkt1244) [[PMID: 24288368]](http://www.ncbi.nlm.nih.gov/pubmed/24288368)",
+        "additional_fields": [
+            {
+                "id": "incertae_sedis",
+                "type": "boolean",
+                "label": "Incertae Sedis?",
+                "tooltip": "ID for this taxon at NCBI",
+                "description": "Indicates a taxonomic group where its broader relationships are unknown or undefined"
+            },
+            {
+                "id": "molecule",
+                "type": "string",
+                "label": "Molecule",
+                "tooltip": "",
+                "description": ""
+            },
+            {
+                "id": "unclassified",
+                "type": "boolean",
+                "label": "Unclassified?",
+                "tooltip": "",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "ns": "silva_taxonomy",
+        "type": "taxonomy",
+        "title": "SILVA",
+        "short_title": "SILVA",
+        "data_url": "https://arb-silva.de/no_cache/download/archive/",
+        "home_url": "https://arb-silva.de",
+        "logo_url": "https://www.arb-silva.de/fileadmin/graphics_general/main/logos/silva-subtitle.svg",
+        "license": {
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "label": "Create Commons Attribution 4.0 (CC-BY 4.0)"
+        },
+        "item_link": {
+            "url_template": "https://www.arb-silva.de/browser/ssu/silva/{{id}}",
+            "label": "SILVA Taxonomy"
+        },
+        "citation": "Quast C, Pruesse E, Yilmaz P, Gerken J, Schweer T, Yarza P, Peplies J, Glöckner FO (2013) The SILVA ribosomal RNA gene database project: improved data processing and web-based tools. [Nucl. Acids Res. 41 (D1): D590-D596](http://nar.oxfordjournals.org/content/41/D1/D590).\n\nYilmaz P, Parfrey LW, Yarza P, Gerken J, Pruesse E, Quast C, Schweer T, Peplies J, Ludwig W, Glöckner FO (2014) The SILVA and \"All-species Living Tree Project (LTP)\" taxonomic frameworks. [Nucl. Acids Res. 42:D643-D648](http://nar.oxfordjournals.org/content/42/D1/D643.full)\n\nGlöckner FO, Yilmaz P, Quast C, Gerken J, Beccati A, Ciuprina A, Bruns G, Yarza P, Peplies J, Westram R, Ludwig W (2017) 25 years of serving the community with ribosomal RNA gene reference databases and tools. [J. Biotechnol](http://www.sciencedirect.com/science/article/pii/S0168165617314943).",
+        "additional_fields": [
+            {
+                "id": "datasets",
+                "type": "array<string>",
+                "label": "Data Sets",
+                "tooltip": "",
+                "description": ""
+            },
+            {
+                "id": "sequence",
+                "type": "sequence",
+                "label": "Sequence",
+                "tooltip": "",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "ns": "go_ontology",
+        "type": "ontology",
+        "title": "Gene Ontology",
+        "short_title": "GO",
+        "data_url": "http://release.geneontology.org/",
+        "home_url": "http://geneontology.org/",
+        "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/go/logo-248-64.png",
+        "license": {
+            "url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "label": "Creative Commons Attribution 4.0 Unported License"
+        },
+        "citation": "Ashburner et al. Gene ontology: tool for the unification of biology. Nat Genet. May 2000;25(1):25-9. [[abstract](https://www.ncbi.nlm.nih.gov/pubmed/10802651) | [full text](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3037419/)]\n\nThe Gene Ontology Consortium. The Gene Ontology Resource: 20 years and still GOing strong. Nucleic Acids Res. Jan 2019;47(D1):D330-D338. [[abstract](https://www.ncbi.nlm.nih.gov/pubmed/30395331) | [full text](https://academic.oup.com/nar/article/47/D1/D330/5160994)]",
+        "item_link": {
+            "url_template": "http://amigo.geneontology.org/amigo/term/{{term}}",
+            "label": "Gene Ontology AmiGO"
+        },
+        "additional_fields": [
+            {
+                "id": "synonyms",
+                "type": "array<synonym>",
+                "label": "Synonyms",
+                "tooltip": "",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "ns": "envo_ontology",
+        "type": "ontology",
+        "title": "Environmental Ontology",
+        "short_title": "ENVO",
+        "data_url": "https://github.com/EnvironmentOntology/envo/releases",
+        "home_url": "https://sites.google.com/site/environmentontology/",
+        "logo_url": "https://ci.kbase.us/ui-assets/images/third-party-data-sources/envo/logo-119-64.png",
+        "license": {
+            "url": "https://creativecommons.org/licenses/by/3.0/",
+            "label": "Attribution 3.0 Unported (CC BY 3.0)"
+        },
+        "citation": "Buttigieg, P. L., Morrison, N., Smith, B., Mungall, C. J., & Lewis, S. E. (2013). The environment ontology: contextualising biological and biomedical entities. Journal of Biomedical Semantics, 4(1), 43. [doi:10.1186/2041-1480-4-43](http://www.dx.doi.org/10.1186/2041-1480-4-43)\n        \nButtigieg, P. L., Pafilis, E., Lewis, S. E., Schildhauer, M. P., Walls, R. L., & Mungall, C. J. (2016). The environment ontology in 2016: bridging domains with increased scope, semantic density, and interoperation. Journal of Biomedical Semantics, 7(1), 57. [doi:10.1186/s13326-016-0097-6](https://doi.org/10.1186/s13326-016-0097-6)\n        ",
+        "item_link": {
+            "url_template": "http://purl.obolibrary.org/obo/{{term}}",
+            "label": "ENVO Ontology Ontobee"
+        },
+        "additional_fields": []
+    },
+    {
+        "ns": "gaz_ontology",
+        "type": "ontology",
+        "title": "Gazetteer Ontology",
+        "short_title": "GAZ",
+        "home_url": "http://environmentontology.github.io/gaz/",
+        "data_url": "http://purl.obolibrary.org/obo/gaz.obo"
+    }
+]

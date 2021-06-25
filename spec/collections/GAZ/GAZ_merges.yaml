@@ -1,42 +1,37 @@
-name: GAZ_merges
-type: edge
 delta: true
-
 indexes:
-  - type: persistent
-    fields: [id, expired, created]
-  - type: persistent
-    fields: [expired, created, last_version]
-
+- fields:
+  - id
+  - expired
+  - created
+  type: persistent
+- fields:
+  - expired
+  - created
+  - last_version
+  type: persistent
+name: GAZ_merges
 schema:
-    "$schema": http://json-schema.org/draft-07/schema#
-    title: GAZ_merges
-    type: object
-    description: A entry for merge edges in the Gazetteer Ontology (GAZ) hierarchy
-    properties:
-      id:
-        type: string
-        description: an edge ID, consisting of from::to::type
-        examples:
-          - GAZ:00563959::GAZ:00562535::consider
-      type:
-        type: string
-        description: GAZ merge edge type
-        examples:
-          - consider
-          - replaced_by
-      from:
-        type: string
-        description: GAZ id
-        examples:
-          - GAZ:00563959
-      to:
-        type: string
-        title: GAZ id
-        examples:
-          - GAZ:00562535
-    required:
-      - id
-      - type
-      - from
-      - to
+  $schema: http://json-schema.org/draft-07/schema#
+  description: A entry for merge edges in the GAZ ontology hierarchy
+  properties:
+    from:
+      description: GAZ id
+      type: string
+    id:
+      description: an edge ID, consisting of from::to::type
+      type: string
+    to:
+      description: GAZ id
+      type: string
+    type:
+      description: GAZ merge edge type
+      type: string
+  required:
+  - id
+  - type
+  - from
+  - to
+  title: GAZ_merges
+  type: object
+type: edge
