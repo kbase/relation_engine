@@ -175,11 +175,11 @@
         "additional_fields": []
     },
     {
-        "ns": "gaz_ontology",
+        "ns": "fake_ontology",
         "type": "ontology",
-        "title": "Gazetteer Ontology",
-        "short_title": "GAZ",
-        "home_url": "http://environmentontology.github.io/gaz/",
-        "data_url": "http://purl.obolibrary.org/obo/gaz.obo"
+        "title": "Fake Ontology",
+        "short_title": "FAKE",
+        "home_url": "http://environmentontology.github.io/fake/",
+        "data_url": "http://purl.obolibrary.org/obo/fake.obo"
     }
 ]

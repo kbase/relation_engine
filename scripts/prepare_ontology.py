@@ -2,9 +2,10 @@ import sys
 import os
 import yaml
 import json
+import shutil
 
 """
-python3 scripts/prepare_ontology.py scripts/test/data_sources.json gaz_ontology
+python3 scripts/prepare_ontology.py scripts/test/data/data_sources.json fake_ontology
 """
 
 __NAME = "__NAME__"
@@ -22,7 +23,6 @@ def main():
 
     prepare_collections_file(datasource, __COLLECTIONS_PATH)
     prepare_data_sources_file(datasource, __DATASOURCES_PATH)
-
     return
 
 
@@ -46,7 +46,7 @@ def prepare_collections_file(datasource, collections_path):
         if not os.path.exists(target_file):
             with open(target_file, "w") as target:
                 yaml.dump(data, target)
-    return
+    return target_dir
 
 
 def prepare_data_sources_file(datasource, datasources_path):
@@ -62,11 +62,19 @@ def prepare_data_sources_file(datasource, datasources_path):
     if not os.path.exists(target_file):
         with open(target_file, "w") as target:
             yaml.dump(data, target)
-    return
+    return target_file
 
 
 def parse_namespace(ns):
     return tuple(ns.split("_"))
+
+
+def clean_up_data(path):
+    if os.path.exists(path):
+        if os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
 
 
 if __name__ == "__main__":
