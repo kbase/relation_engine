@@ -23,7 +23,7 @@ RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
     if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies && \
-    mypy --install-types
+    pip install types-requests types-PyYAML
 
 COPY . /app
 
