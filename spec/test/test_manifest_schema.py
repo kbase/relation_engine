@@ -16,7 +16,7 @@ _TEST_DIR = os_path.join("/app", "spec", "test", "djornl")
 
 class Test_Manifest_Schema(unittest.TestCase):
     def test_load_invalid_manifest(self):
-        """ test an invalid manifest file """
+        """test an invalid manifest file"""
 
         invalid_dir = os_path.join(_TEST_DIR, "invalid_manifest")
 
