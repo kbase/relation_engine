@@ -37,7 +37,7 @@ class Test_DJORNL_Collections(unittest.TestCase):
                 )
 
     def test_node(self, query_name=None, test_data=None):
-        """ ensure node data validates correctly """
+        """ensure node data validates correctly"""
 
         schema_file = get_schema("collection", "djornl_node", path_only=True)
         validator = get_schema_validator(schema_file=schema_file, validate_at="/schema")

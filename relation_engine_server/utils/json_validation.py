@@ -137,7 +137,7 @@ def run_validator(
 
 
 def _load_json_schema(file):
-    """ Loads the given schema file """
+    """Loads the given schema file"""
 
     with open(file) as fd:
         if file.endswith(".yaml") or file.endswith(".yml"):

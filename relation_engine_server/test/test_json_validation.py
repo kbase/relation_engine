@@ -181,7 +181,7 @@ class TestJsonValidation(unittest.TestCase):
         self.assertEqual(output, {**schema_defaults, **{"name": "name", "distance": 3}})
 
     def test_json_validation(self):
-        """ Generic JSON validation tests to ensure that all is working as expected """
+        """Generic JSON validation tests to ensure that all is working as expected"""
 
         # run these tests with the schema as a data structure, as JSON, and as YAML
         test_list = [
