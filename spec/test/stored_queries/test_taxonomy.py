@@ -481,7 +481,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_implicit_defaults(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=None,
@@ -491,7 +491,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_explicit_defaults(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=[],
@@ -501,7 +501,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_2(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=["Domain", "Class"],
@@ -511,7 +511,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_1(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=["Class"],
@@ -521,7 +521,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_1_with_strain(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=["Class"],
@@ -531,7 +531,7 @@ class TestTaxonomy(unittest.TestCase):
         )
 
     def test_search_sciname_limit_ranks_1_with_false_strain(self):
-        """ Test queries where the results are limited by the rank or strain flag. """
+        """Test queries where the results are limited by the rank or strain flag."""
         _run_search_sciname(
             self,
             ranks=["Class"],

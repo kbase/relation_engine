@@ -67,7 +67,7 @@ def create_test_docs(coll_name, docs, update_on_dupe=False):
 
 
 def check_spec_test_env():
-    """ ensure that the environment is prepared for running the spec tests """
+    """ensure that the environment is prepared for running the spec tests"""
     if os.environ.get("SPEC_TEST_READY", None) is None:
         wait_for_api()
         _CONF = get_re_config()
