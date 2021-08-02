@@ -175,6 +175,30 @@
         "additional_fields": []
     },
     {
+        "ns": "gaz_ontology",
+        "type": "ontology",
+        "title": "Gazetteer Ontology",
+        "short_title": "GAZ",
+        "home_url": "http://environmentontology.github.io/gaz/",
+        "data_url": "http://purl.obolibrary.org/obo/gaz.obo"
+    },
+    {
+        "ns": "uo_ontology",
+        "type": "ontology",
+        "title": "Units of measurement ontology",
+        "short_title": "UO",
+        "home_url": "https://github.com/bio-ontology-research-group/unit-ontology",
+        "data_url": "http://purl.obolibrary.org/obo/uo.obo"
+    },
+    {
+        "ns": "po_ontology",
+        "type": "ontology",
+        "title": "Plant Ontology",
+        "short_title": "PO",
+        "home_url": "http://browser.planteome.org/amigo",
+        "data_url": "http://purl.obolibrary.org/obo/po.obo"
+    },
+    {
         "ns": "fake_ontology",
         "type": "ontology",
         "title": "Fake Ontology",
