@@ -1,0 +1,45 @@
+$schema: http://json-schema.org/draft-07/schema#
+name: tsv_node
+title: TSV node file syntax
+description: Jacobson lab Arabidopsis gene and phenotype data file columns
+type: object
+required: [gid]
+additionalProperties: false
+properties:
+  defline:
+    examples: ["NAC domain containing protein 1"]
+    title: Defline
+    type: string
+  gid:
+    examples: ["AT1G01010", "AT4G09995", "AT4G03060-CVI", "SU(RGN)"]
+    format: regex
+    pattern: ^(AT[0-9CM][0-9G]+|[- ().0-9A-Z]{,13})$
+    title: Gene ID
+    type: string
+  go:
+    pattern: ^((NA|GO:\d{7})\|?)+$
+    type: string
+  godesc:
+    pattern: ^((NA|[- ()+,'./0-9>:A-z_])\|?)+$
+    type: string
+  ko_effect:
+    pattern: ^((NA|[- %,()/0-9:A-z])\|?)+$
+    type: string
+  mapman_code:
+    pattern: ^((NA|[0-9]{,2}\.?))+$
+    type: string
+  mapman_desc:
+    type: string
+  mapman_name:
+    type: string
+  names:
+    pattern: !!str "^\\|?(([\
+      - \\#&\"'()+,./0-9:;?A-Z\\[\\\\\\]_a-z{}\
+      \xa0\xad\xb3\xc2\xc3\xdf\xf3\
+    ])\\|?)*$"
+    type: string
+  symbols:
+    examples: ["ANAC001 | NAC001 | NTL10", "NA"]
+    format: regex
+    pattern: ^((NA|[- \#&'()*,./0-9:;A-Z\[\]_a-z{}])\|?)+$
+    type: string
