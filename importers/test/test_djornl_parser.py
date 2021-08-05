@@ -163,8 +163,8 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 missing_err("hithruput-edges.csv", ["edge_type"]),
             ],
             "nodes": [
-                missing_err("extra_node.tsv", ["node_type"]),
-                invalid_err("extra_node.tsv", ["node_types"]),
+                missing_err("extra_node.csv", ["node_type"]),
+                invalid_err("extra_node.csv", ["node_types"]),
                 missing_err("pheno_nodes.csv", ["node_id"]),
                 invalid_err("pheno_nodes.csv", ["id", "pheno_ref", "usernotes"]),
             ],
@@ -292,7 +292,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 "hithruput-edges.csv line 11: duplicate data for edge "
                 + "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True",
             ],
-            "nodes": ["extra_node.tsv line 5: duplicate data for node AT1G01080"],
+            "nodes": ["extra_node.csv line 5: duplicate data for node AT1G01080"],
         }
         self.test_errors(parser, errs)
 

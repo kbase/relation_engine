@@ -8,4 +8,5 @@ file_list:
     path: directed_edges.tsv
 
   - data_type: node
+    file_format: csv
     path: nodes.csv

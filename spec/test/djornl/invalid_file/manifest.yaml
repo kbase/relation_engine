@@ -5,6 +5,7 @@ file_list:
     path: edges.tsv
 
   - data_type: node
+    file_format: csv
     path: nodes.csv
 
   - data_type: cluster

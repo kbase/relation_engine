@@ -515,7 +515,8 @@ class DJORNL_Parser(object):
         If a node is already present, new data is checked for conflicts with existing data
         """
         node_ix = datum.get("gid", datum.get("_key"))
-        if not node_ix: return
+        if not node_ix:
+            return
         # check whether we have this node already
         if node_ix in self.node_ix:
             # identical data: ignore it
@@ -523,9 +524,7 @@ class DJORNL_Parser(object):
                 return None
 
             # try merging the data
-            (merged, err_list) = self._try_node_merge(
-                self.node_ix[node_ix], datum
-            )
+            (merged, err_list) = self._try_node_merge(self.node_ix[node_ix], datum)
             if err_list:
                 return "duplicate data for node " + node_ix
             datum = merged
@@ -540,10 +539,11 @@ class DJORNL_Parser(object):
         schema_file = os.path.join(
             self._get_dataset_schema_dir(), "{file_format}_node.yaml"
         )
+
         def _get_node_validator(file_format):
-            return get_schema_validator(schema_file=schema_file.format(
-                file_format=file_format
-            ))
+            return get_schema_validator(
+                schema_file=schema_file.format(file_format=file_format)
+            )
 
         def go_terms(row):
             if "go_terms" in row and len(row["go_terms"]):
@@ -582,7 +582,7 @@ class DJORNL_Parser(object):
                 remap_fn=remap_functions,
                 store_fn=self.store_parsed_node_data,
                 err_list=err_list,
-                validator=_get_node_validator(file_format=file['file_format']),
+                validator=_get_node_validator(file_format=file["file_format"]),
             )
 
         return {

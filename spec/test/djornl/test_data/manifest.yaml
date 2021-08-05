@@ -15,8 +15,9 @@ file_list:
     date: "2020-12-25"
 
   - data_type: node
-    path: nodes.csv
     date: "2019-01-01"
+    file_format: csv
+    path: nodes.csv
 
   - data_type: cluster
     cluster_prefix: markov_i2
@@ -31,9 +32,11 @@ file_list:
     path: I6_named.tsv
 
   - data_type: node
-    path: pheno_nodes.csv
     date: "2019-01-01"
+    file_format: csv
+    path: pheno_nodes.csv
 
   - data_type: node
-    path: extra_node.tsv
     date: "2019-01-01"
+    file_format: csv
+    path: extra_node.csv
