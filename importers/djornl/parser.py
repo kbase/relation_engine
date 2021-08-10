@@ -383,9 +383,9 @@ class DJORNL_Parser(object):
 
         # keep track of the nodes mentioned in this edge set
         for node_n in ["1", "2"]:
-            _key = datum[f"node{node_n}"]
-            if _key not in self.node_ix:
-                self.node_ix[_key] = {"_key": _key}
+            _node_key = datum[f"node{node_n}"]
+            if _node_key not in self.node_ix:
+                self.node_ix[_node_key] = {"_key": _node_key}
             del datum[f"node{node_n}"]
 
         self.edge_ix[edge_key] = datum
@@ -510,34 +510,40 @@ class DJORNL_Parser(object):
 
     def store_parsed_node_data(self, datum):
         """
-        store node data in the node index, node_ix, indexed by the node _key
+        store node data in the node index, node_ix, indexed by the node _key or gid
 
         If a node is already present, new data is checked for conflicts with existing data
         """
+        node_ix = datum.get("gid", datum.get("_key"))
+        if not node_ix:
+            return
         # check whether we have this node already
-        if datum["_key"] in self.node_ix:
+        if node_ix in self.node_ix:
             # identical data: ignore it
-            if datum == self.node_ix[datum["_key"]]:
+            if datum == self.node_ix[node_ix]:
                 return None
 
             # try merging the data
-            (merged, err_list) = self._try_node_merge(
-                self.node_ix[datum["_key"]], datum
-            )
+            (merged, err_list) = self._try_node_merge(self.node_ix[node_ix], datum)
             if err_list:
-                return "duplicate data for node " + datum["_key"]
+                return "duplicate data for node " + node_ix
             datum = merged
 
-        self.node_ix[datum["_key"]] = datum
-        return None
+        self.node_ix[node_ix] = datum
 
     def load_nodes(self):
         """Load node metadata"""
 
         err_list = []
 
-        schema_file = os.path.join(self._get_dataset_schema_dir(), "csv_node.yaml")
-        validator = get_schema_validator(schema_file=schema_file)
+        schema_file = os.path.join(
+            self._get_dataset_schema_dir(), "{file_format}_node.yaml"
+        )
+
+        def _get_node_validator(file_format):
+            return get_schema_validator(
+                schema_file=schema_file.format(file_format=file_format)
+            )
 
         def go_terms(row):
             if "go_terms" in row and len(row["go_terms"]):
@@ -565,7 +571,7 @@ class DJORNL_Parser(object):
             "transcript": None,
             "user_notes": None,
             # rename
-            "_key": lambda row: row["node_id"],
+            "_key": lambda row: row["gid"] if "gid" in row else row["node_id"],
             # see functions above
             "go_terms": go_terms,
         }
@@ -576,7 +582,7 @@ class DJORNL_Parser(object):
                 remap_fn=remap_functions,
                 store_fn=self.store_parsed_node_data,
                 err_list=err_list,
-                validator=validator,
+                validator=_get_node_validator(file_format=file["file_format"]),
             )
 
         return {

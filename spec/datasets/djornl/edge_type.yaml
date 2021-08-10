@@ -52,24 +52,42 @@ oneOf:
     title: ATRM TF to Target LitCurated 01082020 TranscriptionFactorToGene
     description: Contains literature mined and manually curated TF regulatory interactions for A.thaliana from 1701 TFFs from PlantTFDB 2.0 and 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Downloaded from http://atrm.cbi.pku.edu.cn/download.php
 
-  - const       : "GO"
-    title       : "GO"
-    description : "GeneA connects to GeneB if the two genes have semantically similar GO terms (with a similarity score > 0). This network is used to evaluate other networks for biological functional content. DOI: [TODO]"
+  - const      : AT-UU-GO-03-AA-01
+    title      : GO
+    description: GeneA connects to GeneB if the two genes have semantically similar GO terms (with a similarity score > 0). This network is used to evaluate other networks for biological functional content.
 
-  - const       : "Knockout"
-    title       : "Knockout"
-    description : "GeneA connects to GeneB if the phenotypic effect of knocking out GeneA is similar to the phenotypic effect of knocking out GeneB. Similarity is based on Phenotype Ontology semantic similarity. DOI: https://doi.org/10.1186/s13007-015-0053-y"
+  - const      : AT-UU-KS-00-AA-01
+    title      : Knockout Similarity
+    description: GeneA connects to GeneB if the phenotypic effect of knocking out GeneA is similar to the phenotypic effect of knocking out GeneB. Similarity is based on Phenotype Ontology semantic similarity.
 
-  - const       : "Metabolic-AraCyc"
-    title       : "Metabolic-AraCyc"
-    description : "GeneA connects to GeneB if they are both enzymes and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1. DOI: [TODO]"
+  - const      : AT-UU-PX-01-AA-01
+    title      : PEN-Diversity
+    description: GeneA connects to GeneB if the expression vector of GeneA is an important predictor of the expression vector of GeneB in an iRF model, where all other genes’ expression are included as covariates. The iRF model is a feature-selection version of Random Forest.
 
-  - const       : "PPI-6merged"
-    title       : "PPI-6merged"
-    description : "GeneA connects to GeneB if their protein products have been shown to bind to interact with each other, typically through experimental evidence. The PPI-6merged network is the union of 6 different A.thaliana PPI networks: AraNet2 LC, AraNet2 HT, AraPPInet2 0.60, BIOGRID 4.3.194 physical, AtPIN, Mentha. These 6 were all relatively high scoring with GOintersect. DOI: [TODO]"
+  - const      : AT-UU-GA-01-AA-01
+    title      : Coex Gene-Atlas
+    description: Coexpression network obtained from AtGenie.org. It uses expression array data from multiple tissues to calculate the correlation between genes.
 
-  - const       : "Regulation-ATRM"
-    title       : "Regulation-ATRM"
-    description : "GeneA connects to GeneB if GeneA is a Transcription Factor (TF) that is shown to interact with GeneB (which may or may not be a TF). This dataset contains literature mined and manually curated TF regulatory interactions for A.thaliana. Started from 1701 TFs from PlantTFDB 2.0 and retrieved 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Final result is 1431 confirmed TF regulatory interactions, of which 637 are TF-TF. Data origin:  http://atrm.cbi.pku.edu.cn/download.php DOI: [TODO]"
+  - const      : AT-UU-PP-00-AA-01
+    title      : PPI-6merged
+    description: "GeneA connects to GeneB if their protein products have been shown to bind to interact with each other, typically through experimental evidence. The PPI-6merged network is the union of 6 different A.thaliana PPI networks: AraNet2 LC, AraNet2 HT, AraPPInet2 0.60, BIOGRID 4.3.194 physical, AtPIN, Mentha. These 6 were all relatively high scoring with GOintersect. StringDB scored badly so was not included"
 
+  - const      : AT-UU-RE-00-AA-01
+    title      : Regulation-ATRM
+    description: GeneA connects to GeneB if GeneA is a Transcription Factor (TF) that is shown to interact with GeneB (which may or may not be a TF). This dataset contains literature mined and manually curated TF regulatory interactions for A.thaliana. Started from 1701 TFs from PlantTFDB 2.0 and retrieved 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Final result is 1431 confirmed TF regulatory interactions, of which 637 are TF-TF.
 
+  - const      : AT-UU-RP-03-AA-01
+    title      : Regulation-Plantregmap
+    description: This network contains computationally predicted TF-Target relationships based on motifs, binding sites, ChipSeq data
+
+  - const      : AT-UU-DU-07-AA-01
+    title      : CoEvolution-DUO
+    description: GeneA connects to GeneB if a SNP in GeneA is correlated with a SNP in GeneB using the DUO metric (cite). SNP data is from the full 1001 Genomes.
+
+  - const      : AT-UU-CD-00-AA-01
+    title      : CoDomain
+    description: GeneA connects to GeneB if they share one or more common protein domains. Network was obtained from AraNet2.
+
+  - const      : AT-UU-RX-00-AA-01
+    title      : Metabolic-AraCyc
+    description: GeneA connects to GeneB if they are both enzymatic and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1.
