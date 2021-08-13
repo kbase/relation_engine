@@ -1,30 +1,27 @@
 # Testing
 
+All tests are run in docker containers, and the test scripts are run via the Makefile. Thus top level dependencies are:
+- make
+- docker
+
+
 ## Unit testing
 
 ### Quick 
 
-Ensure dependencies:
-- make
-- python 3.7 or higher (?)
-
 ```bash
-python -m venv venv
-source vevn/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-make unit-test
+make unit-tests
 ```
 
 
 ## Integration Testing
 
-### Quick
-
-Ensure have dependencies:
-- make
-- docker
-
 ```bash
 make integration-tests
+```
+
+## All Tests
+
+```bash
+make test
 ```
