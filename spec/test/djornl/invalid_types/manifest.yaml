@@ -8,6 +8,7 @@ file_list:
     path: directed_edges.tsv
 
   - data_type: node
+    file_format: csv
     path: nodes.csv
 
   - data_type: cluster
@@ -15,4 +16,5 @@ file_list:
     cluster_prefix: markov_i2
 
   - data_type: node
+    file_format: csv
     path: pheno_nodes.csv

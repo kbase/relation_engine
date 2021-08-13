@@ -72,7 +72,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             parser.config("bananas")
 
     def test_load_no_manifest(self):
-        """ test loading when the manifest does not exist """
+
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "no_manifest")
         err_str = "No manifest file found at " + os.path.join(
             RES_ROOT_DATA_PATH, "manifest.yaml"
@@ -81,14 +81,14 @@ class Test_DJORNL_Parser(unittest.TestCase):
             self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_invalid_manifest(self):
-        """ test an invalid manifest file """
+        """test an invalid manifest file"""
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "invalid_manifest")
         err_str = "The manifest file failed validation"
         with self.assertRaisesRegex(RuntimeError, err_str):
             self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_invalid_file(self):
-        """ test loading when what is supposed to be a file is actually a directory """
+        """test loading when what is supposed to be a file is actually a directory"""
 
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "invalid_file")
 
@@ -98,7 +98,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_missing_files(self):
-        """ test loading when files cannot be found """
+        """test loading when files cannot be found"""
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "missing_files")
         # not found
         err_str = (
@@ -108,7 +108,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             self.init_parser_with_path(RES_ROOT_DATA_PATH)
 
     def test_load_empty_files(self):
-        """ test loading files containing no data """
+        """test loading files containing no data"""
 
         # path: test/djornl/empty_files
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "empty_files")
@@ -131,7 +131,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.test_errors(parser, errs)
 
     def test_load_missing_headers(self):
-        """ test loading when files lack required headers """
+        """test loading when files lack required headers"""
         RES_ROOT_DATA_PATH = os.path.join(
             _TEST_DIR, "djornl", "missing_required_headers"
         )
@@ -163,8 +163,8 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 missing_err("hithruput-edges.csv", ["edge_type"]),
             ],
             "nodes": [
-                missing_err("extra_node.tsv", ["node_type"]),
-                invalid_err("extra_node.tsv", ["node_types"]),
+                missing_err("extra_node.csv", ["node_type"]),
+                invalid_err("extra_node.csv", ["node_types"]),
                 missing_err("pheno_nodes.csv", ["node_id"]),
                 invalid_err("pheno_nodes.csv", ["id", "pheno_ref", "usernotes"]),
             ],
@@ -172,7 +172,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.test_errors(parser, errs)
 
     def test_load_invalid_types(self):
-        """ test file format errors """
+        """test file format errors"""
 
         # path: test/djornl/invalid_types
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "invalid_types")
@@ -213,7 +213,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.test_errors(parser, errs)
 
     def test_load_col_count_errors(self):
-        """ test files with invalid numbers of columns """
+        """test files with invalid numbers of columns"""
 
         # path: test/djornl/col_count_errors
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "col_count_errors")
@@ -276,7 +276,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
         self.assertEqual(cluster_data, expected)
 
     def test_duplicate_data(self):
-        """ test files with duplicate data that should throw an error """
+        """test files with duplicate data that should throw an error"""
 
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "duplicate_data")
         parser = self.init_parser_with_path(RES_ROOT_DATA_PATH)
@@ -292,12 +292,12 @@ class Test_DJORNL_Parser(unittest.TestCase):
                 "hithruput-edges.csv line 11: duplicate data for edge "
                 + "SDV__AT1G01100__protein-protein-interaction_literature-curated_AraNet_v2__True",
             ],
-            "nodes": ["extra_node.tsv line 5: duplicate data for node AT1G01080"],
+            "nodes": ["extra_node.csv line 5: duplicate data for node AT1G01080"],
         }
         self.test_errors(parser, errs)
 
     def test_duplicate_cluster_data(self):
-        """ test files with duplicate cluster data, which should be seamlessly merged """
+        """test files with duplicate cluster data, which should be seamlessly merged"""
 
         # path: test/djornl/duplicate_data
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "duplicate_data")
