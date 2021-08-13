@@ -19,8 +19,6 @@ if RE_API_URL is None:
 
 def wait_for_re_api() -> None:
     """wait for a service or list of services to start up"""
-    TIMEOUT
-    POLL_INTERVAL
     print(f"Waiting for RE_API to be available at {RE_API_URL}...", end="")
     timeout = int(time.time()) + TIMEOUT
     clock = Clock()
