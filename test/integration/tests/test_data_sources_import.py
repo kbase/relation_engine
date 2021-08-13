@@ -7,7 +7,7 @@ import yaml
 
 import requests
 
-from common.json_validation import (
+from relation_engine_server.utils.json_validation import (
     get_schema_validator,
 )
 
