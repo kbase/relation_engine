@@ -11,6 +11,7 @@ Ensure dependencies:
 ```bash
 python -m venv venv
 source vevn/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 make unit-test
 ```
