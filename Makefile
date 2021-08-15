@@ -15,6 +15,12 @@ integration-tests: dev-network start-dev run-integration-tests stop-dev
 run-integration-tests:
 	cd test/integration && docker-compose run --rm testrunner
 
+run-importer:
+	cd importers && docker-compose run --rm importer
+
+test-run-importer:
+	cd importers && docker-compose run -v /var/run/docker.sock:/var/run/docker.sock --rm importer
+
 start-dev:
 	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
 

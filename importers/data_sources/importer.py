@@ -19,7 +19,6 @@ import os
 import sys
 import traceback
 import requests
-import importers.utils.config as config
 from relation_engine_server.utils.json_validation import (
     get_schema_validator,
 )
@@ -27,7 +26,7 @@ from relation_engine_server.utils.json_validation import (
 QUIET = False
 
 
-def get_dataset_schema_dir():
+def get_default_dataset_schema_dir():
     """
     Returns the canonical location for the data_sources collection
     schema files.
@@ -68,44 +67,24 @@ def note(note_type, message):
 
 
 class Importer(object):
-    def __init__(self):
-        self.load_config()
+    def __init__(self, re_api_url=None, data_dir=None, dry_run=False, auth_token=False):
+        if re_api_url is None:
+            raise ValueError('The "re_api_url" parameter is required')
+        self.re_api_url = re_api_url
 
-    def get_config_or_fail(self, key):
-        """
-        Return the value for a given config key, or raise a KeyError if it does not
-        exist.
-        """
-        if key not in self._config:
-            raise KeyError(f'No such config key: "{key}"')
+        if auth_token is None:
+            raise ValueError('The "auth_token" parameter is required')
+        self.auth_token = auth_token
 
-        note('info', self._config)
-        note('info', os.environ)
+        self.dry_run = dry_run
+        self.data_dir = data_dir
 
-        return self._config[key]
-
-    def get_config(self, key, default_value):
-        """
-        Return the value for a given config key, return the given default_value if it
-        does not exist.
-        """
-        if key not in self._config:
-            return default_value
-
-        return self._config[key]
-
-    def load_config(self):
-        """
-        Loads the standard configuration with the addition of the `ROOT_DATA_PATH`
-        environment variable utilized by the importer to locate the data files.
-        """
-        self._config = config.load_from_env(extra_optional=["ROOT_DATA_PATH"])
-
-    def load_data(self, dry_run=False):
+    def load_data(self):
         """
         Load the data_sources source data files located in `ROOT_DATA_PATH` via the 
-        RE API located at `API_URL`. Data files are validated with the jsonschema
-        located in the path returned by `get_dataset_schema_dir()` defined above.
+        RE API located at `RE_API_URL`. Data files are validated with the jsonschema
+        located in the path returned by `get_default_dataset_schema_dir()` defined
+        above.
 
         The `dry_run` parameter will cause the loading process to stop just shy of 
         calling the RE API to store the data in the database. This is a useful for
@@ -115,18 +94,18 @@ class Importer(object):
         """
         note('info', 'Loading data')
         note('info', 'Parameters:')
-        note('info', f'     API_URL: {self.get_config_or_fail("API_URL")}')
-        note('info', f'     dry run: {dry_run}')
+        note('info', f'    re-api-url: {self.re_api_url}')
+        note('info', f'    data-dir: {self.data_dir}')
+        note('info', f'    dry-run: {self.dry_run}')
 
         is_error = False
 
         default_data_dir = get_relative_dir('data')
-        env_data_dir = self.get_config('ROOT_DATA_PATH', None)
-        if env_data_dir is not None:
+        # env_data_dir = self.get_config('ROOT_DATA_PATH', None)
+        if self.data_dir is not None:
             note('info',
-                 '     (Taking data dir from environment variable '
-                 '"RES_ROOT_DATA_PATH")')
-            data_dir = env_data_dir
+                 '     (using provided data dir')
+            data_dir = self.data_dir
         else:
             note('info', '     (Taking data dir from default)')
             data_dir = default_data_dir
@@ -137,7 +116,8 @@ class Importer(object):
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
-        schema_file = os.path.join(get_dataset_schema_dir(), "data_sources_nodes.yaml")
+        schema_file = os.path.join(get_default_dataset_schema_dir(),
+                                   'data_sources_nodes.yaml')
         validator = get_schema_validator(schema_file=schema_file)
 
         file_path = os.path.join(data_dir, 'data_sources.json')
@@ -162,7 +142,7 @@ class Importer(object):
 
         if is_error:
             note('error', 'Data did not validate')
-            if dry_run:
+            if self.dry_run:
                 note('error', 'Dry run completed with errors')
             else:
                 note('error', 'Due to errors, data will not be loaded')
@@ -171,7 +151,7 @@ class Importer(object):
         note('success', 'Data loaded and validated successfully')
 
         # if there are no errors then save the dataset unless this is a dry run
-        if dry_run:
+        if self.dry_run:
             note('success', 'Dry run completed successfully')
             note('warning', 'REMEMBER: Data not loaded')
         else:
@@ -183,13 +163,13 @@ class Importer(object):
         Saves the source_data docs into the RE database via the RE api
         """
         resp = requests.put(
-            f'{self.get_config_or_fail("API_URL")}/api/v1/documents',
+            f'{self.re_api_url}/api/v1/documents',
             params={
                 "collection": collection,
                 "on_duplicate": on_duplicate
             },
             headers={
-                "Authorization": self.get_config_or_fail("AUTH_TOKEN")
+                "Authorization": self.auth_token
             },
             data="\n".join(json.dumps(d) for d in docs),
         )
@@ -202,16 +182,17 @@ class Importer(object):
         return resp
 
 
-def do_import(dry_run=False):
+def do_import(dry_run, data_dir, re_api_url, auth_token):
     """
     Wraps the loading process, passing the `dry_run` parameter to the 
     `load_data()` method. It traps exceptions, displaying them and exiting with
     the exit status code 1.
     """
     note('info', 'Starting Import')
-    importer = Importer()
+    importer = Importer(dry_run=dry_run, data_dir=data_dir, re_api_url=re_api_url,
+                        auth_token=auth_token)
     try:
-        if not importer.load_data(dry_run=dry_run):
+        if not importer.load_data():
             sys.exit(1)
     except Exception as err:
         note('error', "Unhandled exception:")
@@ -226,18 +207,42 @@ def get_args():
     """
     Convenience function to define and parse command line arguments.
     """
-    argparser = argparse.ArgumentParser(description="Load data_sources data")
-    argparser.add_argument(
+    parser = argparse.ArgumentParser(description="Load data_sources data")
+
+    # Required arguments
+    required = parser.add_argument_group('required named arguments')
+    required.add_argument(
+        "--re-api-url",
+        type=str,
+        help="URL to an instance of Relation Engine",
+        required=True
+    )
+    required.add_argument(
+        "--auth-token",
+        type=str,
+        help="URL to an instance of Relation Engine",
+        required=True
+    )
+
+    # Optional arguments; they have sensible defaults
+    optional = parser.add_argument_group('optional named arguments')
+    optional.add_argument(
         "--dry-run",
         action="store_true",
         help="Perform all actions of the importer, except loading the data.",
     )
-    argparser.add_argument(
+    optional.add_argument(
         "--quiet",
         action="store_true",
         help="Shh, run quietly; do not print notes",
     )
-    return argparser.parse_args()
+    optional.add_argument(
+        "--data-dir",
+        type=str,
+        help="Path to the import data file(s)",
+    )
+
+    return parser.parse_args()
 
 
 def main():
@@ -248,7 +253,8 @@ def main():
     global QUIET
     args = get_args()
     QUIET = args.quiet
-    do_import(args.dry_run)
+    do_import(dry_run=args.dry_run, data_dir=args.data_dir, re_api_url=args.re_api_url,
+              auth_token=args.auth_token)
     sys.exit(0)
 
 

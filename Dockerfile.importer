@@ -5,15 +5,13 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG BRANCH=develop
 
-RUN apk add --update --no-cache make docker docker-compose
-
 # Note that we use a specific subset of dependencies, just enough to support
 # the integration tests.
 COPY . /app
 
 # Install dependencies
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /app/test/integration/requirements.txt
+    pip install --no-cache-dir -r /app/importers/requirements.txt
 
 WORKDIR /app
 
@@ -28,4 +26,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       maintainer="KBase Team"
 
 ENTRYPOINT ["sh"]
-CMD ["-x", "/app/test/integration/scripts/run-integration-tests.sh"]
+CMD ["/app/importers/import.sh"]

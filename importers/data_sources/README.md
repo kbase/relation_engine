@@ -1,6 +1,6 @@
 # Install data_sources dataset
 
-The script and data within this directory allow one to load the _data sources_ into the RE database via the RE API. The default RE API base url is `http://localhost:5000`, as defined in `importers/utils/config.py`, which can be redefined with the environment variable `RES_API_URL`.
+The script and data within this directory allow one to load the _data sources_ into the RE database via the RE API. The default RE API base url is `http://localhost:5000`, as defined in `importers/utils/config.py`, which can be redefined with the environment variable `RE_API_URL`.
 
 A set of data files is located in the `importers/data_sources/data` directory, which will be used unless the `RES_ROOT_DATA_PATH` environment variable is set before calling the importer script.
 
@@ -8,7 +8,7 @@ This script has only been used in development thus far. In this case, the local 
 
 > This document describes a procedure for loading data locally, but does not claim provenance over production data provisioning. This script should work fine for initial load, and can be used for subsequent updates if the script is pointed at a data file which contains just the new documents.
 
-## Procedure
+## Direct import with Python
 
 Set up a Python environment:
 
@@ -17,6 +17,7 @@ At top level of repo:
 ```bash
 python -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 ```
 
 Install Python dependencies:
@@ -24,9 +25,6 @@ Install Python dependencies:
 ```bash
 pip install -r dev-requirement.txt
 ```
-
-> Tip: If you encounter an install error, you should first try updating pip:
-> `pip install --upgrade pip`
 
 Run the data importer. Each importer is an independent script, but they will probably follow a pattern similar to this example.
 
@@ -67,3 +65,47 @@ Finally, to import the data, simply remove `--dry-run`.
 [importer]     updated: 0
 [importer] done 
 ```
+
+
+## Import via Docker container
+
+Generally this is the preferred method for running the importer.
+
+A container is run, the importer is invoked against a running instance of the Relation Engine API.
+
+E.g. 
+
+Start the relation engine:
+
+```bash
+make start-dev
+```
+
+The relation engine will be running at on the host at `localhost:5000`, or internally at `re_api:5000` in the docker network.
+
+When running against a local RE instance like this, you'll need to point the importer at `re_api:5000`. For a deployment, you would want to use the appropriate url, e.g. `https://ci.kbase.us/services/relation_engine`.
+
+Run the importer 
+
+```bash
+python -m importers.data_sources.importer --auth-token admin_token --api-url http://localhost:5000 
+```
+
+Note that 
+
+- `--auth-token admin_token` matches the mocking setup, so must be used for evaluating import with the local test container
+- `--api-url http://localhost:5000` matches the RE api running in a local container
+
+Clearly, if running against a deployed RE API, the url to that service must be used, and a real admin token for that environment must be used.
+
+> TODO: describe that admin url...
+> 
+> 
+
+### Dependencies
+
+- make
+- docker
+
+### Environment Variables
+

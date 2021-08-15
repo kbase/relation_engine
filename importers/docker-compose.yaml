@@ -1,0 +1,25 @@
+version: '3'
+
+# This docker-compose is for developer convenience, not for running in production.
+networks:
+  kbase-dev:
+    name: kbase-dev
+services:
+  # For running integration tests
+  importer:
+    build:
+      context: ..
+      dockerfile: Dockerfile.importer
+    networks:
+    - kbase-dev
+    #    volumes:
+    #    - ${PWD}/..:/app
+    environment:
+    - PYTHONUNBUFFERED=true
+    - IMPORTER=${IMPORTER}
+    - RE_API_URL=${RE_API_URL}
+    - AUTH_TOKEN=${AUTH_TOKEN}
+    - DATA_DIR=${DATA_DIR}
+    - DRY_RUN=${DRY_RUN}
+    - QUIET=${QUIET}
+    - VERBOSE=${VERBOSE}

@@ -3,8 +3,6 @@ import os
 import subprocess
 import sys
 import unittest
-import yaml
-
 import requests
 
 from relation_engine_server.utils.json_validation import (
@@ -16,6 +14,8 @@ from relation_engine_server.utils.json_validation import (
 # python instance in a subprocess.
 #
 PYTHON_BIN = os.environ.get("PYTHON_BIN", sys.executable)
+SHELL_BIN = 'sh'
+MAKE_BIN = 'make'
 
 #
 # Set up urls required by the integration tests.
@@ -113,16 +113,37 @@ def check_response(response):
     return response
 
 
-def do_import(token, data_path=None):
-    command_args = [PYTHON_BIN, "-m", "importers.data_sources.importer"]
+def do_import(token, data_dir=None):
+    command_args = [PYTHON_BIN, "-m", "importers.data_sources.importer", '--auth-token',
+                    token, '--re-api-url', os.environ.get("RE_API_URL")]
+
+    if data_dir is not None:
+        command_args.append('--data-dir')
+        command_args.append(data_dir)
+
     if QUIET:
         command_args.append("--quiet")
 
-    env = {"RES_AUTH_TOKEN": token, "RES_API_URL": os.environ.get("RE_API_URL")}
-    if data_path is not None:
-        env["RES_ROOT_DATA_PATH"] = data_path
+    subprocess.run(command_args, check=True)
 
-    subprocess.run(command_args, check=True, env=env)
+
+def do_import_via_make(token, data_dir=None):
+    command_args = [MAKE_BIN, "test-run-importer"]
+
+    if data_dir is not None:
+        command_args.append('--data-dir')
+        command_args.append(data_dir)
+
+    env = {"AUTH_TOKEN": token, "RE_API_URL": os.environ.get("RE_API_URL"),
+           "IMPORTER": "data_sources"}
+
+    if QUIET:
+        env['QUIET'] = 't'
+
+    if data_dir is not None:
+        env["DATA_DIR"] = data_dir
+
+    subprocess.run(' '.join(command_args), check=True, shell=True, env=env)
 
 
 def get_collection_schema_dir(collection):
@@ -154,7 +175,7 @@ class DataSourcesTests(unittest.TestCase):
         self.assertEqual(len(all_data_sources["results"]), count)
         # now apply the jsonschema.
         spec_path = os.path.join(get_collection_schema_dir("data_sources"),
-                                   "data_sources_nodes.yaml")
+                                 "data_sources_nodes.yaml")
         validator = get_schema_validator(schema_file=spec_path, validate_at="/schema")
         # Expect each doc to be just like uploaded, with the exception of keys
         # added by arangodb (_id, _rev) and by RE (updated_at).
@@ -184,6 +205,26 @@ class DataSourcesTests(unittest.TestCase):
         check_response(clear_collection())
         self.assert_collection_count(0)
         do_import("admin_token")
+        self.assert_collection_count(6)
+        self.assert_data_sources_in_re("taxonomy", 4)
+        self.assert_data_sources_in_re("ontology", 2)
+        # exercise the api for subsets of sources
+        self.assert_data_sources_in_re("taxonomy", 2, ["gtdb", "ncbi_taxonomy"])
+        self.assert_data_sources_in_re("ontology", 1, ["envo_ontology"])
+        # finally, validate actual returned content:
+        self.assert_data_sources_in_re("taxonomy", 4)
+        self.assert_data_sources_in_re("ontology", 2)
+
+    def test_import_admin_via_make(self):
+        """
+        Ensures that a normal import succeeds and that the api fetches the expected
+        items.
+        Note that the counts being asserted are based on knowledge of the
+        data being imported.
+        """
+        check_response(clear_collection())
+        self.assert_collection_count(0)
+        do_import_via_make("admin_token")
         self.assert_collection_count(6)
         self.assert_data_sources_in_re("taxonomy", 4)
         self.assert_data_sources_in_re("ontology", 2)
