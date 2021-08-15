@@ -49,3 +49,6 @@ dmypy.json
 # docker bits
 Dockerfile*
 docker-compose*
+
+# Dev bits
+/venv/
