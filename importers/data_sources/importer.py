@@ -220,7 +220,7 @@ def get_args():
     required.add_argument(
         "--auth-token",
         type=str,
-        help="URL to an instance of Relation Engine",
+        help="A KBase auth token",
         required=True
     )
 
