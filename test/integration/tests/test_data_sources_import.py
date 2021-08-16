@@ -60,7 +60,7 @@ class RequestError(Exception):
         self.status_code = response.status_code
 
 
-# Tiny arrango client to support the tests
+# Tiny arango client to support the tests
 
 
 def arango(path, method="GET"):
