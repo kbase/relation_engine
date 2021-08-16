@@ -215,7 +215,7 @@ class TestDataSourcesImporter(unittest.TestCase):
         )
         with patch(
             "importers.data_sources.importer.get_args", return_value=my_get_args
-        ) as mock_get_args:
+        ):
             with self.assertRaises(SystemExit) as se:
                 main()
             self.assertEqual(se.exception.code, 0)

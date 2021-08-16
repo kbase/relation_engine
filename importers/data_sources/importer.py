@@ -1,5 +1,5 @@
 """
-Loads canonical (defined in the codebase) or separate (defined elsewhere) 
+Loads canonical (defined in the codebase) or separate (defined elsewhere)
 documents into the data_sources collection in the Relation Engine (RE).
 
 This is a simple importer, as the data_sources load data is quite simple,
@@ -112,7 +112,7 @@ class Importer(object):
         try:
             with open(file_path, "r") as data_file:
                 data_sources = json.load(data_file)
-        except OSError as ose:
+        except OSError:
             note("error", "Error loading import data file")
             return False
 
