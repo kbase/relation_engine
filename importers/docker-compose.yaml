@@ -12,14 +12,11 @@ services:
       dockerfile: Dockerfile.importer
     networks:
     - kbase-dev
-    #    volumes:
-    #    - ${PWD}/..:/app
     environment:
     - PYTHONUNBUFFERED=true
     - IMPORTER=${IMPORTER}
     - RE_API_URL=${RE_API_URL}
     - AUTH_TOKEN=${AUTH_TOKEN}
-    - DATA_DIR=${DATA_DIR}
     - DRY_RUN=${DRY_RUN}
     - QUIET=${QUIET}
     - VERBOSE=${VERBOSE}

@@ -19,6 +19,7 @@ then
     exit 1
 fi
 
+
 if [ -z "${RE_API_URL}" ]
 then
     echo "Error: required environment variable RE_API_URL not found"
@@ -34,7 +35,7 @@ fi
 
 # Build up args based on environment variables
 export IMPORT_PATH="importers.${IMPORTER}.importer"
-export ARGS="--re-api-url $RE_API_URL --auth-token $AUTH_TOKEN ${DATA_DIR:+--data-dir $DATA_DIR} ${DRY_RUN:+--dry-run} ${QUIET:+--quiet}"
+export ARGS="--data-dir /data --re-api-url $RE_API_URL --auth-token $AUTH_TOKEN ${DRY_RUN:+--dry-run} ${QUIET:+--quiet}"
 
 # E.g. IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
 

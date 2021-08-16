@@ -42,15 +42,13 @@ ME_RESPONSE = {
 }
 
 
-def make_importer(data_path, use_env_data=True, dry_run=None, auth_token=AUTH_TOKEN):
-    # Data files are located in the test directory
+def get_test_data_dir(data_path):
     dir_path = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(dir_path, "data", data_path)
 
-    # ... in the data directory
-    # ... and in the specified data path
-    test_data_path = os.path.join(dir_path, "data", data_path)
-    print('\nTEST DATA PATH', test_data_path, use_env_data)
 
+def make_importer(data_path, dry_run=None, auth_token=AUTH_TOKEN):
+    test_data_path = get_test_data_dir(data_path)
     return Importer(re_api_url=RE_API_URL, data_dir=test_data_path, dry_run=dry_run,
                     auth_token=auth_token)
 
@@ -108,14 +106,6 @@ class TestDataSourcesImporter(unittest.TestCase):
         result = imp.load_data()
         self.assertTrue(result)
 
-    def test_load_data_dry_run_default_data_dir(self):
-        """
-        A dry run load which uses the canonical (built-in) data
-        """
-        imp = make_importer('standard', use_env_data=False, dry_run=True)
-        result = imp.load_data()
-        self.assertTrue(result)
-
     def test_load_data_dry_run_bad_dir(self):
         """
         A dry run load which uses a bad data loading directory.
@@ -162,7 +152,8 @@ class TestDataSourcesImporter(unittest.TestCase):
             imp.load_data()
 
     def test_do_import_dry_run(self):
-        do_import(dry_run=True, data_dir=None, re_api_url=RE_API_URL,
+        do_import(dry_run=True, data_dir=get_test_data_dir('standard'),
+                  re_api_url=RE_API_URL,
                   auth_token=AUTH_TOKEN)
         self.assertTrue(True)
 
@@ -173,7 +164,8 @@ class TestDataSourcesImporter(unittest.TestCase):
         """
         responses.add(responses.PUT, f'{RE_API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=200)
-        do_import(dry_run=False, data_dir=None, re_api_url=RE_API_URL,
+        do_import(dry_run=False, data_dir=get_test_data_dir('standard'),
+                  re_api_url=RE_API_URL,
                   auth_token=AUTH_TOKEN)
         self.assertTrue(True)
 
@@ -186,7 +178,8 @@ class TestDataSourcesImporter(unittest.TestCase):
         responses.add(responses.PUT, f'{RE_API_URL}/api/v1/documents',
                       json={'do_not': 'care'}, status=400)
         with self.assertRaises(SystemExit) as se:
-            do_import(dry_run=False, data_dir=None, re_api_url=RE_API_URL,
+            do_import(dry_run=False, data_dir=get_test_data_dir('standard'),
+                      re_api_url=RE_API_URL,
                       auth_token=AUTH_TOKEN)
         self.assertEqual(se.exception.code, 1)
 
@@ -196,7 +189,8 @@ class TestDataSourcesImporter(unittest.TestCase):
         using the default data path should succeed.
         """
         my_get_args = MyArgs(dry_run=True, quiet=True, re_api_url=RE_API_URL,
-                             data_dir=None, auth_token=AUTH_TOKEN)
+                             data_dir=get_test_data_dir('standard'),
+                             auth_token=AUTH_TOKEN)
         with patch('importers.data_sources.importer.get_args',
                    return_value=my_get_args) as mock_get_args:
             with self.assertRaises(SystemExit) as se:
@@ -214,7 +208,8 @@ class TestDataSourcesImporter(unittest.TestCase):
 
         for case in cases:
             my_get_args = MyArgs(dry_run=case['dry_run'], quiet=case['quiet'],
-                                 re_api_url=RE_API_URL, data_dir=None,
+                                 re_api_url=RE_API_URL,
+                                 data_dir=get_test_data_dir('standard'),
                                  auth_token=AUTH_TOKEN)
             with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
                 args = get_args()
@@ -228,7 +223,8 @@ class TestDataSourcesImporter(unittest.TestCase):
         """
         from importers.data_sources import importer
         my_get_args = MyArgs(dry_run=True, quiet=True, re_api_url=RE_API_URL,
-                             data_dir=None, auth_token=AUTH_TOKEN)
+                             data_dir=get_test_data_dir('standard'),
+                             auth_token=AUTH_TOKEN)
         with patch('argparse.ArgumentParser.parse_args', return_value=my_get_args):
             with patch.object(importer, '__name__', '__main__'):
                 with self.assertRaises(SystemExit) as se:

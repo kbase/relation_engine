@@ -50,6 +50,16 @@ def get_relative_dir(relative_path):
     return os.path.join(this_dir_path, "..", relative_path)
 
 
+def get_builtin_data_dir():
+    """
+    Utility function to return the full path for a given sub-path
+    relative to the directory this source file resides in.
+    """
+    this_dir_path = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(this_dir_path, "..", "..", "..", 'importers', 'data_sources',
+                        'data')
+
+
 def fail_test():
     assert False
 
@@ -113,13 +123,10 @@ def check_response(response):
     return response
 
 
-def do_import(token, data_dir=None):
+def do_import(token, data_dir):
     command_args = [PYTHON_BIN, "-m", "importers.data_sources.importer", '--auth-token',
-                    token, '--re-api-url', os.environ.get("RE_API_URL")]
-
-    if data_dir is not None:
-        command_args.append('--data-dir')
-        command_args.append(data_dir)
+                    token, '--re-api-url', os.environ.get("RE_API_URL"), '--data-dir',
+                    data_dir]
 
     if QUIET:
         command_args.append("--quiet")
@@ -127,23 +134,23 @@ def do_import(token, data_dir=None):
     subprocess.run(command_args, check=True)
 
 
-def do_import_via_make(token, data_dir=None):
-    command_args = [MAKE_BIN, "test-run-importer"]
+def do_import_via_make(token, data_subdir):
+    command_args = [MAKE_BIN, "run-importer"]
 
-    if data_dir is not None:
-        command_args.append('--data-dir')
-        command_args.append(data_dir)
+    env = os.environ.copy()
 
-    env = {"AUTH_TOKEN": token, "RE_API_URL": os.environ.get("RE_API_URL"),
-           "IMPORTER": "data_sources"}
+    new_env = {"AUTH_TOKEN": token,
+               "RE_API_URL": os.environ.get("RE_API_URL"),
+               "DATA_DIR": f'{os.environ.get("INTEGRATION_TEST_DATA_DIR")}/'
+                           f'{data_subdir}',
+               "IMPORTER": "data_sources"}
+
+    env.update(new_env)
 
     if QUIET:
         env['QUIET'] = 't'
 
-    if data_dir is not None:
-        env["DATA_DIR"] = data_dir
-
-    subprocess.run(' '.join(command_args), check=True, shell=True, env=env)
+    subprocess.run(command_args, check=True, env=env)
 
 
 def get_collection_schema_dir(collection):
@@ -204,7 +211,7 @@ class DataSourcesTests(unittest.TestCase):
         """
         check_response(clear_collection())
         self.assert_collection_count(0)
-        do_import("admin_token")
+        do_import("admin_token", get_builtin_data_dir())
         self.assert_collection_count(6)
         self.assert_data_sources_in_re("taxonomy", 4)
         self.assert_data_sources_in_re("ontology", 2)
@@ -224,7 +231,7 @@ class DataSourcesTests(unittest.TestCase):
         """
         check_response(clear_collection())
         self.assert_collection_count(0)
-        do_import_via_make("admin_token")
+        do_import_via_make("admin_token", 'data_sources/standard')
         self.assert_collection_count(6)
         self.assert_data_sources_in_re("taxonomy", 4)
         self.assert_data_sources_in_re("ontology", 2)
@@ -243,7 +250,7 @@ class DataSourcesTests(unittest.TestCase):
         """
         check_response(clear_collection())
         self.assert_collection_count(0)
-        do_import("admin_token")
+        do_import("admin_token", get_builtin_data_dir())
         self.assert_collection_count(6)
         self.assert_data_sources_in_re("taxonomy", 4)
         self.assert_data_sources_in_re("ontology", 2)
@@ -254,7 +261,7 @@ class DataSourcesTests(unittest.TestCase):
         """
 
         def importer():
-            do_import("non_admin_token")
+            do_import("non_admin_token", get_builtin_data_dir())
 
         self.assert_will_fail(importer)
 
@@ -264,7 +271,7 @@ class DataSourcesTests(unittest.TestCase):
         """
 
         def importer():
-            do_import("invalid_token")
+            do_import("invalid_token", get_builtin_data_dir())
 
         self.assert_will_fail(importer)
 
@@ -274,7 +281,7 @@ class DataSourcesTests(unittest.TestCase):
         """
 
         def importer():
-            do_import("")
+            do_import("", get_builtin_data_dir())
 
         self.assert_will_fail(importer)
 

@@ -10,21 +10,18 @@ unit-tests: dev-network
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
-integration-tests: dev-network start-dev run-integration-tests stop-dev
+integration-tests: dev-network start-dev-server run-integration-tests stop-dev-server
 
 run-integration-tests:
-	cd test/integration && docker-compose run --rm testrunner
+	@cd test/integration && docker-compose run --rm testrunner
 
 run-importer:
-	cd importers && docker-compose run --rm importer
+	@sh scripts/run-importer.sh
 
-test-run-importer:
-	cd importers && docker-compose run -v /var/run/docker.sock:/var/run/docker.sock --rm importer
-
-start-dev:
+start-dev-server:
 	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
 
-stop-dev:
+stop-dev-server:
 	docker-compose down
 
 dev-image:

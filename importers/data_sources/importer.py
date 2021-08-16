@@ -95,24 +95,12 @@ class Importer(object):
         note('info', 'Loading data')
         note('info', 'Parameters:')
         note('info', f'    re-api-url: {self.re_api_url}')
-        note('info', f'    data-dir: {self.data_dir}')
         note('info', f'    dry-run: {self.dry_run}')
 
         is_error = False
 
-        default_data_dir = get_relative_dir('data')
-        # env_data_dir = self.get_config('ROOT_DATA_PATH', None)
-        if self.data_dir is not None:
-            note('info',
-                 '     (using provided data dir')
-            data_dir = self.data_dir
-        else:
-            note('info', '     (Taking data dir from default)')
-            data_dir = default_data_dir
-        note('info', f'     data_dir: "{data_dir}"')
-
-        if not os.path.isdir(data_dir):
-            raise Exception(f'data directory does not exist: {data_dir}')
+        if not os.path.isdir(self.data_dir):
+            raise Exception(f'data directory does not exist: {self.data_dir}')
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
@@ -120,7 +108,7 @@ class Importer(object):
                                    'data_sources_nodes.yaml')
         validator = get_schema_validator(schema_file=schema_file)
 
-        file_path = os.path.join(data_dir, 'data_sources.json')
+        file_path = os.path.join(self.data_dir, 'data_sources.json')
 
         try:
             with open(file_path, 'r') as data_file:
@@ -223,6 +211,12 @@ def get_args():
         help="A KBase auth token",
         required=True
     )
+    required.add_argument(
+        "--data-dir",
+        type=str,
+        help="Path to the import data file(s)",
+        required=True
+    )
 
     # Optional arguments; they have sensible defaults
     optional = parser.add_argument_group('optional named arguments')
@@ -235,11 +229,6 @@ def get_args():
         "--quiet",
         action="store_true",
         help="Shh, run quietly; do not print notes",
-    )
-    optional.add_argument(
-        "--data-dir",
-        type=str,
-        help="Path to the import data file(s)",
     )
 
     return parser.parse_args()
