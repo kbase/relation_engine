@@ -32,9 +32,7 @@ def get_default_dataset_schema_dir():
     schema files.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(
-        dir_path, "../", "../", "spec", "datasets", "data_sources"
-    )
+    return os.path.join(dir_path, "../", "../", "spec", "datasets", "data_sources")
 
 
 def get_relative_dir(relative_path):
@@ -53,17 +51,17 @@ def note(note_type, message):
     if QUIET:
         return
 
-    if note_type == 'info':
-        icon = 'ℹ'
-    elif note_type == 'success':
-        icon = '✓'
-    elif note_type == 'warning':
-        icon = '⚠'
-    elif note_type == 'error':
-        icon = '🐛'
+    if note_type == "info":
+        icon = "ℹ"
+    elif note_type == "success":
+        icon = "✓"
+    elif note_type == "warning":
+        icon = "⚠"
+    elif note_type == "error":
+        icon = "🐛"
     else:
-        icon = '?'
-    print(f'[importer] {icon} {message}')
+        icon = "?"
+    print(f"[importer] {icon} {message}")
 
 
 class Importer(object):
@@ -81,40 +79,41 @@ class Importer(object):
 
     def load_data(self):
         """
-        Load the data_sources source data files located in `ROOT_DATA_PATH` via the 
+        Load the data_sources source data files located in `ROOT_DATA_PATH` via the
         RE API located at `RE_API_URL`. Data files are validated with the jsonschema
         located in the path returned by `get_default_dataset_schema_dir()` defined
         above.
 
-        The `dry_run` parameter will cause the loading process to stop just shy of 
+        The `dry_run` parameter will cause the loading process to stop just shy of
         calling the RE API to store the data in the database. This is a useful for
         validating the data before actual loading, because the loading process is not
-        transactional -- any documents loaded before an error is encountered will 
+        transactional -- any documents loaded before an error is encountered will
         be stored, leaving the collection in an inconsistent state.
         """
-        note('info', 'Loading data')
-        note('info', 'Parameters:')
-        note('info', f'    re-api-url: {self.re_api_url}')
-        note('info', f'    dry-run: {self.dry_run}')
+        note("info", "Loading data")
+        note("info", "Parameters:")
+        note("info", f"    re-api-url: {self.re_api_url}")
+        note("info", f"    dry-run: {self.dry_run}")
 
         is_error = False
 
         if not os.path.isdir(self.data_dir):
-            raise Exception(f'data directory does not exist: {self.data_dir}')
+            raise Exception(f"data directory does not exist: {self.data_dir}")
 
         # The save_dataset method expects a list of documents
         # to save, so we are already set!
-        schema_file = os.path.join(get_default_dataset_schema_dir(),
-                                   'data_sources_nodes.yaml')
+        schema_file = os.path.join(
+            get_default_dataset_schema_dir(), "data_sources_nodes.yaml"
+        )
         validator = get_schema_validator(schema_file=schema_file)
 
-        file_path = os.path.join(self.data_dir, 'data_sources.json')
+        file_path = os.path.join(self.data_dir, "data_sources.json")
 
         try:
-            with open(file_path, 'r') as data_file:
+            with open(file_path, "r") as data_file:
                 data_sources = json.load(data_file)
         except OSError as ose:
-            note('error', 'Error loading import data file')
+            note("error", "Error loading import data file")
             return False
 
         data_sources_to_save = []
@@ -122,28 +121,28 @@ class Importer(object):
             if not validator.is_valid(data_source):
                 for e in sorted(validator.iter_errors(data_source), key=str):
                     is_error = True
-                    note('error', f'Validation error: {e.message}')
+                    note("error", f"Validation error: {e.message}")
                 continue
             else:
-                data_source['_key'] = data_source['ns']
+                data_source["_key"] = data_source["ns"]
                 data_sources_to_save.append(data_source)
 
         if is_error:
-            note('error', 'Data did not validate')
+            note("error", "Data did not validate")
             if self.dry_run:
-                note('error', 'Dry run completed with errors')
+                note("error", "Dry run completed with errors")
             else:
-                note('error', 'Due to errors, data will not be loaded')
+                note("error", "Due to errors, data will not be loaded")
             return False
 
-        note('success', 'Data loaded and validated successfully')
+        note("success", "Data loaded and validated successfully")
 
         # if there are no errors then save the dataset unless this is a dry run
         if self.dry_run:
-            note('success', 'Dry run completed successfully')
-            note('warning', 'REMEMBER: Data not loaded')
+            note("success", "Dry run completed successfully")
+            note("warning", "REMEMBER: Data not loaded")
         else:
-            self.save_docs('data_sources_nodes', data_sources_to_save)
+            self.save_docs("data_sources_nodes", data_sources_to_save)
         return True
 
     def save_docs(self, collection, docs, on_duplicate="update"):
@@ -151,44 +150,40 @@ class Importer(object):
         Saves the source_data docs into the RE database via the RE api
         """
         resp = requests.put(
-            f'{self.re_api_url}/api/v1/documents',
-            params={
-                "collection": collection,
-                "on_duplicate": on_duplicate
-            },
-            headers={
-                "Authorization": self.auth_token
-            },
+            f"{self.re_api_url}/api/v1/documents",
+            params={"collection": collection, "on_duplicate": on_duplicate},
+            headers={"Authorization": self.auth_token},
             data="\n".join(json.dumps(d) for d in docs),
         )
         if not resp.ok:
             raise RuntimeError(resp.text)
 
-        note('success', f"Saved docs to collection {collection}!")
+        note("success", f"Saved docs to collection {collection}!")
         for key, value in resp.json().items():
-            note('info', f'     {key}: {value}')
+            note("info", f"     {key}: {value}")
         return resp
 
 
 def do_import(dry_run, data_dir, re_api_url, auth_token):
     """
-    Wraps the loading process, passing the `dry_run` parameter to the 
+    Wraps the loading process, passing the `dry_run` parameter to the
     `load_data()` method. It traps exceptions, displaying them and exiting with
     the exit status code 1.
     """
-    note('info', 'Starting Import')
-    importer = Importer(dry_run=dry_run, data_dir=data_dir, re_api_url=re_api_url,
-                        auth_token=auth_token)
+    note("info", "Starting Import")
+    importer = Importer(
+        dry_run=dry_run, data_dir=data_dir, re_api_url=re_api_url, auth_token=auth_token
+    )
     try:
         if not importer.load_data():
             sys.exit(1)
     except Exception as err:
-        note('error', "Unhandled exception:")
-        note('error', str(err))
-        note('error', traceback.format_exc())
+        note("error", "Unhandled exception:")
+        note("error", str(err))
+        note("error", traceback.format_exc())
         sys.exit(1)
     finally:
-        note('info', 'Finished Import')
+        note("info", "Finished Import")
 
 
 def get_args():
@@ -198,28 +193,22 @@ def get_args():
     parser = argparse.ArgumentParser(description="Load data_sources data")
 
     # Required arguments
-    required = parser.add_argument_group('required named arguments')
+    required = parser.add_argument_group("required named arguments")
     required.add_argument(
         "--re-api-url",
         type=str,
         help="URL to an instance of Relation Engine",
-        required=True
+        required=True,
     )
     required.add_argument(
-        "--auth-token",
-        type=str,
-        help="A KBase auth token",
-        required=True
+        "--auth-token", type=str, help="A KBase auth token", required=True
     )
     required.add_argument(
-        "--data-dir",
-        type=str,
-        help="Path to the import data file(s)",
-        required=True
+        "--data-dir", type=str, help="Path to the import data file(s)", required=True
     )
 
     # Optional arguments; they have sensible defaults
-    optional = parser.add_argument_group('optional named arguments')
+    optional = parser.add_argument_group("optional named arguments")
     optional.add_argument(
         "--dry-run",
         action="store_true",
@@ -236,14 +225,18 @@ def get_args():
 
 def main():
     """
-    The canonical main function is the interface between command line usage and 
+    The canonical main function is the interface between command line usage and
     the import process defined above.
     """
     global QUIET
     args = get_args()
     QUIET = args.quiet
-    do_import(dry_run=args.dry_run, data_dir=args.data_dir, re_api_url=args.re_api_url,
-              auth_token=args.auth_token)
+    do_import(
+        dry_run=args.dry_run,
+        data_dir=args.data_dir,
+        re_api_url=args.re_api_url,
+        auth_token=args.auth_token,
+    )
     sys.exit(0)
 
 

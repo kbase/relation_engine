@@ -14,8 +14,8 @@ from relation_engine_server.utils.json_validation import (
 # python instance in a subprocess.
 #
 PYTHON_BIN = os.environ.get("PYTHON_BIN", sys.executable)
-SHELL_BIN = 'sh'
-MAKE_BIN = 'make'
+SHELL_BIN = "sh"
+MAKE_BIN = "make"
 
 #
 # Set up urls required by the integration tests.
@@ -56,8 +56,9 @@ def get_builtin_data_dir():
     relative to the directory this source file resides in.
     """
     this_dir_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(this_dir_path, "..", "..", "..", 'importers', 'data_sources',
-                        'data')
+    return os.path.join(
+        this_dir_path, "..", "..", "..", "importers", "data_sources", "data"
+    )
 
 
 def fail_test():
@@ -124,9 +125,17 @@ def check_response(response):
 
 
 def do_import(token, data_dir):
-    command_args = [PYTHON_BIN, "-m", "importers.data_sources.importer", '--auth-token',
-                    token, '--re-api-url', os.environ.get("RE_API_URL"), '--data-dir',
-                    data_dir]
+    command_args = [
+        PYTHON_BIN,
+        "-m",
+        "importers.data_sources.importer",
+        "--auth-token",
+        token,
+        "--re-api-url",
+        os.environ.get("RE_API_URL"),
+        "--data-dir",
+        data_dir,
+    ]
 
     if QUIET:
         command_args.append("--quiet")
@@ -139,16 +148,17 @@ def do_import_via_make(token, data_subdir):
 
     env = os.environ.copy()
 
-    new_env = {"AUTH_TOKEN": token,
-               "RE_API_URL": os.environ.get("RE_API_URL"),
-               "DATA_DIR": f'{os.environ.get("INTEGRATION_TEST_DATA_DIR")}/'
-                           f'{data_subdir}',
-               "IMPORTER": "data_sources"}
+    new_env = {
+        "AUTH_TOKEN": token,
+        "RE_API_URL": os.environ.get("RE_API_URL"),
+        "DATA_DIR": f'{os.environ.get("INTEGRATION_TEST_DATA_DIR")}/' f"{data_subdir}",
+        "IMPORTER": "data_sources",
+    }
 
     env.update(new_env)
 
     if QUIET:
-        env['QUIET'] = 't'
+        env["QUIET"] = "t"
 
     subprocess.run(command_args, check=True, env=env)
 
@@ -159,9 +169,7 @@ def get_collection_schema_dir(collection):
     schema files.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(
-        dir_path, "..", "..", "..", "spec", "collections", collection
-    )
+    return os.path.join(dir_path, "..", "..", "..", "spec", "collections", collection)
 
 
 # The Tests
@@ -181,13 +189,14 @@ class DataSourcesTests(unittest.TestCase):
         self.assertFalse(all_data_sources["has_more"])
         self.assertEqual(len(all_data_sources["results"]), count)
         # now apply the jsonschema.
-        spec_path = os.path.join(get_collection_schema_dir("data_sources"),
-                                 "data_sources_nodes.yaml")
+        spec_path = os.path.join(
+            get_collection_schema_dir("data_sources"), "data_sources_nodes.yaml"
+        )
         validator = get_schema_validator(schema_file=spec_path, validate_at="/schema")
         # Expect each doc to be just like uploaded, with the exception of keys
         # added by arangodb (_id, _rev) and by RE (updated_at).
         for data_source in all_data_sources["results"]:
-            for extra_key in ['_id', '_rev', 'updated_at']:
+            for extra_key in ["_id", "_rev", "updated_at"]:
                 del data_source[extra_key]
             validator.validate(instance=data_source)
 
@@ -231,7 +240,7 @@ class DataSourcesTests(unittest.TestCase):
         """
         check_response(clear_collection())
         self.assert_collection_count(0)
-        do_import_via_make("admin_token", 'data_sources/standard')
+        do_import_via_make("admin_token", "data_sources/standard")
         self.assert_collection_count(6)
         self.assert_data_sources_in_re("taxonomy", 4)
         self.assert_data_sources_in_re("ontology", 2)
