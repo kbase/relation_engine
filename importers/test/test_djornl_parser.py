@@ -72,7 +72,7 @@ class Test_DJORNL_Parser(unittest.TestCase):
             parser.config("bananas")
 
     def test_load_no_manifest(self):
-
+        """test loading when the manifest does not exist"""
         RES_ROOT_DATA_PATH = os.path.join(_TEST_DIR, "djornl", "no_manifest")
         err_str = "No manifest file found at " + os.path.join(
             RES_ROOT_DATA_PATH, "manifest.yaml"
