@@ -38,3 +38,9 @@ reset:
 
 interpreter-container:
 	cd dev/interpreter && sh build.sh
+
+black:
+	black relation_engine_server
+	black test/integration
+	black client_src
+	black importers
