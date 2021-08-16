@@ -25,6 +25,11 @@ class Test_prepare_ontology(unittest.TestCase):
     def test_parse_input(self):
         d = parse_input(self.data_sources_file, _TEST_NAMESPACE)
         self.assertEqual(d["ns"], _TEST_NAMESPACE)
+        with self.assertRaises(FileNotFoundError):
+            parse_input("non_exist_file", _TEST_NAMESPACE)
+        with self.assertRaises(ValueError) as ctx:
+            parse_input(self.data_sources_file, "non_exist_ns")
+        self.assertEqual("no namespace: non_exist_ns", str(ctx.exception))
 
     def test_parse_namespace(self):
         n, t = parse_namespace(_TEST_NAMESPACE)
@@ -35,12 +40,22 @@ class Test_prepare_ontology(unittest.TestCase):
         d = parse_input(self.data_sources_file, _TEST_NAMESPACE)
         ret = prepare_data_sources_file(d, _TEST_DIR)
         self.assertTrue(os.path.exists(ret))
+        with self.assertWarns(UserWarning):
+            prepare_data_sources_file(d, _TEST_DIR)
         clean_up_data(ret)
         self.assertFalse(os.path.exists(ret))
+        with self.assertRaises(FileNotFoundError) as ctx:
+            prepare_data_sources_file(d, "non_exist_path")
+        self.assertEqual("non_exist_path doesn't exists", str(ctx.exception))
 
     def test_collections_file(self):
         d = parse_input(self.data_sources_file, _TEST_NAMESPACE)
         ret = prepare_collections_file(d, _TEST_DIR)
         self.assertTrue(os.path.exists(ret))
+        with self.assertWarns(UserWarning):
+            prepare_collections_file(d, _TEST_DIR)
         clean_up_data(ret)
         self.assertFalse(os.path.exists(ret))
+        with self.assertRaises(FileNotFoundError) as ctx:
+            prepare_collections_file(d, "non_exist_path")
+        self.assertEqual("non_exist_path doesn't exists", str(ctx.exception))
