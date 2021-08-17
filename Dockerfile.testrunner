@@ -21,11 +21,11 @@ WORKDIR /app
 # mounted at /app.
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.vcs-url="https://github.com/kbase/relation_engine" \
-      org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.schema-version="1.0.0-rc1" \
-      us.kbase.vcs-branch=$BRANCH \
-      maintainer="KBase Team"
+    org.label-schema.vcs-url="https://github.com/kbase/relation_engine" \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.schema-version="1.0.0-rc1" \
+    us.kbase.vcs-branch=$BRANCH \
+    maintainer="KBase Team"
 
 ENTRYPOINT ["sh"]
-CMD ["-x", "/app/test/integration/scripts/run-integration-tests.sh"]
+CMD ["/app/test/integration/scripts/run-integration-tests.sh"]
