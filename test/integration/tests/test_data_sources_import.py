@@ -148,10 +148,12 @@ def do_import_via_make(token, data_subdir):
 
     env = os.environ.copy()
 
+    data_dir = os.environ.get("INTEGRATION_TEST_DATA_DIR")
+
     new_env = {
         "AUTH_TOKEN": token,
         "RE_API_URL": os.environ.get("RE_API_URL"),
-        "DATA_DIR": f'{os.environ.get("INTEGRATION_TEST_DATA_DIR")}/' f"{data_subdir}",
+        "DATA_DIR": f"{data_dir}/{data_subdir}",
         "IMPORTER": "data_sources",
     }
 

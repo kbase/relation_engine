@@ -13,7 +13,7 @@ unit-tests: dev-network
 integration-tests: dev-network start-dev-server run-integration-tests stop-dev-server
 
 run-integration-tests:
-	@cd test/integration && docker-compose run --rm testrunner
+	@sh scripts/run-integration-tests.sh
 
 run-importer:
 	@sh scripts/run-importer.sh
