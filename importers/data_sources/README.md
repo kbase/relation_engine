@@ -1,58 +1,62 @@
-# Install data_sources dataset
+# Data Sources
 
-The script and data within this directory allow one to load _data sources_ into the RE database via the RE API.
+## Background
 
-A default import data file is located in the `importers/data_sources/data` directory, containing data sources for
-taxonomy and ontology sources.
+A data source describes a taxonomy or ontology namespace. Taxonomies and ontologies are created and managed by external organizations and roughly (or specifically, in the case of many ontologies) conform to the same data model. When imported into RE, each taxonomy and ontology is associated with a namespace identifier. Each data source is uniquely identified by this namespace identifier.
 
-This script has only been used in development thus far. In this case, a local RE API server is started first and
-subsequently used as the target for importing.
+A data source describes the data organization (e.g. name, description, url) and characteristics of the data model. Generally the data model for taxonomies within RE are consistent within taxonomies, and ontologies are self-consistent as well. Assuming there is a "base" data model for taxonomies and ontologies, the data source describes any differences from that base model. More concretely, the data source provides a set of additional fields beyond the base model. This allows front end code to display taxonomy and ontology items in both a consistent manner (exploiting the base model) but with specificity (as informed by the data source definition.)
 
-> This document describes a procedure for loading data locally, but does not claim provenance over production data provisioning. This script should work fine for initial load, and can be used for subsequent updates if the script is pointed at a data file which contains just the new documents.
+A default import data file is located in the `importers/data_sources/data` directory, containing data sources for taxonomy and ontology sources.
 
-This
+## Purpose
+
+This document describes a procedure for loading data_sources into RE.
 
 ## Import via Docker container
 
-Although the import script may be run directly from the host system via a virtual environment terminal, it is easier and
-more reliable to run the import script within a Docker container.
+Although the import script may be run directly from the host system via Python, it is easier and more reliable to run the import script within a Docker container.
 
-### Requirements
-
-- make
-- docker
+See the [import doc](../README.md) for details on usage of the importer container.
 
 ### Example
 
-An RE API server should be available for importing to. In this example, we'll start the development server locally:
+#### Start a development RE API server
+
+First, an RE API server must be available for importing to operate against. In this example, we'll start the development server locally:
 
 ```bash
 make start-dev-server
+SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
+Creating relation_engine_workspace_1 ... done
+Creating relation_engine_arangodb_1  ... done
+Creating relation_engine_auth_1      ... done
+Creating relation_engine_re_api_1    ... done
 ```
 
-Then we run the container-based importer via the Makefile.
+Note that this instance of the server uses the full Spec release to populate the database. This ensures that all collections are adequately set up, and ready for population.
+
+#### Import data sources
+
+Next, we run the container-based importer via the Makefile.
 
 ```bash
-IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
+DATA_DIR=`pwd`/importers/data_sources/data IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
 ```
 
-Note that we communicate parameters to the import container via environment variables. Internally, these environment
-variables are transformed to command line arguments for the import script.
+Note that we communicate parameters to the import container via environment variables. Internally, these environment variables are transformed to command line arguments for the import script.
 
 In this case:
 
-- `IMPORTER` determines which import script is run; the script should be located in `importers/IMPORTER/import.py`.
-- `RE_API_URL` provides the url to the RE API server; in this case it is the hostname assigned to the RE API development
+- `DATA_DIR` indicates an absolute path to the `data_sources` canonical data on the host system.
+- `IMPORTER` indicates that we want to run the `data_sources` importer; the script is located in `importers/data_sources/import.py`.
+- `RE_API_URL` provides the url to the RE API server; we are using the RE API development server, which is assigned the hostname `re_api` and port 5000; this hostname is only available inside the docker network, which is where the import script runs.
   server within the docker network.
-- `AUTH_TOKEN` provides a KBase auth token to be used for RE API or other service requests. In this case, the
-  development auth server recognizes `admin_token` and `nonadmin_token` as valid auth tokens.
+- `AUTH_TOKEN` provides a KBase auth token to be used for RE API or other service requests. In this case, the development RE API and auth server recognizes `admin_token` and `nonadmin_token` as valid auth tokens.
 
 The result should look like:
 
 ```bash
-(venv) % IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
-cd importers && docker-compose run --rm importer
-WARNING: The DATA_DIR variable is not set. Defaulting to a blank string.
+% DATA_DIR=`pwd`/importers/data_sources/data IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
 WARNING: The DRY_RUN variable is not set. Defaulting to a blank string.
 WARNING: The QUIET variable is not set. Defaulting to a blank string.
 WARNING: The VERBOSE variable is not set. Defaulting to a blank string.
@@ -61,74 +65,25 @@ Creating importers_importer_run ... done
 [importer] ℹ Loading data
 [importer] ℹ Parameters:
 [importer] ℹ     re-api-url: http://re_api:5000
-[importer] ℹ     data-dir: None
 [importer] ℹ     dry-run: False
-[importer] ℹ      (Taking data dir from default)
-[importer] ℹ      data_dir: "/app/importers/data_sources/data"
 [importer] ✓ Data loaded and validated successfully
 [importer] ✓ Saved docs to collection data_sources_nodes!
-[importer] ℹ      created: 6
+[importer] ℹ      created: 0
 [importer] ℹ      empty: 0
 [importer] ℹ      error: False
 [importer] ℹ      errors: 0
 [importer] ℹ      ignored: 0
-[importer] ℹ      updated: 0
+[importer] ℹ      updated: 6
 [importer] ℹ Finished Import
 ```
-
-### More examples
-
-#### Inhibit messages (QUIET)
-
-Use the `QUIET` variable to stop printing most information to the console. Setting it to any non-blank string will set
-QUIET mode.
-
-```bash
-(venv) % QUIET=t IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
-WARNING: The DATA_DIR variable is not set. Defaulting to a blank string.
-WARNING: The DRY_RUN variable is not set. Defaulting to a blank string.
-WARNING: The VERBOSE variable is not set. Defaulting to a blank string.
-Creating importers_importer_run ... done
-```
-
-Note that informational lines are still printed. These are from `docker-compose`, and cannot be prevented.
-
-#### Print more info (VERBOSE)
-
-On the other hand, the printing of script lines may be enabled with the `VERBOSE` flag:
-
-```bash
-(venv) % VERBOSE=t QUIET=t IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
-WARNING: The DATA_DIR variable is not set. Defaulting to a blank string.
-WARNING: The DRY_RUN variable is not set. Defaulting to a blank string.
-Creating importers_importer_run ... done
-+ '[' -z data_sources ]
-+ '[' -z http://re_api:5000 ]
-+ '[' -z admin_token ]
-+ export 'IMPORT_PATH=importers.data_sources.importer'
-+ export 'ARGS=--re-api-url http://re_api:5000 --auth-token admin_token   --quiet'
-+ python -m importers.data_sources.importer --re-api-url http://re_api:5000 --auth-token admin_token --quiet
-```
-
-Note the addition of the lines beginning with `+`: These are the actual script lines run by the container's entrypoint
-script.
-
-#### Use custom data (DATA_DIR)
-
-Data may be imported from an arbitrary directory with the `DATA_DIR` environment variable. Within this directory must be
-a JSON file named `data_sources.json`.
-
-```bash
-DATA_DIR=`pwd`/temp IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
-```
-
-### More
 
 See the [importers docs](../README.md) for details.
 
 ## Direct import with Python
 
-Set up a Python environment:
+> Note that this method represents the original way to run the importer; now that the containerized workflow is in place, it may not be necessary to support direct import explicitly like this, although documenting the operation of the import script is still a good thing.
+
+### Set up a Python environment
 
 At top level of repo:
 
@@ -138,87 +93,66 @@ source venv/bin/activate
 pip install --upgrade pip
 ```
 
-Install Python dependencies:
+### Install Python dependencies
 
 ```bash
 pip install -r dev-requirement.txt
 ```
 
-Run the data importer. Each importer is an independent script, but they will probably follow a pattern similar to this
-example.
+### Ensure an RE API server is available
+
+In this case, we will start up the local development server:
+
+```bash
+make start-dev-server
+```
+
+The relation engine will be running at on the host at `localhost:5000`, or internally at `re_api:5000` in the docker network.
+
+When running against a local RE instance like this, you'll need to point the importer at `re_api:5000`. For a deployment, you would want to use the appropriate url, e.g. `https://ci.kbase.us/services/relation_engine`.
+
+### Run an import in `dry-run` mode
 
 The import script uses a file named `data_sources.json` to populate the `data_sources_nodes` collection.
 
 Here we install from the default built-in data source, in dry-run mode, which prevents saving to the database.
 
 ```bash
- (venv) % python -m importers.data_sources.importer --dry-run --re-api-url http://localhost:5000 --auth-token none                  
+(venv) % python -m importers.data_sources.importer --dry-run --re-api-url http://localhost:5000 --auth-token admin_token --data-dir importers/data_sources/data
 [importer] ℹ Starting Import
 [importer] ℹ Loading data
 [importer] ℹ Parameters:
 [importer] ℹ     re-api-url: http://localhost:5000
 [importer] ℹ     dry-run: True
-[importer] ℹ     (Taking data dir from default)
-[importer] ℹ     data-dir: "/Users/erikpearson/work/kbase/relation_engine/importers/data_sources/data"
-[importer] ✓ Data loaded and validated successfully
-[importer] ✓ Dry run completed successfully
-[importer] ⚠ REMEMBER: Data not loaded
-[importer] ℹ Finished Import
-
-```
-
-Note that the import script reports that it is importing the default, base data. This data is located
-in `importers/data_sources/data` and consists of a single file, `data_sources.json`. This file contains a good set of
-valid taxonomy and ontology data sources which can be used to seed the database or in testing.
-
-In the next example we use an external data source, in this case located in the `temp`:
-
-```bash
-(venv )% `python -m importers.data_sources.importer --dry-run --re-api-url http://localhost:5000 --auth-token none --data-dir temp`
-[importer] ℹ Starting Import
-[importer] ℹ Loading data
-[importer] ℹ Parameters:
-[importer] ℹ     re-api-url: http://localhost:5000
-[importer] ℹ     dry-run: True
-[importer] ℹ     (using provided data dir
-[importer] ℹ     data-dir: "temp"
 [importer] ✓ Data loaded and validated successfully
 [importer] ✓ Dry run completed successfully
 [importer] ⚠ REMEMBER: Data not loaded
 [importer] ℹ Finished Import
 ```
 
-The `quiet` option may be used to prevent printing of notes to the terminal:
+Let us tease this apart:
+
+- we invoke the data_sources importer main script with `-m importers.data_sources.importer`
+- we indicate this is a dry run with the `--dry-run` switch
+- we specify the url for the RE API server we want to import into; in this case it is the url to the development server we started earlier, which operates on `localhost:5000` since it is operating inside the docker container, and port 5000 is exposed
+- we use the KBase auth token `admin_token`, which is configured in the development server
+- we use the built-in data in `importers/data_sources/data`.
+
+The data is located in `importers/data_sources/data` and consists of a single file, `data_sources.json`. This file contains a good set of valid taxonomy and ontology data sources which can be used to seed the database or in testing.
+
+In actual usage all of these arguments would be tailored to the actual task; the url would point to an actual RE API instance, the data would either update existing data sources or add new ones, and the token would be a real KBase token associated with an account which has admin privileges for RE.
+
+#### Perform the import
+
+Of course, our goal is to actually import data, so after an initial `--dry-run` to prove that the data is valid, we would want to perform a real import:
 
 ```bash
-(venv) % python -m importers.data_sources.importer --dry-run --re-api-url http://localhost:5000 --auth-token none --quiet
-(venv) % 
-
-```
-
-Finally, to import the data, simply remove `--dry-run`.
-
-In this example we'll first start up a local testing copy of the RE API server:
-
-```bash
-make start-dev-server
-```
-
-This makes the RE API available on the host machine at http://localhost:5000. (In a later section, we'll see that the
-import script may (should) be run inside a docker container.)
-
-```bash
-python -m importers.data_sources.importer --re-api-url http://localhost:5000 --auth-token admin_token ```
-
-```bash
-(venv)  % python -m importers.data_sources.importer --re-api-url http://localhost:5000 --auth-token admin_token
+(venv)  % python -m importers.data_sources.importer --re-api-url http://localhost:5000 --auth-token admin_token --data-dir importers/data_sources/data
 [importer] ℹ Starting Import
 [importer] ℹ Loading data
 [importer] ℹ Parameters:
 [importer] ℹ     re-api-url: http://localhost:5000
 [importer] ℹ     dry-run: False
-[importer] ℹ     (Taking data dir from default)
-[importer] ℹ     data-dir: "/Users/erikpearson/work/kbase/relation_engine/importers/data_sources/data"
 [importer] ✓ Data loaded and validated successfully
 [importer] ✓ Saved docs to collection data_sources_nodes!
 [importer] ℹ      created: 6
@@ -228,8 +162,11 @@ python -m importers.data_sources.importer --re-api-url http://localhost:5000 --a
 [importer] ℹ      ignored: 0
 [importer] ℹ      updated: 0
 [importer] ℹ Finished Import
-
 ```
+
+Note that the script reports that '6' documents were created.
+
+#### Shut down server
 
 The test RE API Server should be shut down when done:
 
@@ -237,13 +174,31 @@ The test RE API Server should be shut down when done:
 make stop-dev-server
 ```
 
-### Files involved:
+### Other Options
+
+The `--quiet` switch may be used to prevent printing of notes to the terminal; off by default.
+
+The `--verbose` switch may be used to have shell scripts echo their command lines; useful for debugging; off by default.
+
+### Files involved
+
+#### General usage
 
 - `Makefile` (`make run-importer`)
 - `Dockerfile.importer`
 - `importers/import.sh`
 - `importers/docker-compose.yaml`
 - `importers/requirements.txt`
+
+#### `data_sources` importer
+
+- `importers`
+  - `data_sources`
+    - `data`
+      - `data_sources.json`
+    - `test/data`
+    - `importer.py`
+    - `README.md`
 
 E.g.
 
@@ -252,36 +207,3 @@ Start the relation engine:
 ```bash
 make start-dev
 ```
-
-The relation engine will be running at on the host at `localhost:5000`, or internally at `re_api:5000` in the docker
-network.
-
-When running against a local RE instance like this, you'll need to point the importer at `re_api:5000`. For a
-deployment, you would want to use the appropriate url, e.g. `https://ci.kbase.us/services/relation_engine`.
-
-Run the importer
-
-```bash
-python -m importers.data_sources.importer --auth-token admin_token --api-url http://localhost:5000 
-```
-
-Note that
-
-- `--auth-token admin_token` matches the mocking setup, so must be used for evaluating import with the local test
-  container
-- `--api-url http://localhost:5000` matches the RE api running in a local container
-
-Clearly, if running against a deployed RE API, the url to that service must be used, and a real admin token for that
-environment must be used.
-
-> TODO: describe that admin url...
->
->
-
-### Dependencies
-
-- make
-- docker
-
-### Environment Variables
-
