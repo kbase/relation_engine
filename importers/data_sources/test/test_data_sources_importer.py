@@ -17,7 +17,7 @@ from importers.data_sources.importer import (
 
 RE_API_URL = "http://localhost:5000"
 AUTH_URL = "http://auth:5000"
-AUTH_TOKEN = "admin_token"
+AUTH_TOKEN = "admin_token"  # nosec
 
 ME_RESPONSE = {
     "created": 1578347292120,
