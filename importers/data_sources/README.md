@@ -56,7 +56,7 @@ In this case:
 The result should look like:
 
 ```bash
-% DATA_DIR=`pwd`/importers/data_sources/data IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
+(venv) % DATA_DIR=`pwd`/importers/data_sources/data IMPORTER=data_sources RE_API_URL=http://re_api:5000 AUTH_TOKEN=admin_token make run-importer
 WARNING: The DRY_RUN variable is not set. Defaulting to a blank string.
 WARNING: The QUIET variable is not set. Defaulting to a blank string.
 WARNING: The VERBOSE variable is not set. Defaulting to a blank string.
@@ -68,12 +68,12 @@ Creating importers_importer_run ... done
 [importer] ℹ     dry-run: False
 [importer] ✓ Data loaded and validated successfully
 [importer] ✓ Saved docs to collection data_sources_nodes!
-[importer] ℹ      created: 0
+[importer] ℹ      created: 6
 [importer] ℹ      empty: 0
 [importer] ℹ      error: False
 [importer] ℹ      errors: 0
 [importer] ℹ      ignored: 0
-[importer] ℹ      updated: 6
+[importer] ℹ      updated: 0
 [importer] ℹ Finished Import
 ```
 

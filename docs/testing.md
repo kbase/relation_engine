@@ -1,13 +1,13 @@
 # Testing
 
-All tests are run in docker containers, and the test scripts are run via the Makefile. Thus top level dependencies are:
+All tests are run in docker containers. Tests are invoked with Makefile tasks.
+
+Top level dependencies are:
 
 - make
 - docker
 
 ## Unit testing
-
-### Quick
 
 ```bash
 make unit-tests
@@ -19,8 +19,10 @@ make unit-tests
 make integration-tests
 ```
 
-## All Tests
+## All Tests and code quality checks
 
 ```bash
 make test
 ```
+
+Note that after running this, files may have been reformatted by `black`. 
