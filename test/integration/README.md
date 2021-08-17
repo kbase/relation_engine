@@ -22,13 +22,13 @@ At present, integration tests only support the `data_sources` importer.
 
 ## How it works
 
-First the RE_API and support services (arango, mock workspace and user profile) are started with `docker compose`. These are defined in the top level `docker-compose.yml` file. 
+First the RE_API and support services (arango, mock workspace and user profile) are started with `docker compose`. These are defined in the top level `docker-compose.yml` file.
 
-Then the script `test/integration/scripts/run-integration-scripts.sh` is run. 
+Then the script `test/integration/scripts/run-integration-scripts.sh` is run.
 
 This script first waits for the RE_API to become ready. The RE_API will populate the arango db with collections as soon as it starts, which may take a few seconds.
 
-When the RE_API is ready, the integration tests located in `test/integration/tests` are run. The tests are run in a small (ish, 64MB at last count, compared to the base python image size of 42MB) test container. 
+When the RE_API is ready, the integration tests located in `test/integration/tests` are run. The tests are run in a small (ish, 64MB at last count, compared to the base python image size of 42MB) test container.
 
 When the tests complete, the RE_API and support services are shut down.
 
