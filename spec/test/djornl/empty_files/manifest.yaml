@@ -5,6 +5,7 @@ file_list:
     path: merged_edges-AMW-060820_AF.tsv
 
   - data_type: node
+    file_format: csv
     path: aranet2-aragwas-MERGED-AMW-v2_091319_nodeTable.csv
 
   - data_type: cluster
