@@ -5,6 +5,10 @@ delta: true
 indexes:
   - type: fulltext
     fields: [scientific_name]
+    minLength: 1
+  - type: fulltext
+    fields: [name]
+    min_length: 1
   - type: persistent
     fields: [id, expired, created]
   - type: persistent
@@ -22,11 +26,21 @@ schema:
         with ':' and the taxon name with spaces replaced by underscores. For an organism node,
         it is the accession ID.
       examples: ['p:Firmicutes', 's:Sediminibacterium_sp002786355', 'RS_GCF_000169355.1']
-    scientific_name:
-      type: string
-      description: The name of the taxon
-      examples: ['Firmicutes', 'Sediminibacterium sp002786355']
     rank:
       type: string
       title: Taxonomic rank
-      examples: [domain, phylum]
+      enum: [domain, phylum, class, order, family, genus, species, genome]
+    name:
+      type: string
+      description: The name of the taxon
+      examples: ['Firmicutes', 'Sediminibacterium sp002786355']
+    first_version:
+      type: string
+      examples: [r89]
+    last_version:
+      type: string
+      examples: [r89]
+    scientific_name:
+      type: string
+      description: Legacy copy of property `name`. Scientific names typically only apply to species taxa,
+        i.e., only are binomial nomenclature consisting of genus name and species epithet

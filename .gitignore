@@ -18,3 +18,9 @@ coverage_report/
 
 # Spec archives
 spec.tar.gz
+
+# Creds
+arango_config.json
+
+*.sw[a-z]
+out

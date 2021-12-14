@@ -24,6 +24,7 @@ RUN apk --update add --virtual build-dependencies build-base python3-dev && \
     if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \
     apk del build-dependencies && \
     pip install types-requests types-PyYAML
+RUN pip install pytest
 
 COPY . /app
 

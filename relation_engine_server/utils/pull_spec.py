@@ -58,6 +58,7 @@ def download_specs(
     if init_collections:
         do_init_collections()
         do_init_views()
+        do_init_analyzers()
     return update_name
 
 
@@ -79,6 +80,15 @@ def do_init_views():
         with open(path) as fd:
             config = json.load(fd)
         arango_client.create_view(view_name, config)
+
+
+def do_init_analyzers():
+    pattern = os.path.join(_CONF["spec_paths"]["analyzers"], "*.json")
+    for path in glob.iglob(pattern):
+        analyzer_name = os.path.basename(os.path.splitext(path)[0])
+        with open(path) as fd:
+            config = json.load(fd)
+        arango_client.create_analyzer(analyzer_name, config)
 
 
 def _fetch_github_release_url():

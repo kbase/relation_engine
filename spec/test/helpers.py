@@ -66,7 +66,7 @@ def create_test_docs(coll_name, docs, update_on_dupe=False):
     return resp
 
 
-def check_spec_test_env():
+def check_spec_test_env(do_download_specs=True):
     """ensure that the environment is prepared for running the spec tests"""
     if os.environ.get("SPEC_TEST_READY", None) is None:
         wait_for_api()
@@ -78,7 +78,8 @@ def check_spec_test_env():
         # copy the contents of /app/spec into /spec
         shutil.rmtree(_CONF["spec_paths"]["root"], ignore_errors=True)
         shutil.copytree("/app/spec", _CONF["spec_paths"]["root"])
-        download_specs()
+        if do_download_specs:
+            download_specs()
         os.environ.update({"SPEC_TEST_READY": "Done"})
 
 

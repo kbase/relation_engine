@@ -54,5 +54,6 @@ def get_config():
             "data_sources": os.path.join(spec_path, "data_sources"),
             "stored_queries": os.path.join(spec_path, "stored_queries"),
             "views": os.path.join(spec_path, "views"),
+            "analyzers": os.path.join(spec_path, "analyzers"),
         },
     }

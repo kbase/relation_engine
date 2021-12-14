@@ -1,0 +1,11 @@
+name: analyzer_schema
+type: object
+required: ['name', 'type']
+properties:
+  name:
+    type: string
+    title: Analyzer name
+  type:
+    type: string
+    title: Analyzer type
+    examples: ['identity', 'text']
