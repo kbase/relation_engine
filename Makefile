@@ -1,11 +1,33 @@
 .PHONY: test reset
 
-test:
+dev-network:
+	docker network create kbase-dev || true
+
+test: unit-tests integration-tests
+
+unit-tests: dev-network
 	docker-compose build
 	docker-compose run re_api sh scripts/run_tests.sh
 	docker-compose down --remove-orphans
 
-shell:
+integration-tests: dev-network start-dev-server run-integration-tests stop-dev-server
+
+run-integration-tests:
+	@sh scripts/run-integration-tests.sh
+
+run-importer:
+	@sh scripts/run-importer.sh
+
+start-dev-server:
+	SPEC_RELEASE_PATH=/opt/spec.tar.gz docker-compose up -d re_api
+
+stop-dev-server:
+	docker-compose down
+
+dev-image:
+	docker-compose build
+
+shell: dev-network
 	docker-compose down --remove-orphans
 	docker-compose build
 	docker-compose run re_api sh
@@ -13,3 +35,12 @@ shell:
 reset:
 	docker-compose --rmi all -v
 	docker-compose build
+
+interpreter-container:
+	cd dev/interpreter && sh build.sh
+
+black:
+	black relation_engine_server
+	black test/integration
+	black client_src
+	black importers

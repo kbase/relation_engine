@@ -41,32 +41,32 @@ class TestValidate(unittest.TestCase):
 
         error_list = [
             {
-                "msg": "Name key should match filename: test_nodes vs wrong_name",
+                "msg": r"Name key should match filename: test_nodes vs wrong_name",
                 "file": "wrong_name.yaml",
                 "err": ValueError,
             },
             {
-                "msg": "'http://json-schema.org/draft-07/schema#' is not of type 'object'",
+                "msg": r"'http://json-schema.org/draft-07/schema#' is not of type 'object'",
                 "file": "schema_not_object.yaml",
             },
             {
-                "msg": "Additional properties are not allowed \('title' was unexpected\)",
+                "msg": r"Additional properties are not allowed \('title' was unexpected\)",
                 "file": "extra_top_level_entries.yaml",
             },
             {
-                "msg": 'Time-travel edge schemas must require "from" and "to" attributes in ',
+                "msg": r'Time-travel edge schemas must require "from" and "to" attributes in ',
                 "file": "edge_delta_missing_to_from.yaml",
             },
             {
-                "msg": 'Edge schemas must require "_from" and "_to" attributes in ',
+                "msg": r'Edge schemas must require "_from" and "_to" attributes in ',
                 "file": "edge_missing_to_from.yaml",
             },
             {
-                "msg": 'Vertex schemas must require the "_key" attribute in ',
+                "msg": r'Vertex schemas must require the "_key" attribute in ',
                 "file": "vertex_missing_key.yaml",
             },
             {
-                "msg": 'Time-travel vertex schemas must require the "id" attribute in ',
+                "msg": r'Time-travel vertex schemas must require the "id" attribute in ',
                 "file": "vertex_missing_id.yaml",
             },
         ]
@@ -116,11 +116,11 @@ class TestValidate(unittest.TestCase):
 
         error_list = [
             {
-                "msg": "Additional properties are not allowed \('type' was unexpected\)",
+                "msg": r"Additional properties are not allowed \('type' was unexpected\)",
                 "file": "invalid_additional_property.json",
             },
             {
-                "msg": "'this is not a valid URI' is not a 'uri'",
+                "msg": r"'this is not a valid URI' is not a 'uri'",
                 "file": "uri_validation.json",
             },
         ]
@@ -168,7 +168,7 @@ class TestValidate(unittest.TestCase):
 
         self.assertEqual(validate_view(os_path.join(base_dir, "minimal.json")), output)
 
-        err_str = "'from the shore' is not one of \['arangosearch'\]"
+        err_str = r"'from the shore' is not one of \['arangosearch'\]"
         with self.assertRaisesRegex(ValidationError, err_str):
             validate_view(os_path.join(base_dir, "wrong_type.json"))
 

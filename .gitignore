@@ -14,7 +14,18 @@
 /tmp/
 coverage_report/
 .coverage
+.coverage.*
 *.egg-info/
 
 # Spec archives
 spec.tar.gz
+
+# IDEs
+/.idea/
+/.vscode/
+
+# Python virtual environment directory
+/venv/
+
+# Handy place to stash code out of the codebase
+/_attic/

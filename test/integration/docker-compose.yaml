@@ -1,0 +1,23 @@
+version: '3'
+
+# This docker-compose is for developer convenience, not for running in production.
+networks:
+  kbase-dev:
+    name: kbase-dev
+services:
+  # For running integration tests
+  testrunner:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.testrunner
+    networks:
+    - kbase-dev
+    volumes:
+    #    - ${PWD}/../..:/app
+    # Makes docker api available inside this container.
+    - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+    - PYTHONUNBUFFERED=true
+    - RE_API_URL=http://re_api:5000
+    - ARANGO_URL=http://arangodb:8529
+    - INTEGRATION_TEST_DATA_DIR=${INTEGRATION_TEST_DATA_DIR}

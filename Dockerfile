@@ -18,7 +18,7 @@ RUN apk --update add --virtual build-dependencies curl tar gzip && \
     apk del build-dependencies
 
 # Install dependencies
-RUN apk --update add --virtual build-dependencies build-base python3-dev && \
+RUN apk --update add --virtual build-dependencies build-base python3-dev libffi-dev && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
     if [ "$DEVELOPMENT" ]; then pip install --no-cache-dir -r /tmp/dev-requirements.txt; fi && \

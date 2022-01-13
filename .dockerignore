@@ -17,7 +17,6 @@ coverage.xml
 .git*
 CODEOWNERS
 LICENSE.md
-Makefile
 hooks
 
 # Byte-compiled / optimized / DLL files
@@ -47,5 +46,8 @@ pip-delete-this-directory.txt
 dmypy.json
 
 # docker bits
-Dockerfile*
-docker-compose*
+#Dockerfile*
+#docker-compose*
+
+# Dev bits
+/venv/
