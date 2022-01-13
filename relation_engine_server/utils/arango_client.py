@@ -100,27 +100,35 @@ def create_collection(name, config):
         _create_indexes(name, config)
 
 
-def _create_indexes(coll_name, config):
-    """Create indexes for a collection"""
-    url = _CONF["api_url"] + "/index"
-    # Fetch existing indexes
-    auth = (_CONF["db_user"], _CONF["db_pass"])
-    resp = requests.get(url, params={"collection": coll_name}, auth=auth)
+def _get_indexes(coll_name):
+    """Fetch existing indexes for a collection"""
+    resp = requests.get(
+        url=_CONF["api_url"] + "/index",
+        params={"collection": coll_name},
+        auth=(_CONF["db_user"], _CONF["db_pass"]),
+    )
     if not resp.ok:
         raise RuntimeError(resp.text)
     indexes = resp.json()["indexes"]
+    return indexes
+
+
+def _create_indexes(coll_name, config):
+    """Create indexes for a collection"""
+    url = _CONF["api_url"] + "/index"
+    indexes = _get_indexes(coll_name)
     for idx_conf in config["indexes"]:
-        if _index_exists(idx_conf, indexes):
-            continue
         idx_type = idx_conf["type"]
         idx_url = url + "#" + idx_type
-        idx_conf["type"] = idx_type
+        if _index_exists(idx_conf, indexes):
+            # POSTing again would not overwrite anyway
+            continue
         print(f"Creating {idx_type} index for collection {coll_name}: {idx_conf}")
         resp = requests.post(
             idx_url,
             params={"collection": coll_name},
             data=json.dumps(idx_conf),
-            auth=auth,
+            auth=(_CONF["db_user"], _CONF["db_pass"]),
         )
         if not resp.ok:
             raise RuntimeError(resp.text)
@@ -181,6 +189,22 @@ def create_view(name, config):
     if not resp.ok:
         if "duplicate" not in resp_json["errorMessage"]:
             # Unable to create the view
+            raise ArangoServerError(resp.text)
+
+
+def get_analyzers(name):
+    pass
+
+
+def create_analyzer(name, config):
+    print(f"Creating analyzer {name}")
+    resp = requests.post(
+        url=_CONF["api_url"] + "/analyzer",
+        data=json.dumps(config),
+        auth=(_CONF["db_user"], _CONF["db_pass"]),
+    )
+    if not resp.ok:
+        if "duplicate" not in resp.json()["errorMessage"]:
             raise ArangoServerError(resp.text)
 
 

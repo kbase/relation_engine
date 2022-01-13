@@ -8,7 +8,7 @@ This repo holds the code associated with the KBase relation engine, previously h
 ## Relation Engine Spec
 ### `spec/`
 
-The `spec/` directory holds the schemas for [stored queries](spec/stored_queries), [collections](spec/collections), [views](spec/views) and [migrations](spec/migrations) for the relation engine graph database service.
+The `spec/` directory holds the schemas for [stored queries](spec/stored_queries), [collections](spec/collections), [views](spec/views), [analyzers](spec/analyzers), and [migrations](spec/migrations) for the relation engine graph database service.
 
 These specifications are used by the [Relation Engine API](relation_engine_server).
 

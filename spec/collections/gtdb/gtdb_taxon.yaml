@@ -5,6 +5,7 @@ delta: true
 indexes:
   - type: fulltext
     fields: [scientific_name]
+    minLength: 1
   - type: persistent
     fields: [id, expired, created]
   - type: persistent
