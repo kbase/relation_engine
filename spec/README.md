@@ -10,6 +10,7 @@ by KBase apps to fetch data from the database.
 * **[Datasets](spec/datasets)** contain partial and full schemas specific to a certain dataset.
 * **[Data sources](spec/data_sources)** contain general information about where some of our imported data comes from.
 * **[Views](spec/views)** are raw ArangoSearch view configuration files
+* **[Analyzers](spec/analyzers)** are analyzer configuration files
 
 ## Development
 
