@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.16] - 2022-01-14
 ### Added
-- Added github actions to build docker images
+- Added github actions to build docker images on ghcr.io
 
 
 
