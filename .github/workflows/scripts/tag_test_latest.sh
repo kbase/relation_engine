@@ -1,26 +1,12 @@
----
-name: Tag Latest Test Image
-'on':
-  pull_request:
-    branches:
-    - develop
-    types:
-    - closed
-jobs:
-  docker_tag:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out GitHub Repo
-      if: github.event_name == 'pull_request' && github.event.action == 'closed' &&
-        github.event.pull_request.merged == true
-      with:
-        ref: "${{ github.event.pull_request.head.sha }}"
-      uses: actions/checkout@v2
-    - name: Build and Push to Packages
-      if: github.event.pull_request.draft == false
-      env:
-        PR: "${{ github.event.pull_request.number }}"
-        SHA: "${{ github.event.pull_request.head.sha }}"
-        DOCKER_ACTOR: "${{ secrets.GHCR_USERNAME }}"
-        DOCKER_TOKEN: "${{ secrets.GHCR_TOKEN }}"
-      run: "./.github/workflows/scripts/tag_test_latest.sh\n"
+#! /usr/bin/env bash
+
+export MY_ORG=$(echo "${GITHUB_REPOSITORY}" | awk -F / '{print $1}')
+export MY_APP=$(echo $(echo "${GITHUB_REPOSITORY}" | awk -F / '{print $2}')"-develop")
+export DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+export COMMIT=$(echo "$SHA" | cut -c -7)
+
+docker login -u "$DOCKER_ACTOR" -p "$DOCKER_TOKEN" ghcr.io
+docker pull ghcr.io/"$MY_ORG"/"$MY_APP":"pr-""$PR"
+docker tag ghcr.io/"$MY_ORG"/"$MY_APP":"pr-""$PR" ghcr.io/"$MY_ORG"/"$MY_APP":"latest"
+docker push ghcr.io/"$MY_ORG"/"$MY_APP":"latest"
