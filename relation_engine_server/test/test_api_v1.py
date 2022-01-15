@@ -335,6 +335,18 @@ class TestApi(unittest.TestCase):
             },
         )
 
+    def test_ensure_specs(self):
+        """Test endpoint for testing local specs against server specs"""
+
+        self.test_request(
+            "/ensure_specs",
+            resp_json={
+                "indexes": [],
+                "views": [],
+                "analyzers": [],
+            },
+        )
+
     def test_show_data_sources(self):
         resp = requests.get(API_URL + "/data_sources")
         self.assertTrue(resp.ok)

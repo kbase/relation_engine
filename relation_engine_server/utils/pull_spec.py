@@ -62,10 +62,20 @@ def download_specs(
     return update_name
 
 
+def _glob_specs(spec_type):
+    patterns = [
+        os.path.join(_CONF["spec_paths"][spec_type], "*.json"),
+        os.path.join(_CONF["spec_paths"][spec_type], "*.yaml"),
+        os.path.join(_CONF["spec_paths"][spec_type], "**", "*.json"),
+        os.path.join(_CONF["spec_paths"][spec_type], "**", "*.yaml"),
+    ]
+    for pattern in patterns:
+        yield from glob.iglob(pattern)
+
+
 def do_init_collections():
     """Initialize any uninitialized collections in the database from a set of collection schemas."""
-    pattern = os.path.join(_CONF["spec_paths"]["collections"], "**", "*.yaml")
-    for path in glob.iglob(pattern):
+    for path in _glob_specs("collections"):
         coll_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = yaml.safe_load(fd)
@@ -74,8 +84,7 @@ def do_init_collections():
 
 def do_init_views():
     """Initialize any uninitialized views in the database from a set of schemas."""
-    pattern = os.path.join(_CONF["spec_paths"]["views"], "**", "*.json")
-    for path in glob.iglob(pattern):
+    for path in _glob_specs("views"):
         view_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = json.load(fd)
@@ -83,8 +92,7 @@ def do_init_views():
 
 
 def do_init_analyzers():
-    pattern = os.path.join(_CONF["spec_paths"]["analyzers"], "*.json")
-    for path in glob.iglob(pattern):
+    for path in _glob_specs("analyzers"):
         analyzer_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = json.load(fd)

@@ -7,6 +7,7 @@ from relation_engine_server.utils import (
     pull_spec,
     config,
     parse_json,
+    ensure_specs as ensure_specs_,
 )
 from relation_engine_server.utils.json_validation import run_validator
 from relation_engine_server.exceptions import InvalidParameters
@@ -193,6 +194,12 @@ def show_config():
             "spec_release_path": conf["spec_release_path"],
         }
     )
+
+
+@api_v1.route("/ensure_specs", methods=["GET"])
+def ensure_specs():
+    failed_names = ensure_specs_.ensure_all()
+    return flask.jsonify(failed_names)
 
 
 def _preprocess_stored_query(query_text, config):

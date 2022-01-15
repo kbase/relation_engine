@@ -9,6 +9,20 @@ import json
 from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
+adb_url = _CONF["api_url"]
+auth = (_CONF["db_user"], _CONF["db_pass"])
+
+
+def adb_request(req_method, url_append, **kw):
+    """Make HTTP request to ArangoDB server"""
+    resp = req_method(
+        adb_url + url_append,
+        auth=auth,
+        **kw,
+    )
+    if not resp.ok or resp.json()["error"]:
+        raise ArangoServerError(resp.text)
+    return resp.json()
 
 
 def server_status():
@@ -66,6 +80,36 @@ def run_query(
     }
 
 
+def get_all_collections():
+    """
+    Fetch information for all existing non-system collections
+
+    Resp to GET /_api/collection is
+    {
+        "error": False,
+        "code": 200,
+        "result": [
+            {
+                "id": str of int,
+                "name": str,
+                "status": int,
+                "type": int,
+                "isSystem": bool,
+                "globallyUniqueId": str,
+            },
+            ...
+        ]
+    }
+    """
+    resp_json = adb_request(
+        req_method=requests.get,
+        url_append="/collection",
+        # ---
+        params={"excludeSystem": True},
+    )
+    return resp_json
+
+
 def create_collection(name, config):
     """
     Create a single collection by name using some basic defaults.
@@ -100,23 +144,77 @@ def create_collection(name, config):
         _create_indexes(name, config)
 
 
-def _get_indexes(coll_name):
-    """Fetch existing indexes for a collection"""
-    resp = requests.get(
-        url=_CONF["api_url"] + "/index",
+def get_all_indexes():
+    """
+    Fetch all existing indexes for all non-system collections
+
+    Returns
+    {
+        "coll_name_0":
+            [
+                {
+                    "deduplicate" : true,
+                    "estimates" : true,
+                    "fields" : [
+                        "price"
+                    ],
+                    "id" : "products/68128",
+                    "name" : "idx_1721606625944403968",
+                    "selectivityEstimate" : 1,
+                    "sparse" : true,
+                    "type" : "skiplist",
+                    "unique" : false
+                },
+                ...
+            ],
+        ...
+    }
+    """
+    coll_names = [coll["name"] for coll in get_all_collections()["result"]]
+    all_indexes = {}
+    for coll_name in coll_names:
+        all_indexes[coll_name] = _get_coll_indexes(coll_name)
+    return all_indexes
+
+
+def _get_coll_indexes(coll_name):
+    """
+    Fetch existing indexes for a collection
+    Resp to GET /_api/index is
+    {
+        "error" : False,
+        "code" : 200,
+        "indexes" : [
+            {
+                "deduplicate" : true,
+                "estimates" : true,
+                "fields" : [
+                    "price"
+                ],
+                "id" : "products/68128",
+                "name" : "idx_1721606625944403968",
+                "selectivityEstimate" : 1,
+                "sparse" : true,
+                "type" : "skiplist",
+                "unique" : false
+            },
+            ...
+        ],
+        ...
+    }
+    """
+    resp_json = adb_request(
+        req_method=requests.get,
+        url_append="/index",
         params={"collection": coll_name},
-        auth=(_CONF["db_user"], _CONF["db_pass"]),
     )
-    if not resp.ok:
-        raise RuntimeError(resp.text)
-    indexes = resp.json()["indexes"]
-    return indexes
+    return resp_json["indexes"]
 
 
 def _create_indexes(coll_name, config):
     """Create indexes for a collection"""
     url = _CONF["api_url"] + "/index"
-    indexes = _get_indexes(coll_name)
+    indexes = _get_coll_indexes(coll_name)
     for idx_conf in config["indexes"]:
         idx_type = idx_conf["type"]
         idx_url = url + "#" + idx_type
@@ -170,6 +268,74 @@ def import_from_file(file_path, query):
     return resp_json
 
 
+def get_all_views():
+    """
+    Fetch all existing views from server
+
+    Resp to GET /_api/view is
+    {
+        "error": false,
+        "code": 200,
+        "result": [
+            {"id": str, "name": str, "type": str},
+            ...
+        ]
+    }
+
+    Resp to GET /_api/view/{view_name}/properties is
+    {
+        "error" : false,
+        "code" : 200,
+        "writebufferIdle" : 64,
+        "type" : "arangosearch",
+        "writebufferSizeMax" : 33554432,
+        "consolidationPolicy" : {
+            "type" : "tier",
+            "segmentsBytesFloor" : 2097152,
+            "segmentsBytesMax" : 5368709120,
+            "segmentsMax" : 10,
+            "segmentsMin" : 1,
+            "minScore" : 0
+        },
+        "name" : "products",
+        "primarySort" : [ ],
+        "globallyUniqueId" : "hA5F3C05BE80C/68910",
+        "id" : "68910",
+        "storedValues" : [ ],
+        "writebufferActive" : 0,
+        "consolidationIntervalMsec" : 1000,
+        "cleanupIntervalStep" : 2,
+        "commitIntervalMsec" : 1000,
+        "links" : {
+        },
+        "primarySortCompression" : "lz4"
+    }
+
+    Returns
+    [
+        {},
+        {},
+        ...
+    ]
+    where each item is the properties dict (from above)
+    """
+    resp_json = adb_request(
+        req_method=requests.get,
+        url_append="/view",
+    )
+    view_names = [view["name"] for view in resp_json["result"]]
+
+    view_properties = []
+    for view_name in view_names:
+        resp_json = adb_request(
+            req_method=requests.get,
+            url_append=f"/view/{view_name}/properties",
+        )
+        view_properties.append(resp_json)
+
+    return view_properties
+
+
 def create_view(name, config):
     """
     Create a view by name, ignoring duplicates.
@@ -192,8 +358,47 @@ def create_view(name, config):
             raise ArangoServerError(resp.text)
 
 
-def get_analyzers(name):
-    pass
+def get_all_analyzers():
+    """
+    Fetch all existing analyzers from server
+    Resp to GET /_api/analyzer is
+    {
+        "error" : false,
+        "code" : 200,
+        "result" : [
+            {
+                "name" : "text_pt",
+                "type" : "text",
+                "properties" : {
+                    "locale" : "pt.utf-8",
+                    "case" : "lower",
+                    "stopwords" : [ ],
+                    "accent" : false,
+                    "stemming" : true
+                },
+                "features" : [
+                    "frequency",
+                    "norm",
+                    "position"
+                ]
+            },
+            ...
+        ]
+    }
+
+    Returns
+    [
+        { ... }
+    ]
+    """
+    resp = requests.get(
+        url=_CONF["api_url"] + "/analyzer",
+        auth=(_CONF["db_user"], _CONF["db_pass"]),
+    )
+    if not resp.ok:
+        raise RuntimeError(resp.text)
+    analyzers = resp.json()["result"]
+    return analyzers
 
 
 def create_analyzer(name, config):
