@@ -13,9 +13,7 @@ from relation_engine_server.utils.ensure_specs import (
     excise_namespace,
     get_names,
 )
-from spec.test.helpers import (
-    check_spec_test_env,
-)
+from spec.test.helpers import check_spec_test_env
 
 
 def ensure_borked_indexes():

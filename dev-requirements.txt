@@ -6,3 +6,4 @@ grequests==0.3.0
 coverage==5.2.1
 typed-ast>=1.4.0
 black==20.8b1
+pytest==6.2.5

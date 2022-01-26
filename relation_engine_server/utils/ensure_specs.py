@@ -1,3 +1,8 @@
+"""
+Ensure that all the specs in the spec/**/*.json and spec/**/*.yaml are
+present in the server, with the top-level fields of the local specs being
+a subset of the top-level fields of the server specs
+"""
 import json
 from typing import Union, Callable
 

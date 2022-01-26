@@ -4,12 +4,13 @@ import tarfile
 import tempfile
 import shutil
 import json
-import glob
 import yaml
 from typing import Optional
 
 from relation_engine_server.utils import arango_client
 from relation_engine_server.utils.config import get_config
+from relation_engine_server.utils.ensure_specs import ensure_all
+from spec.validate import get_schema_type_paths
 
 _CONF = get_config()
 
@@ -59,23 +60,21 @@ def download_specs(
         do_init_collections()
         do_init_views()
         do_init_analyzers()
+    # Check that local specs have matching server specs
+    # Necessary because creating resources like indexes
+    # does not overwrite
+    failed_names = ensure_all()
+    if any([name for schema_type, names in failed_names.items() for name in names]):
+        raise RuntimeError(
+            "Some local specs have no matching server specs:"
+            "\n" + json.dumps(failed_names, indent=4)
+        )
     return update_name
-
-
-def _glob_specs(spec_type):
-    patterns = [
-        os.path.join(_CONF["spec_paths"][spec_type], "*.json"),
-        os.path.join(_CONF["spec_paths"][spec_type], "*.yaml"),
-        os.path.join(_CONF["spec_paths"][spec_type], "**", "*.json"),
-        os.path.join(_CONF["spec_paths"][spec_type], "**", "*.yaml"),
-    ]
-    for pattern in patterns:
-        yield from glob.iglob(pattern)
 
 
 def do_init_collections():
     """Initialize any uninitialized collections in the database from a set of collection schemas."""
-    for path in _glob_specs("collections"):
+    for path in get_schema_type_paths("collection"):
         coll_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = yaml.safe_load(fd)
@@ -84,7 +83,7 @@ def do_init_collections():
 
 def do_init_views():
     """Initialize any uninitialized views in the database from a set of schemas."""
-    for path in _glob_specs("views"):
+    for path in get_schema_type_paths("view"):
         view_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = json.load(fd)
@@ -92,7 +91,7 @@ def do_init_views():
 
 
 def do_init_analyzers():
-    for path in _glob_specs("analyzers"):
+    for path in get_schema_type_paths("analyzer"):
         analyzer_name = os.path.basename(os.path.splitext(path)[0])
         with open(path) as fd:
             config = json.load(fd)
