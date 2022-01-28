@@ -7,7 +7,7 @@ from relation_engine_server.utils import (
     pull_spec,
     config,
     parse_json,
-    ensure_specs as ensure_specs_,
+    ensure_specs,
 )
 from relation_engine_server.utils.json_validation import run_validator
 from relation_engine_server.exceptions import InvalidParameters
@@ -197,9 +197,12 @@ def show_config():
 
 
 @api_v1.route("/ensure_specs", methods=["GET"])
-def ensure_specs():
-    failed_names = ensure_specs_.ensure_all()
-    return flask.jsonify(failed_names)
+def ensure_all_specs():
+    failed_names = ensure_specs.ensure_all()
+    if any([name for schema_type, names in failed_names.items() for name in names]):
+        return flask.jsonify(failed_names), 500
+    else:
+        return flask.jsonify(failed_names)
 
 
 def _preprocess_stored_query(query_text, config):

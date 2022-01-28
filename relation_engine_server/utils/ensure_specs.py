@@ -11,6 +11,13 @@ from relation_engine_server.utils import arango_client
 from spec.validate import get_schema_type_paths
 
 
+def match(spec_local, specs_server):
+    for spec_server in specs_server:
+        if spec_local.items() <= spec_server.items():
+            return True
+    return False
+
+
 def get_local_coll_indexes():
     """
     Read all schemas for the collection schema type
@@ -60,12 +67,7 @@ def ensure_indexes():
             failed_specs[coll_name] = []
         indexes_server = coll_name_2_indexes_server[coll_name]
         for index_local in indexes_local:
-            match = False
-            for index_server in indexes_server:
-                if index_local.items() <= index_server.items():
-                    match = True
-                    break
-            if match is False:
+            if not match(index_local, indexes_server):
                 failed_specs[coll_name] = index_local
 
     failed_specs = {
@@ -99,12 +101,7 @@ def ensure_views():
     for view_spec_path in view_spec_paths:
         print(f"Ensuring view {view_spec_path}")
         view_local = load_json_yaml(view_spec_path)
-        match = False
-        for view_server in all_views_server:
-            if view_local.items() <= view_server.items():
-                match = True
-                break
-        if match is False:
+        if not match(view_local, all_views_server):
             failed_specs.append(view_local)
 
     if failed_specs:
@@ -135,12 +132,7 @@ def ensure_analyzers():
     for analyzer_spec_path in analyzer_spec_paths:
         print(f"Ensuring analyzer {analyzer_spec_path}")
         analyzer_local = load_json_yaml(analyzer_spec_path)
-        for analyzer_server in all_analyzers_server:
-            match = False
-            if analyzer_local.items() <= analyzer_server.items():
-                match = True
-                break
-        if match is False:
+        if not match(analyzer_local, all_analyzers_server):
             failed_specs.append(analyzer_local)
 
     if failed_specs:

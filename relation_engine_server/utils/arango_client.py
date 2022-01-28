@@ -9,15 +9,13 @@ import json
 from relation_engine_server.utils.config import get_config
 
 _CONF = get_config()
-adb_url = _CONF["api_url"]
-auth = (_CONF["db_user"], _CONF["db_pass"])
 
 
 def adb_request(req_method, url_append, **kw):
     """Make HTTP request to ArangoDB server"""
     resp = req_method(
-        adb_url + url_append,
-        auth=auth,
+        _CONF["api_url"] + url_append,
+        auth=(_CONF["db_user"], _CONF["db_pass"]),
         **kw,
     )
     if not resp.ok or resp.json()["error"]:
@@ -391,13 +389,11 @@ def get_all_analyzers():
         { ... }
     ]
     """
-    resp = requests.get(
-        url=_CONF["api_url"] + "/analyzer",
-        auth=(_CONF["db_user"], _CONF["db_pass"]),
+    resp_json = adb_request(
+        requests.get,
+        url_append="/analyzer",
     )
-    if not resp.ok:
-        raise RuntimeError(resp.text)
-    analyzers = resp.json()["result"]
+    analyzers = resp_json["result"]
     return analyzers
 
 

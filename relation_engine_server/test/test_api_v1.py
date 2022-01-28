@@ -7,8 +7,10 @@ import unittest
 import requests
 import json
 import os
+
 from relation_engine_server.utils.config import get_config
 from relation_engine_server.utils.wait_for import wait_for_api
+from spec.test.test_ensure_specs import ensure_borked_indexes
 
 _CONF = get_config()
 
@@ -337,11 +339,22 @@ class TestApi(unittest.TestCase):
 
     def test_ensure_specs(self):
         """Test endpoint for testing local specs against server specs"""
-
         self.test_request(
             "/ensure_specs",
             resp_json={
                 "indexes": [],
+                "views": [],
+                "analyzers": [],
+            },
+        )
+
+    @unittest.skip("TODO - DELETE index")
+    def test_ensure_specs_fail(self):
+        self.test_request(
+            "/ensure_specs",
+            status_code=500,
+            resp_json={
+                "indexes": ensure_borked_indexes()[0],
                 "views": [],
                 "analyzers": [],
             },

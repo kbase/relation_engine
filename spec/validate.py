@@ -149,7 +149,7 @@ def validate_schema(path, schema_type):
 
 
 def validate_collection(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for vertex and edge collection schemas found in /schema
     collection_schema_file = _VALID_SCHEMA_TYPES["collection"]["file"]
@@ -197,7 +197,7 @@ def validate_collection(path):
 
 
 def validate_data_source(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for data source files in /data_sources
     data_source_schema_file = _VALID_SCHEMA_TYPES["data_source"]["file"]
@@ -209,7 +209,7 @@ def validate_data_source(path):
 
 
 def validate_stored_query(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     stored_queries_schema_file = _VALID_SCHEMA_TYPES["stored_query"]["file"]
     data = run_validator(schema_file=stored_queries_schema_file, data_file=path)
@@ -233,7 +233,7 @@ def validate_stored_query(path):
 
 def validate_view(path):
     """Validate the structure and syntax of an arangodb view"""
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for /views
     view_schema_file = _VALID_SCHEMA_TYPES["view"]["file"]
@@ -246,7 +246,7 @@ def validate_view(path):
 
 def validate_analyzer(path):
     """Validate ArangoDB analyzer config"""
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for /analyzers
     analyzer_schema_file = _VALID_SCHEMA_TYPES["analyzer"]["file"]

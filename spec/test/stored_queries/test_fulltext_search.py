@@ -235,7 +235,7 @@ def _fulltext_query(
     expect_error=False,
     expect_hit=True,
     expected_hits=None,
-    **kw,
+    **kw,  # for testing passing disallowed properties
 ):
     """
     Run query against ArangoDB server

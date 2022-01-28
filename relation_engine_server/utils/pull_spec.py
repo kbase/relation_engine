@@ -62,7 +62,7 @@ def download_specs(
         do_init_analyzers()
     # Check that local specs have matching server specs
     # Necessary because creating resources like indexes
-    # does not overwrite
+    # does not overwrite any pre-existing indexes
     failed_names = ensure_all()
     if any([name for schema_type, names in failed_names.items() for name in names]):
         raise RuntimeError(
