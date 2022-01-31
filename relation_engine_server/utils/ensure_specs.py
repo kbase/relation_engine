@@ -34,6 +34,20 @@ def get_local_coll_indexes():
     return coll_spec_paths, coll_name_2_indexes
 
 
+def get_local_views():
+    view_spec_paths = get_schema_type_paths("view")
+    view_specs = [load_json_yaml(view_spec_path) for view_spec_path in view_spec_paths]
+    return view_spec_paths, view_specs
+
+
+def get_local_analyzers():
+    analyzer_spec_paths = get_schema_type_paths("analyzer")
+    analyzer_specs = [
+        load_json_yaml(analyzer_spec_path) for analyzer_spec_path in analyzer_spec_paths
+    ]
+    return analyzer_spec_paths, analyzer_specs
+
+
 def ensure_indexes():
     """
     Returns tuple
@@ -74,7 +88,7 @@ def ensure_indexes():
         k: v for k, v in failed_specs.items() if v
     }  # filter out 0-failure colls
     if failed_specs:
-        print_failed_vs_server("indexes", failed_specs, coll_name_2_indexes_server)
+        print_failed_specs("indexes", failed_specs)
     else:
         print("All index specs ensured")
 
@@ -95,17 +109,15 @@ def ensure_views():
     """
     all_views_server = arango_client.get_all_views()
     mod_obj_literal(all_views_server, float, round_float)
-    view_spec_paths = get_schema_type_paths("view")
 
     failed_specs = []
-    for view_spec_path in view_spec_paths:
+    for view_spec_path, view_local in zip(*get_local_views()):
         print(f"Ensuring view {view_spec_path}")
-        view_local = load_json_yaml(view_spec_path)
         if not match(view_local, all_views_server):
             failed_specs.append(view_local)
 
     if failed_specs:
-        print_failed_vs_server("views", failed_specs, all_views_server)
+        print_failed_specs("views", failed_specs)
     else:
         print("All view specs ensured")
 
@@ -126,17 +138,15 @@ def ensure_analyzers():
     """
     all_analyzers_server = arango_client.get_all_analyzers()
     mod_obj_literal(all_analyzers_server, str, excise_namespace)
-    analyzer_spec_paths = get_schema_type_paths("analyzer")
 
     failed_specs = []
-    for analyzer_spec_path in analyzer_spec_paths:
+    for analyzer_spec_path, analyzer_local in zip(*get_local_analyzers()):
         print(f"Ensuring analyzer {analyzer_spec_path}")
-        analyzer_local = load_json_yaml(analyzer_spec_path)
         if not match(analyzer_local, all_analyzers_server):
             failed_specs.append(analyzer_local)
 
     if failed_specs:
-        print_failed_vs_server("analyzers", failed_specs, all_analyzers_server)
+        print_failed_specs("analyzers", failed_specs)
     else:
         print("All analyzer specs ensured")
 
@@ -186,25 +196,21 @@ def get_names(specs, schema_type):
     return names
 
 
-def print_failed_vs_server(schema_type, failed_specs, server_specs):
+def print_failed_specs(schema_type, failed_specs):
     """
-    Print message with names and contents of failed local specs and all server specs
+    Print message with names of failed local specs
     """
-    dec = "*" * 80
 
     def format_json(jo):
         return json.dumps(jo, indent=4)
 
     fail_msg = (
-        dec + "\n"
-        f"----------> failed ({len(failed_specs)} {schema_type}) ---------->"
+        "\n"
+        f"----------> {len(failed_specs)} {schema_type} failed ---------->"
         "\n"
         f"----------> names: {get_names(failed_specs, schema_type)} ---------->"
-        "\n" + format_json(failed_specs) + "\n"
-        f"----------> server ({len(server_specs)} {schema_type}) ---------->"
         "\n"
-        f"----------> names: {get_names(server_specs, schema_type)} ---------->"
-        "\n" + format_json(server_specs) + "\n" + dec
+        f"----------> Please compare local/server specs ---------->"
     )
 
     print(fail_msg)

@@ -4,6 +4,9 @@ import copy
 
 from relation_engine_server.utils import arango_client
 from relation_engine_server.utils.ensure_specs import (
+    get_local_coll_indexes,
+    get_local_views,
+    get_local_analyzers,
     ensure_indexes,
     ensure_views,
     ensure_analyzers,
@@ -87,8 +90,8 @@ class TestEnsureSpecs(unittest.TestCase):
         "relation_engine_server.utils.ensure_specs.ensure_analyzers",
         ensure_borked_analyzers,
     )
-    def test_ensure_all__fail(self):
-        """Mock server spec fetches so that 1st spec of each type is borked"""
+    def test_ensure_all__fail__mock_ensure_things(self):
+        """Mock ensure_things calls so that 1st spec is borked"""
         borked_index_names, _ = ensure_borked_indexes()
         borked_view_names, _ = ensure_borked_views()
         borked_analyzer_names, _ = ensure_borked_analyzers()
@@ -99,6 +102,26 @@ class TestEnsureSpecs(unittest.TestCase):
                 "indexes": borked_index_names,
                 "views": borked_view_names,
                 "analyzers": borked_analyzer_names,
+            },
+            failed_names,
+        )
+
+    @mock.patch(
+        "relation_engine_server.utils.arango_client.get_all_indexes", lambda: {}
+    )
+    @mock.patch("relation_engine_server.utils.arango_client.get_all_views", lambda: [])
+    @mock.patch(
+        "relation_engine_server.utils.arango_client.get_all_analyzers", lambda: []
+    )
+    def test_ensure_all__fail__mock_arango_client_get_all_things(self):
+        """Mock more upstream in server spec fetches"""
+        failed_names = ensure_all()
+
+        self.assertEqual(
+            {
+                "indexes": get_names(get_local_coll_indexes()[1], "indexes"),
+                "views": get_names(get_local_views()[1], "views"),
+                "analyzers": get_names(get_local_analyzers()[1], "analyzers"),
             },
             failed_names,
         )

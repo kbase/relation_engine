@@ -98,6 +98,13 @@ def get_all_collections():
             ...
         ]
     }
+
+    Returns
+    [
+        {"id": ..., ...},
+        {"id": ..., ...},
+        ...
+    ]
     """
     resp_json = adb_request(
         req_method=requests.get,
@@ -105,7 +112,7 @@ def get_all_collections():
         # ---
         params={"excludeSystem": True},
     )
-    return resp_json
+    return resp_json["result"]
 
 
 def create_collection(name, config):
@@ -168,7 +175,7 @@ def get_all_indexes():
         ...
     }
     """
-    coll_names = [coll["name"] for coll in get_all_collections()["result"]]
+    coll_names = [coll["name"] for coll in get_all_collections()]
     all_indexes = {}
     for coll_name in coll_names:
         all_indexes[coll_name] = _get_coll_indexes(coll_name)
