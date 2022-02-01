@@ -3,7 +3,6 @@ Ensure that all the specs in the spec/**/*.json and spec/**/*.yaml are
 present in the server, with the top-level fields of the local specs being
 a subset of the top-level fields of the server specs
 """
-import json
 from typing import Union, Callable
 
 from relation_engine_server.utils.json_validation import load_json_yaml
@@ -200,9 +199,6 @@ def print_failed_specs(schema_type, failed_specs):
     """
     Print message with names of failed local specs
     """
-
-    def format_json(jo):
-        return json.dumps(jo, indent=4)
 
     fail_msg = (
         "\n"
