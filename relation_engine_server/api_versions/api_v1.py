@@ -199,9 +199,19 @@ def show_config():
 @api_v1.route("/ensure_specs", methods=["GET"])
 def ensure_all_specs():
     """
+    Ensure that the local index/view/analyzer specs under spec/ have a
+    corresponding spec on the server.
+
     This endpoint is not strictly necessary, as the ensure_specs.ensure_all()
     code should triggered in startup scripts. This is more insurance in case
     one wishes to ensure the specs without re-deployment
+
+    Example ensure_specs.ensure_all() return value:
+    {
+        "indexes": [],
+        "views": ["Compounds/arangosearch", "Reactions/arangosearch"],
+        "analyzers": ["icu_tokenize/text"]
+    }
     """
     failed_names = ensure_specs.ensure_all()
     if any([name for schema_type, names in failed_names.items() for name in names]):
