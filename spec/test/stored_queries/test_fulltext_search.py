@@ -148,21 +148,41 @@ class Test(unittest.TestCase):
                 expect_hit=True,
             )
 
-    def test_stored_query_validation_fail(self):
-        # TODO stored query validation does not seem to work
-        return
-        with self.assertRaises(RuntimeError):
-            _fulltext_query(
-                self,
-                coll=[],
-                search_attrkey=42,
-                search_text={"hi": 1},
-                ts=None,
-                filter_attr_expr=None,
-                offset=None,
-                limit=None,
-                select=None,
-            )
+    def test_extra_params(self):
+        """Extra params not in spec/aql"""
+        _fulltext_query(
+            self,
+            coll="ncbi_taxon",
+            search_attrkey="scientific_name",
+            search_text="esch",
+            ts=None,
+            filter_attr_expr=[
+                {"rank": "species"},
+                {"rank": "strain"},
+                {"strain": True},
+            ],
+            offset=0,
+            limit=LIMIT,
+            select=["id", "scientific_name"],
+            extra_unused_param=42,
+            # ---
+            expect_error=("Additional properties are not allowed"),
+        )
+
+    def test_validation_fail(self):
+        _fulltext_query(
+            self,
+            coll=[],
+            search_attrkey=42,
+            search_text={"hi": 1},
+            ts=None,
+            filter_attr_expr=None,
+            offset=None,
+            limit=None,
+            select=None,
+            # ---
+            expect_error="[] is not of type 'string'",
+        )
 
     def test_aql_error(self):
         for sciname in scinames_test_all:
@@ -215,6 +235,7 @@ def _fulltext_query(
     expect_error=False,
     expect_hit=True,
     expected_hits=None,
+    **kw,  # for testing passing disallowed properties
 ):
     """
     Run query against ArangoDB server
@@ -228,6 +249,7 @@ def _fulltext_query(
         "offset": offset,
         "limit": limit,
         "select": select,
+        **kw,
     }
     resp = requests.post(
         _CONF["re_api_url"] + "/api/v1/query_results",
@@ -237,8 +259,12 @@ def _fulltext_query(
 
     if expect_error:
         self.assertIn("error", resp.json())
+        if isinstance(expect_error, str):
+            self.assertIn(expect_error, json.dumps(resp.json()))
 
     else:
+        self.assertNotIn("error", resp.json(), json.dumps(resp.json(), indent=4))
+
         docs = resp.json()["results"]
         hits = [doc[search_attrkey] for doc in docs]
         if expect_hit:
@@ -262,8 +288,12 @@ def _fulltext_query(
 
     if expect_error:
         self.assertIn("error", resp.json())
+        if isinstance(expect_error, str):
+            self.assertIn(expect_error, json.dumps(resp.json()))
 
     else:
+        self.assertNotIn("error", resp.json(), json.dumps(resp.json(), indent=4))
+
         docs = resp.json()["results"]
         hits = [doc[search_attrkey] for doc in docs]
         if expect_hit:

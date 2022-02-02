@@ -32,7 +32,26 @@ _VALID_SCHEMA_TYPES = {
         "file": os.path.join(_BASE_DIR, "view_schema.yaml"),
         "plural": "views",
     },
+    "analyzer": {
+        "file": os.path.join(_BASE_DIR, "analyzer_schema.yaml"),
+        "plural": "analyzers",
+    },
 }
+
+
+def get_schema_type_paths(schema_type, directory=None):
+    if schema_type not in _VALID_SCHEMA_TYPES.keys():
+        raise ValueError(f"No validation schema found for '{schema_type}'")
+    if directory is None:
+        type_dir_name = _VALID_SCHEMA_TYPES[schema_type]["plural"]
+        directory = _CONF["spec_paths"][type_dir_name]
+
+    paths = []
+    for path in glob.iglob(os.path.join(directory, "**", "*.*"), recursive=True):
+        if path.endswith(".yaml") or path.endswith(".json"):
+            paths.append(path)
+
+    return sorted(paths)
 
 
 def validate_all(schema_type, directory=None):
@@ -44,37 +63,30 @@ def validate_all(schema_type, directory=None):
                                   If not specified, the default directory for the schema_type
                                   will be used.
     """
-    if schema_type not in _VALID_SCHEMA_TYPES.keys():
-        raise ValueError(f"No validation schema found for '{schema_type}'")
-
     err_files = []
     n_files = 0
     names = set()  # type: set
-    if directory is None:
-        type_dir_name = _VALID_SCHEMA_TYPES[schema_type]["plural"]
-        directory = _CONF["spec_paths"][type_dir_name]
 
     print(f"Validating {schema_type} schemas in {directory}...")
 
-    for path in glob.iglob(os.path.join(directory, "**", "*.*"), recursive=True):
-        if path.endswith(".yaml") or path.endswith(".json"):
-            n_files += 1
-            try:
-                data = validate_schema(path, schema_type)
-                # Check for any duplicate schema names
-                name = data["name"]
-                if name in names:
-                    raise ValueError(f"Duplicate queries named '{name}'")
-                else:
-                    names.add(name)
+    for path in get_schema_type_paths(schema_type, directory):
+        n_files += 1
+        try:
+            data = validate_schema(path, schema_type)
+            # Check for any duplicate schema names
+            name = data["name"]
+            if name in names:
+                raise ValueError(f"Duplicate queries named '{name}'")
+            else:
+                names.add(name)
 
-            except Exception as err:
-                print(f"✕ {path} failed validation")
-                print(err)
-                err_files.append([path, err])
+        except Exception as err:
+            print(f"✕ {path} failed validation")
+            print(err)
+            err_files.append([path, err])
 
     if not n_files:
-        print(f"No schema files found")
+        print("No schema files found")
         return
 
     if err_files:
@@ -137,7 +149,7 @@ def validate_schema(path, schema_type):
 
 
 def validate_collection(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for vertex and edge collection schemas found in /schema
     collection_schema_file = _VALID_SCHEMA_TYPES["collection"]["file"]
@@ -185,7 +197,7 @@ def validate_collection(path):
 
 
 def validate_data_source(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for data source files in /data_sources
     data_source_schema_file = _VALID_SCHEMA_TYPES["data_source"]["file"]
@@ -197,7 +209,7 @@ def validate_data_source(path):
 
 
 def validate_stored_query(path):
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     stored_queries_schema_file = _VALID_SCHEMA_TYPES["stored_query"]["file"]
     data = run_validator(schema_file=stored_queries_schema_file, data_file=path)
@@ -221,11 +233,24 @@ def validate_stored_query(path):
 
 def validate_view(path):
     """Validate the structure and syntax of an arangodb view"""
-    print(f"  validating {path}..")
+    print(f"  validating {path}...")
 
     # JSON schema for /views
     view_schema_file = _VALID_SCHEMA_TYPES["view"]["file"]
     data = run_validator(data_file=path, schema_file=view_schema_file)
+    namecheck_schema(path, data)
+
+    print(f"✓ {path} is valid.")
+    return data
+
+
+def validate_analyzer(path):
+    """Validate ArangoDB analyzer config"""
+    print(f"  validating {path}...")
+
+    # JSON schema for /analyzers
+    analyzer_schema_file = _VALID_SCHEMA_TYPES["analyzer"]["file"]
+    data = run_validator(data_file=path, schema_file=analyzer_schema_file)
     namecheck_schema(path, data)
 
     print(f"✓ {path} is valid.")
@@ -254,7 +279,7 @@ def validate_aql_on_arango(data):
     params = set(data.get("params", {}).get("properties", {}).keys())
     if params != query_bind_vars:
         raise ValueError(
-            f"Bind vars are invalid.\n"
+            "Bind vars are invalid.\n"
             + f"  Extra vars in query: {query_bind_vars - params}.\n"
             + f"  Extra params in schema: {params - query_bind_vars}"
         )

@@ -67,7 +67,7 @@ def get_schema_validator(schema=None, schema_file=None, validate_at=""):
 
     # schema to validate against
     if schema is None:
-        schema = _load_json_schema(schema_file)
+        schema = load_json_yaml(schema_file)
 
     # get the appropriate location in the schema
     validation_schema = resolve_pointer(schema, validate_at)
@@ -120,7 +120,7 @@ def run_validator(
 
     # data to validate
     if data is None:
-        data = _load_json_schema(data_file)
+        data = load_json_yaml(data_file)
 
     if validator.is_valid(data):
         return data
@@ -136,8 +136,8 @@ def run_validator(
     raise ValidationError(err_msg)
 
 
-def _load_json_schema(file):
-    """Loads the given schema file"""
+def load_json_yaml(file):
+    """Loads the given JSON/YAML file"""
 
     with open(file) as fd:
         if file.endswith(".yaml") or file.endswith(".yml"):
