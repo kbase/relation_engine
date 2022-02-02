@@ -17,7 +17,7 @@ coverage erase
 # spec validation
 python -m spec.validate
 # run importer/, relation_engine_server/, and spec/ tests
-coverage run --branch -m unittest discover -v
+coverage run --branch -m pytest
 # RE client tests
-PYTHONPATH=client_src python -m unittest discover client_src/test
+PYTHONPATH=client_src python -m pytest client_src/test
 coverage html --omit=*/test_*
