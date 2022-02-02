@@ -52,7 +52,7 @@ oneOf:
     title: ATRM TF to Target LitCurated 01082020 TranscriptionFactorToGene
     description: Contains literature mined and manually curated TF regulatory interactions for A.thaliana from 1701 TFFs from PlantTFDB 2.0 and 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Downloaded from http://atrm.cbi.pku.edu.cn/download.php
 
-  - const      : AT-UU-GO-03-AA-01
+  - const      : AT-UU-GO-05-AA-01
     title      : GO
     description: GeneA connects to GeneB if the two genes have semantically similar GO terms (with a similarity score > 0). This network is used to evaluate other networks for biological functional content.
 
@@ -80,9 +80,9 @@ oneOf:
     title      : Regulation-Plantregmap
     description: This network contains computationally predicted TF-Target relationships based on motifs, binding sites, ChipSeq data
 
-  - const      : AT-UU-DU-07-AA-01
+  - const      : AT-UU-DU-67-AA-01
     title      : CoEvolution-DUO
-    description: GeneA connects to GeneB if a SNP in GeneA is correlated with a SNP in GeneB using the DUO metric (cite). SNP data is from the full 1001 Genomes.
+    description: GeneA connects to GeneB if a SNP in GeneA is correlated with a SNP in GeneB using the DUO metric (https://doi.org/10.1101/2020.01.28.923730). SNP data is from the full 1001 Genomes.
 
   - const      : AT-UU-CD-00-AA-01
     title      : CoDomain
@@ -91,3 +91,7 @@ oneOf:
   - const      : AT-UU-RX-00-AA-01
     title      : Metabolic-AraCyc
     description: GeneA connects to GeneB if they are both enzymatic and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1.
+
+  - const      : AT-UU-PY-01-LF-01
+    title      : Predictive CG Methylation
+    description: GeneA connects to GeneB if the CG methylation vector of GeneA is an important predictor of the CG methylation vector of GeneB in an iRF model, where all other genes' CG methylation states are included as covariates. The iRF model is an expansion on Random Forest, a feature selection model.
