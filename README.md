@@ -34,5 +34,5 @@ The CI service is available in the `relationapi` service
 * Ensure the `Always pull image before creating` box is ticked
 * Press `Upgrade` button
 * If the deployment suceeded, you can finish the upgrade. If not, you can press the rollback button.
-* 
+
 (For deployments to other environments, request help from the #devops channel)
