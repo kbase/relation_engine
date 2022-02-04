@@ -19,4 +19,20 @@ The relation engine server (`relation_engine_server/`) is a simple API that allo
 
 ## Relation Engine builds
 
-The Relation Engine is available on dockerhub as `kbase/relation_engine_api`. Automated builds are performed whenever there is a new push to `master` or `develop`.
+The Relation Engine is available on github packages. These images are built by the configs in the .github repo.
+The develop tags are located at https://github.com/kbase/relation_engine/pkgs/container/relation_engine-develop  
+e.g.
+```
+docker pull ghcr.io/kbase/relation_engine-develop:latest (Built upon merging a PR)
+docker pull ghcr.io/kbase/relation_engine-develop:pr-93 (Built upon creating a PR)
+```
+
+## How to Deploy in CI
+The CI service is available in the `relationapi` service
+* Press Upgrade Arrow
+* Ensure the relationapi service uses `ghcr.io/kbase/relation_engine-develop:latest`
+* Ensure the `Always pull image before creating` box is ticked
+* Press `Upgrade` button
+* If the deployment suceeded, you can finish the upgrade. If not, you can press the rollback button.
+
+(For deployments to other environments, request help from the #devops channel)
