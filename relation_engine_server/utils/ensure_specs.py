@@ -12,7 +12,7 @@ from spec.validate import get_schema_type_paths
 
 def match(spec_local, specs_server):
     for spec_server in specs_server:
-        if spec_local.items() <= spec_server.items():
+        if is_obj_subset_rec(spec_local, spec_server):
             return True
     return False
 
@@ -226,6 +226,25 @@ def excise_namespace(analyzer_name: str) -> str:
     namespace::thing -> thing
     """
     return analyzer_name.split("::")[-1]
+
+
+def is_obj_subset_rec(
+    l: Union[dict, list, float, str, int],
+    r: Union[dict, list, float, str, int],
+):
+    """
+    Compare two JSON objects, to see if, essentially, l <= r
+    If comparing dicts, recursively compare
+    If comparing lists, shallowly compare. For now, YAGN more
+    """
+    if isinstance(l, dict) and isinstance(r, dict):
+        return all(
+            [k in r.keys() and is_obj_subset_rec(l[k], r[k]) for k in l.keys()]
+        )  # ignore: typing
+    elif isinstance(l, list) and isinstance(r, list):
+        return all([le in r for le in l])
+    else:
+        return l == r  # noqa: E741
 
 
 def mod_obj_literal(

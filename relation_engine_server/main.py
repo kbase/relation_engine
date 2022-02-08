@@ -42,9 +42,9 @@ def return_error(error_dict, code):
 
 @app.route("/", methods=["GET"])
 def root():
-    """Server status."""
-    if os.path.exists(".git/refs/heads/master"):
-        with open(".git/refs/heads/master", "r") as fd:
+    """Server status. develop is default branch"""
+    if os.path.exists(".git/refs/heads/develop"):
+        with open(".git/refs/heads/develop", "r") as fd:
             commit_hash = fd.read().strip()
     else:
         commit_hash = "unknown"
