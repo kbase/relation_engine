@@ -31,7 +31,6 @@ def get_config():
     db_readonly_user = os.environ.get("DB_READONLY_USER", db_user)
     db_readonly_pass = os.environ.get("DB_READONLY_PASS", db_pass)
     api_url = db_url + "/_db/" + db_name + "/_api"
-    print(db_user, db_pass)
     return {
         "auth_url": auth_url,
         "workspace_url": workspace_url,

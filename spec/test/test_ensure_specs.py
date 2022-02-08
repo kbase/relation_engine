@@ -1,6 +1,7 @@
 import unittest
 from unittest import mock
 import copy
+import json
 
 from relation_engine_server.utils import arango_client
 from relation_engine_server.utils.ensure_specs import (
@@ -11,6 +12,7 @@ from relation_engine_server.utils.ensure_specs import (
     ensure_views,
     ensure_analyzers,
     ensure_all,
+    is_obj_subset_rec,
     mod_obj_literal,
     round_float,
     excise_namespace,
@@ -129,6 +131,120 @@ class TestEnsureSpecs(unittest.TestCase):
     # ------------------
     # --- Unit tests ---
     # ------------------
+
+    def test_is_obj_subset_rec(self):
+        """
+        For comparing JSON objects
+        Roughly check l <= r, with recursive checks done with dicts
+        """
+        exp_pass = [
+            ({"hi": 1}, {"hi": 1}),
+            ({"hi": 1}, {"hi": 1, "hello": 2}),
+            ({}, {}),
+            ({}, {"hi": 1}),
+            (
+                {"hi": 1, "hello": {"cat": 3, "sat": 2}},
+                {
+                    "hi": 1,
+                    "hello": {"cat": 3, "sat": 2, "hat": 3, "bat": {}, "map": []},
+                    "hey": 5,
+                    "aloha": [{}],
+                },
+            ),
+        ]
+        exp_fail = [
+            ({"hi": 1}, {}),
+            ({"hi": {}}, {}),
+            ({"hi": 1}, {"hi": {}}),
+            ({"hi": 1, "hello": 2}, {"hi": 1}),
+            (
+                {"hi": 1, "hello": {"cat": 3, "sat": 2, "hat": 3}},
+                {"hi": 1, "hello": {"cat": 3, "sat": 2}},
+            ),
+            (
+                {"hi": 1, "hello": {"cat": 3, "sat": {}}},
+                {"hi": 1, "hello": {"cat": 3, "sat": 2}},
+            ),
+            (
+                {"hi": 1, "hello": {"cat": 3}, "hey": 5},
+                {"hi": 1, "hello": {"cat": 3, "sat": 2}},
+            ),
+            (
+                {
+                    "hi": 1,
+                    "hello": {"cat": 3, "sat": 2, "hat": 3},
+                    "hey": 5,
+                    "howdy": 6,
+                },
+                {"hi": 1, "hello": {"cat": 3, "sat": 2}},
+            ),
+        ]
+
+        for loc, srv in exp_pass:
+            self.assertTrue(is_obj_subset_rec(loc, srv))
+        for loc, srv in exp_fail:
+            self.assertFalse(is_obj_subset_rec(loc, srv))
+
+    def test_is_obj_subset_rec__Reactions(self):
+        """
+        Test the recursive subset functions using Reactions.json view spec
+        """
+        # Local spec
+        local = [view for view in get_local_views()[1] if view["name"] == "Reactions"][
+            0
+        ]
+        # Server spec
+        # From Aardvark, but with "name" key/field added
+        # as seems to happen with GET
+        server = json.loads(
+            """
+{
+    "name": "Reactions",
+    "writebufferIdle": 64,
+    "writebufferActive": 0,
+    "type": "arangosearch",
+    "primarySort": [],
+    "writebufferSizeMax": 33554432,
+    "commitIntervalMsec": 1000,
+    "consolidationPolicy": {
+        "type": "bytes_accum",
+        "threshold": 0.10000000149011612
+    },
+    "globallyUniqueId": "h5455DEB9D2A1/9853332",
+    "cleanupIntervalStep": 10,
+    "id": "9853332",
+    "links": {
+        "rxn_reaction": {
+            "analyzers": [
+                "identity"
+            ],
+            "fields": {
+                "name": {
+                    "analyzers": [
+                        "text_en"
+                    ]
+                },
+                "aliases": {
+                    "analyzers": [
+                        "text_en"
+                    ]
+                },
+                "id": {
+                    "analyzers": [
+                        "text_en"
+                    ]
+                }
+            },
+            "includeAllFields": true,
+            "storeValues": "none",
+            "trackListPositions": false
+        }
+    },
+    "consolidationIntervalMsec": 60000
+}"""
+        )
+        mod_obj_literal(server, float, round_float)
+        self.assertTrue(is_obj_subset_rec(local, server))
 
     def _copy_mod_obj_literal(self, obj, literal_type, func):
         obj = copy.deepcopy(obj)
