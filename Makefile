@@ -1,4 +1,6 @@
-.PHONY: test reset
+QUERY_TESTING_FILE = spec/test/stored_queries/test_query.py
+
+.PHONY: test reset full_query_testing sampling_query_testing
 
 test:
 	docker-compose build
@@ -13,3 +15,9 @@ shell:
 reset:
 	docker-compose --rmi all -v
 	docker-compose build
+
+full_query_testing:
+	DO_QUERY_TESTING=full time python -m pytest -s $(QUERY_TESTING_FILE)
+
+sampling_query_testing:
+	DO_QUERY_TESTING=sampling time python -m pytest -s $(QUERY_TESTING_FILE)
