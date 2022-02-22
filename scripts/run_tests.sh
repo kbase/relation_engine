@@ -16,8 +16,8 @@ sh /app/scripts/start_server.sh &
 coverage erase
 # spec validation
 python -m spec.validate
-# run importer/, relation_engine_server/, and spec/ tests
-coverage run --branch -m pytest
+# run importer/, relation_engine_server/, and spec/ tests, skip test_query.py
+coverage run --branch -m pytest --ignore=spec/test/stored_queries/test_query.py
 # RE client tests
 PYTHONPATH=client_src python -m pytest client_src/test
 coverage html --omit=*/test_*

@@ -204,15 +204,11 @@ def get_search_text_samplings(
 
     # Manual peek to stdout
     peek_len = 10
-    print(
-        json.dumps(
-            {
-                styp: sampling[:peek_len]
-                + (["..."] if len(sampling) > peek_len else [])
-                for styp, sampling in samplings.items()
-            },
-            indent=3,
-        )
+    jprint(
+        {
+            styp: sampling[:peek_len] + (["..."] if len(sampling) > peek_len else [])
+            for styp, sampling in samplings.items()
+        }
     )
 
     # Cache samplings
