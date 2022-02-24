@@ -1,3 +1,5 @@
+# Should be REVISED then DEPRECATED
+# 
 # Search for a taxon with a scientific name
 # Offset is limited to 10k
 name: taxonomy_search_sci_name

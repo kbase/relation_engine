@@ -1,5 +1,12 @@
 """
-Tests for the generic fulltext search
+Tests for stored queries involving a fulltext search:
+* Generic fulltext_search (should be used with caution because it can be slow and timeout at 60s)
+* Taxonomy taxonomy_search_species_strain
+* Taxonomy taxonomy_search_species_strain_no_sort
+
+The latter two are switched between depending on the length of the search text.
+These stored query tests  are all bundled in one test file because their original purpose is to do a species/strain
+name search on the ncbi_taxon collection
 
 These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
 """
@@ -80,7 +87,7 @@ scinames_test_latest = [
 ]
 
 
-class Test(unittest.TestCase):
+class TestTaxonomySearchSpeciesStrainStoredQueries(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         check_spec_test_env()
@@ -89,7 +96,149 @@ class Test(unittest.TestCase):
     def test_ncbi_taxon_scinames(self):
         """Happy path"""
         for sciname in scinames_test_all:
-            _fulltext_query(
+            _taxonomy_search_species_strain_queries(
+                self,
+                taxon_coll="ncbi_taxon",
+                sciname_field="scientific_name",
+                search_text=sciname,
+                ts=_NOW if sciname in scinames_test_latest else None,
+                offset=None,
+                limit=LIMIT,
+                select="scientific_name",
+                # ---
+                expect_error=False,
+                expect_hit=True,
+            )
+
+    def test_null_bind_params(self):
+        """Leave off parameters"""
+        for sciname in scinames_test_all:
+            _taxonomy_search_species_strain_queries(
+                self,
+                taxon_coll="ncbi_taxon",
+                sciname_field="scientific_name",
+                search_text=sciname,
+                ts=None,
+                offset=None,
+                limit=None,
+                select=None,
+                # ---
+                expect_error=False,
+                expect_hit=True,
+            )
+
+    def test_fully_specified_bind_params(self):
+        """Specify all parameters"""
+        for sciname in scinames_test_all:
+            _taxonomy_search_species_strain_queries(
+                self,
+                taxon_coll="ncbi_taxon",
+                sciname_field="scientific_name",
+                search_text=sciname,
+                ts=_NOW if sciname in scinames_test_latest else None,
+                offset=0,
+                limit=LIMIT,
+                select=["id", "scientific_name"],
+                # ---
+                expect_error=False,
+                expect_hit=True,
+            )
+
+    def test_extra_params(self):
+        """Extra params not in spec/aql"""
+        _taxonomy_search_species_strain_queries(
+            self,
+            taxon_coll="ncbi_taxon",
+            sciname_field="scientific_name",
+            search_text="esch",
+            ts=None,
+            offset=0,
+            limit=LIMIT,
+            select=["id", "scientific_name"],
+            extra_unused_param=42,
+            # ---
+            expect_error=("Additional properties are not allowed"),
+        )
+
+    def test_validation_fail(self):
+        _taxonomy_search_species_strain_queries(
+            self,
+            taxon_coll=[],
+            sciname_field=42,
+            search_text={"hi": 1},
+            ts=None,
+            offset=None,
+            limit=None,
+            select=None,
+            # ---
+            expect_error="[] is not of type 'string'",
+        )
+
+    def test_aql_error(self):
+        for sciname in scinames_test_all:
+            _taxonomy_search_species_strain_queries(
+                self,
+                taxon_coll="ncbi_taxon",
+                sciname_field="fake_attrkey",
+                search_text=sciname,
+                ts=None,
+                offset=None,
+                limit=None,
+                select=None,
+                # ---
+                expect_error=True,
+            )
+
+    def test_no_hit(self):
+        for sciname in scinames_test_all:
+            _taxonomy_search_species_strain_queries(
+                self,
+                taxon_coll="ncbi_taxon",
+                sciname_field="scientific_name",
+                search_text=sciname[::-1],
+                ts=None,
+                offset=None,
+                limit=None,
+                select=None,
+                # ---
+                expect_error=False,
+                expect_hit=False,
+                expected_hits=[],
+            )
+
+    def test_prefix_hit(self):
+        """Test search text len being lte 3"""
+        _taxonomy_search_species_strain_queries(
+            self,
+            taxon_coll="ncbi_taxon",
+            sciname_field="scientific_name",
+            search_text="inf",
+            ts=None,
+            offset=None,
+            limit=None,
+            select=None,
+            # ---
+            expect_error=False,
+            expect_hit=False,
+            expected_hits=[
+                "Influenza A virus PX8-XIII(A/USSR/90/77(H1N1)xA/Pintail Duck/Primorie/695/76(H2N3))",
+                "Influenza C virus (C/PIG/Beijing/439/1982)",
+                "Influenza B virus (B/Ann Arbor/1/1966 [cold-adapted and wild- type])",
+                "Influenza B virus (B/Brisbane/FSS700/2017)",
+            ],
+        )
+
+
+class TestFulltextSearchStoredQuery(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        check_spec_test_env()
+        create_test_docs("ncbi_taxon", ncbi_taxa)
+
+    def test_ncbi_taxon_scinames(self):
+        """Happy path"""
+        for sciname in scinames_test_all:
+            _fulltext_search_query(
                 self,
                 coll="ncbi_taxon",
                 search_attrkey="scientific_name",
@@ -111,7 +260,7 @@ class Test(unittest.TestCase):
     def test_null_bind_params(self):
         """Leave off parameters"""
         for sciname in scinames_test_all:
-            _fulltext_query(
+            _fulltext_search_query(
                 self,
                 coll="ncbi_taxon",
                 search_attrkey="scientific_name",
@@ -129,7 +278,7 @@ class Test(unittest.TestCase):
     def test_fully_specified_bind_params(self):
         """Specify all parameters"""
         for sciname in scinames_test_all:
-            _fulltext_query(
+            _fulltext_search_query(
                 self,
                 coll="ncbi_taxon",
                 search_attrkey="scientific_name",
@@ -150,7 +299,7 @@ class Test(unittest.TestCase):
 
     def test_extra_params(self):
         """Extra params not in spec/aql"""
-        _fulltext_query(
+        _fulltext_search_query(
             self,
             coll="ncbi_taxon",
             search_attrkey="scientific_name",
@@ -170,7 +319,7 @@ class Test(unittest.TestCase):
         )
 
     def test_validation_fail(self):
-        _fulltext_query(
+        _fulltext_search_query(
             self,
             coll=[],
             search_attrkey=42,
@@ -186,7 +335,7 @@ class Test(unittest.TestCase):
 
     def test_aql_error(self):
         for sciname in scinames_test_all:
-            _fulltext_query(
+            _fulltext_search_query(
                 self,
                 coll="ncbi_taxon",
                 search_attrkey="fake_attrkey",
@@ -202,7 +351,7 @@ class Test(unittest.TestCase):
 
     def test_no_hit(self):
         for sciname in scinames_test_all:
-            _fulltext_query(
+            _fulltext_search_query(
                 self,
                 coll="ncbi_taxon",
                 search_attrkey="scientific_name",
@@ -222,7 +371,56 @@ class Test(unittest.TestCase):
 # --- Test helpers ---
 
 
-def _fulltext_query(
+def _switch_taxonomy_search_species_strain_queries(search_text):
+    return (
+        "taxonomy_search_species_strain_no_sort"
+        if len(search_text) <= 3
+        else "taxonomy_search_species_strain"
+    )
+
+
+def _taxonomy_search_species_strain_queries(
+    self,
+    taxon_coll,
+    sciname_field,
+    search_text,
+    ts,
+    offset,
+    limit,
+    select,
+    expect_error=False,
+    expect_hit=True,
+    expected_hits=None,
+    **kw,  # for testing passing disallowed properties
+):
+    """
+    Run query against ArangoDB server
+    """
+    data = {
+        "@taxon_coll": taxon_coll,
+        "sciname_field": sciname_field,
+        "search_text": search_text,
+        "ts": ts,
+        "offset": offset,
+        "limit": limit,
+        "select": select,
+        **kw,
+    }
+    stored_query = _switch_taxonomy_search_species_strain_queries(search_text)
+    _check_query_results(
+        self,
+        data,
+        stored_query,
+        sciname_field,
+        search_text,
+        limit,
+        expect_error,
+        expect_hit,
+        expected_hits,
+    )
+
+
+def _fulltext_search_query(
     self,
     coll,
     search_attrkey,
@@ -251,9 +449,34 @@ def _fulltext_query(
         "select": select,
         **kw,
     }
+    stored_query = "fulltext_search"
+    _check_query_results(
+        self,
+        data,
+        stored_query,
+        search_attrkey,
+        search_text,
+        limit,
+        expect_error,
+        expect_hit,
+        expected_hits,
+    )
+
+
+def _check_query_results(
+    self,
+    data,
+    stored_query,
+    search_attrkey,
+    search_text,
+    limit,
+    expect_error,
+    expect_hit,
+    expected_hits,
+):
     resp = requests.post(
         _CONF["re_api_url"] + "/api/v1/query_results",
-        params={"stored_query": "fulltext_search"},
+        params={"stored_query": stored_query},
         data=json.dumps(data),
     )
 
@@ -276,13 +499,14 @@ def _fulltext_query(
             self.assertNotIn(search_text, hits)
 
         if expected_hits is not None:
-            self.assertEqual(expected_hits, hits)
+            self.assertCountEqual(expected_hits, hits)
 
     # Filter out null values
+    # to see if their default null values would kick in properly
     data = {k: v for k, v in data.items() if v is not None}
     resp = requests.post(
         _CONF["re_api_url"] + "/api/v1/query_results",
-        params={"stored_query": "fulltext_search"},
+        params={"stored_query": stored_query},
         data=json.dumps(data),
     )
 
@@ -305,4 +529,4 @@ def _fulltext_query(
             self.assertNotIn(search_text, hits)
 
         if expected_hits is not None:
-            self.assertEqual(expected_hits, hits)
+            self.assertCountEqual(expected_hits, hits)

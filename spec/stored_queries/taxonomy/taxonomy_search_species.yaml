@@ -1,3 +1,5 @@
+# DEPRECATED. See taxonomy_search_species_strains and taxonomy_search_species_strains_no_sort
+#
 # Search for a species/strain. Similar to search_sci_name, but simpler and quicker
 name: taxonomy_search_species
 params:
