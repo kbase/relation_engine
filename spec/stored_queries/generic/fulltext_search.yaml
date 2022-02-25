@@ -1,4 +1,6 @@
 # Search a collection with a fulltext index with an attribute name and search text
+# Also supports filtering by outer-level attributes
+# Not recommended for fast searching because it can be very slow and even timeout at 60s
 name: fulltext_search
 params:
   type: object

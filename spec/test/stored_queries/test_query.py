@@ -10,11 +10,18 @@ import warnings
 import pytest
 from typing import Tuple, List
 from requests.exceptions import ReadTimeout
+import unittest
 
 from arango import ArangoClient
 import numpy as np
 
 from relation_engine_server.utils import json_validation
+
+# Skip entire module if env var not set
+if not os.environ.get("DO_QUERY_TESTING"):
+    raise unittest.SkipTest(
+        "Env var DO_QUERY_TESTING not set. Skipping query testing module"
+    )
 
 warnings.filterwarnings("ignore")
 
@@ -27,24 +34,23 @@ TMP_OUT_DIR = os.path.join(ROOT_DIR, "tmp")
 SCINAMES_LATEST_FP = os.path.join(TMP_OUT_DIR, "ncbi_scinames_latest.json")
 SAMPLINGS_FP = os.path.join(TMP_OUT_DIR, "samplings.json")
 STORED_QUERY_FP = os.path.join(
-    ROOT_DIR, "spec/stored_queries/taxonomy/taxonomy_ncbi_species.yaml"
+    ROOT_DIR, "spec/stored_queries/taxonomy/taxonomy_search_species_strain.yaml"
 )
 STORED_QUERY_NO_SORT_FP = os.path.join(
-    ROOT_DIR, "spec/stored_queries/taxonomy/taxonomy_ncbi_species_no_sort.yaml"
+    ROOT_DIR, "spec/stored_queries/taxonomy/taxonomy_search_species_strain_no_sort.yaml"
 )
 
 if not os.path.exists(TMP_OUT_DIR):
     os.mkdir(TMP_OUT_DIR)
 
+# Read config
 try:
     with open(CONFIG_FP) as fh:
         CONFIG = json.load(fh)
-    if not CONFIG["host"] or not CONFIG["username"] or not CONFIG["password"]:
-        raise RuntimeError("Missing config fields")
     CLIENT = ArangoClient(hosts=CONFIG["host"])
     DB = CLIENT.db("ci", username=CONFIG["username"], password=CONFIG["password"])
 except Exception as e:
-    help = """
+    help_msg = """
 Please set host URL, username, and password in arango_live_server_config.json, e.g.,
 {
     "username": "doe_j",
@@ -56,18 +62,23 @@ you may have to proxy into the live ArangoDB server first, e.g.,
 `ssh -L 8532:10.58.1.211:8532 j_doe@login1.berkeley.kbase.us`
 Then, the url would be `http://localhost:8532`
 """
-    print(help)
-    raise (e)
+    print(help_msg)
+    raise
+
+# Get pointer to collection
 NCBI_TAXON = DB.collection("ncbi_taxon")
 
 # Load the queries
 QUERY = json_validation.load_json_yaml(STORED_QUERY_FP)["query"]
 QUERY_NO_SORT = json_validation.load_json_yaml(STORED_QUERY_NO_SORT_FP)["query"]
 
+# Set query bind parameters
 LIMIT = 20
 NOW = time.time() * 1000
 
 # Load/cache the scinames
+# This probably won't work well and will need some fiddling/improvement
+# because doing it this way can lead to a timeout on some machine setups
 if os.path.isfile(SCINAMES_LATEST_FP):
     with open(SCINAMES_LATEST_FP) as fh:
         SCINAMES_LATEST = json.load(fh)
@@ -85,11 +96,13 @@ else:
         and taxa["created"] <= NOW
         and NOW <= taxa["expired"]
     ]
+    # Cache latest scinames
     with open(SCINAMES_LATEST_FP, "w") as fh:
         json.dump(SCINAMES_LATEST, fh)
 
 
 def use_sort(search_text):
+    """Determine whether to use the sorting or non-sorting query"""
     return len(search_text) > 3
 
 
@@ -111,11 +124,13 @@ def jprint(jo, dry=False):
         print(txt)
 
 
-def fulltext_search_ncbi_scinames(search_text):
-    """"""
+def taxonomy_search_species_strain(search_text):
+    """Make the query"""
     cursor = DB.aql.execute(
         QUERY if use_sort(search_text) else QUERY_NO_SORT,
         bind_vars={
+            "@taxon_coll": "ncbi_taxon",
+            "sciname_field": "scientific_name",
             "search_text": search_text,
             "ts": NOW,
             "offset": None,
@@ -349,7 +364,7 @@ def do_query_testing(
                 data.append(dat)
 
                 try:
-                    query_res = fulltext_search_ncbi_scinames(search_text)
+                    query_res = taxonomy_search_species_strain(search_text)
                 except Exception:
                     handle_err("Something went wrong in the query!", dat, failed)
 
