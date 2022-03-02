@@ -17,6 +17,14 @@ These specifications are used by the [Relation Engine API](relation_engine_serve
 
 The relation engine server (`relation_engine_server/`) is a simple API that allows KBase community developers to interact with the Relation Engine graph database. You can run stored queries or do bulk updates on documents.
 
+## Relation Engine Startup
+* Docker image is built with environment variable `SPEC_RELEASE_PATH=/opt/spec.tar.gz'. This contains the specs from the repo itself.
+* Wait for response from auth, workspace, and arangodb services, as they are set up
+* Specs are set up. Either the repo specs or remote specs are loaded into the specs root path
+* Collections, views, and analyzers from the specs are added to the ArangoDB server. If the collection, view, or analyzer already exists, but in a different configuration, it will _not_ be overwritten.
+* Collections, views, and analyzers from the loaded specs are compared to those on the ArangoDB server. If the loaded specs' attributes are not recursively a subset of the server specs, then an exception is raise. (This is just preliminary validation behavior.)
+
+
 ## Relation Engine builds
 
 The Relation Engine is available on github packages. These images are built by the configs in the .github repo.
