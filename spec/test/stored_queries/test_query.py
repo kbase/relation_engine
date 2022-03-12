@@ -1,30 +1,39 @@
-import traceback as tb
-import sys
+"""
+This script can be run from `make`
+Essentially it was created to run stored queries against the ncbi_taxon collection
+and collect data and stats.
+"""
+
 import os
-import json
-import datetime
-import time
-import random
-import textwrap
-import warnings
-import pytest
-from typing import Tuple, List
-from requests.exceptions import ReadTimeout
 import unittest
 
-from arango import ArangoClient
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-from relation_engine_server.utils import json_validation
-
 # Skip entire module if env var not set
+# to avoid non-Docker-container imports or otherwise
+# specific/costly operations in script
 if not os.environ.get("DO_QUERY_TESTING"):
     raise unittest.SkipTest(
         "Env var DO_QUERY_TESTING not set. Skipping query testing module"
     )
+
+import traceback as tb  # noqa E402
+import sys  # noqa E402
+import json  # noqa E402
+import datetime  # noqa E402
+import time  # noqa E402
+import random  # noqa E402
+import textwrap  # noqa E402
+import warnings  # noqa E402
+import pytest  # noqa E402
+from typing import Tuple, List  # noqa E402
+from requests.exceptions import ReadTimeout  # noqa E402
+
+from arango import ArangoClient  # noqa E402
+import numpy as np  # noqa E402
+import pandas as pd  # noqa E402
+import seaborn as sns  # noqa E402
+import matplotlib.pyplot as plt  # noqa E402
+
+from relation_engine_server.utils import json_validation  # noqa E402
 
 warnings.filterwarnings("ignore")
 
@@ -109,7 +118,10 @@ else:
 
 
 def use_sort(search_text):
-    """Determine whether to use the sorting or non-sorting query"""
+    """
+    Determine whether to use the sorting or non-sorting stored query for the new query.
+    Smaller search texts' results will not be sorted on.
+    """
     return len(search_text) > 3
 
 
@@ -132,12 +144,13 @@ def jprint(jo, dry=False):
 
 
 def do_taxonomy_search_species_query(search_text):
+    """Do the old query"""
     cursor = DB.aql.execute(
         QUERY_OLD,
         bind_vars={
             "@taxon_coll": "ncbi_taxon",
             "sciname_field": "scientific_name",
-            "search_text": search_text,
+            "search_text": "prefix:" + search_text,  # how the old query was set up
             "ts": NOW,
             "offset": None,
             "limit": LIMIT,
@@ -151,7 +164,7 @@ def do_taxonomy_search_species_query(search_text):
 
 
 def do_taxonomy_search_species_strain_query(search_text):
-    """Do the query"""
+    """Do the new query"""
     cursor = DB.aql.execute(
         QUERY if use_sort(search_text) else QUERY_NO_SORT,
         bind_vars={
@@ -193,10 +206,10 @@ def get_search_text_samplings(
 
     print("\nSampling search texts and prefixes thereof ...")
 
-    def get_capped_samplings(styp: str, uniq_prefixes=True) -> Tuple[list, list]:
+    def get_capped_samplings(styp: str) -> Tuple[list, list]:
         """
         Randomly sample scinames
-        Then take all prefixes (not already seen in accumulated prefixes)
+        Then take all prefixes, deduplicated
         "Wild" just means the exclusion of "simple"
         """
         if styp not in ["simple", "wild"]:
@@ -209,22 +222,17 @@ def get_search_text_samplings(
             if is_simple(sciname) == (styp == "simple")
         ]
         random.shuffle(sampling)
-        sampling = sampling[:cap_scinames]  # cap this first to avoid generating overabundant prefixes
-        sampling_prefixes = [
-            sciname[:i] for sciname in sampling for i in range(1, len(sciname))
-        ]
-        if uniq_prefixes:
-            seen_prefixes = set()
-            sampling_prefixes = [
-                sciname
-                for sciname in sampling_prefixes
-                if sciname not in seen_prefixes
-                and not seen_prefixes.add(
-                    sciname
-                )  # latter operand always evaluates to true
-            ]
+        sampling = sampling[
+            :cap_scinames
+        ]  # cap this first to avoid generating overabundant prefixes
+
+        sampling_prefixes = list(
+            set([sciname[:i] for sciname in sampling for i in range(1, len(sciname))])
+        )
         random.shuffle(sampling_prefixes)
-        return sampling, sampling_prefixes[:cap_scinames_prefixes]
+        sampling_prefixes = sampling_prefixes[:cap_scinames_prefixes]
+
+        return sampling, sampling_prefixes
 
     scinames_simple, scinames_simple_prefixes = get_capped_samplings("simple")
     scinames_wild, scinames_wild_prefixes = get_capped_samplings("wild")
@@ -260,7 +268,7 @@ def get_search_text_samplings(
     return samplings
 
 
-def handle_err(msg, dat):
+def handle_err(msg, dat=None):
     """
     During sampling/sciname/query loops,
     if error arises,
@@ -268,8 +276,9 @@ def handle_err(msg, dat):
     """
     print(msg)
     tb.print_exc()
-    dat["failed"] = True
-    jprint(dat)
+    if dat:
+        dat["failed"] = True
+        jprint(dat)
 
 
 def update_print_timekeepers(i, t0, exe_times, sampling, num_failed):
@@ -285,10 +294,10 @@ def update_print_timekeepers(i, t0, exe_times, sampling, num_failed):
         tper_iter, tper_exe, tmed_exe, tmin_exe, tmax_exe = 0, 0, 0, 0, 0
     else:
         tper_iter = (time.time() - t0) / i
-        tper_exe = np.mean(exe_times)
-        tmed_exe = np.median(exe_times)
-        tmin_exe = np.min(exe_times)
-        tmax_exe = np.max(exe_times)
+        tper_exe = np.nanmean(exe_times)
+        tmed_exe = np.nanmedian(exe_times)
+        tmin_exe = np.nanmin(exe_times)
+        tmax_exe = np.nanmax(exe_times)
     print(
         f"[{datetime.datetime.now().strftime('%b%d %H:%M').upper()}]",
         "...",
@@ -319,6 +328,7 @@ def do_query_testing(
         "scinames_latest",
         "scinames_latest_permute",
     ],
+    permute: bool = True,
     update_period: int = 100,
 ):
     """
@@ -326,9 +336,10 @@ def do_query_testing(
     Periodically outputs accumulated mean and median execution times
     """
     # Permute since the scinames tend to start out simpler
-    for styp, sampling in samplings.items():
-        samplings[styp] = sampling[:]
-        random.shuffle(samplings[styp])
+    if permute:
+        for styp, sampling in samplings.items():
+            samplings[styp] = sampling[:]
+            random.shuffle(samplings[styp])
 
     # Get some nice stats to print out
     samplings_metadata = [
@@ -392,19 +403,30 @@ def do_query_testing(
                     query_res = do_query_func(search_text)
                 except Exception:
                     handle_err("Something went wrong in the query!", dat)
+                    query_res = {
+                        "execution_time": np.nan,
+                        "results": [],
+                    }
 
                 exe_times.append(query_res["execution_time"])
                 dat.update(query_res)
 
+                # Set `has_results`
+                dat["has_results"] = len(query_res["results"]) > 0
+                # Set `failed`
                 if styp in expect_hits:
                     hits = query_res["results"]
                     # Given that limit=20,
                     # test that sciname is in top 20,
                     # and they aren't >20 duplicates.
                     # Raise to get traceback in stdout
-                    if search_text not in hits or (
-                        len(hits) == LIMIT and all([hit == search_text for hit in hits])
-                    ):
+                    try:
+                        assert search_text in hits
+                        assert not (
+                            len(hits) == LIMIT
+                            and all([hit == search_text for hit in hits])
+                        )
+                    except AssertionError:
                         num_failed += 1
                         handle_err(
                             "Something went wrong in the expect hit assertion!",
@@ -415,9 +437,7 @@ def do_query_testing(
             update_print_timekeepers(i + 1, t0, exe_times, sampling, num_failed)
 
     except Exception:
-        handle_err(
-            "Something went wrong in the samplings/scinames/query loops!", dat
-        )
+        handle_err("Something went wrong in the samplings/scinames/query loops!")
 
     finally:
         results_fp = os.path.join(
@@ -440,8 +460,8 @@ def do_query_testing(
             "samplings": list(samplings.keys()),
             "expect_hits": expect_hits,
             "total_num_queries": total_num_queries,
-            "_sampling": styp,    # where it may have
-            "_i": i,              # stopped at
+            "_sampling": styp,  # where it may have
+            "_i": i,  # stopped at
             "data_all": data_all,
         }
         print(dec)
@@ -480,12 +500,16 @@ def test_samplings():
 )
 def test_compare_queries():
     do_query_testing(
-        samplings=get_search_text_samplings(resample=True),
+        samplings=get_search_text_samplings(
+            resample=True, cap_scinames=500, cap_scinames_prefixes=500
+        ),
         do_query_func=do_taxonomy_search_species_strain_query,
+        permute=False,
     )
     do_query_testing(
         samplings=get_search_text_samplings(resample=False),
         do_query_func=do_taxonomy_search_species_query,
+        permute=False,
     )
 
 
@@ -503,7 +527,8 @@ def do_graph(data_new_fp, data_old_fp):
                     ],
                     "execution_time": float,  # s
                     ...
-                }
+                },
+                ...
             ],
             "styp1": [
                 ...
@@ -518,36 +543,85 @@ def do_graph(data_new_fp, data_old_fp):
     with open(data_old_fp) as fh:
         data_old = json.load(fh)["data_all"]
 
+    # Not meaningful/large enough to make the figure
+    if "edge_cases" in data_new:
+        del data_new["edge_cases"]
+    if "edge_cases" in data_old:
+        del data_old["edge_cases"]
+
+    # Count num queries where the old stored query `has_results`/`failed`
+    old_failed_counts = {
+        styp: (
+            len([1 for dat in data if not dat["failed"]]),
+            len([1 for dat in data if dat["failed"]]),
+        )
+        for styp, data in data_old.items()
+    }
+    old_has_results_counts = {
+        styp: (
+            len([1 for dat in data if not dat["results"]]),
+            len([1 for dat in data if dat["results"]]),
+        )
+        for styp, data in data_old.items()
+    }
+
+    # Sanity checks
+    # Should have same ordering in `styp` and `search_text`
     for (styp0, data0), (styp1, data1) in zip(data_new.items(), data_old.items()):
         assert styp0 == styp1
         assert len(data0) == len(data1)
+        for dat0, dat1 in zip(data0, data1):
+            assert dat0["search_text"] == dat1["search_text"]
+            assert not np.isnan(dat0["execution_time"])
+            assert not np.isnan(dat1["execution_time"])
+    # old_has_results and old_failed counts should add up
+    for counts in [old_failed_counts, old_has_results_counts]:
+        for styp, count in counts.items():
+            assert sum(count) == len(data_old[styp])
 
     df_data = []
-    df_columns = ["exe_time_ms", "stored_query", "styp", "failed"]
+    df_columns = [
+        "exe_time_ms",
+        "stored_query",
+        "sampling",
+        "failed",
+        "has_results",
+        "old_failed",
+        "old_has_results",
+    ]
     for sq, data_epoch in zip(["new", "old"], [data_new, data_old]):
         for styp, data in data_epoch.items():
-            for dat in data:
+            for i, dat in enumerate(data):
+                # Toggle the literal strings here in tandem with
+                # toggling the `hue` below
                 df_row = [
                     int(dat["execution_time"] * 1000),
                     sq,
-                    styp,
+                    f"{styp}\nn = {len(data)} ({old_failed_counts[styp][0]}/{old_failed_counts[styp][1]})",
+                    # f"{styp}\nn = {len(data)} ({old_has_results_counts[styp][0]}/{old_has_results_counts[styp][1]})",
                     dat["failed"],
+                    dat["has_results"],
+                    data_old[styp][i]["failed"],
+                    data_old[styp][i]["has_results"],
                 ]
                 df_data.append(df_row)
 
     df = pd.DataFrame(df_data, columns=df_columns)
 
-    g = sns.catplot(
+    sns.catplot(
         x="stored_query",
         y="exe_time_ms",
-        # hue="failed",
-        # scale="count",
-        # scale_hue=False,
-        col="styp",
+        hue="old_failed",  # Toggle the `hue` here in tandem with
+        # hue="old_has_results",     # toggling the literal strings n `df_row` above
+        scale="area",
+        scale_hue=False,
+        col="sampling",
         data=df,
         kind="violin",
-        # split=True,
+        split=True,
+        cut=0,
         aspect=0.7,
+        bw=0.2,
     )
 
     plt.show()
