@@ -421,8 +421,8 @@ def do_query_testing(
                     # and they aren't >20 duplicates.
                     # Raise to get traceback in stdout
                     try:
-                        assert search_text in hits
-                        assert not (
+                        assert search_text in hits  # nosec B101
+                        assert not (  # nosec B101
                             len(hits) == LIMIT
                             and all([hit == search_text for hit in hits])
                         )
@@ -568,16 +568,16 @@ def do_graph(data_new_fp, data_old_fp):
     # Sanity checks
     # Should have same ordering in `styp` and `search_text`
     for (styp0, data0), (styp1, data1) in zip(data_new.items(), data_old.items()):
-        assert styp0 == styp1
-        assert len(data0) == len(data1)
+        assert styp0 == styp1  # nosec B101
+        assert len(data0) == len(data1)  # nosec B101
         for dat0, dat1 in zip(data0, data1):
-            assert dat0["search_text"] == dat1["search_text"]
-            assert not np.isnan(dat0["execution_time"])
-            assert not np.isnan(dat1["execution_time"])
+            assert dat0["search_text"] == dat1["search_text"]  # nosec B101
+            assert not np.isnan(dat0["execution_time"])  # nosec B101
+            assert not np.isnan(dat1["execution_time"])  # nosec B101
     # old_has_results and old_failed counts should add up
     for counts in [old_failed_counts, old_has_results_counts]:
         for styp, count in counts.items():
-            assert sum(count) == len(data_old[styp])
+            assert sum(count) == len(data_old[styp])  # nosec B101
 
     df_data = []
     df_columns = [
