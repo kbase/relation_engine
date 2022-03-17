@@ -55,6 +55,15 @@ scinames_test_all = [
     "Vaccinia virus WR 65-16",
     "Dengue virus 2 Jamaica/1409/1983",
     "Dengue virus 2 Thailand/NGS-C/1944",
+    # --- Escape chars (,:+-|"') ---
+    "Salmonella enterica subsp. diarizonae serovar 60:r:e,n,x,z15",
+    "Fusarium cf. solani 3+4-uuu DPGS-2011",
+    "Integrating expression vector pJEB403+drrA",
+    "Vector pEntry-attR2-IRES-eGFP-luc+-pA-attL3",
+    "low G+C Gram-positive bacterium HTA462",
+    "Reporter vector p1168hIL6mC/EBP-luc+",
+    "Pleurocapsales cyanobacterium 'Beach rock 4+5\"'",
+    "Nostoc sp. 'Peltigera sp. \"hawaiensis\" P1236 cyanobiont'",
     # --- Dups (techinically only applicable to live data) ---
     "environmental samples",
     "Listeria sp. FSL_L7-0091",
