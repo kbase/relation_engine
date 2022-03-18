@@ -2404,5 +2404,23 @@
         "expired": 9007199254740991,
         "release_created": 1612137600000,
         "release_expired": 9007199254740991
+    },
+    {
+        "_key": "fake_2021-02-01",
+        "_id": "ncbi_taxon/fake_2021-02-01",
+        "_rev": "fake",
+        "id": "fake",
+        "scientific_name": "|Fake|fake|fake|  ||fake||",
+        "rank": "species",
+        "strain": false,
+        "aliases": [],
+        "ncbi_taxon_id": -1,
+        "gencode": 11,
+        "first_version": "2021-02-01",
+        "last_version": "2021-02-01",
+        "created": 1612915015847,
+        "expired": 9007199254740991,
+        "release_created": 1612137600000,
+        "release_expired": 9007199254740991
     }
 ]

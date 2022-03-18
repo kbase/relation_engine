@@ -35,6 +35,7 @@ with open(ncbi_taxon_fp) as fh:
     ncbi_taxa = json.load(fh)
 
 # scinames_test_all are all the test scinames
+# These are selected from the ncbi_taxon collection
 scinames_test_all = [
     # --- Token preceded by punctuation ---
     "Lactobacillus sp. 'thermophilus'",
@@ -56,6 +57,7 @@ scinames_test_all = [
     "Dengue virus 2 Jamaica/1409/1983",
     "Dengue virus 2 Thailand/NGS-C/1944",
     # --- Escape chars (,:+-|"') ---
+    # --- TODO sample scinames with the escape chars in different variety of syntaxes ---
     "Salmonella enterica subsp. diarizonae serovar 60:r:e,n,x,z15",
     "Fusarium cf. solani 3+4-uuu DPGS-2011",
     "Integrating expression vector pJEB403+drrA",
@@ -64,6 +66,7 @@ scinames_test_all = [
     "Reporter vector p1168hIL6mC/EBP-luc+",
     "Pleurocapsales cyanobacterium 'Beach rock 4+5\"'",
     "Nostoc sp. 'Peltigera sp. \"hawaiensis\" P1236 cyanobiont'",
+    "|Fake|fake|fake|  ||fake||",
     # --- Dups (techinically only applicable to live data) ---
     "environmental samples",
     "Listeria sp. FSL_L7-0091",
@@ -73,7 +76,8 @@ scinames_test_all = [
     "Corticiaceae sp.",
     "Escherichia coli",
 ]
-# scinames_test_latest are the test scinames that are compatible with a current timestamp
+# scinames_test_latest are the test scinames that are not expired and
+# compatible with a current timestamp
 scinames_test_latest = [
     "Lactobacillus sp. 'thermophilus'",
     "Rabbit fibroma virus (strain Kasza)",
@@ -88,6 +92,15 @@ scinames_test_latest = [
     "Vaccinia virus WR 65-16",
     "Dengue virus 2 Jamaica/1409/1983",
     "Dengue virus 2 Thailand/NGS-C/1944",
+    "Salmonella enterica subsp. diarizonae serovar 60:r:e,n,x,z15",
+    "Fusarium cf. solani 3+4-uuu DPGS-2011",
+    "Integrating expression vector pJEB403+drrA",
+    "Vector pEntry-attR2-IRES-eGFP-luc+-pA-attL3",
+    "low G+C Gram-positive bacterium HTA462",
+    "Reporter vector p1168hIL6mC/EBP-luc+",
+    "Pleurocapsales cyanobacterium 'Beach rock 4+5\"'",
+    "Nostoc sp. 'Peltigera sp. \"hawaiensis\" P1236 cyanobiont'",
+    "|Fake|fake|fake|  ||fake||",
     "environmental samples",
     "Listeria sp. FSL_L7-0091",
     "Listeria sp. FSL_L7-1519",
