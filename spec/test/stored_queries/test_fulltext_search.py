@@ -56,7 +56,7 @@ scinames_test_all = [
     "Vaccinia virus WR 65-16",
     "Dengue virus 2 Jamaica/1409/1983",
     "Dengue virus 2 Thailand/NGS-C/1944",
-    # --- Escape chars (,:+-|"') ---
+    # --- Escape chars ( ,:+-|"' ) ---
     # --- TODO sample scinames with the escape chars in different variety of syntaxes ---
     "Salmonella enterica subsp. diarizonae serovar 60:r:e,n,x,z15",
     "Fusarium cf. solani 3+4-uuu DPGS-2011",
@@ -67,7 +67,7 @@ scinames_test_all = [
     "Pleurocapsales cyanobacterium 'Beach rock 4+5\"'",
     "Nostoc sp. 'Peltigera sp. \"hawaiensis\" P1236 cyanobiont'",
     "|Fake|fake|fake|  ||fake||",
-    # --- Dups (techinically only applicable to live data) ---
+    # --- Dups (technically only applicable to live data) ---
     "environmental samples",
     "Listeria sp. FSL_L7-0091",
     "Listeria sp. FSL_L7-1519",
