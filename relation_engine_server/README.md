@@ -460,9 +460,9 @@ make test
 
 ## Deployment
 
-The docker image is pushed to Docker Hub when new commits are made to master. The script that runs when pushing to docker hub is found in `hooks/build`.
+Deploy the image by running the `scripts/docker_deploy` script.
 
-Alternatively, set the image name in `scripts/local-build.sh` and run it to build and deploy locally, which may be a lot faster.
+The image tag will be taken from the `VERSION` file found in the root of the repo.
 
 ## Project anatomy
 
