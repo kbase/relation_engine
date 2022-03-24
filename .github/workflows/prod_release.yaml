@@ -1,0 +1,38 @@
+---
+name: Publish Release Image
+'on':
+  release:
+    branches:
+    - main
+    - master
+    types:
+    - published
+jobs:
+  docker_build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check Tag
+      id: check-tag
+      run: |-
+        if [[ ${{ github.ref_name }} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo ::set-output name=match::true
+        fi
+    - name: Report SemVer Check
+      if: steps.check-tag.outputs.match != 'true'
+      run: echo "Release version must follow semantic naming (e.g. 1.0.2)"; exit 1
+    - name: Check Source Branch
+      if: github.event.release.target_commitish != 'master' && github.event.release.target_commitish != 'main'
+      run: echo "Releases must be built from master/main branch"; exit 1
+    - name: Check out GitHub Repo
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
+      uses: actions/checkout@v2
+    - name: Build and Push to Packages
+      env:
+        ISH: "${{ github.event.release.target_commitish }}"
+        PR: "${{ github.event.pull_request.number }}"
+        SHA: "${{ github.event.pull_request.head.sha }}"
+        VER: "${{ github.event.release.tag_name }}"
+        DOCKER_ACTOR: "${{ secrets.GHCR_USERNAME }}"
+        DOCKER_TOKEN: "${{ secrets.GHCR_TOKEN }}"
+      run: "./.github/workflows/scripts/prod_release.sh\n"

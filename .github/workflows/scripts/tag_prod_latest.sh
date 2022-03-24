@@ -8,5 +8,5 @@ export COMMIT=$(echo "$SHA" | cut -c -7)
 
 docker login -u "$DOCKER_ACTOR" -p "$DOCKER_TOKEN" ghcr.io
 docker pull ghcr.io/"$MY_ORG"/"$MY_APP":"pr-""$PR"
-docker tag ghcr.io/"$MY_ORG"/"$MY_APP":"pr-""$PR" ghcr.io/"$MY_ORG"/"$MY_APP":"latest"
-docker push ghcr.io/"$MY_ORG"/"$MY_APP":"latest"
+docker tag ghcr.io/"$MY_ORG"/"$MY_APP":"pr-""$PR" ghcr.io/"$MY_ORG"/"$MY_APP":"latest-rc"
+docker push ghcr.io/"$MY_ORG"/"$MY_APP":"latest-rc"
