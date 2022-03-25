@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
-##[0.0.18] - 2022-03-02
+## [0.0.18] - 2022-03-02
 ### Added
 - taxonomy_search_species_strain and taxonomy_search_species_strain_no_sort stored queries
 
