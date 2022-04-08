@@ -1,5 +1,6 @@
 name: Run RE tests
 on:
+  workflow_call:
   pull_request:
     types:
     - opened
