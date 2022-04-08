@@ -11,10 +11,10 @@ on:
 
 jobs:
   run_tests:
-    uses: ./.github/workflows/run_tests.yml
+    uses: ./.github/workflows/run_tests.yaml
 
   run_build_and_push:
-    uses: ./.github/workflows/build_and_push_image.yml
+    uses: ./.github/workflows/build_and_push_image.yaml
     needs: run_tests
     secrets:
       GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
