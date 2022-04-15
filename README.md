@@ -44,3 +44,8 @@ The CI service is available in the `relationapi` service
 * If the deployment suceeded, you can finish the upgrade. If not, you can press the rollback button.
 
 (For deployments to other environments, request help from the #devops channel)
+
+## How to Deploy to production
+* Merge from Develop to Main
+* Draft a release using semantic versioning (e.g 1.2.3) by creating a tag with the target of Main
+* Ensure release notes are updated manually and/or by AutoGenerate Release Notes
