@@ -1,0 +1,25 @@
+# Get all children for a taxon, using a cursor
+name: ncbi_taxon_get_children_cursor
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: ID of the taxon vertex for which you want to find descendants
+    ts:
+      type: integer
+      title: Versioning timestamp
+    select:
+      type: [array, "null"]
+      items: {type: string}
+      description: Taxon fields to keep in the results
+      default: null
+query: |
+  for tax in ncbi_taxon
+    filter tax.id == @id
+    filter tax.created <= @ts AND tax.expired >= @ts
+    limit 1
+    for child in 1..1 inbound tax ncbi_child_of_taxon
+      return @select ? KEEP(tax, @select) : tax

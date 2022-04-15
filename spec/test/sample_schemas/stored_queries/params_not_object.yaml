@@ -1,0 +1,3 @@
+name: params_not_object
+query: whatever
+params: false

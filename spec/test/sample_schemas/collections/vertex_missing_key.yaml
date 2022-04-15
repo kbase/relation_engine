@@ -1,0 +1,13 @@
+# Vertex schemas must require the "_key" attribute
+name: vertex_missing_key
+type: vertex
+delta: false
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [id]
+  description: An example vertex schema for testing
+  properties:
+    id: {type: string}
+    is_public: {type: boolean}
+    ws_id: {type: integer}

@@ -1,0 +1,11 @@
+{
+    "name": "icu_tokenize",
+    "type": "text",
+    "properties": {
+        "locale": "c.utf-8",
+        "accent": false,
+        "case": "lower",
+        "stemming": false,
+        "stopwords": []
+    }
+}

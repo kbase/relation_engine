@@ -1,0 +1,58 @@
+name: djornl_fetch_phenotypes
+description: Fetch a phenotype or list of phenotypes by key, and the edges and nodes within the specified distance (number of hops) of those phenotype nodes.
+params:
+  type: object
+  additionalProperties: false
+  required: [phenotype_keys]
+  properties:
+    phenotype_keys:
+      type: array
+      title: Phenotype Keys
+      description: Fetch a phenotype or list of phenotypes by ID
+      items:
+        $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/_key
+      minItems: 1
+      uniqueItems: true
+      examples:
+        - ["As2", "Na23"]
+        - ["As2"]
+    distance:
+      type: integer
+      title: Traversal Distance
+      description: Number of hops to find neighbors and neighbors-of-neighbors
+      default: 0
+      minimum: 0
+      maximum: 100
+    edge_types:
+      title: Edge Types
+      description: Edge types to filter on
+      type: array
+      items:
+        $ref: ../../datasets/djornl/edge_type.yaml
+      default: []
+      uniqueItems: true
+      examples:
+        - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curated_AraNet_v2']
+        - ['phenotype-association_AraGWAS']
+        - []
+query: |
+  LET node_ids = (
+    FOR n IN djornl_node
+      FILTER n._key IN @phenotype_keys AND n.node_type == 'pheno'
+      FOR v, e, p IN 0..@distance ANY n djornl_edge
+        OPTIONS {bfs: true, uniqueVertices: "global"}
+        FILTER length(@edge_types) == 0 || p.edges[*].edge_type ALL IN @edge_types
+        RETURN DISTINCT v._id
+  )
+  LET edges = (
+    FOR edge IN djornl_edge
+      FILTER edge._from IN node_ids AND edge._to IN node_ids
+        AND (length(@edge_types) == 0 || edge.edge_type IN @edge_types)
+      RETURN edge
+  )
+  LET nodes = (
+    FOR node IN djornl_node
+        FILTER node._id IN node_ids
+        RETURN node
+  )
+  RETURN {nodes, edges}

@@ -1,0 +1,24 @@
+# Get a set of 'replaced_by' merge edges for a set of terms by the term IDs, maximum 10000
+
+name: GO_get_merges_from
+params:
+  type: object
+  required: [froms]
+  properties:
+    froms:
+      type: array
+      items:
+        type: string
+      title: GO term IDs
+      description: The list of Go term IDs from which merge edges should emanate
+      maxItems: 10000
+# It'd be nice if there was a way to get the most recent edge for each from
+# But that seems like something that's easy to do client side and removes load from the db, if
+# it's even possible
+# In any case, having more than one replace by edge per term is going to be extremely unlikely
+query: |
+  FOR d IN GO_merges
+    FILTER d.from in @froms
+    FILTER d.type == 'replaced_by'
+    SORT d.from
+    RETURN d

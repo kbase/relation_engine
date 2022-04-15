@@ -1,0 +1,6 @@
+name: not_a_schema
+type: edge
+schema:
+  required: ['whatever']
+  properties:
+    type: "17"

@@ -1,0 +1,59 @@
+name: sample_ontology_link
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to, created, expired, sample_metadata_term]
+  description: minimum necessary terms for sample -> ontology edge link.
+  properties:
+    _from:
+      type: string
+      description: the sample node _id (as found in sample_nodes collection)
+      examples: ["samples_nodes/465b1476-3699-4e6c-a06b-8d384fcc41f3_6d5999ee-42fb-4bad-a3b9-901aa1b490c5_f4bc367798eb923f77d7405031723908"]
+    _to:
+      type: string
+      description: The _id of an ontology vertex, such as from ENVO, GO, etc.
+      examples: ["ENVO_terms/ENVO:01000221_v2019-03-14", 'GO_terms/GO:0047161_v2019-01-01']
+    created:
+      type: integer
+      description: unix epoch of when the link was created
+      minimum: 0
+    createdby:
+      type: string
+      description: Who made this sample-ontology link?
+    expired:
+      type: integer
+      description: unix epoch of when this link expires
+      minimum: 0
+    sample_id:
+      type: string
+      description: uuid identifier for sample object. corresponds to sample id provided by SampleService
+      examples: ['465b1476-3699-4e6c-a06b-8d384fcc41f3']
+    sample_version:
+      type: integer
+      description: integer version of sample object (1, 2, etc.)
+      examples: [1, 2, 3]
+    sample_version_uuid:
+      type: string
+      description: uuid identifier for sample object version in sample version collection
+      examples: ['6d5999ee-42fb-4bad-a3b9-901aa1b490c5']
+    sample_node_name:
+      type: string
+      description: name of sample node in Sample
+      examples: ['HRV003M16']
+    sample_node_uuid:
+      type: string
+      description: uuid identifier for sample node in sample nodes collection
+      examples: ['f4bc367798eb923f77d7405031723908']
+    sample_metadata_term:
+      type: string
+      description: metadata term in sample associated with ontology term
+      examples: ['biome', 'ENIGMA:material', 'feature']
+    ontology_term:
+      type: string
+      description: identifier for term in ontology_collection
+      examples: ['ENVO:01000221', 'GO:0047161']
+    ontology_collection:
+      type: string
+      description: name of collection containing ontology_term
+      examples: ['ENVO_terms', 'GO_terms']

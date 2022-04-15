@@ -1,0 +1,51 @@
+.dockerignore
+.travis.yml
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+*.log
+.git
+.git*
+CODEOWNERS
+LICENSE.md
+Makefile
+hooks
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+/dist/
+/client_src/dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# docker bits
+Dockerfile*
+docker-compose*

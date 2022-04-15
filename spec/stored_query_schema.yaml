@@ -1,0 +1,20 @@
+name: stored_query_schema
+type: object
+required: ['query', 'name']
+properties:
+  name:
+    type: string
+  title:
+    type: string
+  description:
+    type: string
+  params:
+    type: object
+  query_prefix:
+    type: string
+  query:
+    type: string
+  $schema:
+    type: string
+    format: uri
+additionalProperties: false

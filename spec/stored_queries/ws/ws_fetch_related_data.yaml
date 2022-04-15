@@ -1,0 +1,106 @@
+name: ws_fetch_related_data
+params:
+  type: object
+  required: [obj_key]
+  properties:
+    obj_key:
+      type: string
+      description: Key of the wsprov_object to search on
+query_prefix: WITH ws_type_version, ws_object, ws_workspace
+query: |
+  LET obj_id = concat('ws_object_version/', @obj_key)
+  FOR obj IN ws_object_version
+      FILTER obj._id == obj_id
+      LET prov = (
+        FOR v, e, p IN 1..10 ANY obj ws_prov_descendant_of
+          OPTIONS {bfs: true, uniqueVertices: 'global'}
+          LIMIT 1000
+          FILTER v && !v.deleted
+          // Check permissions
+          FILTER v.is_public || v.workspace IN ws_ids
+          // Fetch the type
+          LET t = FIRST(
+            FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+              LIMIT 1
+              RETURN t
+          )
+          // Fetch the parent unversioned object
+          LET parent = FIRST(
+            FOR parent IN 1 OUTBOUND v ws_version_of
+              LIMIT 1
+              RETURN parent
+          )
+          // Fetch the workspace for this object
+          LET ws = FIRST(
+            FOR ws IN 1 INBOUND parent ws_workspace_contains_obj
+              LIMIT 1
+              RETURN ws
+          )
+          RETURN {data: v, type: t, hops: COUNT(p.edges), ws}
+      )
+      let refs = (
+        FOR v, e, p IN 1..10 ANY obj ws_refers_to
+          OPTIONS {bfs: true, uniqueVertices: 'global'}
+          LIMIT 1000
+          FILTER v && !v.deleted
+          // Check permissions
+          FILTER v.is_public || v.workspace IN ws_ids
+          // Fetch the type
+          LET t = FIRST(
+            FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+              LIMIT 1
+              RETURN t
+          )
+          // Fetch the parent unversioned object
+          LET parent = FIRST(
+            FOR parent IN 1 OUTBOUND v ws_version_of
+              LIMIT 1
+              RETURN parent
+          )
+          // Fetch the workspace for this object
+          LET ws = FIRST(
+            FOR ws IN 1 INBOUND parent ws_workspace_contains_obj
+              LIMIT 1
+              RETURN ws
+          )
+          RETURN {data: v, type: t, hops: COUNT(p.edges), ws}
+      )
+      let copies = (
+        FOR v, e, p IN 1..10 ANY obj ws_copied_from
+          OPTIONS {bfs: true, uniqueVertices: 'global'}
+          LIMIT 1000
+          FILTER v && !v.deleted
+          // Check permissions
+          FILTER v.is_public || v.workspace IN ws_ids
+          // Fetch the type
+          LET t = FIRST(
+            FOR t IN 1 OUTBOUND v ws_obj_instance_of_type
+              LIMIT 1
+              RETURN t
+          )
+          // Fetch the parent unversioned object
+          LET parent = FIRST(
+            FOR parent IN 1 OUTBOUND v ws_version_of
+              LIMIT 1
+              RETURN parent
+          )
+          // Fetch the workspace for this object
+          LET ws = FIRST(
+            FOR ws IN 1 INBOUND parent ws_workspace_contains_obj
+              LIMIT 1
+              RETURN ws
+          )
+          RETURN {data: v, type: t, hops: COUNT(p.edges), ws}
+      )
+      let type = FIRST(
+        FOR t IN 1 OUTBOUND obj ws_obj_instance_of_type
+          LIMIT 1
+          RETURN t
+      )
+      RETURN {
+          obj: obj,
+          obj_type: type,
+          copies: {data: copies, count: COUNT(copies)},
+          prov: {data: prov, count: COUNT(prov)},
+          refs: {data: refs, count: COUNT(refs)}
+      }

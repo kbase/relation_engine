@@ -1,0 +1,48 @@
+# Get the associated ws objects of this term
+
+name: GO_get_associated_ws_genomes
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: GO id of the term you want to get the ws object of
+    limit:
+      type: integer
+      title: Maximum result limit
+      default: 20
+      maximum: 1000
+    offset:
+      type: integer
+      title: Result offset for pagination
+      default: 0
+      maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH ws_genome_features, ws_object_version
+query: |
+  LET results=(
+    FOR t in GO_terms
+      FILTER t.id == @id
+      FILTER t.created <= @ts AND t.expired >= @ts
+      LIMIT 1
+      FOR v, e, p IN 2 INBOUND t ws_feature_has_GO_annotation, ws_genome_has_feature
+        FILTER p.edges[0].created <= @ts AND p.edges[0].expired >= @ts
+        FILTER v.is_public OR v.workspace_id IN ws_ids
+        SORT v.workspace_id ASC, p.vertices[1].feature_id ASC
+        COLLECT ws_obj = v WITH COUNT INTO feature_count
+        RETURN DISTINCT {
+          ws_obj: KEEP(ws_obj, ['workspace_id', 'object_id', 'version', 'name']),
+          feature_count
+        }
+  )
+  LET total_count=COUNT(results)
+  LET limited=(
+    FOR r in results
+      LIMIT @offset, @limit
+      RETURN r
+  )
+  RETURN {results: limited, total_count}

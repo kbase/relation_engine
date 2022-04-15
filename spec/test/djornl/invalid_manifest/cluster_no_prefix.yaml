@@ -1,0 +1,18 @@
+# first cluster file has no prefix
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    path: edges.tsv
+    date: "2020-12-25"
+
+  - data_type: node
+    path: nodes.csv
+    date: "2019-01-01"
+
+  - data_type: cluster
+    path: I2_named.tsv
+
+  - data_type: cluster
+    cluster_prefix: markov_i4
+    path: I4_named.tsv

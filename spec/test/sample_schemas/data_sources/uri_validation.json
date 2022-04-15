@@ -1,0 +1,6 @@
+{
+  "name": "uri_validation",
+  "category": "validator testing",
+  "title": "URI vaildation test",
+  "home_url": "this is not a valid URI"
+}

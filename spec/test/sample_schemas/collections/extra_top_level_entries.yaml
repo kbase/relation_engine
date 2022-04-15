@@ -1,0 +1,12 @@
+name: extra_top_level_entries
+title: Extra Top-Level Entries
+type: vertex
+delta: false
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_key]
+  properties:
+    _key:
+      type: string
+      title: Key

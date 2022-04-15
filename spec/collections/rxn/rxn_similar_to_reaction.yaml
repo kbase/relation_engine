@@ -1,0 +1,15 @@
+name: rxn_similar_to_reaction
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  required: [_from, _to]
+  description: A generic similarity association between rections.
+  additionalProperties: true
+  properties:
+    _from:
+      type: string
+      description: The ID of a vertex
+    _to:
+      type: string
+      description: The ID of a vertex

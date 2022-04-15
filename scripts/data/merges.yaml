@@ -1,0 +1,33 @@
+name: __NAME___merges
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+    "$schema": http://json-schema.org/draft-07/schema#
+    title: __NAME___merges
+    type: object
+    description: A entry for merge edges in the __NAME__ ontology hierarchy
+    properties:
+      id:
+        type: string
+        description: an edge ID, consisting of from::to::type
+      type:
+        type: string
+        description: __NAME__ merge edge type
+      from:
+        type: string
+        description: __NAME__ id
+      to:
+        type: string
+        description: __NAME__ id
+    required:
+      - id
+      - type
+      - from
+      - to

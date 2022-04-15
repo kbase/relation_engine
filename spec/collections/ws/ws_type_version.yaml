@@ -1,0 +1,24 @@
+name: ws_type_version
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: false
+  required: [_key]
+  properties:
+    _key:
+      type: string
+      examples: ['KBaseGenomes.Genome‑9.0']
+      pattern: "^\\w+\\.\\w+-\\d+\\.\\d+$"
+    module_name:
+      type: string
+      examples: ['KBaseGenomes']
+    type_name:
+      type: string
+      examples: ['Genome']
+    maj_ver:
+      type: integer
+      min: 0
+    min_ver:
+      type: integer
+      min: 0

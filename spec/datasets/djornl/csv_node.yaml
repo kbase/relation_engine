@@ -1,0 +1,56 @@
+$schema: http://json-schema.org/draft-07/schema#
+name: csv_node
+title: CSV node file syntax
+description: Jacobson lab Arabidopsis gene and phenotype data file columns
+type: object
+required: [node_id, node_type]
+additionalProperties: false
+properties:
+  node_id:
+    $ref: definitions.yaml#/definitions/djornl_node/_key
+  node_type:
+    $ref: definitions.yaml#/definitions/djornl_node/node_type
+  # comma-separated array of cluster IDs
+  clusters:
+    type: string
+    format: regex
+    pattern: ^(\w+:\d+, ?)*(\w+:\d+)?$
+  transcript:
+    $ref: definitions.yaml#/definitions/djornl_node/transcript
+  gene_symbol:
+    $ref: definitions.yaml#/definitions/djornl_node/gene_symbol
+  gene_full_name:
+    $ref: definitions.yaml#/definitions/djornl_node/gene_full_name
+  gene_model_type:
+    $ref: definitions.yaml#/definitions/djornl_node/gene_model_type
+  tair_computational_description:
+    $ref: definitions.yaml#/definitions/djornl_node/tair_computational_description
+  tair_curator_summary:
+    $ref: definitions.yaml#/definitions/djornl_node/tair_curator_summary
+  tair_short_description:
+    $ref: definitions.yaml#/definitions/djornl_node/tair_short_description
+  # comma-separated array of GO terms
+  go_terms:
+    type: string
+    format: regex
+    pattern: ^(GO:\d{7}, ?)*(GO:\d{7})?$
+  go_description:
+    $ref: definitions.yaml#/definitions/djornl_node/go_description
+  mapman_bin:
+    $ref: definitions.yaml#/definitions/djornl_node/mapman_bin
+  mapman_name:
+    $ref: definitions.yaml#/definitions/djornl_node/mapman_name
+  mapman_description:
+    $ref: definitions.yaml#/definitions/djornl_node/mapman_description
+  pheno_aragwas_id:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_aragwas_id
+  pheno_description:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_description
+  pheno_pto_name:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_pto_name
+  pheno_pto_description:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_pto_description
+  pheno_reference:
+    $ref: definitions.yaml#/definitions/djornl_node/pheno_reference
+  user_notes:
+    $ref: definitions.yaml#/definitions/djornl_node/user_notes

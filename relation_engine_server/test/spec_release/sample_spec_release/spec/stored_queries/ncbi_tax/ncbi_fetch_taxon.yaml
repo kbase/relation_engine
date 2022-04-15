@@ -1,0 +1,18 @@
+# Fetch a taxon document by taxonomy ID
+name: ncbi_fetch_taxon
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: NCBI Taxonomy ID
+    ts:
+      type: integer
+      title: Versioning timestamp
+query: |
+  for t in ncbi_taxon
+      filter t.id == @id
+      filter t.created <= @ts AND t.expired >= @ts
+      limit 1
+      return t

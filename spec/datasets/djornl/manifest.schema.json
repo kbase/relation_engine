@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exascale parser file manifest",
+  "type": "object",
+  "required": ["name", "file_list"],
+  "properties": {
+    "name": {
+      "title": "Dataset name",
+      "type": "string",
+      "description": "The name of the dataset",
+      "examples": ["Dan Jacobson Exascale dataset"]
+    },
+    "release_date": {
+      "title": "Release date",
+      "type": "string",
+      "description": "Date of the dataset release, in YYYY-MM-DD format",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Release notes",
+      "description": "Free text describing the release and any notes, or comments relevant to consumers of the data."
+    },
+    "file_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["data_type", "path"],
+        "oneOf": [{
+            "properties": {
+              "data_type": {
+                "enum": ["cluster"]
+              }
+            },
+            "required": ["cluster_prefix"]
+          },
+          {
+            "properties": {
+              "data_type": {
+                "enum": ["node", "edge"]
+              }
+            }
+          }
+        ],
+        "anyOf": [{
+            "properties": {
+              "file_format": {
+                "enum": ["tsv", "csv"]
+              }
+            },
+            "required": ["file_format"]
+          },
+          {
+            "properties": {
+              "path": {
+                "format": "regex",
+                "pattern": ".[ct]sv"
+              }
+            },
+            "required": ["path"]
+          }
+        ],
+        "properties": {
+          "path": {
+            "title": "File path",
+            "type": "string"
+          },
+          "data_type": {
+            "title": "Data type",
+            "type": "string",
+            "enum": ["node", "edge", "cluster"]
+          },
+          "file_format": {
+            "title": "File format",
+            "type": "string",
+            "enum": ["tsv", "csv"]
+          },
+          "date": {
+            "title": "File creation date",
+            "description": "date of file creation in the format YYYY-MM-DD",
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "title": "Description of the file contents",
+            "type": "string"
+          },
+          "cluster_prefix": {
+            "title": "Prefix",
+            "type": "string",
+            "description": "The prefix to be used for clusters, e.g. markov_i2:4. Required for cluster data, not used for node or edge data"
+          },
+          "cluster_title": {
+            "title": "Cluster set name",
+            "description": "Human-readable name of the cluster set. Not used for edge or node data",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

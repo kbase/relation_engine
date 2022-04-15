@@ -1,0 +1,13 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+name: node_type
+title: Node Type
+description: Node types in Dan Jacobson Exascale dataset
+type: string
+examples:
+  - gene
+  - phenotype
+oneOf:
+  - const: gene
+    title: Gene
+  - const: pheno
+    title: Phenotype

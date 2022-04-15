@@ -1,0 +1,17 @@
+name: ws_obj_version_has_taxon
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to, assigned_by]
+  description: The _from WS versioned object is associated with the _to taxon.
+  properties:
+    assigned_by:
+      type: string
+      description: Who made this taxon assignment?
+    _from:
+      type: string
+      description: The WS versioned object that was created.
+    _to:
+      type: string
+      description: The _id of a taxon vertex, such as from NCBI, GTDB, etc.

@@ -1,0 +1,63 @@
+# Search ncbi_taxon collection for species/strains by scientific name
+name: taxonomy_search_species_strain
+params:
+  type: object
+  required: ["@taxon_coll", sciname_field, search_text]
+  additionalProperties: false
+  properties:
+    "@taxon_coll":
+      type: string
+      title: Taxon collection name
+      examples: [ncbi_taxon, gtdb_taxon]
+    search_text:
+      type: string
+      title: Search text
+      examples: [escherichia, es]
+      description: Text to search on the search attribute values
+    sciname_field:
+      type: string
+      title: Scientific name field name
+      examples: [scientific_name, name]
+    ts:
+      type: [integer, "null"]
+      title: Versioning timestamp
+      default: null
+    offset:
+      type: [integer, "null"]
+      title: Paging offset
+      maximum: 100000
+      default: 0
+    limit:
+      type: [integer, "null"]
+      title: Max results to return
+      default: 20
+      maximum: 1000
+    select:
+      type: [string, array, "null"]
+      items:
+        type: string
+      examples: [scientific_name, [scientific_name, id]]
+      default: null
+      description: Document attributes to keep in the results
+query: |
+  LET search_text__norm = REGEX_REPLACE(LOWER(TRIM(@search_text)), "\\s+", " ")
+  LET search_text__first_exact_tok = REGEX_SPLIT(search_text__norm, " ")[0]
+  LET search_text__icu_toks = TOKENS(@search_text, "icu_tokenize")  // analyzer
+  LET search_text__wordboundmod_icu_toks = (
+      FOR tok IN search_text__icu_toks
+          RETURN REGEX_REPLACE(tok, ",.*", "")  // commas cannot be escaped in fulltext search
+  )
+  LET search_text__fulltext = CONCAT_SEPARATOR(", ",  // comma delimit
+      FOR tok IN search_text__wordboundmod_icu_toks  // prepend "prefix:"
+          RETURN CONCAT("prefix:", tok)
+  )
+  FOR doc IN FULLTEXT(@@taxon_coll, @sciname_field, search_text__fulltext)
+      FILTER @ts ? doc.created <= @ts AND doc.expired >= @ts : true
+      FILTER doc.rank IN ["species", "strain"] OR doc.strain
+      LET doc_sciname__norm = REGEX_REPLACE(LOWER(TRIM(doc.scientific_name)), "\\s+", " ")  // for exact matching
+      LET contains_ind = CONTAINS(doc_sciname__norm, search_text__norm, true)
+      SORT contains_ind == 0 DESC,  // prefix match
+          doc_sciname__norm == search_text__norm DESC,  // exact match 
+          doc.scientific_name  // lexical
+      LIMIT @offset ? @offset : 0, @limit ? @limit : 20
+      RETURN @select ? KEEP(doc, @select) : doc

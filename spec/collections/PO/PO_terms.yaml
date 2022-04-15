@@ -1,0 +1,121 @@
+delta: true
+indexes:
+- fields:
+  - id
+  - expired
+  - created
+  type: persistent
+- fields:
+  - expired
+  - created
+  - last_version
+  type: persistent
+name: PO_terms
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  description: A entry for vertices in the PO ontology hierarchy
+  properties:
+    alt_ids:
+      description: Defines an alternate id for this term. A term may have any number
+        of alternate ids.
+      items:
+        type: string
+      type: array
+    comments:
+      description: Comments for this term.
+      items:
+        type: string
+      type: array
+    def:
+      description: The definition of the current term.
+      properties:
+        pred:
+          description: The definition predicate
+          type: string
+        val:
+          description: The definition value
+          type: string
+        xrefs:
+          description: A dbxref that describes an analagous term in another vocabulary
+          items:
+            type: string
+          type: array
+      required:
+      - val
+      type:
+      - 'null'
+      - object
+    id:
+      description: The unique id of the current term.
+      type: string
+    name:
+      description: The term name.
+      type:
+      - 'null'
+      - string
+    namespace:
+      description: The namespace of the term.
+      type:
+      - 'null'
+      - string
+    subsets:
+      description: This tag indicates a term subset to which this term belongs.
+      items:
+        type: string
+      type: array
+    synonyms:
+      description: This tag gives a synonym for this term, some xrefs to describe
+        the origins of the synonym, and may indicate a synonym category or scope information.
+      items:
+        properties:
+          pred:
+            description: The synonym predicate
+            type: string
+          val:
+            description: The synonym value
+            type: string
+          xrefs:
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+            type: array
+        required:
+        - val
+        type: object
+      type: array
+    type:
+      description: The type of the node.
+      type: string
+    xrefs:
+      description: DBxrefs that describes an analagous term in another vocabulary
+      items:
+        properties:
+          pred:
+            description: The xref predicate
+            type: string
+          val:
+            description: The xref value
+            type: string
+          xrefs:
+            description: A dbxref that describes an analagous term in another vocabulary
+            items:
+              type: string
+            type: array
+        required:
+        - val
+        type: object
+      type: array
+  required:
+  - id
+  - type
+  - name
+  - namespace
+  - alt_ids
+  - def
+  - comments
+  - subsets
+  - synonyms
+  - xrefs
+  title: PO_terms
+  type: object
+type: vertex

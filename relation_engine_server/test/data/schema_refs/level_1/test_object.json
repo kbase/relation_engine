@@ -1,0 +1,19 @@
+{
+  "name": "test_object",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Test object",
+  "description": "Object composed from numerous different files",
+  "type": "object",
+  "required": ["edge", "node", "marks_out_of_ten"],
+  "properties": {
+    "edge": {
+      "$ref": "edge.json"
+    },
+    "node": {
+      "$ref": "../../schema_refs/collection_types/node_elements.yaml#/definitions/node"
+    },
+    "marks_out_of_ten": {
+      "$ref": "file:///app/relation_engine_server/test/data/schema_refs/collection_types/common_stuff.json#/definitions/marks_out_of_10"
+    }
+  }
+}

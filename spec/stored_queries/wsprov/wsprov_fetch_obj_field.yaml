@@ -1,0 +1,20 @@
+# Fetch some object field for an array of object ids
+name: wsprov_fetch_obj_field
+params:
+  type: object
+  required: [prop, obj_ids]
+  properties:
+    prop: 
+      type: string
+      description: property name that you want to fetch
+    obj_ids: 
+      type: array
+      items:
+        type: string
+      description: array of object ids
+query: |
+  with wsprov_object
+  for o in wsprov_object
+    filter o._id in @obj_ids
+    filter o.is_public || o.workspace_id IN ws_ids
+    return {key: o._key, @prop: o[@prop]}

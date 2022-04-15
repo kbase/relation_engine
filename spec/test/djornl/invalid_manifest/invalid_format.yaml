@@ -1,0 +1,17 @@
+# invalid node file format
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    date: "2020-12-25"
+    path: edge_data.tsv
+
+  - data_type: node
+    path: nodes.csv
+    date: "2019-01-01"
+    file_format: txt
+
+  - data_type: cluster
+    cluster_prefix: markov_i2
+    file_format: tsv
+    path: clusters

@@ -1,0 +1,13 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+name: edge_types_filter
+title: Edge Types
+description: Edge types to filter on
+type: array
+items:
+  $ref: edge_type.yaml
+default: []
+uniqueItems: true
+examples:
+  - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curated_AraNet_v2']
+  - ['phenotype-association_AraGWAS']
+  - []

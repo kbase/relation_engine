@@ -1,0 +1,58 @@
+name: djornl_node
+type: vertex
+delta: false
+
+indexes:
+  - type: hash
+    fields: ["clusters[*]"]
+
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  title: Gene and Phenotype Vertices
+  description: Arabidopsis gene and phenotype nodes from the Dan Jacobson Lab
+  type: object
+  required: [_key]
+  additionalProperties: false
+  properties:
+    _key:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/_key
+    clusters:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/clusters
+    node_type:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/node_type
+    transcript:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/transcript
+    gene_symbol:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/gene_symbol
+    gene_full_name:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/gene_full_name
+    gene_model_type:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/gene_model_type
+    tair_computational_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/tair_computational_description
+    tair_curator_summary:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/tair_curator_summary
+    tair_short_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/tair_short_description
+    go_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/go_description
+    go_terms:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/go_terms
+    mapman_bin:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/mapman_bin
+    mapman_name:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/mapman_name
+    mapman_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/mapman_description
+    pheno_aragwas_id:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_aragwas_id
+    pheno_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_description
+    pheno_pto_name:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_pto_name
+    pheno_pto_description:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_pto_description
+    pheno_reference:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/pheno_reference
+    user_notes:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_node/user_notes

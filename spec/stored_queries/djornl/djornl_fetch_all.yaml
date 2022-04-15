@@ -1,0 +1,29 @@
+name: djornl_fetch_all
+description: Fetch all node and edge data, optionally filtering on edge type.
+params:
+  type: object
+  additionalProperties: false
+  properties:
+    edge_types:
+      title: Edge Types
+      description: Edge types to filter on
+      type: array
+      items:
+        $ref: ../../datasets/djornl/edge_type.yaml
+      default: []
+      uniqueItems: true
+      examples:
+        - ['protein-protein-interaction_high-throughput_AraNet_v2', 'protein-protein-interaction_literature-curated_AraNet_v2']
+        - ['phenotype-association_AraGWAS']
+        - []
+query: |
+  LET nodes = (
+    FOR v IN djornl_node
+      RETURN v
+  )
+  LET edges = (
+    FOR e IN djornl_edge
+      FILTER length(@edge_types) == 0 || e.edge_type IN @edge_types
+      RETURN e
+  )
+  RETURN {nodes, edges}

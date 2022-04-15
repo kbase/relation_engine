@@ -1,0 +1,66 @@
+# Get all samples reference this term
+
+name: ontology_get_associated_samples
+params:
+  type: object
+  required: [id, ts, user_id, "@onto_terms"]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: Ontology ID of the term you want to get all the associated samples 
+    user_id:
+      type: string
+      title: User ID
+      description: User ID used for checking samples access control
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit 
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+    "@onto_terms":
+      type: string
+      title: Ontology terms collection name
+      description: the name of the vertex collection holding the ontology term data
+      examples: [ENVO_terms, GO_terms]
+query_prefix: WITH samples_nodes, samples_version, samples_sample
+query: |
+  LET results=(
+    FOR t in @@onto_terms
+      FILTER t.id == @id
+      FILTER t.created <= @ts AND t.expired > @ts
+      limit 1
+      FOR v, e, p IN 3 OUTBOUND t INBOUND sample_ontology_link, samples_nodes_edge, samples_ver_edge
+        FILTER p.vertices[1].saved >= t.created AND p.vertices[1].saved < t.expired
+          AND p.edges[0].created <= @ts AND p.edges[0].expired > @ts
+        SORT p.vertices[1].id ASC
+        RETURN {
+          sample: p.vertices[1],
+          sample_metadata_key: p.edges[0].sample_metadata_term,
+          sample_access: v
+        }
+  )
+  LET total_count=COUNT(results)
+  LET filtered=(
+    FOR r in results
+      FILTER @user_id == r.sample_access.acls.owner 
+        OR @user_id IN r.sample_access.acls.admin
+        OR @user_id IN r.sample_access.acls.read
+        OR r.sample_access.acls.pubread
+      RETURN r
+  )
+  LET total_accessible_count=COUNT(filtered)
+  LET limited=(
+    FOR r in filtered
+      LIMIT @offset, @limit
+      RETURN r
+  )
+  RETURN {results: limited, total_count, total_accessible_count}

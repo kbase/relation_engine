@@ -1,0 +1,36 @@
+# Get the direct parents for a specific term
+
+name: GO_get_parents
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: GO id of the term you want to get all the direct parents of
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
+query: |
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v, e IN 1..1 OUTBOUND t GO_edges
+      FILTER e.created <= @ts AND e.expired >= @ts
+      FILTER e.type == "is_a"
+      SORT v.id ASC
+      LIMIT @offset, @limit
+      RETURN {term: v, edge: e}

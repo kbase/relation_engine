@@ -1,0 +1,34 @@
+{
+  "name": "test_vertices",
+  "type": "arangosearch",
+  "writebufferIdle": 64,
+  "writebufferActive": 0,
+  "primarySort": [],
+  "writebufferSizeMax": 33554432,
+  "commitIntervalMsec": 1000,
+  "consolidationPolicy": {
+    "type": "bytes_accum",
+    "threshold": 0.1
+  },
+  "cleanupIntervalStep": 10,
+  "links": {
+    "test_vertex": {
+      "analyzers": [
+        "identity"
+      ],
+      "fields": {
+        "_key": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "is_public": {},
+        "ws_id": {}
+      },
+      "includeAllFields": false,
+      "storeValues": "none",
+      "trackListPositions": false
+    }
+  },
+  "consolidationIntervalMsec": 60000
+}

@@ -1,0 +1,37 @@
+delta: true
+indexes:
+- fields:
+  - id
+  - expired
+  - created
+  type: persistent
+- fields:
+  - expired
+  - created
+  - last_version
+  type: persistent
+name: UO_merges
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  description: A entry for merge edges in the UO ontology hierarchy
+  properties:
+    from:
+      description: UO id
+      type: string
+    id:
+      description: an edge ID, consisting of from::to::type
+      type: string
+    to:
+      description: UO id
+      type: string
+    type:
+      description: UO merge edge type
+      type: string
+  required:
+  - id
+  - type
+  - from
+  - to
+  title: UO_merges
+  type: object
+type: edge

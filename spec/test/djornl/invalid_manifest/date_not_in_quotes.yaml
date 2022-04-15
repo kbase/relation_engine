@@ -1,0 +1,17 @@
+# edge date is not quoted (pyyaml creates a datetime.date object)
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    date: 2020-12-25
+    path: edge_data
+    file_format: csv
+
+  - data_type: node
+    path: nodes.csv
+    date: "2019-01-01"
+
+  - data_type: cluster
+    cluster_prefix: markov_i2
+    file_format: tsv
+    path: clusters

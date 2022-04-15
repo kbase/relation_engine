@@ -1,0 +1,23 @@
+# Environment variables
+.env
+
+# Test coverage
+/htmlcov/
+
+# Caches and temp dirs
+/build/
+/dist/
+/client_src/dist/
+*.pyc
+.mypy_cache/
+.cache/
+/tmp/
+coverage_report/
+.coverage
+*.egg-info/
+
+# Spec archives
+spec.tar.gz
+
+# Creds
+arango_live_server_config.json

@@ -1,0 +1,10 @@
+name: ws_copied_from
+type: edge
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [_from, _to]
+  description: The _from object was created as an exact copy of the _to object.
+  properties:
+    _from: {type: string}
+    _to: {type: string}

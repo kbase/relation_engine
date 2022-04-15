@@ -1,0 +1,97 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+name: edge_type
+title: Edge Type
+description: Edge types in Dan Jacobson Arabidopsis Exascale dataset
+type: string
+oneOf:
+  - const: phenotype-association_AraGWAS
+    title: AraGWAS phenotype association
+    description: GWAS associations produced by analyzing a subset of phenotypes and SNPs in the Arabidopsis 1001 Genomes database. Edge values are significant association scores after FDR correction.
+
+  - const: pairwise-gene-coexpression_AraNet_v2
+    title: AraNetv2 pairwise gene coexpression
+    description: A subset of pairwise gene coexpression values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from Pearson correlation coefficients to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+
+  - const: domain-co-occurrence_AraNet_v2
+    title: AraNetv2 domain co-occurrence
+    description: A layer of protein domain co-occurrence values from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated from weighted mutual information scores to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+
+  - const: protein-protein-interaction_high-throughput_AraNet_v2
+    title: AraNetv2 high-throughput protein-protein interaction
+    description: Log likelihood score. A layer of protein-protein interaction values derived from four high-throughput PPI screening experiments; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+
+  - const: protein-protein-interaction_literature-curated_AraNet_v2
+    title: AraNetv2 literature-curated protein-protein interaction
+    description: A layer of protein-protein interaction values from literature-curated small- to medium-scale experimental data; from the Arabidopsis AraNetv2 database. The LLS scores that serve as edge values were calculated to normalize the data for comparison across studies and different types of data layers (Lee et al, 2015).
+
+  - const: protein-protein-interaction_biogrid_date/release3.5.188
+    title: BIOGRID ORGANISM Arabidopsis thaliana Columbia 3.5.188 tab3 PPI
+    description: BioGRID interactions are relationships between two proteins or genes; the term 'interaction' includes direct physical binding of two proteins, and co-existence in a stable complex and genetic interaction. https://wiki.thebiogrid.org/doku.php/experimental_systems.
+
+  - const: protein-protein-interaction_AtPIN
+    title: AtPIN PPI
+    description: The interactions database includes all interactions present at the Arabidopsis thaliana Protein Interactome Database, the Predicted Interactome for Arabidopsis, Arabidopsis protein-protein interaction data curated from the literature by TAIR curators, BIOGRID and IntAct. https://atpin.bioinfoguy.net/cgi-bin/atpin.pl
+
+  - const: protein-protein-interaction_Mentha_A_thaliana_3702_040319
+    title: Mentha AT 3702 040319 PPI
+    description: Mentha archives evidence collected from different sources and presents these data in a complete and comprehensive way. Data comes from manually curated protein-protein interaction databases that have adhered to the IMEx consortium and assigns to each interaction a reliability score that takes into account all the supporting evidence. https://mentha.uniroma2.it/about.php
+
+  - const: protein-protein-interaction_literature_curated_AraNet_v2_subnet
+    title: AraNetv2 subnet AT-LC PPI
+    description: Literature curated PPI of A. thaliana. https://www.inetbio.org/aranet/dl.php?f=AT-LC
+
+  - const: phenotype-association_GWAS_gene_to_metabolite_10.1371/journal.pgen.1006363
+    title: Wu2016 s015 Gene-to-Metab GeneToPhenotype
+    description: GWAS hits ftom a Gene-to-Metaboiltes GWAS. Phenotypes (metabolites) have a unique ID from the Wu 2016 study (doi:10.1371/journal.pgen.1006363) and need to be given our own UID for future use.
+
+  - const: phenotype-association_AraGWAS_subnet_permsig_geni
+    title: AraGWAS subnet permsig geni GeneToPhenotype
+    description: Phenotypes mapped to SNP position and GeneID if available from AraGWAS database filtered for overFDR threshold.
+
+  - const: transcription-factor-regulatory-interaction_literature_curated_ATRM_01082020
+    title: ATRM TF to Target LitCurated 01082020 TranscriptionFactorToGene
+    description: Contains literature mined and manually curated TF regulatory interactions for A.thaliana from 1701 TFFs from PlantTFDB 2.0 and 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Downloaded from http://atrm.cbi.pku.edu.cn/download.php
+
+  - const      : AT-UU-GO-05-AA-01
+    title      : GO
+    description: GeneA connects to GeneB if the two genes have semantically similar GO terms (with a similarity score > 0). This network is used to evaluate other networks for biological functional content.
+
+  - const      : AT-UU-KS-00-AA-01
+    title      : Knockout Similarity
+    description: GeneA connects to GeneB if the phenotypic effect of knocking out GeneA is similar to the phenotypic effect of knocking out GeneB. Similarity is based on Phenotype Ontology semantic similarity.
+
+  - const      : AT-UU-PX-01-AA-01
+    title      : PEN-Diversity
+    description: GeneA connects to GeneB if the expression vector of GeneA is an important predictor of the expression vector of GeneB in an iRF model, where all other genes’ expression are included as covariates. The iRF model is a feature-selection version of Random Forest.
+
+  - const      : AT-UU-GA-01-AA-01
+    title      : Coex Gene-Atlas
+    description: Coexpression network obtained from AtGenie.org. It uses expression array data from multiple tissues to calculate the correlation between genes.
+
+  - const      : AT-UU-PP-00-AA-01
+    title      : PPI-6merged
+    description: "GeneA connects to GeneB if their protein products have been shown to bind to interact with each other, typically through experimental evidence. The PPI-6merged network is the union of 6 different A.thaliana PPI networks: AraNet2 LC, AraNet2 HT, AraPPInet2 0.60, BIOGRID 4.3.194 physical, AtPIN, Mentha. These 6 were all relatively high scoring with GOintersect. StringDB scored badly so was not included"
+
+  - const      : AT-UU-RE-00-AA-01
+    title      : Regulation-ATRM
+    description: GeneA connects to GeneB if GeneA is a Transcription Factor (TF) that is shown to interact with GeneB (which may or may not be a TF). This dataset contains literature mined and manually curated TF regulatory interactions for A.thaliana. Started from 1701 TFs from PlantTFDB 2.0 and retrieved 4663 TF-associated interactions. These were manually filtered (e.g. FPs, PPI interactions removed). They then added some from other sources. Final result is 1431 confirmed TF regulatory interactions, of which 637 are TF-TF.
+
+  - const      : AT-UU-RP-03-AA-01
+    title      : Regulation-Plantregmap
+    description: This network contains computationally predicted TF-Target relationships based on motifs, binding sites, ChipSeq data
+
+  - const      : AT-UU-DU-67-AA-01
+    title      : CoEvolution-DUO
+    description: GeneA connects to GeneB if a SNP in GeneA is correlated with a SNP in GeneB using the DUO metric (https://doi.org/10.1101/2020.01.28.923730). SNP data is from the full 1001 Genomes.
+
+  - const      : AT-UU-CD-00-AA-01
+    title      : CoDomain
+    description: GeneA connects to GeneB if they share one or more common protein domains. Network was obtained from AraNet2.
+
+  - const      : AT-UU-RX-00-AA-01
+    title      : Metabolic-AraCyc
+    description: GeneA connects to GeneB if they are both enzymatic and are linked by a common substrate or product. E.g. RXNA (GeneA) → Compound1 → RXNB (GeneB). Here GeneA connects to GeneB due to Compound1.
+
+  - const      : AT-UU-PY-01-LF-01
+    title      : Predictive CG Methylation
+    description: GeneA connects to GeneB if the CG methylation vector of GeneA is an important predictor of the CG methylation vector of GeneB in an iRF model, where all other genes' CG methylation states are included as covariates. The iRF model is an expansion on Random Forest, a feature selection model.

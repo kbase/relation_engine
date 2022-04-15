@@ -1,0 +1,25 @@
+$schema: http://json-schema.org/draft-07/schema#
+name: csv_edge
+title: CSV edge file syntax
+description: Jacobson lab Arabidopsis edge data file columns for generic node-to-node edges with scores
+type: object
+required: [node1, node2, score, edge_type]
+properties:
+  node1:
+    $ref: definitions.yaml#/definitions/djornl_edge/_from
+  node2:
+    $ref: definitions.yaml#/definitions/djornl_edge/_to
+  score:
+    # pre-transformation, the parser treats this as a string
+    type: string
+    format: regex
+    pattern: ^\d+(\.\d+)?$
+  edge_type:
+    $ref: edge_type.yaml
+  directed:
+    # pre-transform: parser treats this as a string
+    type: string
+    default: "0"
+    enum:
+      - "1"
+      - "0"

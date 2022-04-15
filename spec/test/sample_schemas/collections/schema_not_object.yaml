@@ -1,0 +1,4 @@
+name: schema_not_object
+type: vertex
+delta: false
+schema: http://json-schema.org/draft-07/schema#

@@ -1,0 +1,30 @@
+name: djornl_edge
+type: edge
+delta: false
+
+indexes:
+ - type: hash
+   fields: [edge_type]
+ - type: persistent
+   fields: [score]
+
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  title: Arabidopsis gene-gene or gene-phenotype edge
+  description: Generic gene-to-gene or gene-to-phenotype edge for Dan Jacobson Arabidopsis data
+  type: object
+  required: [score, edge_type, _from, _to, _key, directed]
+  additionalProperties: false
+  properties:
+    _key:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_key
+    _from:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_from
+    _to:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/_to
+    score:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/score
+    edge_type:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/edge_type
+    directed:
+      $ref: ../../datasets/djornl/definitions.yaml#/definitions/djornl_edge/directed

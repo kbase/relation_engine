@@ -1,0 +1,26 @@
+# Fetch inbound references for an object with acl
+name: wsprov_fetch_references
+params:
+  type: object
+  required: [obj_key]
+  properties:
+    obj_key:
+      type: string
+      description: wsprov_object ._key field that you want to query against
+    result_limit:
+      default: 10
+      type: integer
+      description: limit of object results
+    offset:
+      default: 0
+      type: integer
+      description: result offset for pagination
+query: |
+  with wsprov_object
+  let obj_id = concat('wsprov_object/', @obj_key)
+  for v, e, p in 1..100 inbound obj_id wsprov_links
+      options {bfs: true, uniqueVertices: 'global'}   
+      filter p.edges[*].type all == 'reference'
+      filter v.is_public || v.workspace_id IN ws_ids
+      limit @offset, @result_limit
+      return v

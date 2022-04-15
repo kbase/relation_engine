@@ -1,0 +1,52 @@
+# Return genes associated with reactions similar to a query reaction
+
+name: list_genes_for_similar_reactions
+
+params:
+  type: object
+  required: [sf_sim, df_sim, rid]
+  properties:
+    rid:
+      type: string
+      title: Reaction id (rxn_reaction vertex id)
+    sf_sim:
+      type: number
+      title: Minimum structural fingerprint similarity score
+    df_sim:
+      type: number
+      title: Minimum difference fingerprint similarity score
+    exclude_self:
+      type: boolean
+      description: If true, don't include the query reactions genes
+      default: false
+
+query_prefix: WITH rxn_reaction
+query: |
+  LET start = @exclude_self ? 1 : 0
+  LET rxns = (
+      FOR v, e IN start..1
+          ANY @rid rxn_similar_to_reaction
+          OPTIONS {uniqueVertices: "global", bfs: true}
+          FILTER !e || e.sf_similarity >= @sf_sim
+          FILTER !e || e.df_similarity >= @df_sim
+          RETURN {id: v._id, key: v._key, name: v.name, definition: v.definition, "structural similarity": e.sf_similarity, "difference similarity": e.df_similarity}
+  )
+  LET rxn_ids = rxns[*].id
+  LET rxn_gene_links = (
+      FOR e in rxn_reaction_within_complex
+          FILTER e._from in rxn_ids
+          LET linked_gene_ids = FLATTEN(
+              FOR c in rxn_gene_complex
+                 FILTER c._id == e._to
+                 RETURN c.genes
+          )
+          COLLECT rxn_id = e._from INTO groups KEEP linked_gene_ids
+          RETURN {rxn_id: rxn_id, linked_gene_ids: UNIQUE(FLATTEN(groups[*].linked_gene_ids))}
+  )
+  LET gene_ids = UNIQUE(FLATTEN(rxn_gene_links[*].linked_gene_ids))
+  LET genes = (
+      FOR g in ncbi_gene
+         FILTER g._key IN gene_ids
+         RETURN {key: g._key, product: g.product, function: CONCAT_SEPARATOR(', ', g.functions), sequence: g.protein_translation}
+  )
+  RETURN {rxns: rxns, rxn_gene_links: rxn_gene_links, genes: genes}

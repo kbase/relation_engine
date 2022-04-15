@@ -1,0 +1,36 @@
+# Get all descendents of this term 
+name: GO_get_descendants
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: GO id of the term you want to get all the descendants of 
+    limit:
+        type: integer
+        default: 20
+        description: Maximum result limit 
+        maximum: 1000
+    offset:
+        type: integer
+        default: 0
+        description: Result offset for pagination
+        maximum: 100000
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
+query: |
+  FOR t in GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    FOR v, e, p IN 1..100 INBOUND t GO_edges
+      FILTER p.edges[*].created ALL <= @ts 
+        AND p.edges[*].expired ALL >= @ts 
+        AND p.edges[*].type ALL == "is_a"
+      SORT v._key ASC
+      LIMIT @offset, @limit
+      RETURN {term: v, edge: e}

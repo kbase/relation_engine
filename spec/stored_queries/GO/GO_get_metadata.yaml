@@ -1,0 +1,21 @@
+# Get information/metadata of a particular ontology term (see spec for available fields)
+
+name: GO_get_metadata
+params:
+  type: object
+  required: [id, ts]
+  properties:
+    id:
+      type: string
+      title: Document ID
+      description: Get information/metadata of a particular ontology term
+    ts:
+      type: integer
+      title: Versioning timestamp
+query_prefix: WITH GO_terms
+query: |
+  FOR t IN GO_terms
+    FILTER t.id == @id
+    FILTER t.created <= @ts AND t.expired >= @ts
+    limit 1
+    RETURN t

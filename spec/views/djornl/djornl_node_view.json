@@ -1,0 +1,76 @@
+{
+  "name": "djornl_node_view",
+  "type": "arangosearch",
+  "primarySort": [],
+  "cleanupIntervalStep": 2,
+  "commitIntervalMsec": 1000,
+  "consolidationPolicy": {
+    "type": "bytes_accum",
+    "threshold": 0.1
+  },
+  "writebufferIdle": 64,
+  "writebufferActive": 0,
+  "consolidationIntervalMsec": 60000,
+  "writebufferSizeMax": 33554432,
+  "links": {
+    "djornl_node": {
+      "analyzers": [
+        "identity"
+      ],
+      "fields": {
+        "transcript": {},
+        "tair_computational_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "tair_short_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "gene_model_type": {},
+        "go_terms": {},
+        "go_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "mapman_name": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "mapman_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "pheno_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "pheno_pto_name": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "pheno_pto_description": {
+          "analyzers": [
+            "text_en"
+          ]
+        },
+        "pheno_reference": {},
+        "user_notes": {
+          "analyzers": [
+            "text_en"
+          ]
+        }
+      },
+      "includeAllFields": false,
+      "storeValues": "none",
+      "trackListPositions": false
+    }
+  }
+}

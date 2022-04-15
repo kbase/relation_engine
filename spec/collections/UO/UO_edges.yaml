@@ -1,0 +1,37 @@
+delta: true
+indexes:
+- fields:
+  - id
+  - expired
+  - created
+  type: persistent
+- fields:
+  - expired
+  - created
+  - last_version
+  type: persistent
+name: UO_edges
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  description: A entry for edges in the UO ontology hierarchy
+  properties:
+    from:
+      description: UO id
+      type: string
+    id:
+      description: an edge ID, consisting of from::to::type
+      type: string
+    to:
+      description: UO id
+      type: string
+    type:
+      description: UO edge type
+      type: string
+  required:
+  - id
+  - type
+  - from
+  - to
+  title: UO_edges
+  type: object
+type: edge

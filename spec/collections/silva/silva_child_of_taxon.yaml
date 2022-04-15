@@ -1,0 +1,25 @@
+name: silva_child_of_taxon
+type: edge
+delta: true
+
+indexes:
+  - type: persistent
+    fields: [id, expired, created]
+  - type: persistent
+    fields: [expired, created, last_version]
+
+schema:
+  "$schema": http://json-schema.org/draft-07/schema#
+  type: object
+  required: [from, to, id]
+  description: Edges in the SILVA taxonomy tree in direction from leaf to root.
+  properties:
+    id:
+      type: string
+      description: The id of the edge, which is identical to the edge's `from` field 
+    from:
+      type: string
+      description: The taxon id of the edge's source node
+    to:
+      type: string
+      description: The taxon id of the edge's sink node

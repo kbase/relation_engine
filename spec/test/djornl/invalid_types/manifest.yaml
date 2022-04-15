@@ -1,0 +1,20 @@
+name: Dan Jacobson Exascale data
+release_date: "2020-06-06"
+file_list:
+  - data_type: edge
+    path: edges.tsv
+
+  - data_type: edge
+    path: directed_edges.tsv
+
+  - data_type: node
+    file_format: csv
+    path: nodes.csv
+
+  - data_type: cluster
+    path: markov2_named.tsv
+    cluster_prefix: markov_i2
+
+  - data_type: node
+    file_format: csv
+    path: pheno_nodes.csv
