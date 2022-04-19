@@ -2,7 +2,7 @@
     "name": "icu_tokenize",
     "type": "text",
     "properties": {
-        "locale": "c.utf-8",
+        "locale": "c",
         "accent": false,
         "case": "lower",
         "stemming": false,
