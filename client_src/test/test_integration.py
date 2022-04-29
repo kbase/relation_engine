@@ -2,7 +2,7 @@ import unittest
 import os
 from uuid import uuid4
 
-from relation_engine_client import REClient
+from relation_engine_client.main import REClient
 from relation_engine_client.exceptions import RERequestError, RENotFound
 
 _API_URL = os.environ.get("RE_API_URL", "http://localhost:5000")
