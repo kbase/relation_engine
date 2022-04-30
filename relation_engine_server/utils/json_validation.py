@@ -159,7 +159,7 @@ class ExtendedRefResolver(RefResolver):
 
         if scheme in self.handlers:
             result = self.handlers[scheme](uri)
-        elif scheme in [u"http", u"https"]:
+        elif scheme in ["http", "https"]:
             # Requests has support for detecting the correct encoding of
             # json over http
             result = requests.get(uri).json()

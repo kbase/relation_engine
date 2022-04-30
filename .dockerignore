@@ -49,3 +49,7 @@ dmypy.json
 # docker bits
 Dockerfile*
 docker-compose*
+
+# Temp files
+tmp/
+

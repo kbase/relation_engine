@@ -1,12 +1,9 @@
 """
 Tests for stored queries involving a fulltext search:
-* Generic fulltext_search (should be used with caution because it can be slow and timeout at 60s)
 * Taxonomy taxonomy_search_species_strain
 * Taxonomy taxonomy_search_species_strain_no_sort
 
 The latter two are switched between depending on the length of the search text.
-These stored query tests  are all bundled in one test file because their original purpose is to do a species/strain
-name search on the ncbi_taxon collection
 
 These tests run within the re_api docker image, and require access to the ArangoDB, auth, and workspace images.
 """
@@ -249,148 +246,6 @@ class TestTaxonomySearchSpeciesStrainStoredQueries(unittest.TestCase):
                 "Influenza B virus (B/Brisbane/FSS700/2017)",
             ],
         )
-
-
-class TestFulltextSearchStoredQuery(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        check_spec_test_env()
-        create_test_docs("ncbi_taxon", ncbi_taxa)
-
-    def test_ncbi_taxon_scinames(self):
-        """Happy path"""
-        for sciname in scinames_test_all:
-            _fulltext_search_query(
-                self,
-                coll="ncbi_taxon",
-                search_attrkey="scientific_name",
-                search_text=sciname,
-                ts=_NOW if sciname in scinames_test_latest else None,
-                filter_attr_expr=[
-                    {"rank": "species"},
-                    {"rank": "strain"},
-                    {"strain": True},
-                ],
-                offset=None,
-                limit=LIMIT,
-                select="scientific_name",
-                # ---
-                expect_error=False,
-                expect_hit=True,
-            )
-
-    def test_null_bind_params(self):
-        """Leave off parameters"""
-        for sciname in scinames_test_all:
-            _fulltext_search_query(
-                self,
-                coll="ncbi_taxon",
-                search_attrkey="scientific_name",
-                search_text=sciname,
-                ts=None,
-                filter_attr_expr=None,
-                offset=None,
-                limit=None,
-                select=None,
-                # ---
-                expect_error=False,
-                expect_hit=True,
-            )
-
-    def test_fully_specified_bind_params(self):
-        """Specify all parameters"""
-        for sciname in scinames_test_all:
-            _fulltext_search_query(
-                self,
-                coll="ncbi_taxon",
-                search_attrkey="scientific_name",
-                search_text=sciname,
-                ts=_NOW if sciname in scinames_test_latest else None,
-                filter_attr_expr=[
-                    {"rank": "species"},
-                    {"rank": "strain"},
-                    {"strain": True},
-                ],
-                offset=0,
-                limit=LIMIT,
-                select=["id", "scientific_name"],
-                # ---
-                expect_error=False,
-                expect_hit=True,
-            )
-
-    def test_extra_params(self):
-        """Extra params not in spec/aql"""
-        _fulltext_search_query(
-            self,
-            coll="ncbi_taxon",
-            search_attrkey="scientific_name",
-            search_text="esch",
-            ts=None,
-            filter_attr_expr=[
-                {"rank": "species"},
-                {"rank": "strain"},
-                {"strain": True},
-            ],
-            offset=0,
-            limit=LIMIT,
-            select=["id", "scientific_name"],
-            extra_unused_param=42,
-            # ---
-            expect_error=("Additional properties are not allowed"),
-        )
-
-    def test_validation_fail(self):
-        _fulltext_search_query(
-            self,
-            coll=[],
-            search_attrkey=42,
-            search_text={"hi": 1},
-            ts=None,
-            filter_attr_expr=None,
-            offset=None,
-            limit=None,
-            select=None,
-            # ---
-            expect_error="[] is not of type 'string'",
-        )
-
-    def test_aql_error(self):
-        for sciname in scinames_test_all:
-            _fulltext_search_query(
-                self,
-                coll="ncbi_taxon",
-                search_attrkey="fake_attrkey",
-                search_text=sciname,
-                ts=None,
-                filter_attr_expr=None,
-                offset=None,
-                limit=None,
-                select=None,
-                # ---
-                expect_error=True,
-            )
-
-    def test_no_hit(self):
-        for sciname in scinames_test_all:
-            _fulltext_search_query(
-                self,
-                coll="ncbi_taxon",
-                search_attrkey="scientific_name",
-                search_text=sciname[::-1],
-                ts=None,
-                filter_attr_expr=None,
-                offset=None,
-                limit=None,
-                select=None,
-                # ---
-                expect_error=False,
-                expect_hit=False,
-                expected_hits=[],
-            )
-
-
-# --- Test helpers ---
 
 
 def _switch_taxonomy_search_species_strain_queries(search_text):

@@ -13,8 +13,7 @@ shell:
 	docker-compose run re_api sh
 
 reset:
-	docker-compose --rmi all -v
-	docker-compose build
+	docker-compose down --rmi all -v
 
 full_query_testing:
 	DO_QUERY_TESTING=full time python -m pytest -s $(QUERY_TESTING_FILE)
