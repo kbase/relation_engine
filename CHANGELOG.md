@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Use locale en_US instead of c.utf-8
+- Upgrade to image arangodb:3.9
 
 ### Removed
 - Generic fulltext search and tests
