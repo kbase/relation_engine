@@ -11,4 +11,4 @@ on:
 
 jobs:
   run_important_job:
-    uses: kbase/relation_engine/.github/workflows/demo_workflow.yaml
+    uses: kbase/relation_engine/.github/workflows/demo_workflow.yaml@develop
