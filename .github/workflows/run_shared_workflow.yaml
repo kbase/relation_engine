@@ -1,0 +1,14 @@
+---
+name: Run shared workflow
+on:
+  pull_request:
+    branches:
+    - main
+    types:
+    - opened
+    - synchronize
+    - ready_for_review
+
+jobs:
+  run_important_job:
+    uses: kbase/.github/.github/workflows/shared_workflow.yaml
