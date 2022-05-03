@@ -1,9 +1,10 @@
+---
 name: Shared workflow demo
 
- on:
+on:
    workflow_call
 
- jobs:
+jobs:
    say_hello:
      runs-on: ubuntu-latest
      steps:
