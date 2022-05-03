@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Changed
+- github actions only run on `pull_request`, no longer on `push`
+
 ## [0.0.19] - 2022-05-02
 ### Added
 - github actions to build `develop`, `pr-x` and released version (e.g. `1.2.3`) Tags
