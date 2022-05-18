@@ -46,7 +46,7 @@ services:
 
   # Arangodb server in cluster mode
   arangodb:
-    image: arangodb:3.5
+    image: arangodb:3.9
     ports:
       - "127.0.0.1:8529:8529"
     command: sh -c "arangodb --starter.local"

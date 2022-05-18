@@ -1,6 +1,11 @@
 name: Relation Engine test and deploy
 on:
-  [push, pull_request]
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - ready_for_review
+
 jobs:
   run_tests:
     runs-on: ubuntu-latest
