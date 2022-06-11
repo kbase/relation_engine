@@ -1,4 +1,4 @@
-import flask
+import flask, current_app
 from relation_engine_server.utils import (
     arango_client,
     spec_loader,
@@ -12,6 +12,7 @@ from relation_engine_server.utils import (
 from relation_engine_server.utils.json_validation import run_validator
 from relation_engine_server.exceptions import InvalidParameters
 
+app = Flask(__name__)
 api_v1 = flask.Blueprint("api_v1", __name__)
 
 
@@ -73,68 +74,70 @@ def run_query():
      - only kbase re admins for ad-hoc queries
      - public stored queries (these have access controls within them based on params)
     """
-    json_body = parse_json.get_json_body() or {}
-    # fetch number of documents to return
-    batch_size = int(flask.request.args.get("batch_size", 10000))
-    full_count = flask.request.args.get("full_count", False)
+    
+    with app.app_context():
+        json_body = parse_json.get_json_body() or {}
+        # fetch number of documents to return
+        batch_size = int(flask.request.args.get("batch_size", 10000))
+        full_count = flask.request.args.get("full_count", False)
 
-    if "query" in json_body:
-        # Run an adhoc query for a sysadmin
-        auth.require_auth_token(roles=["RE_ADMIN"])
-        query_text = _preprocess_stored_query(json_body["query"], json_body)
-        del json_body["query"]
-        if "ws_ids" in query_text:
-            # Fetch any authorized workspace IDs using a KBase auth token, if present
-            auth_token = auth.get_auth_header()
-            json_body["ws_ids"] = auth.get_workspace_ids(auth_token)
+        if "query" in json_body:
+            # Run an adhoc query for a sysadmin
+            auth.require_auth_token(roles=["RE_ADMIN"])
+            query_text = _preprocess_stored_query(json_body["query"], json_body)
+            del json_body["query"]
+            if "ws_ids" in query_text:
+                # Fetch any authorized workspace IDs using a KBase auth token, if present
+                auth_token = auth.get_auth_header()
+                json_body["ws_ids"] = auth.get_workspace_ids(auth_token)
 
-        resp_body = arango_client.run_query(
-            query_text=query_text,
-            bind_vars=json_body,
-            batch_size=batch_size,
-            full_count=full_count,
-        )
-        return flask.jsonify(resp_body)
-
-    if "stored_query" in flask.request.args or "view" in flask.request.args:
-        # Run a query from a query name
-        # Note: we are maintaining backwards compatibility here with the "view" arg.
-        # "stored_query" is the more accurate name
-        query_name = flask.request.args.get("stored_query") or flask.request.args.get(
-            "view"
-        )
-        stored_query = spec_loader.get_stored_query(query_name)
-
-        if "params" in stored_query:
-            # Validate the user params for the query
-            stored_query_path = spec_loader.get_stored_query(query_name, path_only=True)
-            run_validator(
-                schema_file=stored_query_path, data=json_body, validate_at="/params"
+            resp_body = arango_client.run_query(
+                query_text=query_text,
+                bind_vars=json_body,
+                batch_size=batch_size,
+                full_count=full_count,
             )
+            return flask.jsonify(resp_body)
 
-        stored_query_source = _preprocess_stored_query(
-            stored_query["query"], stored_query
-        )
-        if "ws_ids" in stored_query_source:
-            # Fetch any authorized workspace IDs using a KBase auth token, if present
-            auth_token = auth.get_auth_header()
-            json_body["ws_ids"] = auth.get_workspace_ids(auth_token)
+        if "stored_query" in flask.request.args or "view" in flask.request.args:
+            # Run a query from a query name
+            # Note: we are maintaining backwards compatibility here with the "view" arg.
+            # "stored_query" is the more accurate name
+            query_name = flask.request.args.get("stored_query") or flask.request.args.get(
+                "view"
+            )
+            stored_query = spec_loader.get_stored_query(query_name)
 
-        resp_body = arango_client.run_query(
-            query_text=stored_query_source,
-            bind_vars=json_body,
-            batch_size=batch_size,
-            full_count=full_count,
-        )
-        return flask.jsonify(resp_body)
+            if "params" in stored_query:
+                # Validate the user params for the query
+                stored_query_path = spec_loader.get_stored_query(query_name, path_only=True)
+                run_validator(
+                    schema_file=stored_query_path, data=json_body, validate_at="/params"
+                )
 
-    if "cursor_id" in flask.request.args:
-        # Run a query from a cursor ID
-        cursor_id = flask.request.args["cursor_id"]
-        resp_body = arango_client.run_query(cursor_id=cursor_id)
-        return flask.jsonify(resp_body)
-    # No valid options were passed
-    raise InvalidParameters("Pass in a query name or a cursor_id")
+            stored_query_source = _preprocess_stored_query(
+                stored_query["query"], stored_query
+            )
+            if "ws_ids" in stored_query_source:
+                # Fetch any authorized workspace IDs using a KBase auth token, if present
+                auth_token = auth.get_auth_header()
+                json_body["ws_ids"] = auth.get_workspace_ids(auth_token)
+
+            resp_body = arango_client.run_query(
+                query_text=stored_query_source,
+                bind_vars=json_body,
+                batch_size=batch_size,
+                full_count=full_count,
+            )
+            return flask.jsonify(resp_body)
+
+        if "cursor_id" in flask.request.args:
+            # Run a query from a cursor ID
+            cursor_id = flask.request.args["cursor_id"]
+            resp_body = arango_client.run_query(cursor_id=cursor_id)
+            return flask.jsonify(resp_body)
+        # No valid options were passed
+        raise InvalidParameters("Pass in a query name or a cursor_id")
 
 
 @api_v1.route("/specs", methods=["PUT"])
