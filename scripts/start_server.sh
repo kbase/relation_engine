@@ -11,7 +11,6 @@ python -m relation_engine_server.utils.wait_for services
 python -m relation_engine_server.utils.pull_spec
 
 gunicorn \
-  --worker-class gevent \
   --timeout 1800 \
   --workers $workers \
   --bind :5000 \
