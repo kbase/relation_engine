@@ -5,10 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.21] 2022-06-10
+## [0.0.21] 2022-06-13
+### Added
+- Dependabot
+
 ### Changed
-- Upgrade flask
 - Update Github Actions to use new format
+- Upgrades:
+  - flask: 1.0.2 -> 2.1.2
+  - gunicorn: 19.9.0 -> 20.1.0
+  - requests: 2.20.0 -> 2.28.0
+  - pyyaml: 5.4 -> 6.0
+- Use default instead of gevent for gunicorn
 
 ## [0.0.20] 2022-05-17
 ### Changed
