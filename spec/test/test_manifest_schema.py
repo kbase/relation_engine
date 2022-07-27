@@ -39,12 +39,12 @@ class Test_Manifest_Schema(unittest.TestCase):
             {
                 # if the date is not quoted, pyyaml will turn it into a date object. Doh!
                 "file": "date_not_in_quotes",
-                "msg": "datetime.date\(2020, 12, 25\) is not of type 'string'",
+                "msg": r"datetime.date\(2020, 12, 25\) is not of type 'string'",
             },
             {
                 # file format is invalid
                 "file": "invalid_format",
-                "msg": "'txt' is not one of \['tsv', 'csv'\]",
+                "msg": r"'txt' is not one of \['tsv', 'csv'\]",
             },
             {
                 # there must be an indicator of file format
