@@ -12,12 +12,10 @@ Example usage:
 """
 from jsonschema import validators, Draft7Validator, FormatChecker, RefResolver
 
-from jsonschema.compat import (
-    urlopen,
-    urlsplit,
-)
 from jsonschema.exceptions import ValidationError
 from jsonpointer import resolve_pointer
+from urllib.request import urlopen
+from urllib.parse import urlsplit
 import yaml
 import json
 import requests
@@ -165,7 +163,8 @@ class ExtendedRefResolver(RefResolver):
             result = requests.get(uri).json()
         else:
             # Otherwise, pass off to urllib and assume utf-8
-            with urlopen(uri) as url:
+            # TODO https://github.com/kbase/relation_engine/issues/156
+            with urlopen(uri) as url:  # nosec
                 content = url.read().decode("utf-8")
                 if uri.endswith(".yaml") or uri.endswith(".yml"):
                     result = yaml.safe_load(content)
