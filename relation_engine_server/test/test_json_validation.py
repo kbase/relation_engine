@@ -160,8 +160,8 @@ class TestJsonValidation(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, err_msg):
             run_validator(schema_file=test_file, data={})
 
-        # invalid jsonpointer string - note the grammar error is from jsonpointer
-        err_str = "location must starts with /"
+        # invalid jsonpointer string
+        err_str = "Location must start with /"
         json_loc = "start validating here"
         with self.assertRaisesRegex(JsonPointerException, err_str):
             run_validator(schema=test_schema, data={}, validate_at=json_loc)
