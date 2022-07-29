@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.22] TBD
+### Changed
+- The NCBI taxa scientfic name lookup queries below were updated to make use of the new
+  NCBI taxa loader `species_or_below` flag and note that the `strain` flag is deprecated.
+  TODO add link
+  - taxonomy_search_species_strain
+  - taxonomy_search_species_strain_no_sort
+
 ## [0.0.21] 2022-06-13
 ### Added
 - Dependabot
