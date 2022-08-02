@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - The NCBI taxa scientfic name lookup queries below were updated to make use of the new
   NCBI taxa loader `species_or_below` flag and note that the `strain` flag is deprecated.
-  TODO add link
+  See https://github.com/kbase/relation_engine_importers/blob/d8f87fb74e984cae1c94985b82349b13bc7f277e/docs/NCBI_taxa_sciname_lookup_issues_22_07.md
   - taxonomy_search_species_strain
   - taxonomy_search_species_strain_no_sort
 

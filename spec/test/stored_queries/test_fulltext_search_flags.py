@@ -59,12 +59,12 @@ def re_client(conf):
 
 
 @fixture()
-def col(db, spec):
+def coll(db, spec):
     yield _clear_collection(db, spec["name"])
 
 
-def _clear_collection(db, col_name):
-    collection = db.collection(col_name)
+def _clear_collection(db, coll_name):
+    collection = db.collection(coll_name)
     collection.truncate()
 
     return collection
@@ -166,39 +166,39 @@ COVID_GENUS_SOB_FALSE = {
 }
 
 
-def test_missing_species_or_below_flag_covid(col, re_client):
+def test_missing_species_or_below_flag_covid(coll, re_client):
     """
     Test queries against documents that don't have the species_or_below flag at all.
     """
-    col.import_bulk(
+    coll.import_bulk(
         [COVID_NO_RANK_STRAIN, COVID_GENUS, COVID_SPECIES, COVID_STRAIN, COV_SPECIES]
     )
 
-    expected = _add_id(col.name, [COVID_NO_RANK_STRAIN, COVID_SPECIES, COVID_STRAIN])
+    expected = _add_id(coll.name, [COVID_NO_RANK_STRAIN, COVID_SPECIES, COVID_STRAIN])
 
-    _check_queries(re_client, col.name, expected, "Covid")
+    _check_queries(re_client, coll.name, expected, "Covid")
 
 
-def test_missing_species_or_below_flag_cov(col, re_client):
+def test_missing_species_or_below_flag_cov(coll, re_client):
     """
     Test queries against documents that don't have the species_or_below flag at all.
     """
-    col.import_bulk(
+    coll.import_bulk(
         [COVID_NO_RANK_STRAIN, COVID_GENUS, COVID_SPECIES, COVID_STRAIN, COV_SPECIES]
     )
 
     expected = _add_id(
-        col.name, [COV_SPECIES, COVID_NO_RANK_STRAIN, COVID_SPECIES, COVID_STRAIN]
+        coll.name, [COV_SPECIES, COVID_NO_RANK_STRAIN, COVID_SPECIES, COVID_STRAIN]
     )
 
-    _check_queries(re_client, col.name, expected, "Cov")
+    _check_queries(re_client, coll.name, expected, "Cov")
 
 
-def test_with_species_or_below_flag_covid(col, re_client):
+def test_with_species_or_below_flag_covid(coll, re_client):
     """
     Test queries against documents that have the new species_or_below flag.
     """
-    col.import_bulk(
+    coll.import_bulk(
         [
             COVID_NO_RANK_SOB_TRUE,
             COV_SPECIES,
@@ -212,7 +212,7 @@ def test_with_species_or_below_flag_covid(col, re_client):
         ]
     )
     expected = _add_id(
-        col.name,
+        coll.name,
         [
             COVID_NO_RANK_STRAIN,
             COVID_SPECIES,
@@ -222,14 +222,14 @@ def test_with_species_or_below_flag_covid(col, re_client):
             COVID_NO_RANK_SOB_TRUE,
         ],
     )
-    _check_queries(re_client, col.name, expected, "Covid")
+    _check_queries(re_client, coll.name, expected, "Covid")
 
 
-def test_with_species_or_below_flag_cov(col, re_client):
+def test_with_species_or_below_flag_cov(coll, re_client):
     """
     Test queries against documents that have the new species_or_below.
     """
-    col.import_bulk(
+    coll.import_bulk(
         [
             COVID_NO_RANK_SOB_TRUE,
             COV_SPECIES,
@@ -243,7 +243,7 @@ def test_with_species_or_below_flag_cov(col, re_client):
         ]
     )
     expected = _add_id(
-        col.name,
+        coll.name,
         [
             COV_SPECIES,
             COVID_NO_RANK_STRAIN,
@@ -254,18 +254,18 @@ def test_with_species_or_below_flag_cov(col, re_client):
             COVID_NO_RANK_SOB_TRUE,
         ],
     )
-    _check_queries(re_client, col.name, expected, "Cov")
+    _check_queries(re_client, coll.name, expected, "Cov")
 
 
-def _add_id(col_name, list_o_dicts):
-    return [d | {"_id": f"{col_name}/{d['_key']}"} for d in list_o_dicts]
+def _add_id(coll_name, list_o_dicts):
+    return [d | {"_id": f"{coll_name}/{d['_key']}"} for d in list_o_dicts]
 
 
-def _check_queries(re_client, col_name, expected_sorted, search_text):
-    res = _run_query(re_client, col_name, _QUERY_NO_SORT, search_text)
+def _check_queries(re_client, coll_name, expected_sorted, search_text):
+    res = _run_query(re_client, coll_name, _QUERY_NO_SORT, search_text)
     assert set(_freeze(res)) == set(_freeze(expected_sorted))
 
-    res = _run_query(re_client, col_name, _QUERY_SORT, search_text)
+    res = _run_query(re_client, coll_name, _QUERY_SORT, search_text)
     assert res == expected_sorted
 
 
@@ -273,11 +273,11 @@ def _freeze(list_o_dicts):
     return [frozendict(d) for d in list_o_dicts]
 
 
-def _run_query(re_client, col_name, query, search_text):
+def _run_query(re_client, coll_name, query, search_text):
     res = re_client.stored_query(
         query,
         {
-            "@taxon_coll": col_name,
+            "@taxon_coll": coll_name,
             "search_text": search_text,
             "sciname_field": "scientific_name",
         },
