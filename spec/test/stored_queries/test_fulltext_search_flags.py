@@ -49,21 +49,20 @@ def db(conf, spec):
     yield db
 
     # clean up for tests in other modules that might be using the same db / collection
-    _clear_collection(db, spec["name"])
+    _clear_collection_and_return(db, spec["name"])
 
 
 @fixture(scope="module")
 def re_client(conf):
-    re_c = REClient(conf["re_api_url"], "non_admin_token")
-    yield re_c
+    yield REClient(conf["re_api_url"], "non_admin_token")
 
 
 @fixture()
 def coll(db, spec):
-    yield _clear_collection(db, spec["name"])
+    yield _clear_collection_and_return(db, spec["name"])
 
 
-def _clear_collection(db, coll_name):
+def _clear_collection_and_return(db, coll_name):
     collection = db.collection(coll_name)
     collection.truncate()
 
