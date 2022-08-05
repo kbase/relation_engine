@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   See https://github.com/kbase/relation_engine_importers/blob/d8f87fb74e984cae1c94985b82349b13bc7f277e/docs/NCBI_taxa_sciname_lookup_issues_22_07.md
   - taxonomy_search_species_strain
   - taxonomy_search_species_strain_no_sort
+- The NCBI and GTDB taxon collections were updated to include the new flag.
 
 ## [0.0.21] 2022-06-13
 ### Added

@@ -31,3 +31,8 @@ schema:
       type: string
       title: Taxonomic rank
       examples: [domain, phylum]
+    species_or_below:
+      type: boolean
+      title: Species or below
+      description: A flag that denotes the taxon is of rank species or a lower rank, e.g.
+        strain, forma, genome, subspecies, etc.
