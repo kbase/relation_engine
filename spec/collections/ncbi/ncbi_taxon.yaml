@@ -51,12 +51,22 @@ schema:
       type: string
       title: Taxonomic rank
       examples: ["Domain", "Phylum", "no rank"]
+    species_or_below:
+      type: boolean
+      title: Species or below flag
+      description: A flag that denotes the taxon is of rank species or a lower rank, e.g.
+        strain, forma, genome, subspecies, etc.
     strain:
       type: boolean
-      title: Strain flag
-      description: Whether this node corresponds to a strain. Strains are considered to be nodes
+      title: Strain flag (DEPRECATED)
+      description: DEPRECATED. See https://github.com/kbase/relation_engine_importers/blob/29cbf68b289335ec5c27201efba0058a501c6b74/docs/NCBI_taxa_sciname_lookup_issues_22_07.md
+        This field should not be used in any new code, but is left intact as it may be contained in
+        already loaded data.
+        Original description was
+        "Whether this node corresponds to a strain. Strains are considered to be nodes
         that have a rank of "no rank" and whose parents' rank is either species or subspecies or
-        where the parent's strain flag is true.
+        where the parent's strain flag is true."
+
     ncbi_taxon_id:
       type: integer
       title: The NCBI taxon ID as a number
