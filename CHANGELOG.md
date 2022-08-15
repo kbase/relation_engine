@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.22] TBD
+## [0.0.22] 2022-08-15
 ### Changed
 - The NCBI taxa scientfic name lookup queries below were updated to make use of the new
   NCBI taxa loader `species_or_below` flag and note that the `strain` flag is deprecated.
