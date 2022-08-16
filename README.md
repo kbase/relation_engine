@@ -49,3 +49,10 @@ The CI service is available in the `relationapi` service
 * Merge from Develop to Main
 * Draft a release using semantic versioning (e.g 1.2.3) by creating a tag with the target of Main
 * Ensure release notes are updated manually and/or by AutoGenerate Release Notes
+
+## Testing
+
+To run tests:
+```
+make test
+```

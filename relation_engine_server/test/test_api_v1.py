@@ -15,9 +15,9 @@ from spec.test.test_ensure_specs import ensure_borked_indexes
 _CONF = get_config()
 
 # Use the mock auth tokens
-NON_ADMIN_TOKEN = "non_admin_token"
-ADMIN_TOKEN = "admin_token"
-INVALID_TOKEN = "invalid_token"
+NON_ADMIN_TOKEN = "non_admin_token"  # nosec
+ADMIN_TOKEN = "admin_token"  # nosec
+INVALID_TOKEN = "invalid_token"  # nosec
 
 # Use the docker-compose url of the running flask server
 URL = os.environ.get("TEST_URL", "http://localhost:5000")

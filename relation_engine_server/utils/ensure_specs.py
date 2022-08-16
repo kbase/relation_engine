@@ -229,22 +229,25 @@ def excise_namespace(analyzer_name: str) -> str:
 
 
 def is_obj_subset_rec(
-    l: Union[dict, list, float, str, int],
-    r: Union[dict, list, float, str, int],
+    left: Union[dict, list, float, str, int],
+    right: Union[dict, list, float, str, int],
 ):
     """
-    Compare two JSON objects, to see if, essentially, l <= r
+    Compare two JSON objects, to see if, essentially, left <= right
     If comparing dicts, recursively compare
     If comparing lists, shallowly compare. For now, YAGN more
     """
-    if isinstance(l, dict) and isinstance(r, dict):
+    if isinstance(left, dict) and isinstance(right, dict):
         return all(
-            [k in r.keys() and is_obj_subset_rec(l[k], r[k]) for k in l.keys()]
+            [
+                k in right.keys() and is_obj_subset_rec(left[k], right[k])
+                for k in left.keys()
+            ]
         )  # ignore: typing
-    elif isinstance(l, list) and isinstance(r, list):
-        return all([le in r for le in l])
+    elif isinstance(left, list) and isinstance(right, list):
+        return all([le in right for le in left])
     else:
-        return l == r  # noqa: E741
+        return left == right
 
 
 def mod_obj_literal(

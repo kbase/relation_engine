@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.22] 2022-08-15
+### Changed
+- The NCBI taxa scientfic name lookup queries below were updated to make use of the new
+  NCBI taxa loader `species_or_below` flag and note that the `strain` flag is deprecated.
+  See https://github.com/kbase/relation_engine_importers/blob/d8f87fb74e984cae1c94985b82349b13bc7f277e/docs/NCBI_taxa_sciname_lookup_issues_22_07.md
+  - taxonomy_search_species_strain
+  - taxonomy_search_species_strain_no_sort
+- The NCBI and GTDB taxon collections were updated to include the new flag.
+
 ## [0.0.21] 2022-06-13
 ### Added
 - Dependabot

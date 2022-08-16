@@ -50,7 +50,7 @@ class TestValidate(unittest.TestCase):
                 "file": "schema_not_object.yaml",
             },
             {
-                "msg": "Additional properties are not allowed \('title' was unexpected\)",
+                "msg": r"Additional properties are not allowed \('title' was unexpected\)",
                 "file": "extra_top_level_entries.yaml",
             },
             {
@@ -116,7 +116,7 @@ class TestValidate(unittest.TestCase):
 
         error_list = [
             {
-                "msg": "Additional properties are not allowed \('type' was unexpected\)",
+                "msg": r"Additional properties are not allowed \('type' was unexpected\)",
                 "file": "invalid_additional_property.json",
             },
             {
@@ -168,7 +168,7 @@ class TestValidate(unittest.TestCase):
 
         self.assertEqual(validate_view(os_path.join(base_dir, "minimal.json")), output)
 
-        err_str = "'from the shore' is not one of \['arangosearch'\]"
+        err_str = r"'from the shore' is not one of \['arangosearch'\]"
         with self.assertRaisesRegex(ValidationError, err_str):
             validate_view(os_path.join(base_dir, "wrong_type.json"))
 
