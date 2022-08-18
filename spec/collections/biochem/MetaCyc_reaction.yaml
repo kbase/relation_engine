@@ -1,0 +1,12 @@
+name: MetaCyc_reaction
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: |
+    MetaCyc reactions. IDs only, no metadata.
+  properties:
+    _key:
+      type: string

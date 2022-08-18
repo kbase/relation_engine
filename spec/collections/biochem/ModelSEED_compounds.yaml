@@ -1,0 +1,12 @@
+name: ModelSEED_compounds
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: |
+    ModelSEED compounds
+  properties:
+    _key:
+      type: string

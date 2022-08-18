@@ -1,0 +1,16 @@
+name: ModelSEED_reaction_similarity
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Link reactions that are similar    
+  properties:
+    _from:
+      type: string
+      description: One reaction
+    _to:
+      type: string
+      description: Another reaction

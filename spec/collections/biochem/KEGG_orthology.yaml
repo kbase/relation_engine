@@ -1,0 +1,12 @@
+name: KEGG_orthology
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: |
+    KO terms.
+  properties:
+    _key:
+      type: string

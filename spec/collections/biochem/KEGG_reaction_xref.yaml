@@ -1,0 +1,16 @@
+name: KEGG_reaction_xref
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Cross references from the KEGG reaction database to external databases (namely, KEGG orthology)
+  properties:
+    _from:
+      type: string
+      description: The KEGG reaction record
+    _to:
+      type: string
+      description: The external database record

@@ -1,0 +1,16 @@
+name: ModelSEED_computation
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Links ModelSEED records (reaction or compound) to a computed attribute (namely, a fingerprint)
+  properties:
+    _from:
+      type: string
+      description: The ModelSEED reaction record
+    _to:
+      type: string
+      description: The computed attribute

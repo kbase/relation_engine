@@ -1,0 +1,16 @@
+name: ModelSEED_compound_merge
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Merge obsolete records
+  properties:
+    _from:
+      type: string
+      description: Obsolete compound
+    _to:
+      type: string
+      description: Extant compound

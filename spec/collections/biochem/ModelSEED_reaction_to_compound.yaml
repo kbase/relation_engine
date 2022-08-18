@@ -1,0 +1,16 @@
+name: ModelSEED_reaction_to_compound
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Link reactions to reactant and product compounds
+  properties:
+    _from:
+      type: string
+      description: A reaction
+    _to:
+      type: string
+      description: A constituent compound

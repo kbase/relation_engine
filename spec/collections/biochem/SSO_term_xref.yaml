@@ -1,0 +1,16 @@
+name: SSO_term_xref
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Cross references from the SSO database to external databases (namely, ModelSEED reactions)
+  properties:
+    _from:
+      type: string
+      description: The SSO term record
+    _to:
+      type: string
+      description: The external database record

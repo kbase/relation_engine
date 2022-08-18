@@ -1,0 +1,12 @@
+name: EC_number
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: |
+    EC numbers
+  properties:
+    _key:
+      type: string

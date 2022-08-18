@@ -1,0 +1,12 @@
+name: ModelSEED_reaction
+type: vertex
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_key]
+  description: |
+    ModelSEED reactions
+  properties:
+    _key:
+      type: string

@@ -1,0 +1,16 @@
+name: ModelSEED_compound_xref
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Cross references from the ModelSEED compound database to external databases
+  properties:
+    _from:
+      type: string
+      description: The ModelSEED compound
+    _to:
+      type: string
+      description: The external database record

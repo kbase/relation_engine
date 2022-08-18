@@ -1,0 +1,16 @@
+name: EC_edge
+type: edge
+schema:
+  "$schema": "http://json-schema.org/draft-07/schema#"
+  type: object
+  additionalProperties: true
+  required: [_from, _to]
+  description: |
+    Link hierarchically related EC numbers
+  properties:
+    _from:
+      type: string
+      description: The EC number child
+    _to:
+      type: string
+      description: The EC number parent
