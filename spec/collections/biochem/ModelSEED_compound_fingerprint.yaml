@@ -10,3 +10,8 @@ schema:
   properties:
     _key:
       type: string
+    fingerprint:
+      type: string
+    algorithm:
+      type: string
+      description: Algorithm used to compute fingerprint

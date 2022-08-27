@@ -10,3 +10,38 @@ schema:
   properties:
     _key:
       type: string
+    ENTRY:
+      type: string
+      pattern: "K\d{5}"
+      examples: ["K00001"]
+    SYMBOL:
+      type: array
+      items:
+        type: string
+      examples: [['E1.1.1.1', 'adh']]
+    NAME:
+      type: [string, "null"]
+      examples: ['alcohol dehydrogenase [EC:1.1.1.1]']
+    PATHWAY:
+      type: [array, "null"]
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+        examples: [[{"id": "map00650", "name": "Butanoate metabolism"}, {"id": "map01110", "name": "Biosynthesis of secondary metabolites"}]]
+    MODULE:
+      type: [array, "null"]
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+        examples: [[{"id": "M00003", "name": "Gluconeogenesis, oxaloacetate => fructose-6P"}, {"id": "M00165", "name": "Reductive pentose phosphate cycle (Calvin cycle)"}, {"id": "M00167", "name": "Reductive pentose phosphate cycle, glyceraldehyde-3P => ribulose-5P"}]]
+    REFERENCE:
+      type: [string, "null"]
+      examples: ["PMID:18452897"]

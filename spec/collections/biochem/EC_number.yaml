@@ -6,7 +6,66 @@ schema:
   additionalProperties: true
   required: [_key]
   description: |
-    EC numbers
+    EC numbers. Either from KEGG, ModelSEED, or generated parents. KEGG EC numbers come with metadata.
   properties:
     _key:
       type: string
+    id:
+      type: string
+      pattern: "Root|([\d-].){3}[\d-]"
+      examples: ["Root", "1.1.1.1", "1.1.1.-"]
+    is_obsolete:
+      type: integer
+      enum: [0, 1]
+    NAME:
+      type: [array, "null"]
+      items:
+        type: string
+      examples: [['(2S)-methylsuccinyl-CoA dehydrogenase', 'Mcd']]
+    CLASS:
+      type: [array, "null"]
+      items:
+        type: string
+      examples: [['Transferases', 'Acyltransferases']]
+    SYSNAME:
+      type: [string, "null"]
+      examples: ['L-aspartate:oxygen oxidoreductase']
+    REACTION:
+      type: [string, "null"]
+      examples: ['RCH2NH2 + H2O + O2 = RCHO + NH3 + H2O2 [RN:R01853]']
+    SUBSTRATE:
+      type: [array, "null"]
+      items:
+        type: string
+      examples: [['glutathione [CPD:C00051]', 'hydroperoxy-fatty-acyl-[lipid]']]
+    PRODUCT:
+      type: [array, "null"]
+      items:
+        type: string
+      examples: [['pyranos-2-ulose', 'pyranos-3-ulose', 'pyranos-2,3-diulose']]
+    COMMENT:
+      type: [string, "null"]
+    PATHWAY:
+      type: [object, "null"]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      examples: [{"id": "ec00330", "name": "Arginine and proline metabolism"}]
+    ORTHOLOGY:
+      type: [object, "null"]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      examples: [{"id": "K24693", "name": "pre-mycofactocin synthase"}]
+    REFERENCE:
+      type: array
+      items:
+        type: string
+      examples: [["PMID:11744710", "PMID:9827558"]]
+    source:
+      type: string
+      enum: ["KEGG", "ModelSEED", "null"] 

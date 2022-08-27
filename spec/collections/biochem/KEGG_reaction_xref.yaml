@@ -14,3 +14,16 @@ schema:
     _to:
       type: string
       description: The external database record
+    id:
+      type: string
+    name:
+      type: string
+      description: KO name
+    xref_coll:
+      type: string
+      description: The external database
+      enum: ["KEGG_orthology"]
+    from:
+      type: string
+    to:
+      type: string

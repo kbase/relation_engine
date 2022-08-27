@@ -10,3 +10,6 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      examples: ["RXN-9762"]

@@ -14,3 +14,9 @@ schema:
     _to:
       type: string
       description: Extant compound
+    id:
+      type: string
+    from:
+      type: string
+    to:
+      type: string

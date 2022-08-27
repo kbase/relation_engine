@@ -10,3 +10,9 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      pattern: "C\d{5}"
+    name:
+      type: string
+      examples: ["H2O; Water"]

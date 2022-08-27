@@ -14,3 +14,12 @@ schema:
     _to:
       type: string
       description: The computed attribute
+    source_coll:
+      type: string
+      enum: ["ModelSEED_reaction", "ModelSEED_compound"]
+    computation:
+      type: string
+      enum: ["fingerprint"]
+    algorithm:
+      type: string
+      enum: ["structural_fingerprint", "difference_fingerprint"]

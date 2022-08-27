@@ -14,3 +14,16 @@ schema:
     _to:
       type: string
       description: The external database record
+    id:
+      type: string
+    xref_coll:
+      type: string
+      description: The external database
+      enum: ["KEGG_compound", "MetaCyc_compound", "ChEBI_term"]
+    is_alias:
+      type: integer
+      enum: [1]
+    from:
+      type: string
+    to:
+      type: string

@@ -10,3 +10,9 @@ schema:
   properties:
     _key:
       type: string
+    fingerprint:
+      type: string
+      description: Hexadecimal
+    algorithm:
+      type: string
+      enum: ["structural_fingerprint", "difference_fingerprint"]

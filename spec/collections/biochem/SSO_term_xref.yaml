@@ -14,3 +14,13 @@ schema:
     _to:
       type: string
       description: The external database record
+    id:
+      type: string
+    xref_coll:
+      type: string
+      description: The external database
+      enum: ["ModelSEED_reaction"]
+    from:
+      type: string
+    to:
+      type: string

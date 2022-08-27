@@ -14,3 +14,12 @@ schema:
     _to:
       type: string
       description: A constituent compound
+    id:
+      type: string
+    rxn_member_type:
+      type: [string, "null"]
+      enum: ["reactant", "product", "transported_in", "transported_out", "null"]
+    from:
+      type: string
+    to:
+      type: string

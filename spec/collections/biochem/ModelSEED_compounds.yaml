@@ -10,3 +10,50 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      description: Unique ID for the compound in the format cpdNNNNN where NNNNN is a five digit number (e.g. cpd00001)
+    abbreviation:
+      description: Short name of compound
+    name:
+      description: Long name of compound
+    formula:
+      description: Standard chemical format (using Hill system) in protonated form to match reported charge
+    mass:
+      description: Mass of compound or "null" when unknown
+    source:
+      description: Source database of compound (currently only source is ModelSEED)
+    inchikey:
+      description: Structure of compound using IUPAC International Chemical Identifier (InChI) format
+    charge:
+      description: Electric charge of compound
+    is_core:
+      description: True if compound is in core biochemistry (currently all compounds are set to true)
+      enum: [1]
+    is_obsolete:
+      description: True if compound is obsolete and replaced by different compound (currently all compounds are set to false)
+      enum: [0]
+    linked_compound:
+      description: List of compound IDs separated by semicolon related to this compound or "null" if not specified (used to link an obsolete compound to replacement compound)
+    is_cofactor:
+      description: True if compound is a cofactor (currently all compounds are set to false)
+      enum: [0]
+    deltag:
+      description: Value for change in free energy of compound or "null" when unknown
+    deltagerr:
+      description: Value for change in free energy error of compound or "null" when unknown
+    pka:
+      description: Acid dissociation constants of compound
+    pkb:
+      description: Base dissociation constants of compound
+    abstract_compound:
+      description: True if compound is an abstraction of a chemical concept (currently all compounds are set to null)
+      enum: ["null"]
+    comprised_of:
+      description: or "null" if not specified (currently all compounds are set to null)
+      enum: ["null"]
+    aliases:
+      description: List of alternative names of compound separated by semicolon or "null" if not specified
+    smiles:
+      description: Structure of compound using Simplified Molecular-Input Line-Entry System (SMILES) format
+    notes:
+      description: Abbreviated notation used to store derived information about the compound.

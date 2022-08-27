@@ -10,3 +10,9 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      pattern: "CHEBI:\d+"
+    name:
+      type: string
+      examples: ["(+)-car-3-ene"]

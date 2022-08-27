@@ -14,3 +14,9 @@ schema:
     _to:
       type: string
       description: Another reaction
+    id:
+      type: string
+    from:
+      type: string
+    to:
+      type: string

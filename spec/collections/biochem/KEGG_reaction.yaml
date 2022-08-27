@@ -10,3 +10,11 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      pattern: "R\d{5}"
+    name:
+      type: array
+      items:
+        type: string 
+      examples: [["polyphosphate polyphosphohydrolase", "Polyphosphate + n H2O <=> (n+1) Oligophosphate"]]

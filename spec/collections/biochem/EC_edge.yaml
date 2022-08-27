@@ -14,3 +14,7 @@ schema:
     _to:
       type: string
       description: The EC number parent
+    from:
+      type: string
+    to:
+      type: string

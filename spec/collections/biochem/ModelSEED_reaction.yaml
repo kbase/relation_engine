@@ -10,3 +10,76 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      description: Unique ID for the reaction in the format rxnNNNNN where NNNNN is a five digit number (e.g. rxn03789)
+    abbreviation:
+      type: string
+      description: Short name of reaction
+    name:
+      type: string
+      description: Long name of reaction
+    code:
+      type: string
+      description: Definition of reaction expressed using compound IDs and before protonation
+    stoichiometry:
+      type: string
+      description: Definition of reaction expressed in stoichiometry format
+    is_transport:
+      type: integer
+      description: True if reaction is a transport reaction
+      enum: [0, 1]
+    equation:
+      type: string
+      description: Definition of reaction expressed using compound IDs and after protonation
+    definition:
+      type: string
+      description: Definition of reaction expressed using compound names
+    reversibility:
+      type: string
+      description: Reversibility of reaction where ">" means right directional, "<" means left directional, "=" means bi-directional, and "?" means unknown
+    direction:
+      type: string
+      description: Direction of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
+    abstract_reaction:
+      type: "null"
+      description: "null" if not specified (currently all reactions are set to null)
+      enum: ["null"]
+    pathways:
+      type: [array, "null"]
+      description: Pathways reaction is a part of or "null" if not specified (currently all reactions are set to null)
+      enum: ["null"]
+    aliases:
+      type: [array, "null"]
+      description: List of alternative names of reaction or "null" if not specified
+    ec_numbers:
+      type: [array, "null"]
+      description: Enzyme Commission numbers of enzymes that catalyze reaction or "null" if not specified (currently all reactions are set to null)
+    deltag:
+      type: number
+      description: Value for change in free energy of reaction or 10000000 when unknown
+    deltagerr:
+      type: number
+      description: Value for change in free energy error of reaction or 10000000 when unknown
+    compound_ids:
+      type: [array, "null"]
+      description: List of compound IDs for compounds involved in reaction 
+    status:
+      type: array
+      description: Status of the reaction with multiple values
+    is_obsolete:
+      type: integer
+      description: True if reaction is obsolete and replaced by different reaction
+      enum: [0, 1]
+    linked_reaction:
+      type: [array, "null"]
+      items:
+        type: string
+      description:  List of reaction IDs separated by semicolon related to this reaction or "null" if not specified (used to link an obsolete reaction to replacement reaction)
+    notes:
+      type: string
+      description: Abbreviated notation used to store derived information about the reaction
+    source:
+      type: string
+      description: Source database of reaction (currently only source is ModelSEED)
+      enum: ["ModelSEED"]

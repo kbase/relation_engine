@@ -14,3 +14,9 @@ schema:
     _to:
       type: string
       description: The extant reaction record
+    id:
+      type: string
+    from:
+      type: string
+    to:
+      type: string

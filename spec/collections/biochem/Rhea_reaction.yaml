@@ -10,3 +10,22 @@ schema:
   properties:
     _key:
       type: string
+    id:
+      type: string
+      description: Rhea reaction ID
+    is_master:
+      type: integer
+      description: Whether this is the "master", i.e., unknown, direction
+      enum: [0, 1]
+    directions:
+      type: object
+      description: All the associated reaction IDs
+      properties:
+        UN:
+          description: The unknown direction reaction ID
+        LR:
+          description: The left to right direction reaction ID
+        RL:
+          description: The right to left direction reaction ID
+        BI:
+          description: The bidirectional reaction ID
