@@ -15,4 +15,5 @@ schema:
       pattern: "CHEBI:\d+"
     name:
       type: string
+      description: The name. (Technically no metadata is required, but the name was included because it was available.)
       examples: ["(+)-car-3-ene"]

@@ -6,14 +6,14 @@ schema:
   additionalProperties: true
   required: [_key]
   description: |
-    EC numbers. Either from KEGG, ModelSEED, or generated parents. KEGG EC numbers come with metadata.
+    EC numbers, as a tree. Either terminal nodes from KEGG or ModelSEED; or generated parents thereof. "Root" is the parent of "1.-.-.-" and "2.-.-.-", etc. "1.1.1.-" is the parent of "1.1.1.1".  KEGG EC numbers come with metadata.
   properties:
     _key:
       type: string
     id:
       type: string
-      pattern: "Root|([\d-].){3}[\d-]"
-      examples: ["Root", "1.1.1.1", "1.1.1.-"]
+      pattern: "Root|([\d-]\.){3}[\d-]"
+      examples: ["Root", "1.-.-.-", "2.-.-.-",  "1.1.1.-", "1.1.1.1"]
     is_obsolete:
       type: integer
       enum: [0, 1]
