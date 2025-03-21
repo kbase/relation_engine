@@ -18,9 +18,9 @@ jobs:
       env:
         GITHUB_ACTIONS_CI: 1
       run: |
-        docker-compose build
-        docker-compose run re_api sh scripts/run_tests.sh
-        docker-compose down --remove-orphans
+        docker compose build
+        docker compose run re_api sh scripts/run_tests.sh
+        docker compose down --remove-orphans
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
