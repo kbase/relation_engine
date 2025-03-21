@@ -5,8 +5,24 @@
 
 version: 2
 updates:
-  - package-ecosystem: pip # See documentation for possible values
+
+  # Docker
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 25
+
+  # Python
+  - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
-      time: '11:00'
+    open-pull-requests-limit: 25
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: ".github/workflows"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 25
