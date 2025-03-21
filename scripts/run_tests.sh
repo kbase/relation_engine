@@ -24,4 +24,4 @@ python -m spec.validate
 python -m relation_engine_server.utils.wait_for api
 
 # run importer/, relation_engine_server/, spec/, scripts/, and client_src/ tests
-pytest -vv --cov=. --cov-report=term --cov-report=xml --cov-omit=*/test_*
+pytest -vv --cov=. --cov-report=term --cov-report=xml
