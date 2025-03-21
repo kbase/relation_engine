@@ -24,7 +24,7 @@ python -m spec.validate
 python -m relation_engine_server.utils.wait_for api
 
 # run importer/, relation_engine_server/, and spec/ tests
-pytest -vv --cov-report=term --cov-report=xml --ignore=*/test_*
+pytest -vv --cov=. --cov-report=term --cov-report=xml --ignore=*/test_*
 # # RE client tests - seems like these tests were already run in the line above, why run them again?
 # PYTHONPATH=client_src python -m pytest client_src/test
 
