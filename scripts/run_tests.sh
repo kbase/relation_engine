@@ -26,4 +26,7 @@ python -m relation_engine_server.utils.wait_for api
 coverage run --branch -m pytest -vv
 # RE client tests - seems like these tests were already run in the line above, why run them again?
 PYTHONPATH=client_src python -m pytest client_src/test
+
+coverage report --omit=*/test_*
+
 coverage html --omit=*/test_*
