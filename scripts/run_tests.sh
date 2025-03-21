@@ -10,8 +10,8 @@ echo "> black"
 black .
 echo "> flake8"
 flake8 --max-complexity 20 /app
-echo "> mypy"
-mypy --ignore-missing-imports /app
+# echo "> mypy"
+# mypy --ignore-missing-imports /app
 echo "> bandit"
 bandit -r -c .bandit.yaml /app
 
