@@ -1,7 +1,7 @@
 [coverage:report]
 omit =
     */test_*
-    relation_engine_server/api_versions/
+    relation_engine_server/api_versions/*
     relation_engine_server/exceptions.py
     relation_engine_server/main.py
     relation_engine_server/utils/auth.py
