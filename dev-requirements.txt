@@ -7,5 +7,5 @@ grequests==0.6.0
 black==22.6.0
 pytest==7.4.0
 pytest-cov==4.1.0
-python-arango==7.4.1
+python-arango==8.1.6
 frozendict==2.3.4
