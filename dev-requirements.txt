@@ -2,7 +2,7 @@ mypy>=0.971
 bandit==1.7.4
 # mccabe 0.7.0 is not compatible with flake8 4.0.1
 mccabe==0.6.1
-flake8==4.0.1
+flake8==7.3.0
 grequests==0.6.0
 black==22.6.0
 pytest==7.4.0
