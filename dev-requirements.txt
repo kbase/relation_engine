@@ -1,5 +1,5 @@
 mypy>=0.971
-bandit==1.7.4
+bandit==1.8.6
 # mccabe 0.7.0 is not compatible with flake8 4.0.1
 mccabe==0.6.1
 flake8==4.0.1
